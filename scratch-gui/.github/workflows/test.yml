@@ -52,6 +52,14 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Upload build artifact
+        if: steps.build.outputs.build_status == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: build/
+          retention-days: 1
+
       # ============================================================
       # TESTING PHASE
       # ============================================================
@@ -127,36 +135,52 @@ jobs:
           echo "integration_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
           echo "integration_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
 
-      # ============================================================
-      # SERVER SETUP
-      # ============================================================
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            install-output.txt
+            build-output.txt
+            lint-output.txt
+            unit-test-output.txt
+            integration-test-output.txt
+          retention-days: 1
 
-      - name: Start HTTP server
-        if: steps.build.outputs.build_status == 'success'
-        run: |
-          npx http-server build -p 8080 &
-          echo $! > server.pid
-          for i in {1..30}; do
-            if curl -f -s http://localhost:8080/ > /dev/null 2>&1; then
-              echo "Server is ready!"
-              break
-            fi
-            if [ $i -eq 30 ]; then
-              echo "Server failed to start within 30 seconds"
-              exit 1
-            fi
-            echo "Waiting for server... ($i/30)"
-            sleep 1
-          done
+  # ============================================================
+  # MATRIX JOB: SCREENSHOTS + CHAOS TESTING
+  # ============================================================
+  chaos-matrix:
+    needs: main-branch-test-and-chaos
+    if: needs.main-branch-test-and-chaos.outputs.build_status == 'success'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        browser: [chromium]
+    
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: build/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Install Playwright
-        if: steps.build.outputs.build_status == 'success'
         run: |
+          npm init -y
           npm install --save-dev @playwright/test@latest
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Create Playwright config
-        if: steps.build.outputs.build_status == 'success'
+        shell: bash
         run: |
           cat > playwright.config.js << 'EOF'
           const { defineConfig, devices } = require('@playwright/test');
@@ -184,12 +208,8 @@ jobs:
           });
           EOF
 
-      # ============================================================
-      # SCREENSHOT PHASE
-      # ============================================================
-
       - name: Create screenshot test
-        if: steps.build.outputs.build_status == 'success'
+        shell: bash
         run: |
           cat > screenshot-test.spec.js << 'EOF'
           const { test } = require('@playwright/test');
@@ -293,29 +313,86 @@ jobs:
               
               await page.screenshot({ path: 'screenshots/songs-tab.png', fullPage: true });
             });
+
+            test('Extension Library', async ({ page }) => {
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              const extensionButton = page.locator('[class*="extension-button"]').first()
+                .or(page.locator('button:has-text("Add Extension")'))
+                .or(page.locator('[aria-label*="extension" i]').first());
+              
+              if (await extensionButton.count() > 0) {
+                await extensionButton.click();
+                await page.waitForTimeout(2000);
+              }
+              
+              await page.screenshot({ path: 'screenshots/extension-library.png', fullPage: true });
+            });
+
+            test('Advanced Settings', async ({ page }) => {
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              const settingsButton = page.locator('[class*="menu-bar"]')
+                .locator('[class*="settings"], [aria-label*="settings" i], [aria-label*="advanced" i]')
+                .first()
+                .or(page.locator('button:has-text("Settings")'))
+                .or(page.locator('button:has-text("Advanced")'));
+              
+              if (await settingsButton.count() > 0) {
+                await settingsButton.click();
+                await page.waitForTimeout(2000);
+              }
+              
+              await page.screenshot({ path: 'screenshots/advanced-settings.png', fullPage: true });
+            });
           });
           EOF
 
-      - name: Capture screenshots
-        id: screenshots
-        if: steps.build.outputs.build_status == 'success'
-        continue-on-error: true
+      - name: Checkout repo for chaos tests
+        uses: actions/checkout@v4
+        with:
+          path: repo-source
+
+      - name: Create chaos tests directory
+        shell: bash
         run: |
-          mkdir -p screenshots
-          npx playwright test screenshot-test.spec.js --project=chromium 2>&1 | tee screenshot-output.txt
-          if [ $? -eq 0 ]; then
-            echo "screenshot_status=success" >> $GITHUB_OUTPUT
-          else
-            echo "screenshot_status=failed" >> $GITHUB_OUTPUT
+          mkdir -p .github/chaos-tests
+          
+          # Copy from repo if exists
+          if [ -d "repo-source/.github/chaos-tests" ]; then
+            cp -r repo-source/.github/chaos-tests/* .github/chaos-tests/ 2>/dev/null || true
+          fi
+          
+          # Create sample if none exist
+          if [ ! "$(ls -A .github/chaos-tests/*.json 2>/dev/null)" ]; then
+            cat > .github/chaos-tests/sample-tabs.json << 'JSONEOF'
+          {
+            "name": "Sample Tab Navigation",
+            "description": "Navigate through all tabs",
+            "actions": [
+              { "type": "goto", "url": "/editor.html" },
+              { "type": "wait", "duration": 3000 },
+              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 1 },
+              { "type": "wait", "duration": 2000 },
+              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 2 },
+              { "type": "wait", "duration": 2000 },
+              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 0 },
+              { "type": "wait", "duration": 2000 }
+            ]
+          }
+          JSONEOF
           fi
 
-      # ============================================================
-      # 🌪️ CHAOS TESTING PHASE 🌪️
-      # ============================================================
-
-      - name: Create chaos test (random click spam)
-        if: steps.build.outputs.build_status == 'success'
+      - name: Generate chaos and recorded tests
+        shell: bash
         run: |
+          # Create random click chaos test
           cat > chaos-test.spec.js << 'EOF'
           const { test } = require('@playwright/test');
           const fs = require('fs');
@@ -394,31 +471,8 @@ jobs:
             });
           });
           EOF
-
-      - name: Discover and generate custom recorded tests
-        if: steps.build.outputs.build_status == 'success'
-        run: |
-          mkdir -p .github/chaos-tests
           
-          if [ ! "$(ls -A .github/chaos-tests/*.json 2>/dev/null)" ]; then
-            cat > .github/chaos-tests/sample-tabs.json << 'EOF'
-          {
-            "name": "Sample Tab Navigation",
-            "description": "Navigate through all tabs",
-            "actions": [
-              { "type": "goto", "url": "/editor.html" },
-              { "type": "wait", "duration": 3000 },
-              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 1 },
-              { "type": "wait", "duration": 2000 },
-              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 2 },
-              { "type": "wait", "duration": 2000 },
-              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 0 },
-              { "type": "wait", "duration": 2000 }
-            ]
-          }
-          EOF
-          fi
-          
+          # Generate recorded actions tests
           cat > generate-custom-tests.js << 'GENEOF'
           const fs = require('fs');
           const path = require('path');
@@ -505,10 +559,42 @@ jobs:
           
           node generate-custom-tests.js
 
+      - name: Start HTTP server
+        shell: bash
+        run: |
+          npx http-server build -p 8080 &
+          echo $! > server.pid
+          
+          for i in {1..30}; do
+            if curl -f -s http://localhost:8080/ > /dev/null 2>&1; then
+              echo "Server is ready!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Server failed to start within 30 seconds"
+              exit 1
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 1
+          done
+
+      - name: Capture screenshots
+        id: screenshots
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p screenshots
+          npx playwright test screenshot-test.spec.js --project=chromium 2>&1 | tee screenshot-output.txt
+          if [ $? -eq 0 ]; then
+            echo "screenshot_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "screenshot_status=failed" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run chaos tests with video recording
         id: chaos_tests
-        if: steps.build.outputs.build_status == 'success'
         continue-on-error: true
+        shell: bash
         run: |
           set +e
           set -o pipefail
@@ -530,104 +616,80 @@ jobs:
             echo "errors_found=true" >> $GITHUB_OUTPUT
           fi
 
-      # ============================================================
-      # 📹 UPLOAD VIDEOS TO BRANCH 📹
-      # ============================================================
-
-      - name: Checkout chaos-videos branch
-        if: always() && steps.chaos_tests.outputs.errors_found == 'true'
-        id: checkout_videos
-        uses: actions/checkout@v4
-        with:
-          ref: chaos-videos
-          path: chaos-videos
-          token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: true
-        continue-on-error: true
-
-      - name: Create chaos-videos branch if not exists
-        if: always() && steps.chaos_tests.outputs.errors_found == 'true' && steps.checkout_videos.outcome == 'failure'
+      - name: Stop HTTP server
+        if: always()
+        shell: bash
         run: |
-          mkdir -p chaos-videos
-          cd chaos-videos
-          git init -b chaos-videos
-          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          echo "# Chaos Test Videos" > README.md
-          echo "This branch stores video recordings from chaos testing." >> README.md
-          git add README.md
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git commit -m "Initialize chaos-videos branch"
-          git push origin chaos-videos
-          
-          cd ..
-          rm -rf chaos-videos
-          git clone -b chaos-videos https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git chaos-videos
-
-      - name: Upload videos to chaos-videos branch
-        if: always() && steps.chaos_tests.outputs.errors_found == 'true'
-        id: upload_to_branch
-        run: |
-          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          RUN_ID="${{ github.run_id }}"
-          VIDEO_DIR="${TIMESTAMP}-${RUN_ID}"
-          
-          mkdir -p "chaos-videos/${VIDEO_DIR}"
-          
-          # Copy and rename videos with ASCII-safe names
-          counter=1
-          find test-videos -type f -name "*.webm" | while read video; do
-            cp "$video" "chaos-videos/${VIDEO_DIR}/video-$(printf '%03d' $counter).webm"
-            counter=$((counter + 1))
-          done
-          
-          # Also copy with test-specific names for dashboard
-          find test-videos -path "*chaos-test*" -name "video.webm" -exec cp {} "chaos-videos/${VIDEO_DIR}/chaos-test-chromium-video.webm" \;
-          find test-videos -path "*recorded-actions*" -name "video.webm" -exec cp {} "chaos-videos/${VIDEO_DIR}/recorded-actions-chromium-video.webm" \;
-          
-          # Copy screenshots and traces
-          find test-videos -type f -name "test-failed-*.png" -exec cp {} "chaos-videos/${VIDEO_DIR}/" \;
-          find test-videos -type f -name "trace.zip" -exec cp {} "chaos-videos/${VIDEO_DIR}/" \;
-          
-          echo "Files uploaded:"
-          ls -lah "chaos-videos/${VIDEO_DIR}/" || echo "No files!"
-          
-          echo "video_timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
-          echo "video_dir=${VIDEO_DIR}" >> $GITHUB_OUTPUT
-          
-          cd chaos-videos
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Add chaos test videos from run ${RUN_ID}"
-            git push origin chaos-videos
-            echo "✅ Videos pushed!"
-          else
-            echo "⚠️ No changes"
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
           fi
 
-      - name: Upload video artifacts (fallback)
-        if: always() && steps.chaos_tests.outputs.errors_found == 'true'
+      - name: Create platform summary
+        shell: bash
+        run: |
+          cat > platform-summary.json << EOF
+          {
+            "os": "${{ matrix.os }}",
+            "browser": "${{ matrix.browser }}",
+            "chaos_status": "${{ steps.chaos_tests.outputs.chaos_status }}",
+            "screenshot_status": "${{ steps.screenshots.outputs.screenshot_status }}",
+            "errors_found": "${{ steps.chaos_tests.outputs.errors_found }}"
+          }
+          EOF
+
+      - name: Upload matrix results
         uses: actions/upload-artifact@v4
         with:
-          name: chaos-test-videos
+          name: chaos-results-${{ matrix.os }}-${{ matrix.browser }}
           path: |
-            test-videos/**/video.webm
-            test-videos/**/test-failed-*.png
-            test-videos/**/trace.zip
-          retention-days: 30
+            screenshots/
+            chaos-results.json
+            recorded-*-results.json
+            test-videos/
+            screenshot-output.txt
+            chaos-test-output.txt
+            recorded-actions-output.txt
+            platform-summary.json
+          retention-days: 1
 
-      # ============================================================
-      # 🤖 AI ERROR ANALYSIS & ISSUE CREATION 🤖
-      # ============================================================
+  # ============================================================
+  # ANALYZE + CREATE ISSUES (Windows+Chromium only)
+  # ============================================================
+  analyze-and-report:
+    needs: [main-branch-test-and-chaos, chaos-matrix]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Analyze chaos test errors
+      - name: Download test logs
+        uses: actions/download-artifact@v4
+        with:
+          name: test-logs
+        continue-on-error: true
+
+      - name: Download Windows results
+        uses: actions/download-artifact@v4
+        with:
+          name: chaos-results-windows-latest-chromium
+          path: windows-results/
+        continue-on-error: true
+
+      - name: Download all matrix results for dashboard
+        uses: actions/download-artifact@v4
+        with:
+          path: all-matrix-results/
+        continue-on-error: true
+
+      - name: Analyze Windows chaos test errors (for issues)
         id: analyze_chaos_errors
-        if: always() && steps.chaos_tests.outputs.errors_found == 'true'
         continue-on-error: true
         run: |
+          cd windows-results || exit 0
+          
           FOUND_ERRORS=false
           
           if [ -f chaos-results.json ]; then
@@ -697,9 +759,60 @@ jobs:
           
           echo "found_errors=$FOUND_ERRORS" >> $GITHUB_OUTPUT
 
+      - name: Upload videos to chaos-videos branch
+        if: steps.analyze_chaos_errors.outputs.found_errors == 'true'
+        id: upload_to_branch
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          if git ls-remote --heads https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git chaos-videos | grep -q chaos-videos; then
+            git clone --single-branch --branch chaos-videos --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git chaos-videos
+            cd chaos-videos
+          else
+            mkdir -p chaos-videos
+            cd chaos-videos
+            git init -b chaos-videos
+            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            echo "# Chaos Test Videos" > README.md
+            git add README.md
+            git commit -m "Initialize chaos-videos branch"
+            git push origin chaos-videos || git push -u origin chaos-videos
+          fi
+          
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          RUN_ID="${{ github.run_id }}"
+          VIDEO_DIR="${TIMESTAMP}-${RUN_ID}"
+          
+          mkdir -p "$VIDEO_DIR"
+          
+          # Copy and rename videos with ASCII-safe names
+          counter=1
+          find ../windows-results/test-videos -type f -name "*.webm" 2>/dev/null | while read video; do
+            cp "$video" "$VIDEO_DIR/video-$(printf '%03d' $counter).webm"
+            counter=$((counter + 1))
+          done || true
+          
+          # Also copy with test-specific names
+          find ../windows-results/test-videos -path "*chaos-test*" -name "video.webm" -exec cp {} "$VIDEO_DIR/chaos-test-chromium-video.webm" \; 2>/dev/null || true
+          find ../windows-results/test-videos -path "*recorded-actions*" -name "video.webm" -exec cp {} "$VIDEO_DIR/recorded-actions-chromium-video.webm" \; 2>/dev/null || true
+          
+          echo "video_timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "video_dir=$VIDEO_DIR" >> $GITHUB_OUTPUT
+          
+          git add .
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Add chaos test videos from run $RUN_ID"
+            git push origin chaos-videos
+            echo "✅ Videos pushed!"
+          else
+            echo "⚠️ No changes"
+          fi
+
       - name: AI analysis for chaos test errors
         id: ai_chaos_analysis
-        if: always() && steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true' && steps.analyze_chaos_errors.outputs.chaos_token_estimate < 8000
+        if: steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true' && steps.analyze_chaos_errors.outputs.chaos_token_estimate < 8000
         continue-on-error: true
         uses: actions/ai-inference@v1
         with:
@@ -722,7 +835,7 @@ jobs:
 
       - name: AI analysis for recorded actions errors
         id: ai_recorded_analysis
-        if: always() && steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true' && steps.analyze_chaos_errors.outputs.recorded_token_estimate < 8000
+        if: steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true' && steps.analyze_chaos_errors.outputs.recorded_token_estimate < 8000
         continue-on-error: true
         uses: actions/ai-inference@v1
         with:
@@ -744,7 +857,7 @@ jobs:
             Be specific about the action sequence and timing.
 
       - name: Create issue for chaos test errors
-        if: always() && steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true'
+        if: steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true'
         uses: actions/github-script@v7
         env:
           ERRORS: ${{ steps.analyze_chaos_errors.outputs.chaos_errors }}
@@ -761,10 +874,11 @@ jobs:
             const videoDir = process.env.VIDEO_DIR;
             const runId = context.runId;
             const sha = context.sha;
-            const commitAuthor = context.payload.head_commit.author.username;
+            const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
             
+            // FIX: Deduplicate assignees
             let assignees = ['supervoidcoder'];
-            if (commitAuthor) {
+            if (commitAuthor && commitAuthor !== 'supervoidcoder') {
               assignees.push(commitAuthor);
             }
             
@@ -775,33 +889,28 @@ jobs:
               aiSection = `### ⚠️ AI Analysis Skipped\n\nLog too large (${tokenEstimate} tokens).\n\n`;
             }
             
-            const videoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
-            
             let videoSection = `### 📹 Video\n\n`;
             if (videoDir) {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
               const rawVideoUrl = `${videoBranchUrl}/chaos-test-chromium-video.webm`;
               videoSection += `- [Download video](${rawVideoUrl})\n`;
               videoSection += `- [Browse files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
-              
-              // Add raw video URL with newlines
               videoSection += `\n\n${rawVideoUrl}\n\n`;
             } else {
-              videoSection += `[Workflow artifacts](${videoUrl})\n\n`;
+              videoSection += `[Workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})\n\n`;
             }
             
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🌪️ Console Errors During Chaos Testing`,
-              body: `## 🐛 Chaos Test Errors\n\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor || 'unknown'}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎯 Last 10 Clicks\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
+              title: `🌪️ Console Errors During Chaos Testing (Windows)`,
+              body: `## 🐛 Chaos Test Errors\n\n**Platform:** <img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows + Chromium\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎯 Last 10 Clicks\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
               labels: ['bug', 'automated-test', 'console-error', 'chaos-testing'],
-              assignees: assignees,
-              type: 'Bug'
+              assignees: assignees
             });
 
       - name: Create issue for recorded actions errors
-        if: always() && steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true'
+        if: steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true'
         uses: actions/github-script@v7
         env:
           ERRORS: ${{ steps.analyze_chaos_errors.outputs.recorded_errors }}
@@ -822,10 +931,11 @@ jobs:
             const videoDir = process.env.VIDEO_DIR;
             const runId = context.runId;
             const sha = context.sha;
-            const commitAuthor = context.payload.head_commit.author.username;
+            const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
             
+            // FIX: Deduplicate assignees
             let assignees = ['supervoidcoder'];
-            if (commitAuthor) {
+            if (commitAuthor && commitAuthor !== 'supervoidcoder') {
               assignees.push(commitAuthor);
             }
             
@@ -836,127 +946,92 @@ jobs:
               aiSection = `### ⚠️ AI Analysis Skipped\n\nLog too large (${tokenEstimate} tokens).\n\n`;
             }
             
-            const videoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
-            
             let videoSection = `### 📹 Video\n\n`;
             if (videoDir) {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
               const rawVideoUrl = `${videoBranchUrl}/recorded-actions-chromium-video.webm`;
               videoSection += `- [Download video](${rawVideoUrl})\n`;
               videoSection += `- [Browse files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
-              
-              // Add raw video URL with newlines
               videoSection += `\n\n${rawVideoUrl}\n\n`;
             } else {
-              videoSection += `[Workflow artifacts](${videoUrl})\n\n`;
+              videoSection += `[Workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})\n\n`;
             }
             
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🎬 Errors in "${testName}" Test`,
-              body: `## 🐛 Recorded Actions Errors\n\n**Test:** ${testName}\n**File:** \`.github/chaos-tests/${testFile}\`\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor || 'unknown'}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎬 Actions\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
+              title: `🎬 Errors in "${testName}" Test (Windows)`,
+              body: `## 🐛 Recorded Actions Errors\n\n**Test:** ${testName}\n**File:** \`.github/chaos-tests/${testFile}\`\n**Platform:** <img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows + Chromium\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎬 Actions\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
               labels: ['bug', 'automated-test', 'console-error', 'recorded-actions'],
-              assignees: assignees,
-              type: 'Bug'
+              assignees: assignees
             });
-
-      # ============================================================
-      # STOP SERVER
-      # ============================================================
-
-      - name: Stop HTTP server
-        if: always()
-        run: |
-          if [ -f server.pid ]; then
-            kill $(cat server.pid) || true
-            rm server.pid
-          fi
-
-      # ============================================================
-      # DASHBOARD GENERATION
-      # ============================================================
 
       - name: Calculate duration
         id: duration
         if: always()
         run: |
           END_TIME=$(date +%s)
-          START_TIME=${{ steps.start_time.outputs.timestamp }}
+          START_TIME=${{ needs.main-branch-test-and-chaos.outputs.start_timestamp }}
           DURATION=$((END_TIME - START_TIME))
           MINUTES=$((DURATION / 60))
           SECONDS=$((DURATION % 60))
           echo "duration=${MINUTES}m ${SECONDS}s" >> $GITHUB_OUTPUT
-          echo "duration_seconds=${DURATION}" >> $GITHUB_OUTPUT
 
-      - name: Generate HTML dashboard
-        if: always()
+      - name: Generate enhanced HTML dashboard
         env:
           COMMIT_SHA: ${{ github.sha }}
-          BUILD_STATUS: ${{ steps.build.outputs.build_status }}
-          LINT_STATUS: ${{ steps.lint.outputs.lint_status }}
-          LINT_ERRORS: ${{ steps.lint.outputs.lint_errors }}
-          LINT_WARNINGS: ${{ steps.lint.outputs.lint_warnings }}
-          UNIT_STATUS: ${{ steps.unit_tests.outputs.unit_status }}
-          UNIT_TOTAL: ${{ steps.unit_tests.outputs.unit_total }}
-          UNIT_PASSED: ${{ steps.unit_tests.outputs.unit_passed }}
-          UNIT_FAILED: ${{ steps.unit_tests.outputs.unit_failed }}
-          UNIT_SKIPPED: ${{ steps.unit_tests.outputs.unit_skipped }}
-          INTEGRATION_STATUS: ${{ steps.integration_tests.outputs.integration_status }}
-          INTEGRATION_TOTAL: ${{ steps.integration_tests.outputs.integration_total }}
-          INTEGRATION_PASSED: ${{ steps.integration_tests.outputs.integration_passed }}
-          INTEGRATION_FAILED: ${{ steps.integration_tests.outputs.integration_failed }}
-          INTEGRATION_SKIPPED: ${{ steps.integration_tests.outputs.integration_skipped }}
-          SCREENSHOT_STATUS: ${{ steps.screenshots.outputs.screenshot_status }}
-          CHAOS_STATUS: ${{ steps.chaos_tests.outputs.chaos_status }}
-          CHAOS_ERRORS_FOUND: ${{ steps.chaos_tests.outputs.errors_found }}
-          VIDEO_DIR: ${{ steps.upload_to_branch.outputs.video_dir }}
+          BUILD_STATUS: ${{ needs.main-branch-test-and-chaos.outputs.build_status }}
+          LINT_STATUS: ${{ needs.main-branch-test-and-chaos.outputs.lint_status }}
+          LINT_ERRORS: ${{ needs.main-branch-test-and-chaos.outputs.lint_errors }}
+          LINT_WARNINGS: ${{ needs.main-branch-test-and-chaos.outputs.lint_warnings }}
+          UNIT_STATUS: ${{ needs.main-branch-test-and-chaos.outputs.unit_status }}
+          UNIT_TOTAL: ${{ needs.main-branch-test-and-chaos.outputs.unit_total }}
+          UNIT_PASSED: ${{ needs.main-branch-test-and-chaos.outputs.unit_passed }}
+          UNIT_FAILED: ${{ needs.main-branch-test-and-chaos.outputs.unit_failed }}
+          UNIT_SKIPPED: ${{ needs.main-branch-test-and-chaos.outputs.unit_skipped }}
+          INTEGRATION_STATUS: ${{ needs.main-branch-test-and-chaos.outputs.integration_status }}
+          INTEGRATION_TOTAL: ${{ needs.main-branch-test-and-chaos.outputs.integration_total }}
+          INTEGRATION_PASSED: ${{ needs.main-branch-test-and-chaos.outputs.integration_passed }}
+          INTEGRATION_FAILED: ${{ needs.main-branch-test-and-chaos.outputs.integration_failed }}
+          INTEGRATION_SKIPPED: ${{ needs.main-branch-test-and-chaos.outputs.integration_skipped }}
           DURATION: ${{ steps.duration.outputs.duration }}
           REPO: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
         run: |
           mkdir -p dashboard
           
-          if [ -d "screenshots" ]; then
-            cp -r screenshots dashboard/
-          fi
+          # Copy all screenshots from all platforms
+          for platform_dir in all-matrix-results/chaos-results-*/; do
+            if [ -d "$platform_dir/screenshots" ]; then
+              platform_name=$(basename "$platform_dir" | sed 's/chaos-results-//')
+              mkdir -p "dashboard/screenshots-${platform_name}"
+              cp -r "$platform_dir/screenshots"/* "dashboard/screenshots-${platform_name}/" 2>/dev/null || true
+            fi
+          done
           
           python3 .github/scripts/generate-dashboard.py dashboard
 
-      # ============================================================
-      # DEPLOY TO GH-PAGES
-      # ============================================================
-
-      - name: Checkout gh-pages branch
-        if: always()
-        id: checkout_gh_pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: true
-          fetch-depth: 0
-        continue-on-error: true
-
-      - name: Create gh-pages branch if not exists
-        if: always() && steps.checkout_gh_pages.outcome == 'failure'
-        run: |
-          mkdir -p gh-pages
-          cd gh-pages
-          git init -b gh-pages
-          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-
-      - name: Sync dashboard to gh-pages/tests
+      - name: Deploy to gh-pages
         if: always()
         run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          if git ls-remote --heads https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages | grep -q gh-pages; then
+            git clone --single-branch --branch gh-pages --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
+            cd gh-pages
+          else
+            mkdir -p gh-pages
+            cd gh-pages
+            git init -b gh-pages
+            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          fi
+          
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          TEST_DIR="gh-pages/tests/$TIMESTAMP"
-          mkdir -p "$TEST_DIR"
+          mkdir -p "tests/$TIMESTAMP"
+          cp -r ../dashboard/* "tests/$TIMESTAMP/"
           
-          cp -r dashboard/* "$TEST_DIR/"
-          
-          cd gh-pages/tests
+          cd tests
           rm -f latest
           ln -s "$TIMESTAMP" latest
           
@@ -968,98 +1043,61 @@ jobs:
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Test Results - OmniBlocks 🌪️</title>
             <style>
-              body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 40px;
-                text-align: center;
-              }
-              .container {
-                max-width: 800px;
-                margin: 0 auto;
-                background: rgba(255,255,255,0.1);
-                backdrop-filter: blur(10px);
-                border-radius: 20px;
-                padding: 40px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-              }
-              h1 {
-                font-size: 3em;
-                margin-bottom: 20px;
-              }
-              .button {
-                display: inline-block;
-                padding: 15px 40px;
-                margin: 10px;
-                background: white;
-                color: #667eea;
-                text-decoration: none;
-                border-radius: 50px;
-                font-weight: bold;
-                font-size: 1.1em;
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-              }
-              .button:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-              }
-              .note {
-                margin-top: 30px;
-                opacity: 0.8;
-              }
-              .chaos {
-                font-size: 2em;
-                margin: 20px 0;
-              }
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+              .container { max-width: 800px; margin: 0 auto; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+              h1 { font-size: 3em; margin-bottom: 20px; }
+              .button { display: inline-block; padding: 15px 40px; margin: 10px; background: white; color: #667eea; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1em; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+              .button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+              .note { margin-top: 30px; opacity: 0.8; }
+              .chaos { font-size: 2em; margin: 20px 0; }
             </style>
           </head>
           <body>
             <div class="container">
               <h1>🚀 OmniBlocks</h1>
               <h2>Main Branch Test Results</h2>
-              <div class="chaos">🌪️ NOW WITH CHAOS TESTING! 🌪️</div>
-              <p>View the latest test results, screenshots, and chaos test videos</p>
+              <div class="chaos">🌪️ ULTRA CHAOS TESTING! 🌪️</div>
+              <p>Multi-platform chaos testing with AI-powered error analysis!</p>
               <a href="latest/index.html" class="button">📊 View Latest Dashboard</a>
-              <p class="note">Includes automated chaos testing with AI-powered error analysis!</p>
+              <p class="note">Now testing across Windows, Ubuntu, and macOS! 🎉</p>
             </div>
           </body>
           </html>
           INDEXEOF
-
-      - name: Commit and push to gh-pages
-        if: always()
-        run: |
-          cd gh-pages
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
           
+          cd ..
           git add tests/
           
           if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Update test results with chaos testing 🌪️ - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
-            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-            git push origin gh-pages
+            git commit -m "Update test results with ULTRA chaos testing 🌪️ - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git push origin gh-pages || git push -u origin gh-pages
           else
             echo "No changes to commit."
           fi
-          
-      # ============================================================
-      # CREATE ISSUE ON BUILD/INSTALL FAILURE
-      # ============================================================
 
-      - name: Create issue on failure
-        if: failure() || steps.build.outputs.build_status == 'failure' || steps.install.outputs.install_status == 'failure'
+      - name: Create issue on build failure
+        if: needs.main-branch-test-and-chaos.result == 'failure'
         uses: actions/github-script@v7
         env:
           DURATION: ${{ steps.duration.outputs.duration }}
-          INSTALL_STATUS: ${{ steps.install.outputs.install_status }}
-          BUILD_STATUS: ${{ steps.build.outputs.build_status }}
-          LINT_STATUS: ${{ steps.lint.outputs.lint_status }}
-          UNIT_STATUS: ${{ steps.unit_tests.outputs.unit_status }}
-          INTEGRATION_STATUS: ${{ steps.integration_tests.outputs.integration_status }}
         with:
           script: |
             const script = require('./.github/scripts/create-failure-issue.js');
             await script({github, context, core});
+
+    outputs:
+      start_timestamp: ${{ needs.main-branch-test-and-chaos.outputs.start_timestamp }}
+      build_status: ${{ needs.main-branch-test-and-chaos.outputs.build_status }}
+      lint_status: ${{ needs.main-branch-test-and-chaos.outputs.lint_status }}
+      lint_errors: ${{ needs.main-branch-test-and-chaos.outputs.lint_errors }}
+      lint_warnings: ${{ needs.main-branch-test-and-chaos.outputs.lint_warnings }}
+      unit_status: ${{ needs.main-branch-test-and-chaos.outputs.unit_status }}
+      unit_total: ${{ needs.main-branch-test-and-chaos.outputs.unit_total }}
+      unit_passed: ${{ needs.main-branch-test-and-chaos.outputs.unit_passed }}
+      unit_failed: ${{ needs.main-branch-test-and-chaos.outputs.unit_failed }}
+      unit_skipped: ${{ needs.main-branch-test-and-chaos.outputs.unit_skipped }}
+      integration_status: ${{ needs.main-branch-test-and-chaos.outputs.integration_status }}
+      integration_total: ${{ needs.main-branch-test-and-chaos.outputs.integration_total }}
+      integration_passed: ${{ needs.main-branch-test-and-chaos.outputs.integration_passed }}
+      integration_failed: ${{ needs.main-branch-test-and-chaos.outputs.integration_failed }}
+      integration_skipped: ${{ needs.main-branch-test-and-chaos.outputs.integration_skipped }}

@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`081cc796f`](https://github.com/OmniBlocks/scratch-gui/commit/081cc796f16b38b851879f4e298e6cf1df0a4966) - 2025-12-03 01:51:54 +0000
+
+**feat: (ci) added commit author to test workflow and show videos in issues**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`31abb9c34`](https://github.com/OmniBlocks/scratch-gui/commit/31abb9c348151ee5cceea4889e8f8ccf2504ee6a) - 2025-12-02 19:49:38 -0500
 
 **Update test.yml**

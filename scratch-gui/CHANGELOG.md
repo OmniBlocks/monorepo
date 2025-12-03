@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`1911e214b`](https://github.com/OmniBlocks/scratch-gui/commit/1911e214b607ec30664f56803d5927c504ad73aa) - 2025-12-03 14:00:56 +0000
+
+**update github actions**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`d3d797df6`](https://github.com/OmniBlocks/scratch-gui/commit/d3d797df67114e989a436544b8698e8819148e5b) - 2025-12-03 08:52:34 -0500
 
 **fix: (ci) made AI know that it's github-actions**

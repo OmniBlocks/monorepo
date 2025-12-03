@@ -1,7 +1,7 @@
 language: en-US
 tone_instructions: ''
 early_access: true
-enable_free_tier: true
+enable_free_tier: false
 reviews:
   profile: chill
   request_changes_workflow: true

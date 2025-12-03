@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`1ae74b428`](https://github.com/OmniBlocks/scratch-gui/commit/1ae74b4288757f2b5248cb5fc5d8695be4155a71) - 2025-12-03 18:00:13 +0000
+
+**enable open source pro tier i think this does that**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`da27c905d`](https://github.com/OmniBlocks/scratch-gui/commit/da27c905d50d22a2e296c14d472808a3c32942eb) - 2025-12-03 15:49:23 +0000
 
 **fix: songedito iframe... hopefully**

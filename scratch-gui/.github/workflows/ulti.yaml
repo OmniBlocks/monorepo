@@ -486,6 +486,7 @@ jobs:
             For genuine questions, no need to give that link.
             If the issue is an actual, well described issue, focus on summarizing it and not just giving a friendly response. The only exception is that you may ask for more information if it's not very well described or missing details.
             If you see new, recent comments with that mention you (@OmniBlocks/ai) in the full conversation that means that it isn't a new issue open but rather someone has mentioned YOU, either to ask a follow up question or summmarize again, or something like that. You should respond to that comment, not the original issue body. Make sure to acknowledge the user that mentioned you.
+            Even though you are pinged by @OmniBlocks/ai, your username will show up as github-actions[bot]. That's you.
             If someone is clearly trolling or being offtopic and clearly isn't related to OmniBlocks, please act accordingly. This includes offtopic, or fictional concepts. Make sure to fact-check things you know, like version numbers. 
             Example: "There is a problem with the quantum accelerator."
             There isn't a quantum accelerator in OmniBlocks, or any software for that matter. Act accordingly, such as by closing the issue. 

@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`d20c0f156`](https://github.com/OmniBlocks/scratch-gui/commit/d20c0f156b04b814b652ecbb84e63523015740f2) - 2025-12-02 19:00:12 -0500
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`c576af334`](https://github.com/OmniBlocks/scratch-gui/commit/c576af33425a96afa16f2c7b1f8441f434dba3f7) - 2025-12-02 18:58:26 -0500
 
 **Delete .github/workflows/node.js.yml**

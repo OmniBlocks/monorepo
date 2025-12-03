@@ -4,6 +4,20 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`3c0066cbf`](https://github.com/OmniBlocks/scratch-gui/commit/3c0066cbfaaaf7190784afe518cacc039e4b51ab) - 2025-12-02 21:46:22 -0500
+
+**feat: Add matrix-driven chaos testing workflow with multi-platform support and automated reporting**
+
+* **Chores**
+  * Expanded automated testing across multiple operating systems (Windows, macOS, Ubuntu) and browsers for improved platform compatibility validation
+  * Enhanced chaos testing capabilities to strengthen reliability assessment
+  * Improved test analytics and streamlined failure reporting infrastructure
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`081cc796f`](https://github.com/OmniBlocks/scratch-gui/commit/081cc796f16b38b851879f4e298e6cf1df0a4966) - 2025-12-03 01:51:54 +0000
 
 **feat: (ci) added commit author to test workflow and show videos in issues**

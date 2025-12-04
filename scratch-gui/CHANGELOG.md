@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`7f728f4fb`](https://github.com/OmniBlocks/scratch-gui/commit/7f728f4fb15a3ba78858cd115c477ae3466d2715) - 2025-12-04 15:12:51 -0600
+
+**Update ulti.yaml to include CODERS section**
+
+Added a section for CODERS with specific names and nicknames.
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`2367372ab`](https://github.com/OmniBlocks/scratch-gui/commit/2367372ab15570dc96a35e8c58626d3667833139) - 2025-12-04 06:24:53 -0600
 
 **Add files via upload**

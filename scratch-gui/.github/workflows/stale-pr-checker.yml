@@ -96,9 +96,7 @@ Write a personalized stale PR reminder for:
 - Title: "${pr.title}"
 - Days since last update: ${daysSinceUpdate}
 - ${recentCommentContext}
-
 ${diffContext ? `Here's the PR diff:\n\`\`\`diff\n${diffContext}\n\`\`\`` : '(Diff too large to include)'}
-
 Write a friendly 2-3 sentence reminder that:
 - Acknowledges what the PR is trying to do
 - Gently asks if they need help or if something is blocking progress

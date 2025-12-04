@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`bcf6abc6b`](https://github.com/OmniBlocks/scratch-gui/commit/bcf6abc6b397c6f695d1f0be262079c293bc93ec) - 2025-12-03 18:20:18 -0600
+
+**?**
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`1ae74b428`](https://github.com/OmniBlocks/scratch-gui/commit/1ae74b4288757f2b5248cb5fc5d8695be4155a71) - 2025-12-03 18:00:13 +0000
 
 **enable open source pro tier i think this does that**

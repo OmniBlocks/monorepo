@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`4ca62550e`](https://github.com/OmniBlocks/scratch-gui/commit/4ca62550e454ce24da734e3b06c7583c9aaeab87) - 2025-12-04 02:47:32 +0000
+
+**docs: revamp docs entirely and remove ai clanker slop garbage trash skibidi**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`8df35c92e`](https://github.com/OmniBlocks/scratch-gui/commit/8df35c92e0a2c470f15c6a757b249cbad546abc4) - 2025-12-03 18:24:15 -0600
 
 **will this fix the syntax error?**

@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`14e100420`](https://github.com/OmniBlocks/scratch-gui/commit/14e1004207eaff279196b5e7d7e86fb17d09ce4c) - 2025-12-03 18:20:55 -0600
+
+**Add files via upload**
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`bcf6abc6b`](https://github.com/OmniBlocks/scratch-gui/commit/bcf6abc6b397c6f695d1f0be262079c293bc93ec) - 2025-12-03 18:20:18 -0600
 
 **?**

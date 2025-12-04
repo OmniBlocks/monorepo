@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`8df35c92e`](https://github.com/OmniBlocks/scratch-gui/commit/8df35c92e0a2c470f15c6a757b249cbad546abc4) - 2025-12-03 18:24:15 -0600
+
+**will this fix the syntax error?**
+
+I dunno! it'sa bunch sh(bleeeeeeep)
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`14e100420`](https://github.com/OmniBlocks/scratch-gui/commit/14e1004207eaff279196b5e7d7e86fb17d09ce4c) - 2025-12-03 18:20:55 -0600
 
 **Add files via upload**

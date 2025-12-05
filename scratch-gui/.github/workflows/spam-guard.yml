@@ -1,0 +1,241 @@
+name: Comment Spam Guard 🛡️
+
+on:
+  issue_comment:
+    types: [created]
+  discussion_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  discussions: write
+  contents: read
+  models: read
+
+jobs:
+  check-spam:
+    # Only check human users, not bots
+    if: github.event.sender.type == 'User'
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------------------------------------
+      # 1️⃣ Check if this is a first-time commenter
+      # ------------------------------------------------------
+      - name: Check if first-time commenter
+        id: first-time-check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENTER: ${{ github.event.sender.login }}
+        run: |
+          # Check if user has ever contributed to this repo
+          CONTRIBUTION_COUNT=$(gh api \
+            "/repos/${{ github.repository }}/commits?author=$COMMENTER&per_page=1" \
+            --jq 'length' 2>/dev/null || echo "0")
+          
+          PR_COUNT=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --author "$COMMENTER" \
+            --state all \
+            --limit 1 \
+            --json number \
+            --jq 'length' 2>/dev/null || echo "0")
+          
+          ISSUE_COUNT=$(gh issue list \
+            --repo "${{ github.repository }}" \
+            --author "$COMMENTER" \
+            --state all \
+            --limit 1 \
+            --json number \
+            --jq 'length' 2>/dev/null || echo "0")
+          
+          COMMENT_COUNT=$(gh api \
+            "/repos/${{ github.repository }}/issues/comments?per_page=100" \
+            --jq "[.[] | select(.user.login==\"$COMMENTER\")] | length" 2>/dev/null || echo "0")
+          
+          TOTAL=$((CONTRIBUTION_COUNT + PR_COUNT + ISSUE_COUNT + COMMENT_COUNT))
+          
+          if [ "$TOTAL" -le 1 ]; then
+            echo "is_first_time=true" >> "$GITHUB_OUTPUT"
+            echo "🆕 First-time commenter detected: $COMMENTER"
+          else
+            echo "is_first_time=false" >> "$GITHUB_OUTPUT"
+            echo "✅ Known contributor: $COMMENTER (contributions: $TOTAL)"
+          fi
+
+      # ------------------------------------------------------
+      # 2️⃣ Skip if not first-time (trusted users bypass check)
+      # ------------------------------------------------------
+      - name: Skip spam check for known contributors
+        if: steps.first-time-check.outputs.is_first_time != 'true'
+        run: |
+          echo "✅ Skipping spam check for known contributor"
+          exit 0
+
+      # ------------------------------------------------------
+      # 3️⃣ Analyze comment with AI for spam/phishing
+      # ------------------------------------------------------
+      - name: Analyze comment for spam with AI
+        if: steps.first-time-check.outputs.is_first_time == 'true'
+        id: ai-analyze
+        uses: actions/ai-inference@v1
+        with:
+          model: 'mistral-ai/Ministral-3B'
+          prompt: |
+            You are a spam and phishing detector for the OmniBlocks scratch-gui repository.
+            Your job is to analyze comments from first-time contributors and determine if they are spam, phishing, or legitimate.
+
+            COMMENT AUTHOR: ${{ github.event.sender.login }}
+            COMMENT TEXT:
+            ${{ github.event.comment.body }}
+
+            SPAM DETECTION RULES:
+            
+            **SPAM indicators (flag as SPAM):**
+            - Cryptocurrency/NFT promotions or scams
+            - "I can build X for $Y" offers soliciting paid work
+            - Repeated words/characters with no meaning
+            - Links to unrelated products, services, or websites
+            - Generic marketing messages
+            - "Click here to win/earn/get" type messages
+            - Phishing attempts or credential harvesting
+            - Malicious links or shortened URLs (bit.ly, tinyurl, etc.)
+            - Requests for personal information
+            - Adult content or inappropriate material
+            
+            **SUSPICIOUS indicators (flag as SUSPICIOUS):**
+            - First comment is overly promotional but somewhat relevant
+            - Contains external links but could be legitimate
+            - Unusual formatting or excessive emojis
+            - Generic praise without specific context
+            - Off-topic but not clearly malicious
+            
+            **SAFE indicators:**
+            - Genuine bug reports or feature requests
+            - Asking legitimate questions about the project
+            - Providing helpful feedback or suggestions
+            - Thanking maintainers or contributors
+            - Contributing to technical discussions
+            - Friendly greetings or introductions
+
+            OUTPUT FORMAT:
+            Respond with EXACTLY ONE of these three words: SAFE, SUSPICIOUS, or SPAM
+            Do not include any explanations, reasoning, or additional text.
+            Just the single word classification.
+
+      # ------------------------------------------------------
+      # 4️⃣ Parse AI response and clean it
+      # ------------------------------------------------------
+      - name: Parse AI classification
+        if: steps.first-time-check.outputs.is_first_time == 'true'
+        id: classification
+        run: |
+          RESPONSE="${{ steps.ai-analyze.outputs.response }}"
+          # Clean and normalize the response
+          CLEAN=$(echo "$RESPONSE" | tr '[:lower:]' '[:upper:]' | sed 's/[^A-Z]//g' | head -c 20)
+          
+          # Default to SAFE if response is invalid
+          if [[ "$CLEAN" == "SPAM" ]]; then
+            echo "verdict=SPAM" >> "$GITHUB_OUTPUT"
+          elif [[ "$CLEAN" == "SUSPICIOUS" ]]; then
+            echo "verdict=SUSPICIOUS" >> "$GITHUB_OUTPUT"
+          else
+            echo "verdict=SAFE" >> "$GITHUB_OUTPUT"
+          fi
+          
+          echo "📊 Classification: $CLEAN"
+
+      # ------------------------------------------------------
+      # 5️⃣ Handle SPAM: Delete comment + notify maintainers
+      # ------------------------------------------------------
+      - name: Handle SPAM comment
+        if: steps.classification.outputs.verdict == 'SPAM'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENTER: ${{ github.event.sender.login }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          # Delete the spam comment
+          gh api \
+            --method DELETE \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/repos/${{ github.repository }}/issues/comments/$COMMENT_ID"
+          
+          # Post notification for maintainers
+          NOTIFICATION="🚨 **SPAM DETECTED AND DELETED**
+
+          **User:** @$COMMENTER (first-time commenter)
+          **Comment ID:** $COMMENT_ID
+          **Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          **Original comment:**
+          \`\`\`
+          ${COMMENT_BODY:0:500}
+          \`\`\`
+          
+          **Action taken:** Comment deleted automatically by spam guard.
+          
+          cc: @supervoidcoder - Review if this was a false positive."
+          
+          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
+            echo "$NOTIFICATION" | gh issue comment ${{ github.event.issue.number }} --body-file -
+          fi
+
+      # ------------------------------------------------------
+      # 6️⃣ Handle SUSPICIOUS: Minimize + notify maintainers
+      # ------------------------------------------------------
+      - name: Handle SUSPICIOUS comment
+        if: steps.classification.outputs.verdict == 'SUSPICIOUS'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENTER: ${{ github.event.sender.login }}
+        run: |
+          # Get the comment node ID for GraphQL
+          NODE_ID=$(gh api \
+            "/repos/${{ github.repository }}/issues/comments/$COMMENT_ID" \
+            --jq '.node_id')
+          
+          # Minimize the comment as OFF_TOPIC
+          gh api graphql -f query='
+            mutation($id: ID!) {
+              minimizeComment(input: {subjectId: $id, classifier: OFF_TOPIC}) {
+                clientMutationId
+              }
+            }' -f id="$NODE_ID"
+          
+          # Post notification for maintainers
+          NOTIFICATION="⚠️ **SUSPICIOUS COMMENT DETECTED**
+
+          **User:** @$COMMENTER (first-time commenter)
+          **Comment ID:** $COMMENT_ID
+          **Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          **Action taken:** Comment minimized as off-topic. Please review.
+          
+          cc: @supervoidcoder - Review and take further action if needed."
+          
+          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
+            echo "$NOTIFICATION" | gh issue comment ${{ github.event.issue.number }} --body-file -
+          fi
+
+      # ------------------------------------------------------
+      # 7️⃣ Log SAFE comments for audit trail
+      # ------------------------------------------------------
+      - name: Log safe first-time comment
+        if: steps.classification.outputs.verdict == 'SAFE'
+        run: |
+          echo "✅ SAFE comment from first-time contributor @${{ github.event.sender.login }}"
+          echo "No action required - legitimate comment"
+
+      # ------------------------------------------------------
+      # 8️⃣ Add audit log comment (hidden from UI)
+      # ------------------------------------------------------
+      - name: Add hidden audit log
+        if: steps.first-time-check.outputs.is_first_time == 'true' && steps.classification.outputs.verdict != ''
+        run: |
+          echo "📝 Audit log: First-time comment from @${{ github.event.sender.login }} classified as ${{ steps.classification.outputs.verdict }}"
+          echo "Comment ID: ${{ github.event.comment.id }}"
+          echo "Analyzed at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"

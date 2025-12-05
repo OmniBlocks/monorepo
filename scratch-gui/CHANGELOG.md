@@ -4,6 +4,18 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`5d1c9394d`](https://github.com/OmniBlocks/scratch-gui/commit/5d1c9394d7a8bfb409bba39ea1f81a33516d9816) - 2025-12-05 13:39:51 -0500
+
+**feat: add new spam guard workflow**
+
+Merge pull request #519 from OmniBlocks/new-spam-guard
+  Added automated spam detection for issue and discussion comments that analyzes contributions from new community members and takes appropriate moderation actions while notifying maintainers.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`62d9397fb`](https://github.com/OmniBlocks/scratch-gui/commit/62d9397fb3121cc31c8685e39cb169dd609dfe6c) - 2025-12-05 11:28:01 -0500
 
 **Merge pull request #515 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-e384517**

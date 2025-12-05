@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`583116acb`](https://github.com/OmniBlocks/scratch-gui/commit/583116acbd753f075a3d3487494b6c36e094df73) - 2025-12-04 23:07:51 -0500
+
+**feat: Merge pull request #439 from OmniBlocks/supervoidcoder-patch-6**
+
+make it so embed works on non-production while keeping restriction
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`7f728f4fb`](https://github.com/OmniBlocks/scratch-gui/commit/7f728f4fb15a3ba78858cd115c477ae3466d2715) - 2025-12-04 15:12:51 -0600
 
 **Update ulti.yaml to include CODERS section**

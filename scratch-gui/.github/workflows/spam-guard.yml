@@ -239,13 +239,25 @@ jobs:
       # ------------------------------------------------------
       # 8️⃣ Add audit log comment (hidden from UI)
       # ------------------------------------------------------
-      - name: Add hidden audit log
-        if: steps.first-time-check.outputs.is_first_time == 'true' && steps.classification.outputs.verdict != ''
+      - name: Add comprehensive audit log
+        if: steps.first-time-check.outputs.is_first_time == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          AUDIT_LOG="<!-- spam-guard-audit: user=${{ github.event.sender.login }} verdict=${{ steps.classification.outputs.verdict }} comment_id=${{ github.event.comment.id }} timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC") -->"
+          # Always construct complete audit log for all verdicts
+          AUDIT_LOG="<!-- spam-guard-audit: user=${{ github.event.sender.login }} verdict=${{ steps.classification.outputs.verdict }} comment_id=${{ github.event.comment.id }} timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC") event=${{ github.event_name }} -->"
           
-          if [[ "${{ github.event_name }}" == "issue_comment" ]] && [[ "${{ steps.classification.outputs.verdict }}" == "SAFE" ]]; then
+          # Branch on event type to post to correct target
+          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
+            # Post audit log to issue comments for issue_comment events
             echo "$AUDIT_LOG" | gh issue comment ${{ github.event.issue.number }} --body-file -
+          elif [[ "${{ github.event_name }}" == "discussion_comment" ]]; then
+            # Post audit log to discussions API for discussion_comment events
+            echo "$AUDIT_LOG" | gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/${{ github.repository }}/discussions/${{ github.event.discussion.number }}/comments" \
+              -f body="$AUDIT_LOG"
+          else
+            echo "⚠️ Unknown event type: ${{ github.event_name }} - audit log not posted"
           fi

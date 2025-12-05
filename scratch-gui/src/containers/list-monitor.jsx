@@ -7,6 +7,7 @@ import {getEventXY} from '../lib/touch-utils';
 import {getVariableValue, setVariableValue} from '../lib/variable-utils';
 import ListMonitorComponent from '../components/monitor/list-monitor.jsx';
 import {Map} from 'immutable';
+import {safeStringify} from '../lib/tw-safe-stringify.js';
 
 class ListMonitor extends React.Component {
     constructor (props) {
@@ -38,7 +39,7 @@ class ListMonitor extends React.Component {
 
         this.setState({
             activeIndex: index,
-            activeValue: this.props.value[index]
+            activeValue: safeStringify(this.props.value[index])
         });
     }
 

@@ -15,7 +15,7 @@ target.setDirection((1 / 0));
 if ((target.direction === 95)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass 2",}, b0, false, false, "r", null);
 }
-target.setDirection(((0 / 0) || 0));
+target.setDirection(toNotNaN((0 / 0)));
 if ((target.direction === 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass 3",}, b0, false, false, "u", null);
 }

@@ -15,7 +15,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass variable",}, b0, false, fals
 b2.value = [];
 b2.value.push(3);
 b2._monitorUpToDate = false;
-if (((+(b2.value[1 - 1] ?? "") || 0) === 3)) {
+if ((toNotNaN(+(b2.value[1 - 1] ?? "")) === 3)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass list",}, b0, false, false, "m", null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "l", null);

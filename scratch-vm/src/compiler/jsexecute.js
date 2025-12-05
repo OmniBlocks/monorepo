@@ -224,6 +224,15 @@ runtimeFunctions.retire = `const retire = () => {
 }`;
 
 /**
+ * Converts NaN to zero. Used to match Scratch's string-to-number.
+ * Unlike (x || 0), -0 stays as -0 and is not converted to 0.
+ * This function needs to be written such that it's very easy for browsers to inline it.
+ * @param {number} value A number. Might be NaN.
+ * @returns {number} A number. Never NaN.
+ */
+runtimeFunctions.toNotNaN = `const toNotNaN = value => Number.isNaN(value) ? 0 : value`;
+
+/**
  * Scratch cast to boolean.
  * Similar to Cast.toBoolean()
  * @param {*} value The value to cast

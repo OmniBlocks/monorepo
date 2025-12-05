@@ -9,14 +9,14 @@ const b2 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
 b0.value = 0;
 thread.timer = timer();
-var a0 = Math.max(0, 1000 * (+b1.value || 0));
+var a0 = Math.max(0, 1000 * toNotNaN(+b1.value));
 runtime.requestRedraw();
 yield;
 while (thread.timer.timeElapsed() < a0) {
 yield;
 }
 thread.timer = null;
-b0.value = ((+b0.value || 0) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 if ((b0.value === 1)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass order is correct (1)",}, b2, false, false, "]4hbk*5ix]V00h|!x1oy", null);
 } else {
@@ -32,7 +32,7 @@ const b1 = stage.variables["p]KODv+)+:l=%NT~j3/d-wait"];
 return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, "1Ba%a0GIK#hwJ46y=WVt", null);
 thread.timer = timer();
-var a0 = Math.max(0, 1000 * (+b1.value || 0));
+var a0 = Math.max(0, 1000 * toNotNaN(+b1.value));
 runtime.requestRedraw();
 yield;
 while (thread.timer.timeElapsed() < a0) {
@@ -40,7 +40,7 @@ yield;
 }
 thread.timer = null;
 thread.timer = timer();
-var a1 = Math.max(0, 1000 * (+b1.value || 0));
+var a1 = Math.max(0, 1000 * toNotNaN(+b1.value));
 runtime.requestRedraw();
 yield;
 while (thread.timer.timeElapsed() < a1) {
@@ -48,7 +48,7 @@ yield;
 }
 thread.timer = null;
 thread.timer = timer();
-var a2 = Math.max(0, 1000 * (+b1.value || 0));
+var a2 = Math.max(0, 1000 * toNotNaN(+b1.value));
 runtime.requestRedraw();
 yield;
 while (thread.timer.timeElapsed() < a2) {
@@ -67,14 +67,14 @@ const b2 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
 b0.value = 0;
 thread.timer = timer();
-var a0 = Math.max(0, 1000 * (+b1.value || 0));
+var a0 = Math.max(0, 1000 * toNotNaN(+b1.value));
 runtime.requestRedraw();
 yield;
 while (thread.timer.timeElapsed() < a0) {
 yield;
 }
 thread.timer = null;
-b0.value = ((+b0.value || 0) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 if ((b0.value === 2)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass order is correct (2)",}, b2, false, false, "0i[-T:vYTt=bi47@byUE", null);
 } else {

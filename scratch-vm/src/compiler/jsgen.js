@@ -185,9 +185,9 @@ class JSGenerator {
                 return `(+${this.descendInput(node.target.toType(InputType.BOOLEAN))})`;
             }
             if (node.target.isAlwaysType(InputType.NUMBER_OR_NAN)) {
-                return `(${this.descendInput(node.target)} || 0)`;
+                return `toNotNaN(${this.descendInput(node.target)})`;
             }
-            return `(+${this.descendInput(node.target)} || 0)`;
+            return `toNotNaN(+${this.descendInput(node.target)})`;
         case InputOpcode.CAST_NUMBER_OR_NAN:
             return `(+${this.descendInput(node.target)})`;
         case InputOpcode.CAST_NUMBER_INDEX:

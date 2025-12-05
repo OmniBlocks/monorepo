@@ -10,7 +10,7 @@ return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "c", null);
 b1.value = (0 + 0);
 yield* executeInCompatibilityLayer({"MESSAGE":"Hello!","SECS":0.1,}, b2, false, false, "d", null);
-if ((((+b1.value || 0) + 2) === 2)) {
+if (((toNotNaN(+b1.value) + 2) === 2)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "i", null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "m", null);

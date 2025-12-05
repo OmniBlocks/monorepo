@@ -131,8 +131,8 @@ jobs:
         id: classification
         run: |
           RESPONSE="${{ steps.ai-analyze.outputs.response }}"
-          # Clean and normalize the response
-          CLEAN=$(echo "$RESPONSE" | tr '[:lower:]' '[:upper:]' | sed 's/[^A-Z]//g' | head -c 20)
+          # Clean and normalize the response - extract first word only
+          CLEAN=$(echo "$RESPONSE" | tr '[:lower:]' '[:upper:]' | grep -o '^[A-Z]*' | head -c 20)
           
           # Default to SAFE if response is invalid
           if [[ "$CLEAN" == "SPAM" ]]; then

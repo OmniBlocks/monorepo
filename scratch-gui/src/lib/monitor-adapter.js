@@ -28,9 +28,9 @@ export default function ({id, spriteName, opcode, params, value, vm}) {
         label = `${spriteName}: ${label}`;
     }
 
-    // If value is a normal finite number, round it to six decimal places.
-    if (typeof value === 'number' && Number.isFinite(value) && !Object.is(value, -0)) {
-        value = Math.round(value * 1e6) / 1e6;
+    // If value is a normal, round it to six decimal places. -0 is handled in safeStringify, so don't break it here.
+    if (typeof value === 'number' && !Object.is(value, -0)) {
+        value = Number(value.toFixed(6));
     }
 
     // Convert to a string now. That should help avoid unnecessary re-renders in a few edge cases.

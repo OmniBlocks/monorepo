@@ -3,16 +3,15 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, "e", null);
+runtime.ext_scratch3_looks._say("plan 0", target);
 startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "message1" });
-b1.value = "bwah";
-while (!(("" + b1.value).toLowerCase() === "bleh".toLowerCase())) {
+b0.value = "bwah";
+while (!(("" + b0.value).toLowerCase() === "bleh".toLowerCase())) {
 yield;
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "h", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 

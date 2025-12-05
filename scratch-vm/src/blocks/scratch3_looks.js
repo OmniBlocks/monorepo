@@ -352,7 +352,10 @@ class Scratch3LooksBlocks {
     }
 
     think (args, util) {
-        this.runtime.emit(Scratch3LooksBlocks.SAY_OR_THINK, util.target, 'think', args.MESSAGE);
+        this._think(args.MESSAGE, util.target);
+    }
+    _think (message, target) { // used by compiler
+        this.runtime.emit(Scratch3LooksBlocks.SAY_OR_THINK, target, 'think', message);
     }
 
     thinkforsecs (args, util) {

@@ -806,6 +806,10 @@ class ScriptTreeGenerator {
             return new IntermediateStackBlock(StackOpcode.LOOKS_BACKDROP_NEXT);
         case 'looks_nextcostume':
             return new IntermediateStackBlock(StackOpcode.LOOKS_COSTUME_NEXT);
+        case 'looks_say':
+            return new IntermediateStackBlock(StackOpcode.LOOKS_SAY, {
+                message: this.descendInputOfBlock(block, 'MESSAGE')
+            });
         case 'looks_seteffectto':
             return new IntermediateStackBlock(StackOpcode.LOOKS_EFFECT_SET, {
                 effect: block.fields.EFFECT.value.toLowerCase(),
@@ -824,6 +828,10 @@ class ScriptTreeGenerator {
         case 'looks_switchcostumeto':
             return new IntermediateStackBlock(StackOpcode.LOOKS_COSTUME_SET, {
                 costume: this.descendInputOfBlock(block, 'COSTUME', true)
+            });
+        case 'looks_think':
+            return new IntermediateStackBlock(StackOpcode.LOOKS_THINK, {
+                message: this.descendInputOfBlock(block, 'MESSAGE')
             });
 
         case 'motion_changexby':

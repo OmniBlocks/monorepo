@@ -3,72 +3,71 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 21",}, b0, false, false, "B", null);
+runtime.ext_scratch3_looks._say("plan 21", target);
 if (!(("" + (0 / 0)).toLowerCase() === "0".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "aA", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if ((("" + (0 * Infinity)).toLowerCase() === "NaN".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "/", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN((0 * Infinity)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "?", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if ((("" + ((Math.acos(1.01) * 180) / Math.PI)).toLowerCase() === "NaN".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "=", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN(((Math.acos(1.01) * 180) / Math.PI)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "]", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if ((("" + ((Math.asin(1.01) * 180) / Math.PI)).toLowerCase() === "NaN".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "_", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN(((Math.asin(1.01) * 180) / Math.PI)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "{", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if ((("" + (0 / 0)).toLowerCase() === "NaN".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "}", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN((0 / 0)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "aa", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if ((("" + Math.sqrt(-1)).toLowerCase() === "NaN".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "ac", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN(Math.sqrt(-1)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "ae", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if ((("" + mod(0, 0)).toLowerCase() === "NaN".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "ag", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN(mod(0, 0)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "ai", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if ((("" + Math.log(-1)).toLowerCase() === "NaN".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "ak", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN(Math.log(-1)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "am", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if ((("" + (Math.log(-1) / Math.LN10)).toLowerCase() === "NaN".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "ao", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN((Math.log(-1) / Math.LN10)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "aq", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN((Math.round(Math.sin((Math.PI * (1 / 0)) / 180) * 1e10) / 1e10)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "as", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN((Math.round(Math.cos((Math.PI * (1 / 0)) / 180) * 1e10) / 1e10)) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "au", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN(tan((1 / 0))) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "aw", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
 if (((toNotNaN(runtime.ext_scratch3_operators._random((-1 / 0), (1 / 0))) * 1) === 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "ax", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, ":", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })

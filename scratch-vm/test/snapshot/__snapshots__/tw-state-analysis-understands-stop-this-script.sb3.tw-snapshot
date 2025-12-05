@@ -3,16 +3,15 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables["KMKx1gRubgLz,!L]^TBS"];
-const b2 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b0 = stage.variables["KMKx1gRubgLz,!L]^TBS"];
+const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "g", null);
+runtime.ext_scratch3_looks._say("plan 1", target);
 thread.procedures["Wtest"]();
-if ((("" + listGet(b1.value, b2.value)).toLowerCase() === "thing".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "m", null);
+if ((("" + listGet(b0.value, b1.value)).toLowerCase() === "thing".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "o", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 

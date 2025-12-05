@@ -3,18 +3,16 @@
 
 // Player script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "#0F2+kcgu;or|hdwuT9{", null);
-yield* thread.procedures["ZSet Costume"]();
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "Q^(MKge)QH2e:WH6b6g@", null);
+runtime.ext_scratch3_looks._say("plan 1", target);
+thread.procedures["ZSet Costume"]();
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 
 // Player ZSet Costume
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-return function* genXYZ_Set_Costume () {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "Z$W^@c(f)rHu:DL/SGuQ", null);
+return function funXYZ_Set_Costume () {
+runtime.ext_scratch3_looks._say("pass", target);
 return "";
 }; })

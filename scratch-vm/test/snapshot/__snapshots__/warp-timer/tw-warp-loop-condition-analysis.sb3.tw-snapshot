@@ -3,23 +3,22 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables[";~q(!vt3c.Jrz2M]ZMy]"];
-const b2 = stage.variables[",23fjp~KN1aMG|;66K@Z"];
+const b0 = stage.variables[";~q(!vt3c.Jrz2M]ZMy]"];
+const b1 = stage.variables[",23fjp~KN1aMG|;66K@Z"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "j", null);
-b1.value = [];
-b1.value.push((1 + 2));
-b1._monitorUpToDate = false;
-b1.value.push((3 + 4));
-b1._monitorUpToDate = false;
-b1.value.push("final");
-b1._monitorUpToDate = false;
+runtime.ext_scratch3_looks._say("plan 1", target);
+b0.value = [];
+b0.value.push((1 + 2));
+b0._monitorUpToDate = false;
+b0.value.push((3 + 4));
+b0._monitorUpToDate = false;
+b0.value.push("final");
+b0._monitorUpToDate = false;
 yield* thread.procedures["Wtest"]();
-if ((toNotNaN(+b2.value) === 4)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "u", null);
+if ((toNotNaN(+b1.value) === 4)) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "t", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 

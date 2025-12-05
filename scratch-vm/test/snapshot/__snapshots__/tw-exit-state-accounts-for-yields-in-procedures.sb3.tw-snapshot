@@ -3,17 +3,16 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
-const b2 = stage.variables["FpLI$ida6)qR,q~y`1|*"];
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b1 = stage.variables["FpLI$ida6)qR,q~y`1|*"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "e", null);
-b1.value = (1 + 2);
+runtime.ext_scratch3_looks._say("plan 1", target);
+b0.value = (1 + 2);
 yield* thread.procedures["Zsomething that yields"]();
-if ((("" + listGet(b2.value, b1.value)).toLowerCase() === "the only thing".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "o", null);
+if ((("" + listGet(b1.value, b0.value)).toLowerCase() === "the only thing".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "n", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 

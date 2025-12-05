@@ -158,14 +158,34 @@ class IROptimizer {
         case InputOpcode.ADDON_CALL:
             break;
 
+        case InputOpcode.CAST_BOOLEAN: {
+            const innerType = inputs.target.type;
+            if (innerType & InputType.BOOLEAN) return innerType;
+            return InputType.BOOLEAN;
+        }
+
         case InputOpcode.CAST_NUMBER: {
             const innerType = inputs.target.type;
             if (innerType & InputType.NUMBER) return innerType;
             return InputType.NUMBER;
-        } case InputOpcode.CAST_NUMBER_OR_NAN: {
+        }
+
+        case InputOpcode.CAST_NUMBER_INDEX: {
+            const innerType = inputs.target.type;
+            if (innerType & InputType.NUMBER_INDEX) return innerType;
+            return InputType.NUMBER_INDEX;
+        }
+
+        case InputOpcode.CAST_NUMBER_OR_NAN: {
             const innerType = inputs.target.type;
             if (innerType & InputType.NUMBER_OR_NAN) return innerType;
             return InputType.NUMBER_OR_NAN;
+        }
+
+        case InputOpcode.CAST_STRING: {
+            const innerType = inputs.target.type;
+            if (innerType & InputType.STRING) return innerType;
+            return InputType.STRING;
         }
 
         case InputOpcode.OP_ADD: {
@@ -703,15 +723,41 @@ class IROptimizer {
         }
 
         switch (input.opcode) {
+        case InputOpcode.CAST_BOOLEAN: {
+            const targetType = input.inputs.target.type;
+            if ((targetType & InputType.BOOLEAN) === targetType) {
+                return input.inputs.target;
+            }
+            return input;
+        }
+
         case InputOpcode.CAST_NUMBER: {
             const targetType = input.inputs.target.type;
             if ((targetType & InputType.NUMBER) === targetType) {
                 return input.inputs.target;
             }
             return input;
-        } case InputOpcode.CAST_NUMBER_OR_NAN: {
+        }
+
+        case InputOpcode.CAST_NUMBER_INDEX: {
+            const targetType = input.inputs.target.type;
+            if ((targetType & InputType.NUMBER_INDEX) === targetType) {
+                return input.inputs.target;
+            }
+            return input;
+        }
+
+        case InputOpcode.CAST_NUMBER_OR_NAN: {
             const targetType = input.inputs.target.type;
             if ((targetType & InputType.NUMBER_OR_NAN) === targetType) {
+                return input.inputs.target;
+            }
+            return input;
+        }
+
+        case InputOpcode.CAST_STRING: {
+            const targetType = input.inputs.target.type;
+            if ((targetType & InputType.STRING) === targetType) {
                 return input.inputs.target;
             }
             return input;

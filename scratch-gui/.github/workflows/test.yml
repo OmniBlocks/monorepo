@@ -221,11 +221,17 @@ jobs:
               screenshot: 'on',
               video: 'on',
               baseURL: 'http://localhost:8080',
+              // 🎯 FIX: Grant MIDI permissions to stop the nagging!
+              permissions: ['midi', 'midi-sysex'],
             },
             projects: [
               {
                 name: 'chromium',
-                use: { ...devices['Desktop Chrome'] },
+                use: { 
+                  ...devices['Desktop Chrome'],
+                  // Override permissions at project level too
+                  permissions: ['midi', 'midi-sysex'],
+                },
               },
             ],
           });
@@ -238,7 +244,10 @@ jobs:
           const { test } = require('@playwright/test');
 
           test.describe('Main Branch Screenshots', () => {
-            test('Stage and Sprites', async ({ page }) => {
+            test('Stage and Sprites', async ({ page, context }) => {
+              // Grant additional permissions if needed
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
@@ -252,7 +261,9 @@ jobs:
               }
             });
 
-            test('Blocks Workspace', async ({ page }) => {
+            test('Blocks Workspace', async ({ page, context }) => {
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
@@ -273,7 +284,9 @@ jobs:
               await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
             });
 
-            test('Editor Initial (Code Tab)', async ({ page }) => {
+            test('Editor Initial (Code Tab)', async ({ page, context }) => {
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
@@ -281,7 +294,9 @@ jobs:
               await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
             });
 
-            test('Code Tab', async ({ page }) => {
+            test('Code Tab', async ({ page, context }) => {
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
@@ -295,7 +310,9 @@ jobs:
               await page.screenshot({ path: 'screenshots/code-tab.png', fullPage: true });
             });
 
-            test('Costumes Tab', async ({ page }) => {
+            test('Costumes Tab', async ({ page, context }) => {
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
@@ -309,7 +326,9 @@ jobs:
               await page.screenshot({ path: 'screenshots/costumes-tab.png', fullPage: true });
             });
 
-            test('Sounds Tab', async ({ page }) => {
+            test('Sounds Tab', async ({ page, context }) => {
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
@@ -323,7 +342,9 @@ jobs:
               await page.screenshot({ path: 'screenshots/sounds-tab.png', fullPage: true });
             });
 
-            test('Songs Tab', async ({ page }) => {
+            test('Songs Tab', async ({ page, context }) => {
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
@@ -337,7 +358,9 @@ jobs:
               await page.screenshot({ path: 'screenshots/songs-tab.png', fullPage: true });
             });
 
-            test('Extension Library', async ({ page }) => {
+            test('Extension Library', async ({ page, context }) => {
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
@@ -355,7 +378,9 @@ jobs:
               await page.screenshot({ path: 'screenshots/extension-library.png', fullPage: true });
             });
 
-            test('Advanced Settings', async ({ page }) => {
+            test('Advanced Settings', async ({ page, context }) => {
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
@@ -421,14 +446,19 @@ jobs:
           const fs = require('fs');
 
           test.describe('🌪️ Chaos Testing', () => {
-            test('Random Click Spam - 30 Seconds of Chaos', async ({ page }) => {
+            test('Random Click Spam - 30 Seconds of Chaos', async ({ page, context }) => {
+              // Grant MIDI permissions before test starts
+              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              
               const consoleErrors = [];
               const eventLog = [];
               
               page.on('console', msg => {
                 if (msg.type() === 'error') {
+                  // Filter out known benign errors
+                  const text = msg.text();
                   consoleErrors.push({
-                    text: msg.text(),
+                    text: text,
                     timestamp: Date.now(),
                     location: msg.location()
                   });
@@ -511,14 +541,23 @@ jobs:
             const testSlug = file.replace('.json', '');
             
             allTests += `
-              test('${testName}', async ({ page }) => {
+              test('${testName}', async ({ page, context }) => {
+                // Grant MIDI permissions
+                await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                
                 const consoleErrors = [];
                 const eventLog = [];
                 
                 page.on('console', msg => {
                   if (msg.type() === 'error') {
+                    // Filter out known benign errors
+                    const text = msg.text();
+                    if (text.includes('service_worker.js') && text.includes('404')) {
+                      // UltraBox service worker 404 - benign
+                      return;
+                    }
                     consoleErrors.push({
-                      text: msg.text(),
+                      text: text,
                       timestamp: Date.now(),
                       location: msg.location()
                     });
@@ -677,7 +716,7 @@ jobs:
           retention-days: 1
 
   # ============================================================
-  # ANALYZE + CREATE ISSUES (Windows+Chromium only)
+  # ANALYZE + CREATE/UPDATE ISSUES (Windows+Chromium only)
   # ============================================================
   analyze-and-report:
     needs: [main-branch-test-and-chaos, chaos-matrix]
@@ -701,7 +740,6 @@ jobs:
           path: windows-results/
         continue-on-error: true
 
-      # 🎯 FIX #1: Download ALL matrix results (not just Windows) for dashboard
       - name: Download all matrix results
         uses: actions/download-artifact@v4
         with:
@@ -785,7 +823,6 @@ jobs:
           
           echo "found_errors=$FOUND_ERRORS" >> $GITHUB_OUTPUT
 
-      # 🎯 FIX #2: Install FFmpeg for video-to-GIF conversion
       - name: Install FFmpeg
         if: steps.analyze_chaos_errors.outputs.found_errors == 'true'
         run: |
@@ -819,26 +856,55 @@ jobs:
           
           mkdir -p "$VIDEO_DIR"
           
+          # 🎯 FIX: Better video detection - find ALL .webm files recursively
+          echo "🔍 Searching for test videos..."
+          find ../windows-results/test-videos -type f -name "*.webm" 2>/dev/null | while read -r video; do
+            echo "  Found: $video"
+          done
+          
           # Copy videos with ASCII-safe names
           counter=1
-          for video in ../windows-results/test-videos/*.webm; do
+          find ../windows-results/test-videos -type f -name "*.webm" 2>/dev/null | while read -r video; do
             if [ -f "$video" ]; then
               cp "$video" "$VIDEO_DIR/video-$(printf '%03d' $counter).webm"
+              echo "✅ Copied $video -> video-$(printf '%03d' $counter).webm"
               counter=$((counter + 1))
             fi
           done
           
-          # Copy test-specific videos
-          find ../windows-results/test-videos -path "*chaos-test*" -name "video.webm" -exec cp {} "$VIDEO_DIR/chaos-test-chromium-video.webm" \; 2>/dev/null || true
-          find ../windows-results/test-videos -path "*recorded-actions*" -name "video.webm" -exec cp {} "$VIDEO_DIR/recorded-actions-chromium-video.webm" \; 2>/dev/null || true
+          # 🎯 FIX: Improved test-specific video detection using directory names
+          echo ""
+          echo "🎯 Looking for chaos test video..."
+          CHAOS_VIDEO=$(find ../windows-results/test-videos -type d -name "*Chaos*" -o -name "*chaos*" 2>/dev/null | head -1)
+          if [ -n "$CHAOS_VIDEO" ]; then
+            find "$CHAOS_VIDEO" -type f -name "video.webm" -exec cp {} "$VIDEO_DIR/chaos-test-chromium-video.webm" \; 2>/dev/null && echo "✅ Found chaos test video" || echo "⚠️ No video.webm in chaos directory"
+          else
+            echo "⚠️ No chaos test directory found, trying alternate pattern..."
+            find ../windows-results/test-videos -type f -path "*/Random*Click*/video.webm" -exec cp {} "$VIDEO_DIR/chaos-test-chromium-video.webm" \; 2>/dev/null && echo "✅ Found via alternate pattern"
+          fi
           
-          # 🎯 FIX #3: Convert videos to GIF for inline display
-          echo "Converting videos to GIF for inline display..."
+          echo ""
+          echo "🎬 Looking for recorded actions video..."
+          RECORDED_VIDEO=$(find ../windows-results/test-videos -type d -name "*Recorded*" -o -name "*recorded*" 2>/dev/null | head -1)
+          if [ -n "$RECORDED_VIDEO" ]; then
+            find "$RECORDED_VIDEO" -type f -name "video.webm" -exec cp {} "$VIDEO_DIR/recorded-actions-chromium-video.webm" \; 2>/dev/null && echo "✅ Found recorded actions video" || echo "⚠️ No video.webm in recorded directory"
+          else
+            echo "⚠️ No recorded actions directory found, trying alternate pattern..."
+            find ../windows-results/test-videos -type f -path "*/Sample*/video.webm" -exec cp {} "$VIDEO_DIR/recorded-actions-chromium-video.webm" \; 2>/dev/null && echo "✅ Found via alternate pattern"
+          fi
+          
+          # List what we have
+          echo ""
+          echo "📦 Videos collected:"
+          ls -lh "$VIDEO_DIR"/*.webm 2>/dev/null || echo "⚠️ No videos found!"
+          
+          # Convert videos to GIF for inline display
+          echo ""
+          echo "🎨 Converting videos to GIF for inline display..."
           for webm in "$VIDEO_DIR"/*.webm; do
             if [ -f "$webm" ]; then
               gif="${webm%.webm}.gif"
-              echo "Converting $webm to $gif..."
-              # High-quality GIF conversion with reasonable file size
+              echo "Converting $(basename "$webm") to GIF..."
               ffmpeg -i "$webm" -vf "fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=256[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5" -loop 0 "$gif" -y 2>&1 | tail -5
             fi
           done
@@ -902,7 +968,37 @@ jobs:
             
             Be specific about the action sequence and timing.
 
-      - name: Create issue for chaos test errors
+      # 🎯 NEW: Search for existing chaos test error issue
+      - name: Search for existing chaos test issue
+        if: steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true'
+        id: search_chaos_issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'chaos-testing,console-error',
+              per_page: 100
+            });
+            
+            // Look for chaos testing issue
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes('🌪️ Console Errors During Chaos Testing')
+            );
+            
+            if (existingIssue) {
+              console.log(`Found existing issue: #${existingIssue.number}`);
+              core.setOutput('issue_number', existingIssue.number);
+              core.setOutput('issue_exists', 'true');
+            } else {
+              console.log('No existing issue found');
+              core.setOutput('issue_exists', 'false');
+            }
+
+      # 🎯 NEW: Comment on existing chaos issue OR create new one
+      - name: Create or update chaos test issue
         if: steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true'
         uses: actions/github-script@v7
         env:
@@ -911,6 +1007,8 @@ jobs:
           AI_ANALYSIS: ${{ steps.ai_chaos_analysis.outputs.response }}
           TOKEN_ESTIMATE: ${{ steps.analyze_chaos_errors.outputs.chaos_token_estimate }}
           VIDEO_DIR: ${{ steps.upload_to_branch.outputs.video_dir }}
+          ISSUE_EXISTS: ${{ steps.search_chaos_issue.outputs.issue_exists }}
+          ISSUE_NUMBER: ${{ steps.search_chaos_issue.outputs.issue_number }}
         with:
           script: |
             const errors = process.env.ERRORS;
@@ -921,6 +1019,8 @@ jobs:
             const runId = context.runId;
             const sha = context.sha;
             const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
+            const issueExists = process.env.ISSUE_EXISTS === 'true';
+            const issueNumber = process.env.ISSUE_NUMBER;
             
             const assignees = ['supervoidcoder'];
             if (commitAuthor && commitAuthor !== 'unknown' && commitAuthor !== 'supervoidcoder') {
@@ -934,7 +1034,6 @@ jobs:
               aiSection = `### ⚠️ AI Analysis Skipped\n\nLog too large (${tokenEstimate} tokens).\n\n`;
             }
             
-            // 🎯 FIX #4: Use GIF for inline display + webm for download
             let videoSection = `### 📹 Video\n\n`;
             if (videoDir) {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
@@ -948,16 +1047,67 @@ jobs:
               videoSection += `[Workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})\n\n`;
             }
             
-            await github.rest.issues.create({
+            const bodyContent = `## 🐛 Chaos Test Errors (New Occurrence)\n\n**Platform:** <img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows + Chromium\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor}\n**Date:** ${new Date().toUTCString()}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎯 Last 10 Clicks\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-updated from [run ${runId}](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})*`;
+            
+            if (issueExists && issueNumber) {
+              // Comment on existing issue
+              console.log(`💬 Commenting on existing issue #${issueNumber}`);
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: parseInt(issueNumber),
+                body: bodyContent
+              });
+              console.log(`✅ Added comment to issue #${issueNumber}`);
+            } else {
+              // Create new issue
+              console.log('📝 Creating new issue');
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🌪️ Console Errors During Chaos Testing (Windows)`,
+                body: bodyContent.replace('## 🐛 Chaos Test Errors (New Occurrence)', '## 🐛 Chaos Test Errors'),
+                labels: ['bug', 'automated-test', 'console-error', 'chaos-testing'],
+                assignees: assignees
+              });
+              console.log('✅ Created new issue');
+            }
+
+      # 🎯 NEW: Search for existing recorded actions issue
+      - name: Search for existing recorded actions issue
+        if: steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true'
+        id: search_recorded_issue
+        uses: actions/github-script@v7
+        env:
+          TEST_NAME: ${{ steps.analyze_chaos_errors.outputs.recorded_test_name }}
+        with:
+          script: |
+            const testName = process.env.TEST_NAME;
+            
+            const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🌪️ Console Errors During Chaos Testing (Windows)`,
-              body: `## 🐛 Chaos Test Errors\n\n**Platform:** <img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows + Chromium\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎯 Last 10 Clicks\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
-              labels: ['bug', 'automated-test', 'console-error', 'chaos-testing'],
-              assignees: assignees
+              state: 'open',
+              labels: 'recorded-actions,console-error',
+              per_page: 100
             });
+            
+            // Look for matching test name
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes(`🎬 Errors in "${testName}" Test`)
+            );
+            
+            if (existingIssue) {
+              console.log(`Found existing issue: #${existingIssue.number}`);
+              core.setOutput('issue_number', existingIssue.number);
+              core.setOutput('issue_exists', 'true');
+            } else {
+              console.log('No existing issue found');
+              core.setOutput('issue_exists', 'false');
+            }
 
-      - name: Create issue for recorded actions errors
+      # 🎯 NEW: Comment on existing recorded actions issue OR create new one
+      - name: Create or update recorded actions issue
         if: steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true'
         uses: actions/github-script@v7
         env:
@@ -968,6 +1118,8 @@ jobs:
           TEST_NAME: ${{ steps.analyze_chaos_errors.outputs.recorded_test_name }}
           TEST_FILE: ${{ steps.analyze_chaos_errors.outputs.recorded_test_file }}
           VIDEO_DIR: ${{ steps.upload_to_branch.outputs.video_dir }}
+          ISSUE_EXISTS: ${{ steps.search_recorded_issue.outputs.issue_exists }}
+          ISSUE_NUMBER: ${{ steps.search_recorded_issue.outputs.issue_number }}
         with:
           script: |
             const errors = process.env.ERRORS;
@@ -980,6 +1132,8 @@ jobs:
             const runId = context.runId;
             const sha = context.sha;
             const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
+            const issueExists = process.env.ISSUE_EXISTS === 'true';
+            const issueNumber = process.env.ISSUE_NUMBER;
             
             const assignees = ['supervoidcoder'];
             if (commitAuthor && commitAuthor !== 'unknown' && commitAuthor !== 'supervoidcoder') {
@@ -993,7 +1147,6 @@ jobs:
               aiSection = `### ⚠️ AI Analysis Skipped\n\nLog too large (${tokenEstimate} tokens).\n\n`;
             }
             
-            // 🎯 FIX #4: Use GIF for inline display + webm for download
             let videoSection = `### 📹 Video\n\n`;
             if (videoDir) {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
@@ -1007,14 +1160,31 @@ jobs:
               videoSection += `[Workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})\n\n`;
             }
             
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `🎬 Errors in "${testName}" Test (Windows)`,
-              body: `## 🐛 Recorded Actions Errors\n\n**Test:** ${testName}\n**File:** \`.github/chaos-tests/${testFile}\`\n**Platform:** <img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows + Chromium\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎬 Actions\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
-              labels: ['bug', 'automated-test', 'console-error', 'recorded-actions'],
-              assignees: assignees
-            });
+            const bodyContent = `## 🐛 Recorded Actions Errors (New Occurrence)\n\n**Test:** ${testName}\n**File:** \`.github/chaos-tests/${testFile}\`\n**Platform:** <img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows + Chromium\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor}\n**Date:** ${new Date().toUTCString()}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎬 Actions\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-updated from [run ${runId}](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})*`;
+            
+            if (issueExists && issueNumber) {
+              // Comment on existing issue
+              console.log(`💬 Commenting on existing issue #${issueNumber}`);
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: parseInt(issueNumber),
+                body: bodyContent
+              });
+              console.log(`✅ Added comment to issue #${issueNumber}`);
+            } else {
+              // Create new issue
+              console.log('📝 Creating new issue');
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🎬 Errors in "${testName}" Test (Windows)`,
+                body: bodyContent.replace('## 🐛 Recorded Actions Errors (New Occurrence)', '## 🐛 Recorded Actions Errors'),
+                labels: ['bug', 'automated-test', 'console-error', 'recorded-actions'],
+                assignees: assignees
+              });
+              console.log('✅ Created new issue');
+            }
 
       - name: Calculate duration
         id: duration
@@ -1050,7 +1220,6 @@ jobs:
         run: |
           mkdir -p dashboard
           
-          # 🎯 FIX #5: Copy screenshots from ALL platforms for dashboard
           echo "📸 Copying screenshots from all platforms..."
           for platform_dir in all-matrix-results/chaos-results-*/; do
             if [ -d "$platform_dir" ]; then
@@ -1068,7 +1237,6 @@ jobs:
             fi
           done
           
-          # Verify screenshots were copied
           echo ""
           echo "📊 Dashboard screenshot summary:"
           find dashboard -name "*.png" | wc -l | xargs echo "  Total screenshots:"

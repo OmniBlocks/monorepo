@@ -55,7 +55,7 @@ jobs:
           
           TOTAL=$((CONTRIBUTION_COUNT + PR_COUNT + ISSUE_COUNT + COMMENT_COUNT))
           
-          if [ "$TOTAL" -le 1 ]; then
+          if [ "$TOTAL" -eq 1 ]; then
             echo "is_first_time=true" >> "$GITHUB_OUTPUT"
             echo "🆕 First-time commenter detected: $COMMENTER"
           else
@@ -180,7 +180,7 @@ jobs:
           cc: @supervoidcoder - Review if this was a false positive."
           
           if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
-            echo "$NOTIFICATION" | gh issue comment ${{ github.event.issue.number }} --body-file -
+            echo "$NOTIFICATION" | gh issue comment ${{ github.event.issue.number }} --body-file - || echo "Failed to post spam notification"
           fi
 
       # ------------------------------------------------------
@@ -219,6 +219,12 @@ jobs:
           
           if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
             echo "$NOTIFICATION" | gh issue comment ${{ github.event.issue.number }} --body-file -
+          elif [[ "${{ github.event_name }}" == "discussion_comment" ]]; then
+            echo "$NOTIFICATION" | gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/${{ github.repository }}/discussions/${{ github.event.discussion.number }}/comments" \
+              -f body="$NOTIFICATION"
           fi
 
       # ------------------------------------------------------
@@ -235,7 +241,11 @@ jobs:
       # ------------------------------------------------------
       - name: Add hidden audit log
         if: steps.first-time-check.outputs.is_first_time == 'true' && steps.classification.outputs.verdict != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "📝 Audit log: First-time comment from @${{ github.event.sender.login }} classified as ${{ steps.classification.outputs.verdict }}"
-          echo "Comment ID: ${{ github.event.comment.id }}"
-          echo "Analyzed at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+          AUDIT_LOG="<!-- spam-guard-audit: user=${{ github.event.sender.login }} verdict=${{ steps.classification.outputs.verdict }} comment_id=${{ github.event.comment.id }} timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC") -->"
+          
+          if [[ "${{ github.event_name }}" == "issue_comment" ]] && [[ "${{ steps.classification.outputs.verdict }}" == "SAFE" ]]; then
+            echo "$AUDIT_LOG" | gh issue comment ${{ github.event.issue.number }} --body-file -
+          fi

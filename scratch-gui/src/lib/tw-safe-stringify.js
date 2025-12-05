@@ -1,30 +1,24 @@
 const circularReplacer = () => {
-  const seen = new WeakSet();
-  return (_, value) => {
-    if (typeof value === 'object' && value !== null) {
-      if (seen.has(value)) {
-        return Array.isArray(value) ? '[...]' : '{...}';
-      }
-      seen.add(value);
+    const seen = new WeakSet();
+    return (_, value) => {
+        if (typeof value === 'object' && value !== null) {
+            if (seen.has(value)) {
+                return Array.isArray(value) ? '[...]' : '{...}';
+            }
+            seen.add(value);
+        }
+        return value;
+    };
+};
+
+/**
+ * Safely stringify, properly handling circular relations.
+ * @param {unknown} input Any value
+ * @returns {string} A stringified version of the input.
+ */
+export const safeStringify = input => {
+    if (typeof input === 'object' && input !== null) {
+        return JSON.stringify(input, circularReplacer());
     }
-    return value;
-  };
+    return `${input}`;
 };
-
-const sanitize = (input) => {
-  if (typeof input === "object" && input !== null) {
-    return JSON.stringify(input, circularReplacer());
-  } else {
-    return input;
-  }
-};
-
-const sanitizeVariableType = (input, type) => {
-  if (type === "list") {
-    return input.map(item => sanitize(item));
-  } else {
-    return sanitize(input);
-  }
-};
-
-export { sanitizeVariableType };

@@ -1,4 +1,5 @@
 import OpcodeLabels from './opcode-labels.js';
+import {safeStringify} from './tw-safe-stringify.js';
 
 const isUndefined = a => typeof a === 'undefined';
 
@@ -32,20 +33,17 @@ export default function ({id, spriteName, opcode, params, value, vm}) {
         value = Number(value.toFixed(6));
     }
 
-    // Turn the value to a string, to handle boolean values
-    if (typeof value === 'boolean') {
-        value = value.toString();
-    }
-
-    // Lists can contain booleans, which should also be turned to strings
+    // Anything that isn't a string or number, such as a boolean or object, should be converted to string.
     if (Array.isArray(value)) {
         value = value.slice();
         for (let i = 0; i < value.length; i++) {
             const item = value[i];
-            if (typeof item === 'boolean') {
-                value[i] = item.toString();
+            if (typeof item !== 'string' || typeof item !== 'number') {
+                value[i] = safeStringify(item);
             }
         }
+    } else if (typeof value !== 'string' || typeof value !== 'number') {
+        value = safeStringify(value);
     }
 
     return {id, label, category, value};

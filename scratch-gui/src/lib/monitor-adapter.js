@@ -28,14 +28,14 @@ export default function ({id, spriteName, opcode, params, value, vm}) {
         label = `${spriteName}: ${label}`;
     }
 
-    // If value is a number, round it to six decimal places
-    if (typeof value === 'number') {
-        value = Number(value.toFixed(6));
+    // If value is a normal finite number, round it to six decimal places.
+    if (typeof value === 'number' && Number.isFinite(value) && !Object.is(value, -0)) {
+        value = Math.round(value * 1e6) / 1e6;
     }
 
-    // Anything that isn't a string or number, such as a boolean or object, should be converted to string.
-    // For lists, we do this when we display the list row instead of doing a full list copy on every change.
-    if (!Array.isArray(value) && (typeof value !== 'string' || typeof value !== 'number')) {
+    // Convert to a string now. That should help avoid unnecessary re-renders in a few edge cases.
+    // For lists, we stringify when we display the list row instead of doing a full list copy on every change.
+    if (!Array.isArray(value)) {
         value = safeStringify(value);
     }
 

@@ -3,21 +3,20 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = target.variables["gTtSj;o_E;Snkn620KF."];
-const b2 = target.variables["zShM`!CD?d_|Z,]5X}N6"];
+const b0 = target.variables["gTtSj;o_E;Snkn620KF."];
+const b1 = target.variables["zShM`!CD?d_|Z,]5X}N6"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, "d", null);
-b1.value = 2;
-if ((b1.value === 2)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass variable",}, b0, false, false, "k", null);
+runtime.ext_scratch3_looks._say("plan 2", target);
+b0.value = 2;
+if ((b0.value === 2)) {
+runtime.ext_scratch3_looks._say("pass variable", target);
 }
-b2.value = [];
-b2.value.push(3);
-b2._monitorUpToDate = false;
-if (((+(b2.value[1 - 1] ?? "") || 0) === 3)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass list",}, b0, false, false, "m", null);
+b1.value = [];
+b1.value.push(3);
+b1._monitorUpToDate = false;
+if ((toNotNaN(+(b1.value[1 - 1] ?? "")) === 3)) {
+runtime.ext_scratch3_looks._say("pass list", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "l", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })

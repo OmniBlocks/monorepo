@@ -158,14 +158,34 @@ class IROptimizer {
         case InputOpcode.ADDON_CALL:
             break;
 
+        case InputOpcode.CAST_BOOLEAN: {
+            const innerType = inputs.target.type;
+            if (innerType & InputType.BOOLEAN) return innerType;
+            return InputType.BOOLEAN;
+        }
+
         case InputOpcode.CAST_NUMBER: {
             const innerType = inputs.target.type;
             if (innerType & InputType.NUMBER) return innerType;
             return InputType.NUMBER;
-        } case InputOpcode.CAST_NUMBER_OR_NAN: {
+        }
+
+        case InputOpcode.CAST_NUMBER_INDEX: {
+            const innerType = inputs.target.type;
+            if (innerType & InputType.NUMBER_INDEX) return innerType;
+            return InputType.NUMBER_INDEX;
+        }
+
+        case InputOpcode.CAST_NUMBER_OR_NAN: {
             const innerType = inputs.target.type;
             if (innerType & InputType.NUMBER_OR_NAN) return innerType;
             return InputType.NUMBER_OR_NAN;
+        }
+
+        case InputOpcode.CAST_STRING: {
+            const innerType = inputs.target.type;
+            if (innerType & InputType.STRING) return innerType;
+            return InputType.STRING;
         }
 
         case InputOpcode.OP_ADD: {
@@ -559,9 +579,12 @@ class IROptimizer {
             break;
         case StackOpcode.CONTROL_WHILE:
         case StackOpcode.CONTROL_FOR:
+            modified = this.analyzeInputs(inputs, state) || modified;
+            modified = this.analyzeLoopedStack(inputs.do, state, stackBlock, true) || modified;
+            break;
         case StackOpcode.CONTROL_REPEAT:
             modified = this.analyzeInputs(inputs, state) || modified;
-            modified = this.analyzeLoopedStack(inputs.do, state, stackBlock) || modified;
+            modified = this.analyzeLoopedStack(inputs.do, state, stackBlock, false) || modified;
             break;
         case StackOpcode.CONTROL_IF_ELSE: {
             modified = this.analyzeInputs(inputs, state) || modified;
@@ -642,20 +665,24 @@ class IROptimizer {
      * @param {IntermediateStack} stack
      * @param {TypeState} state
      * @param {IntermediateStackBlock} block
+     * @param {boolean} willReevaluateInputs
      * @returns {boolean}
      * @private
      */
-    analyzeLoopedStack (stack, state, block) {
+    analyzeLoopedStack (stack, state, block, willReevaluateInputs) {
+        let modified = false;
+
         if (block.yields && !this.ignoreYields) {
-            let modified = state.clear();
+            modified = state.clear();
+            if (willReevaluateInputs) {
+                modified = this.analyzeInputs(block.inputs, state) || modified;
+            }
             block.entryState = state.clone();
             block.exitState = state.clone();
-            modified = this.analyzeInputs(block.inputs, state) || modified;
             return this.analyzeStack(stack, state) || modified;
         }
 
         let iterations = 0;
-        let modified = false;
         let keepLooping;
         do {
             // If we are stuck in an apparent infinite loop, give up and assume the worst.
@@ -672,7 +699,10 @@ class IROptimizer {
             const newState = state.clone();
             modified = this.analyzeStack(stack, newState) || modified;
             modified = (keepLooping = state.or(newState)) || modified;
-            modified = this.analyzeInputs(block.inputs, state) || modified;
+
+            if (willReevaluateInputs) {
+                modified = this.analyzeInputs(block.inputs, state) || modified;
+            }
         } while (keepLooping);
         block.entryState = state.clone();
         return modified;
@@ -693,15 +723,41 @@ class IROptimizer {
         }
 
         switch (input.opcode) {
+        case InputOpcode.CAST_BOOLEAN: {
+            const targetType = input.inputs.target.type;
+            if ((targetType & InputType.BOOLEAN) === targetType) {
+                return input.inputs.target;
+            }
+            return input;
+        }
+
         case InputOpcode.CAST_NUMBER: {
             const targetType = input.inputs.target.type;
             if ((targetType & InputType.NUMBER) === targetType) {
                 return input.inputs.target;
             }
             return input;
-        } case InputOpcode.CAST_NUMBER_OR_NAN: {
+        }
+
+        case InputOpcode.CAST_NUMBER_INDEX: {
+            const targetType = input.inputs.target.type;
+            if ((targetType & InputType.NUMBER_INDEX) === targetType) {
+                return input.inputs.target;
+            }
+            return input;
+        }
+
+        case InputOpcode.CAST_NUMBER_OR_NAN: {
             const targetType = input.inputs.target.type;
             if ((targetType & InputType.NUMBER_OR_NAN) === targetType) {
+                return input.inputs.target;
+            }
+            return input;
+        }
+
+        case InputOpcode.CAST_STRING: {
+            const targetType = input.inputs.target.type;
+            if ((targetType & InputType.STRING) === targetType) {
                 return input.inputs.target;
             }
             return input;

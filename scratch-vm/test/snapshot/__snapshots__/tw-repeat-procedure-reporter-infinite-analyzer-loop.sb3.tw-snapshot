@@ -3,11 +3,10 @@
 
 // Text script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, "a~", null);
+runtime.ext_scratch3_looks._say("plan 0", target);
 thread.procedures["Wtest 1"]();
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "dh", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 
@@ -15,8 +14,8 @@ retire(); return;
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = target.variables["ts-.PQ{/]mN_9@MbG:m/"];
 return function funXYZ_test_1 () {
-for (var a0 = (+thread.procedures["Wany procedure reporter"]() || 0); a0 >= 0.5; a0--) {
-b0.value = ((+b0.value || 0) + 1);
+for (var a0 = toNotNaN(+thread.procedures["Wany procedure reporter"]()); a0 >= 0.5; a0--) {
+b0.value = (toNotNaN(+b0.value) + 1);
 }
 return "";
 }; })

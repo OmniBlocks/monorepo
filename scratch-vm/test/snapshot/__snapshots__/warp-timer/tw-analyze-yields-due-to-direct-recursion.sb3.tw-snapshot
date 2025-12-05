@@ -3,17 +3,16 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
-const b2 = stage.variables["FpLI$ida6)qR,q~y`1|*"];
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b1 = stage.variables["FpLI$ida6)qR,q~y`1|*"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "j", null);
-b1.value = (1 + 2);
+runtime.ext_scratch3_looks._say("plan 1", target);
+b0.value = (1 + 2);
 yield* thread.procedures["Znon-warp recursion %s"](2);
-if ((("" + listGet(b2.value, b1.value)).toLowerCase() === "the only thing".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "t", null);
+if ((("" + listGet(b1.value, b0.value)).toLowerCase() === "the only thing".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "s", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 
@@ -22,7 +21,7 @@ retire(); return;
 return function* genXYZ_non_warp_recursion_ (p0) {
 if (compareGreaterThan(p0, 0)) {
 yield;
-yield* thread.procedures["Znon-warp recursion %s"](((+p0 || 0) - 1));
+yield* thread.procedures["Znon-warp recursion %s"]((toNotNaN(+p0) - 1));
 }
 return "";
 }; })

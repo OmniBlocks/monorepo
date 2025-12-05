@@ -3,17 +3,15 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "Ny4npe`j3|CTeaIS.:6O", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, "2T.vCF,K}vA=XNZ=kY+v", null);
+runtime.ext_scratch3_looks._say("plan 0", target);
 runtime.ext_scratch3_looks._setBackdrop(stage, "backdrop2");
 retire(); return;
 }; })

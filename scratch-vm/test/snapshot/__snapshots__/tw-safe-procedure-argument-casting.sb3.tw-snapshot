@@ -3,18 +3,17 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, "J#qm1yA(@Z6mj%Mgh;0X", null);
+runtime.ext_scratch3_looks._say("plan 2", target);
 thread.procedures["Zswitch %s"]("1");
-if ((((target.currentCostume + 1) === 2) && ((+target.getCostumes()[target.currentCostume].name || 0) === 1))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, ";DM$.QW6o-O+T/oBdqt!", null);
+if ((((target.currentCostume + 1) === 2) && (toNotNaN(+target.getCostumes()[target.currentCostume].name) === 1))) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
 thread.procedures["Zswitch %s"]("2");
-if ((((target.currentCostume + 1) === 1) && ((+target.getCostumes()[target.currentCostume].name || 0) === 2))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "71a9Slk0w=^~x;5T@nw,", null);
+if ((((target.currentCostume + 1) === 1) && (toNotNaN(+target.getCostumes()[target.currentCostume].name) === 2))) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "$R-1lb(Mu?gdTIH^;kC_", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 

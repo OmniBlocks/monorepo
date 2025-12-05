@@ -224,6 +224,15 @@ runtimeFunctions.retire = `const retire = () => {
 }`;
 
 /**
+ * Converts NaN to zero. Used to match Scratch's string-to-number.
+ * Unlike (x || 0), -0 stays as -0 and is not converted to 0.
+ * This function needs to be written such that it's very easy for browsers to inline it.
+ * @param {number} value A number. Might be NaN.
+ * @returns {number} A number. Never NaN.
+ */
+runtimeFunctions.toNotNaN = `const toNotNaN = value => Number.isNaN(value) ? 0 : value`;
+
+/**
  * Scratch cast to boolean.
  * Similar to Cast.toBoolean()
  * @param {*} value The value to cast
@@ -278,12 +287,12 @@ baseRuntime += `const isNotActuallyZero = val => {
  */
 baseRuntime += `const compareEqualSlow = (v1, v2) => {
     const n1 = +v1;
-    if (isNaN(n1) || (n1 === 0 && isNotActuallyZero(v1))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
+    if (Number.isNaN(n1) || (n1 === 0 && isNotActuallyZero(v1))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
     const n2 = +v2;
-    if (isNaN(n2) || (n2 === 0 && isNotActuallyZero(v2))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
+    if (Number.isNaN(n2) || (n2 === 0 && isNotActuallyZero(v2))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
     return n1 === n2;
 };
-const compareEqual = (v1, v2) => (typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2) || v1 === v2) ? v1 === v2 : compareEqualSlow(v1, v2);`;
+const compareEqual = (v1, v2) => (typeof v1 === 'number' && typeof v2 === 'number' && !Number.isNaN(v1) && !Number.isNaN(v2) || v1 === v2) ? v1 === v2 : compareEqualSlow(v1, v2);`;
 
 /**
  * Determine if one value is greater than another.
@@ -299,14 +308,14 @@ runtimeFunctions.compareGreaterThan = `const compareGreaterThanSlow = (v1, v2) =
     } else if (n2 === 0 && isNotActuallyZero(v2)) {
         n2 = NaN;
     }
-    if (isNaN(n1) || isNaN(n2)) {
+    if (Number.isNaN(n1) || Number.isNaN(n2)) {
         const s1 = ('' + v1).toLowerCase();
         const s2 = ('' + v2).toLowerCase();
         return s1 > s2;
     }
     return n1 > n2;
 };
-const compareGreaterThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) ? v1 > v2 : compareGreaterThanSlow(v1, v2)`;
+const compareGreaterThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !Number.isNaN(v1) ? v1 > v2 : compareGreaterThanSlow(v1, v2)`;
 
 /**
  * Determine if one value is less than another.
@@ -322,14 +331,14 @@ runtimeFunctions.compareLessThan = `const compareLessThanSlow = (v1, v2) => {
     } else if (n2 === 0 && isNotActuallyZero(v2)) {
         n2 = NaN;
     }
-    if (isNaN(n1) || isNaN(n2)) {
+    if (Number.isNaN(n1) || Number.isNaN(n2)) {
         const s1 = ('' + v1).toLowerCase();
         const s2 = ('' + v2).toLowerCase();
         return s1 < s2;
     }
     return n1 < n2;
 };
-const compareLessThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v2) ? v1 < v2 : compareLessThanSlow(v1, v2)`;
+const compareLessThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !Number.isNaN(v2) ? v1 < v2 : compareLessThanSlow(v1, v2)`;
 /**
  * Determine if one value is greater than or equal to another.
  * @param {*} v1 First value

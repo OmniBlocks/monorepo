@@ -3,36 +3,34 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
+const b0 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, "f", null);
+runtime.ext_scratch3_looks._say("plan 2", target);
 yield* thread.procedures["Wreturn stops the script immediately"]();
-if (((+b1.value || 0) === 25)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass return stopped the script immediately",}, b0, false, false, "u", null);
+if ((toNotNaN(+b0.value) === 25)) {
+runtime.ext_scratch3_looks._say("pass return stopped the script immediately", target);
 }
 yield* waitThreads(startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "Test return outside of custom block" }));
-if (((+b1.value || 0) === 18)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass return worked to stop outside of custom block",}, b0, false, false, "x", null);
+if ((toNotNaN(+b0.value) === 18)) {
+runtime.ext_scratch3_looks._say("pass return worked to stop outside of custom block", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "v", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })
 
 // Sprite1 Wreturn stops the script immediately
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
-const b1 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_return_stops_the_scr () {
 b0.value = 0;
 for (var a0 = 100; a0 > 0; a0--) {
-b0.value = ((+b0.value || 0) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 if ((b0.value === 25)) {
 return "stopped!";
 }
 if (isStuck()) yield;
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"fail return did not stop the script immediately",}, b1, true, false, "z", null);
+runtime.ext_scratch3_looks._say("fail return did not stop the script immediately", target);
 return "";
 }; })
 
@@ -42,7 +40,7 @@ const b0 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
 return function* genXYZ () {
 b0.value = 0;
 while (true) {
-b0.value = ((+b0.value || 0) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 if ((b0.value === 18)) {
 retire(); return;
 }

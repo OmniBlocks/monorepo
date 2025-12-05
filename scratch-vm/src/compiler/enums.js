@@ -152,6 +152,8 @@ const StackOpcode = {
     LOOKS_BACKDROP_SET: 'looks.switchBackdrop',
     LOOKS_COSTUME_NEXT: 'looks.nextCostume',
     LOOKS_COSTUME_SET: 'looks.switchCostume',
+    LOOKS_SAY: 'looks.say',
+    LOOKS_THINK: 'looks.think',
 
     MOTION_X_SET: 'motion.setX',
     MOTION_X_CHANGE: 'motion.changeX',

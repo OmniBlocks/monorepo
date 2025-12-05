@@ -185,9 +185,9 @@ class JSGenerator {
                 return `(+${this.descendInput(node.target.toType(InputType.BOOLEAN))})`;
             }
             if (node.target.isAlwaysType(InputType.NUMBER_OR_NAN)) {
-                return `(${this.descendInput(node.target)} || 0)`;
+                return `toNotNaN(${this.descendInput(node.target)})`;
             }
-            return `(+${this.descendInput(node.target)} || 0)`;
+            return `toNotNaN(+${this.descendInput(node.target)})`;
         case InputOpcode.CAST_NUMBER_OR_NAN:
             return `(+${this.descendInput(node.target)})`;
         case InputOpcode.CAST_NUMBER_INDEX:
@@ -812,6 +812,12 @@ case InputOpcode.OP_LTOREQ: {
             break;
         case StackOpcode.LOOKS_COSTUME_SET:
             this.source += `runtime.ext_scratch3_looks._setCostume(target, ${this.descendInput(node.costume)});\n`;
+            break;
+        case StackOpcode.LOOKS_SAY:
+            this.source += `runtime.ext_scratch3_looks._say(${this.descendInput(node.message)}, target);\n`;
+            break;
+        case StackOpcode.LOOKS_THINK:
+            this.source += `runtime.ext_scratch3_looks._think(${this.descendInput(node.message)}, target);\n`;
             break;
 
         case StackOpcode.MOTION_X_CHANGE:

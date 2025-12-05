@@ -76,7 +76,7 @@ class ListMonitor extends React.Component {
             const newIndex = this.wrapListIndex(previouslyActiveIndex + navigateDirection, this.props.value.length);
             this.setState({
                 activeIndex: newIndex,
-                activeValue: this.props.value[newIndex]
+                activeValue: safeStringify(this.props.value[newIndex])
             });
             e.preventDefault(); // Stop default tab behavior, handled by this state change
         } else if (e.key === 'Enter') {
@@ -111,7 +111,7 @@ class ListMonitor extends React.Component {
         const newActiveIndex = Math.min(newListValue.length - 1, this.state.activeIndex);
         this.setState({
             activeIndex: newActiveIndex,
-            activeValue: newListValue[newActiveIndex]
+            activeValue: safeStringify(newListValue[newActiveIndex])
         });
     }
 

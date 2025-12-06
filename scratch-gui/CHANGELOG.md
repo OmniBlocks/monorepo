@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ac2175e7b`](https://github.com/OmniBlocks/scratch-gui/commit/ac2175e7bfed5c8e85d45d7895616321f0008f9b) - 2025-12-06 01:24:28 +0000
+
+**will this work**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`de043d359`](https://github.com/OmniBlocks/scratch-gui/commit/de043d359e4623b80decf1d3e93b47b0461d7e90) - 2025-12-05 16:53:34 -0500
 
 **fix: videos not showing in chaos tests and deduplicate issues to reduce clutter**

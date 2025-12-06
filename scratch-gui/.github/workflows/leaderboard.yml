@@ -110,6 +110,7 @@ jobs:
           
           cat > leaderboard.md << HEADER
           # 🏆 Contributor Leaderboard
+          <!-- @traycerai ignore -->
           
           **Last Updated:** $timestamp
           

@@ -29,10 +29,8 @@ def get_platform_icon(platform_name):
 
 def get_platform_display_name(platform_name):
     """Convert platform directory name to display name."""
-    # Remove 'screenshots-' prefix and '-chromium' suffix
     name = platform_name.replace('screenshots-', '')
     
-    # Map platform names
     if 'ubuntu-latest' in name:
         return 'Ubuntu'
     elif 'windows-latest' in name:
@@ -40,29 +38,35 @@ def get_platform_display_name(platform_name):
     elif 'macos-latest' in name:
         return 'macOS'
     else:
-        # Fallback: capitalize and clean up
         return name.replace('-', ' ').title()
 
 def generate_screenshot_html_for_platform(screenshots_dir, platform_name):
     """Generate HTML for screenshot cards from a specific platform."""
+    print(f"🔍 Checking screenshots in: {screenshots_dir}", file=sys.stderr)
+    
     if not os.path.exists(screenshots_dir):
+        print(f"⚠️  Directory does not exist: {screenshots_dir}", file=sys.stderr)
         return '<p>No screenshots available for this platform</p>'
     
-    screenshots_html = []
     screenshot_files = sorted(Path(screenshots_dir).glob('*.png'))
     
     if not screenshot_files:
+        print(f"⚠️  No PNG files found in: {screenshots_dir}", file=sys.stderr)
+        # List what's actually in the directory
+        all_files = list(Path(screenshots_dir).iterdir()) if os.path.exists(screenshots_dir) else []
+        print(f"   Contents: {[f.name for f in all_files]}", file=sys.stderr)
         return '<p>No screenshots available for this platform</p>'
     
+    print(f"✅ Found {len(screenshot_files)} screenshots in {screenshots_dir}", file=sys.stderr)
+    
+    screenshots_html = []
     for screenshot in screenshot_files:
         filename = screenshot.name
-        # Convert filename to nice title (e.g., "stage-sprites.png" -> "Stage Sprites")
         name = filename.replace('-', ' ').replace('.png', '').title()
         
-        # Relative path for HTML
+        # Relative path from the index.html location
         rel_path = f"{screenshots_dir}/{filename}"
         
-        # Add note only for editor-initial (which is redundant with code-tab)
         note = ''
         if filename == 'editor-initial.png':
             note = '<div class="note">ℹ️ Note: Shows code tab (redundant with code-tab)</div>'
@@ -78,23 +82,31 @@ def generate_screenshot_html_for_platform(screenshots_dir, platform_name):
 
 def generate_all_screenshots_html(output_dir):
     """Generate HTML for all platform screenshots organized by platform."""
-    # Find all screenshot directories (pattern: screenshots-*)
+    print(f"\n📊 Generating screenshots HTML from: {output_dir}", file=sys.stderr)
+    print(f"   Directory exists: {os.path.exists(output_dir)}", file=sys.stderr)
+    
+    if os.path.exists(output_dir):
+        print(f"   Contents: {os.listdir(output_dir)}", file=sys.stderr)
+    
     screenshot_dirs = []
     for entry in os.listdir(output_dir):
-        if entry.startswith('screenshots-') and os.path.isdir(os.path.join(output_dir, entry)):
+        full_path = os.path.join(output_dir, entry)
+        if entry.startswith('screenshots-') and os.path.isdir(full_path):
             screenshot_dirs.append(entry)
+            print(f"✅ Found screenshot directory: {entry}", file=sys.stderr)
     
     # Also check for legacy single screenshots/ directory
     if os.path.exists(os.path.join(output_dir, 'screenshots')) and os.path.isdir(os.path.join(output_dir, 'screenshots')):
         screenshot_dirs.append('screenshots')
+        print(f"✅ Found legacy screenshots directory", file=sys.stderr)
     
     if not screenshot_dirs:
+        print("⚠️  No screenshot directories found!", file=sys.stderr)
         return '<p>No screenshots available</p>', ''
     
-    # Sort directories
     screenshot_dirs.sort()
+    print(f"📁 Processing {len(screenshot_dirs)} screenshot directories", file=sys.stderr)
     
-    # Generate tabs and content
     tabs_html = []
     content_html = []
     
@@ -104,11 +116,9 @@ def generate_all_screenshots_html(output_dir):
         tab_id = f"platform-{idx}"
         active_class = 'active' if idx == 0 else ''
         
-        # Generate tab button
         tabs_html.append(f'''
           <button class="platform-tab {active_class}" onclick="showPlatform('{tab_id}')">{platform_icon} {platform_name}</button>''')
         
-        # Generate tab content
         screenshots_html = generate_screenshot_html_for_platform(dir_name, platform_name)
         content_html.append(f'''
         <div id="{tab_id}" class="platform-content {active_class}">
@@ -126,7 +136,6 @@ def generate_chaos_videos_html(video_dir, repo):
     if not video_dir or video_dir == 'None':
         return '<p>No chaos testing videos available for this run.</p>'
     
-    # List of potential video files from chaos tests
     video_files = [
         ('chaos-test-chromium-video.webm', 'chaos-test-chromium-video.gif', '🌪️ Random Click Spam', 'chaos-test'),
         ('recorded-actions-chromium-video.webm', 'recorded-actions-chromium-video.gif', '🎬 Recorded Actions Playback', 'recorded-actions')
@@ -154,11 +163,9 @@ def generate_chaos_videos_html(video_dir, repo):
 
 def generate_dashboard(output_dir):
     """Generate the HTML dashboard."""
-    # Get commit SHA
     commit_sha = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], text=True).strip()
     date = subprocess.check_output(['date', '-u', '+%Y-%m-%d %H:%M:%S UTC'], text=True).strip()
     
-    # Get metadata from environment variables
     build_status_raw = os.environ.get('BUILD_STATUS', '')
     if build_status_raw == "success":
         build_status = "✅ Passed"
@@ -169,7 +176,6 @@ def generate_dashboard(output_dir):
         build_status_class = "error"
         build_icon = "❌"
     
-    # Lint status
     lint_status_raw = os.environ.get('LINT_STATUS', '')
     if lint_status_raw == "passed":
         lint_status = "✅ Passed"
@@ -182,7 +188,6 @@ def generate_dashboard(output_dir):
         lint_icon = "❌"
         lint_result = "Failed"
     
-    # Unit test status
     unit_status_raw = os.environ.get('UNIT_STATUS', '')
     if unit_status_raw == "passed":
         unit_status = "✅ Passed"
@@ -193,7 +198,6 @@ def generate_dashboard(output_dir):
         unit_status_class = "error"
         unit_icon = "❌"
     
-    # Integration test status
     integration_status_raw = os.environ.get('INTEGRATION_STATUS', '')
     if integration_status_raw == "passed":
         integration_status = "✅ Passed"
@@ -204,7 +208,6 @@ def generate_dashboard(output_dir):
         integration_status_class = "error"
         integration_icon = "❌"
     
-    # Screenshot status
     screenshot_status_raw = os.environ.get('SCREENSHOT_STATUS', '')
     if screenshot_status_raw == "success":
         screenshot_status = "✅ Done"
@@ -215,7 +218,6 @@ def generate_dashboard(output_dir):
         screenshot_status_class = "warning"
         screenshot_icon = "⚠️"
     
-    # Chaos testing status
     chaos_status_raw = os.environ.get('CHAOS_STATUS', '')
     chaos_errors = os.environ.get('CHAOS_ERRORS_FOUND', 'false')
     if chaos_status_raw == "passed":
@@ -231,7 +233,6 @@ def generate_dashboard(output_dir):
         chaos_status_class = "warning"
         chaos_icon = "⚠️"
     
-    # Read log files
     install_log = read_file_safe('install-output.txt')
     build_log = read_file_safe('build-output.txt')
     lint_log = read_file_safe('lint-output.txt')
@@ -241,15 +242,12 @@ def generate_dashboard(output_dir):
     chaos_log = read_file_safe('chaos-test-output.txt')
     recorded_log = read_file_safe('recorded-actions-output.txt')
     
-    # Generate screenshot tabs and content
     screenshot_tabs, screenshot_content = generate_all_screenshots_html(output_dir)
     
-    # Generate chaos videos HTML
     repo = os.environ.get('REPO', 'Unknown')
     video_dir = os.environ.get('VIDEO_DIR', None)
     chaos_videos_html = generate_chaos_videos_html(video_dir, repo)
     
-    # Chaos section visibility
     chaos_section = ''
     if video_dir and video_dir != 'None':
         chaos_section = f'''
@@ -261,7 +259,6 @@ def generate_dashboard(output_dir):
         <div class="videos-grid">{chaos_videos_html}</div>
       </section>'''
     
-    # Chaos logs tab
     chaos_logs_tabs = ''
     chaos_logs_content = ''
     if chaos_status_raw:
@@ -272,7 +269,6 @@ def generate_dashboard(output_dir):
         <div id="chaos-tab" class="tab-content"><div class="log-viewer"><pre>{html.escape(chaos_log)}</pre></div></div>
         <div id="recorded-tab" class="tab-content"><div class="log-viewer"><pre>{html.escape(recorded_log)}</pre></div></div>'''
     
-    # HTML template - NOTE: CSS/JS curly braces are escaped with {{ and }}
     html_template = '''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -476,7 +472,6 @@ def generate_dashboard(output_dir):
 </body>
 </html>'''
     
-    # Fill template with values
     filled_template = html_template.format(
         commit_sha=html.escape(commit_sha),
         date=html.escape(date),
@@ -525,14 +520,13 @@ def generate_dashboard(output_dir):
         run_id=os.environ.get('RUN_ID', 'Unknown')
     )
     
-    # Write the dashboard
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, 'index.html')
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(filled_template)
     
     print(f"✅ Dashboard generated successfully at {output_file}")
-    print(f"📸 Found screenshot directories: {', '.join(os.listdir(output_dir)) if os.path.exists(output_dir) else 'none'}")
+    print(f"📸 Screenshot directories found: {len([d for d in os.listdir(output_dir) if d.startswith('screenshots-')])}")
 
 if __name__ == '__main__':
     output_dir = sys.argv[1] if len(sys.argv) > 1 else 'dashboard'

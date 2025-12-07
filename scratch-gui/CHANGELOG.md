@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`cf4e3bc7d`](https://github.com/OmniBlocks/scratch-gui/commit/cf4e3bc7d3613f5f5ee1ab11911cd8720674f4a1) - 2025-12-07 14:57:26 -0500
+
+**Update bundle-size.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`76b288482`](https://github.com/OmniBlocks/scratch-gui/commit/76b28848246d5e67390dd427dfd4ac09ba05997d) - 2025-12-07 14:42:38 -0500
 
 **Create bundle-size.yml**

@@ -1,39 +1,50 @@
-name: Check Bundle Size
+name: Build React App (Skip Large JS Minify)
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
-  measure:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build React app
-        run: npm run build
-
-      - name: Measure bundle sizes
+      - name: Build with Webpack skipping large files
         run: |
-          echo "Bundle size report" > bundle-report.txt
-          echo "" >> bundle-report.txt
-          find build -type f -printf "%p = %k KB\n" >> bundle-report.txt
-          echo "" >> bundle-report.txt
-          echo "Total size (KB):" >> bundle-report.txt
-          du -sk build | cut -f1 >> bundle-report.txt
-          cat bundle-report.txt
+          # Create a temporary webpack config that excludes huge files from Terser
+          echo "
+          const path = require('path');
+          const TerserPlugin = require('terser-webpack-plugin');
+          const baseConfig = require('./webpack.config.js');
 
-      - name: Upload report
-        uses: actions/upload-artifact@v4
+          module.exports = {
+            ...baseConfig,
+            optimization: {
+              ...baseConfig.optimization,
+              minimizer: [
+                new TerserPlugin({
+                  exclude: /beepbox_editor\\.min\\.js|mario_paintbox_samples\\.js/,
+                }),
+              ],
+            },
+          };
+          " > webpack.temp.config.js
+
+          # Run webpack with the temporary config
+          npx webpack --config webpack.temp.config.js --mode production
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: bundle-size-report
-          path: bundle-report.txt
+          name: build
+          path: dist/

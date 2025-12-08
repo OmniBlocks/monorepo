@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`cb52b77fc`](https://github.com/OmniBlocks/scratch-gui/commit/cb52b77fca5c469da87265c3ddedd42785b7658f) - 2025-12-08 07:03:31 -0500
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`2a5e792d6`](https://github.com/OmniBlocks/scratch-gui/commit/2a5e792d625c486e5a2d9fbea2a074b86d3c15d3) - 2025-12-08 00:25:29 -0500
 
 **feat: (ci) add anotations to mega pr test**

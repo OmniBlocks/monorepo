@@ -282,6 +282,7 @@ jobs:
         env:
           NODE_ENV: production
           SOURCEMAP: source-map  # 👈 Enables source maps in CI builds!
+          NODE_OPTIONS: --max-old-space-size=2048
 
       # ============================================================
       # DEPLOYMENT PHASE (MOVED UP BEFORE TESTS)

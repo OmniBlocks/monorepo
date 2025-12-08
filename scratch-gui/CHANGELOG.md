@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`dbae7df14`](https://github.com/OmniBlocks/scratch-gui/commit/dbae7df1481fc1cd649b711591e425163522c7e7) - 2025-12-08 07:26:42 -0500
+
+**fix: (ci) javascript heap memory allocation error**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`cb52b77fc`](https://github.com/OmniBlocks/scratch-gui/commit/cb52b77fca5c469da87265c3ddedd42785b7658f) - 2025-12-08 07:03:31 -0500
 
 **Update prtest.yml**

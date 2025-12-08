@@ -53,7 +53,7 @@ jobs:
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: ${{ fromJSON(steps.pr.outputs.result).number }},
+                issue_number: ${{ steps.pr.outputs.number }},
               body: `# ℹ️ **Mega PR Test Skipped**\n\n` +
                     `The comprehensive PR test & analysis has been skipped for this pull request because it was created by Dependabot.\n\n` +
                     `Dependency update PRs are automatically excluded from the mega test workflow to avoid unnecessary CI resource usage.`
@@ -90,7 +90,7 @@ jobs:
               issue_number: ${{ steps.pr.outputs.number }},
               body: `# ℹ️ **Mega PR Test Skipped**\n\n +
                     `Hi @${username}! The comprehensive Mega PR test was skipped because this PR only changes documentation or configuration files (.md, .txt, .yml).\n\n` +
-                    `_To force the Mega PR test  to run, comment \`/test pr\` on this PR._`
+                    `_To force the Mega PR test to run, comment \`/test pr\` on this PR._`
             });
 
   mega-test:
@@ -527,7 +527,7 @@ jobs:
             if (fs.existsSync('unit-test-output.txt')) {
               const unitOutput = fs.readFileSync('unit-test-output.txt', 'utf8');
               
-              // Pattern to match Playwright error locations: at file.js:line:column
+              // Pattern to match JavaScript stack trace locations: at file.js:line:column
               const errorPattern = /at\s+.*?\(([^)]+):(\d+):(\d+)\)/g;
               const lines = unitOutput.split('\n');
               
@@ -617,7 +617,7 @@ jobs:
             
             // Create GitHub Check with annotations (max 50 per request)
             if (annotations.length > 0) {
-              const sha = '${{ fromJSON(steps.pr.outputs.result).sha }}';
+              const sha = '${{ steps.pr.outputs.sha }}';
               
               // Remove duplicates
               const uniqueAnnotations = annotations.filter((annotation, index, self) =>

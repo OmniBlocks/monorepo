@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`0fc542895`](https://github.com/OmniBlocks/scratch-gui/commit/0fc542895c442155d777e3ff101274be9b25b432) - 2025-12-07 22:55:06 -0500
+
+**feat: (github) Update issue templates**
+
+Added GitHub issue templates for feature requests, bug reports, and blank issues to standardize and streamline issue submission processes.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`e2b4f9f70`](https://github.com/OmniBlocks/scratch-gui/commit/e2b4f9f70345a2a1d3ac567e19af68bfb177a0f8) - 2025-12-07 22:22:14 +0000
 
 **bleh**

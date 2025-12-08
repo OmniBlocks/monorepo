@@ -4,6 +4,21 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`2a5e792d6`](https://github.com/OmniBlocks/scratch-gui/commit/2a5e792d625c486e5a2d9fbea2a074b86d3c15d3) - 2025-12-08 00:25:29 -0500
+
+**feat: (ci) add anotations to mega pr test**
+
+* **Enhancements**
+  * Enhanced PR validation with inline annotations highlighting test errors directly in code
+  * Integrated Lighthouse performance and accessibility metrics into test result reporting
+  * Improved test feedback with comprehensive result summaries in pull request comments
+  * Better error diagnostics with clear references to specific file changes
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`8d8cd69e7`](https://github.com/OmniBlocks/scratch-gui/commit/8d8cd69e78fa6806c739e102a748c452135a9836) - 2025-12-07 23:25:26 -0500
 
 **fix: (coderabbit) change coderabbit ci timeout to 15 minutes**

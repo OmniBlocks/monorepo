@@ -400,7 +400,7 @@ jobs:
         id: lint
         continue-on-error: true
         env:
-          NODE_OPTIONS: --max-old-space-size=4096  # 👈 4GB limit prevents OOM!
+          NODE_OPTIONS: --max-old-space-size=2048  # 👈 2GB limit prevents OOM!
         run: |
           npm run test:lint 2>&1 | tee lint-output.txt
           EXIT_CODE=${PIPESTATUS[0]}

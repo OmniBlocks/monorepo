@@ -617,7 +617,7 @@ jobs:
             
             // Create GitHub Check with annotations (max 50 per request)
             if (annotations.length > 0) {
-              const sha = '${{ steps.pr.outputs.sha }}';
+              const sha = '${{ fromJSON(steps.pr.outputs.result).sha }}';
               
               // Remove duplicates
               const uniqueAnnotations = annotations.filter((annotation, index, self) =>

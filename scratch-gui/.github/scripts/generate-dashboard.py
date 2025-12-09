@@ -64,8 +64,12 @@ def generate_screenshot_html_for_platform(screenshots_dir, platform_name):
         filename = screenshot.name
         name = filename.replace('-', ' ').replace('.png', '').title()
         
-        # Relative path from the index.html location
-        rel_path = f"{screenshots_dir}/{filename}"
+        # 🎯 FIX: Use only the directory basename for relative paths
+        # This ensures paths are correct relative to index.html location
+        dir_basename = os.path.basename(screenshots_dir)
+        rel_path = f"{dir_basename}/{filename}"
+        
+        print(f"   Screenshot: {filename} -> {rel_path}", file=sys.stderr)
         
         note = ''
         if filename == 'editor-initial.png':

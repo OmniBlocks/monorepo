@@ -854,47 +854,33 @@ jobs:
           
           mkdir -p "$VIDEO_DIR"
           
-          echo "🔍 Searching for test videos in ../windows-results/test-videos..."
-          find ../windows-results/test-videos -type f -name "*.webm" 2>/dev/null | while read -r video; do
-            echo "  Found: $video"
+          echo "🔍 Searching for ALL test video directories..."
+          find ../windows-results/test-videos -type d 2>/dev/null | while read -r dir; do
+            echo "  Directory: $dir"
+            if [ -f "$dir/video.webm" ]; then
+              echo "    ✅ Contains video.webm"
+            fi
           done
           
-          # 🎯 FIX: Find videos by searching for specific test names in Playwright's directory structure
+          # 🎯 FIX: Find videos by spec filename (more reliable than grep patterns)
           echo ""
           echo "🌪️ Looking for chaos test video..."
-          CHAOS_VIDEO=$(find ../windows-results/test-videos -type f -name "video.webm" 2>/dev/null | \
-            xargs -I {} sh -c 'dirname "{}"' | \
-            grep -i "chaos\|random.*click" | head -1)
-          
-          if [ -n "$CHAOS_VIDEO" ]; then
-            VIDEO_FILE="$CHAOS_VIDEO/video.webm"
-            if [ -f "$VIDEO_FILE" ]; then
-              cp "$VIDEO_FILE" "$VIDEO_DIR/chaos-test-chromium-video.webm"
-              echo "✅ Found chaos test video at: $VIDEO_FILE"
-            fi
+          CHAOS_VIDEO_DIR=$(find ../windows-results/test-videos -type d -name "chaos-test*" 2>/dev/null | head -1)
+          if [ -n "$CHAOS_VIDEO_DIR" ] && [ -f "$CHAOS_VIDEO_DIR/video.webm" ]; then
+            cp "$CHAOS_VIDEO_DIR/video.webm" "$VIDEO_DIR/chaos-test-chromium-video.webm"
+            echo "✅ Found chaos test video at: $CHAOS_VIDEO_DIR"
           else
-            echo "⚠️ No chaos test video found, trying fallback..."
-            # Fallback: find first video that's not in a "Recorded" or "Sample" directory
-            find ../windows-results/test-videos -type f -name "video.webm" 2>/dev/null | \
-              grep -v -i "recorded\|sample" | head -1 | \
-              xargs -I {} cp {} "$VIDEO_DIR/chaos-test-chromium-video.webm" 2>/dev/null && \
-              echo "✅ Used fallback video" || echo "⚠️ No fallback video found"
+            echo "❌ No chaos test video found in directories matching 'chaos-test*'"
           fi
           
           echo ""
           echo "🎬 Looking for recorded actions video..."
-          RECORDED_VIDEO=$(find ../windows-results/test-videos -type f -name "video.webm" 2>/dev/null | \
-            xargs -I {} sh -c 'dirname "{}"' | \
-            grep -i "recorded\|sample" | head -1)
-          
-          if [ -n "$RECORDED_VIDEO" ]; then
-            VIDEO_FILE="$RECORDED_VIDEO/video.webm"
-            if [ -f "$VIDEO_FILE" ]; then
-              cp "$VIDEO_FILE" "$VIDEO_DIR/recorded-actions-chromium-video.webm"
-              echo "✅ Found recorded actions video at: $VIDEO_FILE"
-            fi
+          RECORDED_VIDEO_DIR=$(find ../windows-results/test-videos -type d -name "recorded-actions-test*" 2>/dev/null | head -1)
+          if [ -n "$RECORDED_VIDEO_DIR" ] && [ -f "$RECORDED_VIDEO_DIR/video.webm" ]; then
+            cp "$RECORDED_VIDEO_DIR/video.webm" "$VIDEO_DIR/recorded-actions-chromium-video.webm"
+            echo "✅ Found recorded actions video at: $RECORDED_VIDEO_DIR"
           else
-            echo "⚠️ No recorded actions video found"
+            echo "❌ No recorded actions video found in directories matching 'recorded-actions-test*'"
           fi
           
           # List what we have

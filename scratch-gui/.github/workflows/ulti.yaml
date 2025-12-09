@@ -817,7 +817,7 @@ jobs:
         if: github.event_name == 'issues' && github.event.action == 'opened'
         id: issue-type
         run: |
-          TYPE=$(echo '${{ steps.ai-issue-type.outputs.text }}' | sed 's/[^a-z]*//g' | tr '[:upper:]' '[:lower:]' | grep -E '^(bug|feature|task)$' || echo 'task')
+          TYPE=$(echo '${{ steps.ai-issue-type.outputs.response }}' | sed 's/[^a-z]*//g' | tr '[:upper:]' '[:lower:]' | grep -E '^(bug|feature|task)$' || echo 'task')
           echo "type=$TYPE" >> $GITHUB_OUTPUT
         shell: bash
         continue-on-error: true

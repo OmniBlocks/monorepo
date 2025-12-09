@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`a11dcaad8`](https://github.com/OmniBlocks/scratch-gui/commit/a11dcaad8664e4042d630374cf572c168ccef71f) - 2025-12-08 22:47:41 -0500
+
+**fix: set actual type for issue**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`d67c657fc`](https://github.com/OmniBlocks/scratch-gui/commit/d67c657fcc86af51c2998ae5ba270562f64151c1) - 2025-12-08 15:12:43 -0500
 
 **Merge pull request #530 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-89175c7**

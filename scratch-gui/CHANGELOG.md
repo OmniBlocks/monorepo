@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`2a2428bef`](https://github.com/OmniBlocks/scratch-gui/commit/2a2428befc4fcfeb3ee7d31ad1363b27e3a1d489) - 2025-12-09 15:21:37 -0500
+
+**Update test.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`328ba3289`](https://github.com/OmniBlocks/scratch-gui/commit/328ba328955a05bb9fb4c8ea5a2a945993f1aab0) - 2025-12-09 13:36:43 -0500
 
 **refactor: Refactor test video discovery and AI workflow prompts**

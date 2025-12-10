@@ -40,7 +40,9 @@ While we are quite laid back, as I said earlier, this does not exempt anyone fro
 ## Joke features
 
 Haha! Funny! yes..............
-Joke features for April Fools are allowed, just don't spam PRs for joke features, although that applies for any kind of PR.
+Joke features for April Fools are allowed, just don't spam PRs for joke features, although that applies for any kind of PR.</br>
+No, really don't. Or else this is what we have to deal with:</br>
+<img width="300" height="64" alt="A pull request counter, showing 98 PR's open." src="https://github.com/user-attachments/assets/3f8e9d66-2a67-40df-bb31-dfbea5e61ed8" />
 
 ## Code Review
 

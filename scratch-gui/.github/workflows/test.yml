@@ -174,8 +174,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        browser: [chromium]
+        # 🎯 FIX: Added firefox and webkit while keeping Windows+Chromium dominant
+        include:
+          # Primary platform - most comprehensive testing
+          - os: windows-latest
+            browser: chromium
+            primary: true
+          # Additional coverage
+          - os: windows-latest
+            browser: firefox
+          - os: windows-latest
+            browser: webkit
+          - os: ubuntu-latest
+            browser: chromium
+          - os: ubuntu-latest
+            browser: firefox
+          - os: macos-latest
+            browser: chromium
+          - os: macos-latest
+            browser: webkit
     
     steps:
       - name: Download build artifact
@@ -210,7 +227,7 @@ jobs:
 
           module.exports = defineConfig({
             testDir: '.',
-            outputDir: 'test-videos',  // 🎯 FIX: Videos now save here instead of test-results/
+            outputDir: 'test-results',  // ✅ Standard location for test artifacts
             timeout: 120000,
             fullyParallel: false,
             forbidOnly: !!process.env.CI,
@@ -220,7 +237,7 @@ jobs:
             use: {
               trace: 'on',
               screenshot: 'on',
-              video: 'on',
+              video: 'on',  // ✅ Always record videos
               baseURL: 'http://localhost:8080',
               permissions: ['midi', 'midi-sysex'],
             },
@@ -229,6 +246,20 @@ jobs:
                 name: 'chromium',
                 use: { 
                   ...devices['Desktop Chrome'],
+                  permissions: ['midi', 'midi-sysex'],
+                },
+              },
+              {
+                name: 'firefox',
+                use: { 
+                  ...devices['Desktop Firefox'],
+                  permissions: ['midi', 'midi-sysex'],
+                },
+              },
+              {
+                name: 'webkit',
+                use: { 
+                  ...devices['Desktop Safari'],
                   permissions: ['midi', 'midi-sysex'],
                 },
               },
@@ -639,7 +670,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p screenshots
-          npx playwright test screenshot-test.spec.js --project=chromium 2>&1 | tee screenshot-output.txt
+          npx playwright test screenshot-test.spec.js --project=${{ matrix.browser }} 2>&1 | tee screenshot-output.txt
           if [ $? -eq 0 ]; then
             echo "screenshot_status=success" >> $GITHUB_OUTPUT
           else
@@ -656,18 +687,34 @@ jobs:
         run: |
           set +e
           set -o pipefail
-          mkdir -p test-videos chaos-reports
+          mkdir -p test-results chaos-reports
           
-          npx playwright test chaos-test.spec.js --project=chromium --output=test-videos/ 2>&1 | tee chaos-test-output.txt
+          # ✅ FIX: Don't use --output flag, videos save to outputDir in config
+          npx playwright test chaos-test.spec.js --project=${{ matrix.browser }} 2>&1 | tee chaos-test-output.txt
           CHAOS_EXIT=${PIPESTATUS[0]}
           
-          npx playwright test recorded-actions-test.spec.js --project=chromium --output=test-videos/ 2>&1 | tee recorded-actions-output.txt
+          npx playwright test recorded-actions-test.spec.js --project=${{ matrix.browser }} 2>&1 | tee recorded-actions-output.txt
           RECORDED_EXIT=${PIPESTATUS[0]}
           
           set -e
           
-          echo "🎬 Test videos directory structure:"
-          find test-videos -type f -name "*.webm" 2>/dev/null | head -20
+          # ✅ FIX: Properly locate and list video files
+          echo "🎬 Searching for test videos..."
+          echo "Directory structure:"
+          find test-results -type f 2>/dev/null | head -30
+          
+          # Find ALL webm videos recursively
+          VIDEO_COUNT=$(find test-results -type f -name "*.webm" 2>/dev/null | wc -l)
+          echo "Found $VIDEO_COUNT video files"
+          
+          if [ $VIDEO_COUNT -gt 0 ]; then
+            echo "Video files:"
+            find test-results -type f -name "*.webm" -exec ls -lh {} \;
+          else
+            echo "⚠️ WARNING: No video files found!"
+            echo "Contents of test-results:"
+            ls -R test-results/ 2>/dev/null || echo "test-results directory not found"
+          fi
           
           if [ $CHAOS_EXIT -eq 0 ] && [ $RECORDED_EXIT -eq 0 ]; then
             echo "chaos_status=passed" >> $GITHUB_OUTPUT
@@ -707,7 +754,7 @@ jobs:
             screenshots/
             chaos-results.json
             recorded-*-results.json
-            test-videos/
+            test-results/
             screenshot-output.txt
             chaos-test-output.txt
             recorded-actions-output.txt
@@ -732,7 +779,7 @@ jobs:
           name: test-logs
         continue-on-error: true
 
-      - name: Download Windows results
+      - name: Download Windows+Chromium results (primary)
         uses: actions/download-artifact@v4
         with:
           name: chaos-results-windows-latest-chromium
@@ -855,38 +902,63 @@ jobs:
           
           mkdir -p "$VIDEO_DIR"
           
-          echo "🔍 Searching for ALL test video directories..."
-          find ../windows-results/test-videos -type d 2>/dev/null | while read -r dir; do
-            echo "  Directory: $dir"
-            if [ -f "$dir/video.webm" ]; then
-              echo "    ✅ Contains video.webm"
-            fi
-          done
-          
-          # 🎯 FIX: Find videos by spec filename (more reliable than grep patterns)
+          # ✅ FIX: Improved video discovery - find by test name in path
+          echo "🔍 Searching for test videos in Windows+Chromium results..."
           echo ""
+          
+          # Strategy: Find directories containing our test spec names
           echo "🌪️ Looking for chaos test video..."
-          CHAOS_VIDEO_DIR=$(find ../windows-results/test-videos -type d -name "chaos-test*" 2>/dev/null | head -1)
-          if [ -n "$CHAOS_VIDEO_DIR" ] && [ -f "$CHAOS_VIDEO_DIR/video.webm" ]; then
-            cp "$CHAOS_VIDEO_DIR/video.webm" "$VIDEO_DIR/chaos-test-chromium-video.webm"
-            echo "✅ Found chaos test video at: $CHAOS_VIDEO_DIR"
+          CHAOS_DIRS=$(find ../windows-results/test-results -type d -path "*chaos-test*Random-Click-Spam*" 2>/dev/null)
+          if [ -n "$CHAOS_DIRS" ]; then
+            echo "Found chaos test directories:"
+            echo "$CHAOS_DIRS"
+            # Find the video.webm in any of these directories
+            CHAOS_VIDEO=$(find $CHAOS_DIRS -type f -name "video.webm" 2>/dev/null | head -1)
+            if [ -f "$CHAOS_VIDEO" ]; then
+              cp "$CHAOS_VIDEO" "$VIDEO_DIR/chaos-test-chromium-video.webm"
+              echo "✅ Copied chaos video from: $CHAOS_VIDEO"
+            else
+              echo "⚠️ No video.webm found in chaos directories"
+            fi
           else
-            echo "❌ No chaos test video found in directories matching 'chaos-test*'"
+            # Fallback: search more broadly
+            echo "Trying broader search..."
+            CHAOS_VIDEO=$(find ../windows-results/test-results -type f -name "video.webm" -path "*chaos-test*" 2>/dev/null | head -1)
+            if [ -f "$CHAOS_VIDEO" ]; then
+              cp "$CHAOS_VIDEO" "$VIDEO_DIR/chaos-test-chromium-video.webm"
+              echo "✅ Found chaos video via fallback: $CHAOS_VIDEO"
+            else
+              echo "❌ No chaos test video found"
+            fi
           fi
           
           echo ""
           echo "🎬 Looking for recorded actions video..."
-          RECORDED_VIDEO_DIR=$(find ../windows-results/test-videos -type d -name "recorded-actions-test*" 2>/dev/null | head -1)
-          if [ -n "$RECORDED_VIDEO_DIR" ] && [ -f "$RECORDED_VIDEO_DIR/video.webm" ]; then
-            cp "$RECORDED_VIDEO_DIR/video.webm" "$VIDEO_DIR/recorded-actions-chromium-video.webm"
-            echo "✅ Found recorded actions video at: $RECORDED_VIDEO_DIR"
+          RECORDED_DIRS=$(find ../windows-results/test-results -type d -path "*recorded-actions-test*" 2>/dev/null)
+          if [ -n "$RECORDED_DIRS" ]; then
+            echo "Found recorded actions directories:"
+            echo "$RECORDED_DIRS"
+            RECORDED_VIDEO=$(find $RECORDED_DIRS -type f -name "video.webm" 2>/dev/null | head -1)
+            if [ -f "$RECORDED_VIDEO" ]; then
+              cp "$RECORDED_VIDEO" "$VIDEO_DIR/recorded-actions-chromium-video.webm"
+              echo "✅ Copied recorded actions video from: $RECORDED_VIDEO"
+            else
+              echo "⚠️ No video.webm found in recorded actions directories"
+            fi
           else
-            echo "❌ No recorded actions video found in directories matching 'recorded-actions-test*'"
+            echo "Trying broader search..."
+            RECORDED_VIDEO=$(find ../windows-results/test-results -type f -name "video.webm" -path "*recorded-actions*" 2>/dev/null | head -1)
+            if [ -f "$RECORDED_VIDEO" ]; then
+              cp "$RECORDED_VIDEO" "$VIDEO_DIR/recorded-actions-chromium-video.webm"
+              echo "✅ Found recorded actions video via fallback: $RECORDED_VIDEO"
+            else
+              echo "❌ No recorded actions video found"
+            fi
           fi
           
-          # List what we have
+          # Debug: show what we actually have
           echo ""
-          echo "📦 Videos collected:"
+          echo "📦 Videos collected in $VIDEO_DIR:"
           ls -lh "$VIDEO_DIR"/*.webm 2>/dev/null || echo "⚠️ No videos found!"
           
           # Convert videos to GIF for inline display
@@ -908,7 +980,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Add chaos test videos from run $RUN_ID"
             git push origin chaos-videos
-            echo "✅ Videos pushed!"
+            echo "✅ Videos pushed to chaos-videos branch!"
           else
             echo "⚠️ No changes to push"
           fi
@@ -1201,7 +1273,10 @@ jobs:
         run: |
           mkdir -p dashboard
           
+          # ✅ FIX: Improved screenshot copying with better path handling
           echo "📸 Copying screenshots from all platforms..."
+          SCREENSHOT_COUNT=0
+          
           for platform_dir in all-matrix-results/chaos-results-*/; do
             if [ -d "$platform_dir" ]; then
               platform_name=$(basename "$platform_dir" | sed 's/chaos-results-//')
@@ -1210,19 +1285,15 @@ jobs:
               if [ -d "$platform_dir/screenshots" ]; then
                 target_dir="dashboard/screenshots-${platform_name}"
                 mkdir -p "$target_dir"
-                screenshot_count=$(find "$platform_dir/screenshots" -name "*.png" 2>/dev/null | wc -l)
-                echo "    Found $screenshot_count screenshots"
                 
-                if [ "$screenshot_count" -gt 0 ]; then
-                  cp "$platform_dir/screenshots"/*.png "$target_dir/" 2>/dev/null && \
-                    echo "    ✅ Copied to $target_dir" || \
-                    echo "    ⚠️ Failed to copy"
-                  
-                  # Verify copy
-                  copied_count=$(find "$target_dir" -name "*.png" 2>/dev/null | wc -l)
-                  echo "    Verified: $copied_count files in destination"
+                # Check if there are actual PNG files
+                if ls "$platform_dir/screenshots"/*.png 1> /dev/null 2>&1; then
+                  cp "$platform_dir/screenshots"/*.png "$target_dir/" 2>/dev/null
+                  copied=$(ls "$target_dir"/*.png 2>/dev/null | wc -l)
+                  SCREENSHOT_COUNT=$((SCREENSHOT_COUNT + copied))
+                  echo "    ✅ Copied $copied screenshots to $target_dir"
                 else
-                  echo "    ⚠️ Screenshots directory is empty"
+                  echo "    ⚠️ No PNG files in screenshots directory"
                 fi
               else
                 echo "    ⚠️ No screenshots directory found"
@@ -1231,14 +1302,14 @@ jobs:
           done
           
           echo ""
-          echo "📊 Dashboard screenshot summary:"
-          echo "  Total screenshot directories: $(find dashboard -type d -name "screenshots-*" | wc -l)"
-          find dashboard -name "*.png" 2>/dev/null | wc -l | xargs echo "  Total screenshots:"
+          echo "📊 Screenshot summary: $SCREENSHOT_COUNT total files copied"
+          echo "📁 Dashboard directories created:"
+          find dashboard -type d -name "screenshots-*" | while read dir; do
+            count=$(ls "$dir"/*.png 2>/dev/null | wc -l)
+            echo "  $dir: $count images"
+          done
           
-          echo ""
-          echo "📁 Dashboard directory structure:"
-          ls -R dashboard/
-          
+          # Generate the dashboard HTML
           python3 .github/scripts/generate-dashboard.py dashboard
 
       - name: Deploy to gh-pages
@@ -1324,6 +1395,11 @@ jobs:
                 font-size: 2em;
                 margin: 20px 0;
               }
+              
+              .browsers {
+                font-size: 1.2em;
+                margin: 15px 0;
+              }
             </style>
           </head>
           <body>
@@ -1331,9 +1407,10 @@ jobs:
               <h1>🚀 OmniBlocks</h1>
               <h2>Main Branch Test Results</h2>
               <div class="chaos">🌪️ ULTRA CHAOS TESTING! 🌪️</div>
-              <p>Multi-platform chaos testing with AI-powered error analysis!</p>
+              <div class="browsers">🌐 Multi-Browser Testing: Chromium • Firefox • WebKit</div>
+              <p>Comprehensive chaos testing across Windows, Ubuntu, and macOS with multiple browsers!</p>
               <a href="latest/index.html" class="button">📊 View Latest Dashboard</a>
-              <p class="note">Now testing across Windows, Ubuntu, and macOS! 🎉</p>
+              <p class="note">Now featuring Firefox 🦊 and WebKit 🧭 alongside Chromium! 🎉</p>
             </div>
           </body>
           </html>
@@ -1343,7 +1420,7 @@ jobs:
           git add tests/
           
           if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Update test results with ULTRA chaos testing 🌪️ - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git commit -m "Update test results with multi-browser chaos testing 🌪️🦊🧭 - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
             git push origin gh-pages || git push -u origin gh-pages
           else
             echo "No changes to commit."

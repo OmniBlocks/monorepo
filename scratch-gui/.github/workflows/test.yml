@@ -227,7 +227,7 @@ jobs:
 
           module.exports = defineConfig({
             testDir: '.',
-            outputDir: 'test-results',  // ✅ Standard location for test artifacts
+            outputDir: 'test-results',
             timeout: 120000,
             fullyParallel: false,
             forbidOnly: !!process.env.CI,
@@ -237,30 +237,30 @@ jobs:
             use: {
               trace: 'on',
               screenshot: 'on',
-              video: 'on',  // ✅ Always record videos
+              video: 'on',
               baseURL: 'http://localhost:8080',
-              permissions: ['midi', 'midi-sysex'],
+              // ✅ FIX: Remove global MIDI permissions (not supported in all browsers)
             },
             projects: [
               {
                 name: 'chromium',
                 use: { 
                   ...devices['Desktop Chrome'],
-                  permissions: ['midi', 'midi-sysex'],
+                  permissions: ['midi', 'midi-sysex'],  // Only Chromium supports MIDI
                 },
               },
               {
                 name: 'firefox',
                 use: { 
                   ...devices['Desktop Firefox'],
-                  permissions: ['midi', 'midi-sysex'],
+                  // ✅ FIX: No MIDI permissions for Firefox
                 },
               },
               {
                 name: 'webkit',
                 use: { 
                   ...devices['Desktop Safari'],
-                  permissions: ['midi', 'midi-sysex'],
+                  // ✅ FIX: No MIDI permissions for WebKit
                 },
               },
             ],
@@ -274,8 +274,15 @@ jobs:
           const { test } = require('@playwright/test');
 
           test.describe('Main Branch Screenshots', () => {
-            test('Stage and Sprites', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Stage and Sprites', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
@@ -290,8 +297,15 @@ jobs:
               }
             });
 
-            test('Blocks Workspace', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Blocks Workspace', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
@@ -313,8 +327,15 @@ jobs:
               await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
             });
 
-            test('Editor Initial (Code Tab)', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Editor Initial (Code Tab)', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
@@ -323,8 +344,15 @@ jobs:
               await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
             });
 
-            test('Code Tab', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Code Tab', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
@@ -339,8 +367,15 @@ jobs:
               await page.screenshot({ path: 'screenshots/code-tab.png', fullPage: true });
             });
 
-            test('Costumes Tab', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Costumes Tab', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
@@ -355,8 +390,15 @@ jobs:
               await page.screenshot({ path: 'screenshots/costumes-tab.png', fullPage: true });
             });
 
-            test('Sounds Tab', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Sounds Tab', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
@@ -371,8 +413,15 @@ jobs:
               await page.screenshot({ path: 'screenshots/sounds-tab.png', fullPage: true });
             });
 
-            test('Songs Tab', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Songs Tab', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
@@ -387,8 +436,15 @@ jobs:
               await page.screenshot({ path: 'screenshots/songs-tab.png', fullPage: true });
             });
 
-            test('Extension Library', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Extension Library', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
@@ -407,8 +463,15 @@ jobs:
               await page.screenshot({ path: 'screenshots/extension-library.png', fullPage: true });
             });
 
-            test('Advanced Settings', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Advanced Settings', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
@@ -475,8 +538,15 @@ jobs:
           const fs = require('fs');
 
           test.describe('🌪️ Chaos Testing', () => {
-            test('Random Click Spam', async ({ page, context }) => {
-              await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+            test('Random Click Spam', async ({ page, context, browserName }) => {
+              // ✅ FIX: Only grant MIDI on Chromium
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
               
               const consoleErrors = [];
               const eventLog = [];
@@ -538,6 +608,7 @@ jobs:
               
               const results = {
                 testName: 'Random Click Spam',
+                browser: browserName,
                 clickCount,
                 errors: consoleErrors,
                 events: eventLog
@@ -568,8 +639,15 @@ jobs:
             const testSlug = file.replace('.json', '');
             
             allTests += `
-              test('${testName}', async ({ page, context }) => {
-                await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+              test('${testName}', async ({ page, context, browserName }) => {
+                // ✅ FIX: Only grant MIDI on Chromium
+                if (browserName === 'chromium') {
+                  try {
+                    await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                  } catch (e) {
+                    console.log('MIDI permissions not available');
+                  }
+                }
                 
                 const consoleErrors = [];
                 const eventLog = [];
@@ -617,6 +695,7 @@ jobs:
                 const results = {
                   testName: '${testName}',
                   testFile: '${file}',
+                  browser: browserName,
                   actionsExecuted: actions.length,
                   errors: consoleErrors,
                   events: eventLog

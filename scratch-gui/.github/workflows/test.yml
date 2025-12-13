@@ -174,13 +174,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 🎯 FIX: Added firefox and webkit while keeping Windows+Chromium dominant
         include:
-          # Primary platform - most comprehensive testing
           - os: windows-latest
             browser: chromium
             primary: true
-          # Additional coverage
           - os: windows-latest
             browser: firefox
           - os: windows-latest
@@ -239,28 +236,25 @@ jobs:
               screenshot: 'on',
               video: 'on',
               baseURL: 'http://localhost:8080',
-              // ✅ FIX: Remove global MIDI permissions (not supported in all browsers)
             },
             projects: [
               {
                 name: 'chromium',
                 use: { 
                   ...devices['Desktop Chrome'],
-                  permissions: ['midi', 'midi-sysex'],  // Only Chromium supports MIDI
+                  permissions: ['midi', 'midi-sysex'],
                 },
               },
               {
                 name: 'firefox',
                 use: { 
                   ...devices['Desktop Firefox'],
-                  // ✅ FIX: No MIDI permissions for Firefox
                 },
               },
               {
                 name: 'webkit',
                 use: { 
                   ...devices['Desktop Safari'],
-                  // ✅ FIX: No MIDI permissions for WebKit
                 },
               },
             ],
@@ -275,7 +269,6 @@ jobs:
 
           test.describe('Main Branch Screenshots', () => {
             test('Stage and Sprites', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -298,7 +291,6 @@ jobs:
             });
 
             test('Blocks Workspace', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -328,7 +320,6 @@ jobs:
             });
 
             test('Editor Initial (Code Tab)', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -345,7 +336,6 @@ jobs:
             });
 
             test('Code Tab', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -358,6 +348,16 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
               
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const codeTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(0);
@@ -368,7 +368,6 @@ jobs:
             });
 
             test('Costumes Tab', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -381,6 +380,16 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
               
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const costumesTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(1);
@@ -391,7 +400,6 @@ jobs:
             });
 
             test('Sounds Tab', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -404,6 +412,16 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
               
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const soundsTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(2);
@@ -414,7 +432,6 @@ jobs:
             });
 
             test('Songs Tab', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -427,6 +444,16 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
               
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const songsTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(3);
@@ -437,7 +464,6 @@ jobs:
             });
 
             test('Extension Library', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -450,6 +476,16 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
               
               const extensionButton = page.locator('[class*="extension-button"]').first()
                 .or(page.locator('button:has-text("Add Extension")'))
@@ -464,7 +500,6 @@ jobs:
             });
 
             test('Advanced Settings', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -477,6 +512,16 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
               
               const settingsButton = page.locator('[class*="menu-bar"]')
                 .locator('[class*="settings"], [aria-label*="settings" i], [aria-label*="advanced" i]')
@@ -504,12 +549,10 @@ jobs:
         run: |
           mkdir -p .github/chaos-tests
           
-          # Copy from repo if exists
           if [ -d "repo-source/.github/chaos-tests" ]; then
             cp -r repo-source/.github/chaos-tests/* .github/chaos-tests/ 2>/dev/null || true
           fi
           
-          # Create sample if none exist
           if [ ! "$(ls -A .github/chaos-tests/*.json 2>/dev/null)" ]; then
             cat > .github/chaos-tests/sample-tabs.json << 'JSONEOF'
           {
@@ -532,14 +575,13 @@ jobs:
       - name: Generate chaos and recorded tests
         shell: bash
         run: |
-          # Create random click chaos test
+          # ✅ FIX: NO service worker filtering - catch ALL errors!
           cat > chaos-test.spec.js << 'EOF'
           const { test } = require('@playwright/test');
           const fs = require('fs');
 
           test.describe('🌪️ Chaos Testing', () => {
             test('Random Click Spam', async ({ page, context, browserName }) => {
-              // ✅ FIX: Only grant MIDI on Chromium
               if (browserName === 'chromium') {
                 try {
                   await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -623,7 +665,7 @@ jobs:
           });
           EOF
           
-          # Generate recorded actions tests
+          # ✅ FIX: NO service worker filtering - catch ALL errors!
           cat > generate-custom-tests.js << 'GENEOF'
           const fs = require('fs');
           const path = require('path');
@@ -640,7 +682,6 @@ jobs:
             
             allTests += `
               test('${testName}', async ({ page, context, browserName }) => {
-                // ✅ FIX: Only grant MIDI on Chromium
                 if (browserName === 'chromium') {
                   try {
                     await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
@@ -655,9 +696,6 @@ jobs:
                 page.on('console', msg => {
                   if (msg.type() === 'error') {
                     const text = msg.text();
-                    if (text.includes('service_worker.js') && text.includes('404')) {
-                      return;
-                    }
                     consoleErrors.push({
                       text: text,
                       timestamp: Date.now(),
@@ -768,7 +806,6 @@ jobs:
           set -o pipefail
           mkdir -p test-results chaos-reports
           
-          # ✅ FIX: Don't use --output flag, videos save to outputDir in config
           npx playwright test chaos-test.spec.js --project=${{ matrix.browser }} 2>&1 | tee chaos-test-output.txt
           CHAOS_EXIT=${PIPESTATUS[0]}
           
@@ -777,12 +814,10 @@ jobs:
           
           set -e
           
-          # ✅ FIX: Properly locate and list video files
           echo "🎬 Searching for test videos..."
           echo "Directory structure:"
           find test-results -type f 2>/dev/null | head -30
           
-          # Find ALL webm videos recursively
           VIDEO_COUNT=$(find test-results -type f -name "*.webm" 2>/dev/null | wc -l)
           echo "Found $VIDEO_COUNT video files"
           
@@ -981,66 +1016,49 @@ jobs:
           
           mkdir -p "$VIDEO_DIR"
           
-          # ✅ FIX: Improved video discovery - find by test name in path
+          # ✅ FIX: Simplified video discovery - find by prefix
           echo "🔍 Searching for test videos in Windows+Chromium results..."
           echo ""
           
-          # Strategy: Find directories containing our test spec names
           echo "🌪️ Looking for chaos test video..."
-          CHAOS_DIRS=$(find ../windows-results/test-results -type d -path "*chaos-test*Random-Click-Spam*" 2>/dev/null)
-          if [ -n "$CHAOS_DIRS" ]; then
-            echo "Found chaos test directories:"
-            echo "$CHAOS_DIRS"
-            # Find the video.webm in any of these directories
-            CHAOS_VIDEO=$(find $CHAOS_DIRS -type f -name "video.webm" 2>/dev/null | head -1)
+          CHAOS_DIR=$(find ../windows-results/test-results -type d -name "chaos-test-*" 2>/dev/null | head -1)
+          if [ -n "$CHAOS_DIR" ] && [ -d "$CHAOS_DIR" ]; then
+            echo "Found chaos test directory: $CHAOS_DIR"
+            CHAOS_VIDEO="$CHAOS_DIR/video.webm"
             if [ -f "$CHAOS_VIDEO" ]; then
               cp "$CHAOS_VIDEO" "$VIDEO_DIR/chaos-test-chromium-video.webm"
               echo "✅ Copied chaos video from: $CHAOS_VIDEO"
             else
-              echo "⚠️ No video.webm found in chaos directories"
+              echo "⚠️ No video.webm in chaos directory"
+              ls -la "$CHAOS_DIR" 2>/dev/null || echo "Can't list directory"
             fi
           else
-            # Fallback: search more broadly
-            echo "Trying broader search..."
-            CHAOS_VIDEO=$(find ../windows-results/test-results -type f -name "video.webm" -path "*chaos-test*" 2>/dev/null | head -1)
-            if [ -f "$CHAOS_VIDEO" ]; then
-              cp "$CHAOS_VIDEO" "$VIDEO_DIR/chaos-test-chromium-video.webm"
-              echo "✅ Found chaos video via fallback: $CHAOS_VIDEO"
-            else
-              echo "❌ No chaos test video found"
-            fi
+            echo "❌ No chaos test directory found"
+            echo "Directories in test-results:"
+            ls ../windows-results/test-results 2>/dev/null || echo "test-results not found"
           fi
           
           echo ""
           echo "🎬 Looking for recorded actions video..."
-          RECORDED_DIRS=$(find ../windows-results/test-results -type d -path "*recorded-actions-test*" 2>/dev/null)
-          if [ -n "$RECORDED_DIRS" ]; then
-            echo "Found recorded actions directories:"
-            echo "$RECORDED_DIRS"
-            RECORDED_VIDEO=$(find $RECORDED_DIRS -type f -name "video.webm" 2>/dev/null | head -1)
+          RECORDED_DIR=$(find ../windows-results/test-results -type d -name "recorded-actions-test-*" 2>/dev/null | head -1)
+          if [ -n "$RECORDED_DIR" ] && [ -d "$RECORDED_DIR" ]; then
+            echo "Found recorded actions directory: $RECORDED_DIR"
+            RECORDED_VIDEO="$RECORDED_DIR/video.webm"
             if [ -f "$RECORDED_VIDEO" ]; then
               cp "$RECORDED_VIDEO" "$VIDEO_DIR/recorded-actions-chromium-video.webm"
               echo "✅ Copied recorded actions video from: $RECORDED_VIDEO"
             else
-              echo "⚠️ No video.webm found in recorded actions directories"
+              echo "⚠️ No video.webm in recorded actions directory"
+              ls -la "$RECORDED_DIR" 2>/dev/null || echo "Can't list directory"
             fi
           else
-            echo "Trying broader search..."
-            RECORDED_VIDEO=$(find ../windows-results/test-results -type f -name "video.webm" -path "*recorded-actions*" 2>/dev/null | head -1)
-            if [ -f "$RECORDED_VIDEO" ]; then
-              cp "$RECORDED_VIDEO" "$VIDEO_DIR/recorded-actions-chromium-video.webm"
-              echo "✅ Found recorded actions video via fallback: $RECORDED_VIDEO"
-            else
-              echo "❌ No recorded actions video found"
-            fi
+            echo "❌ No recorded actions directory found"
           fi
           
-          # Debug: show what we actually have
           echo ""
           echo "📦 Videos collected in $VIDEO_DIR:"
           ls -lh "$VIDEO_DIR"/*.webm 2>/dev/null || echo "⚠️ No videos found!"
           
-          # Convert videos to GIF for inline display
           echo ""
           echo "🎨 Converting videos to GIF..."
           for webm in "$VIDEO_DIR"/*.webm; do
@@ -1352,7 +1370,6 @@ jobs:
         run: |
           mkdir -p dashboard
           
-          # ✅ FIX: Improved screenshot copying with better path handling
           echo "📸 Copying screenshots from all platforms..."
           SCREENSHOT_COUNT=0
           
@@ -1365,7 +1382,6 @@ jobs:
                 target_dir="dashboard/screenshots-${platform_name}"
                 mkdir -p "$target_dir"
                 
-                # Check if there are actual PNG files
                 if ls "$platform_dir/screenshots"/*.png 1> /dev/null 2>&1; then
                   cp "$platform_dir/screenshots"/*.png "$target_dir/" 2>/dev/null
                   copied=$(ls "$target_dir"/*.png 2>/dev/null | wc -l)
@@ -1388,7 +1404,6 @@ jobs:
             echo "  $dir: $count images"
           done
           
-          # Generate the dashboard HTML
           python3 .github/scripts/generate-dashboard.py dashboard
 
       - name: Deploy to gh-pages

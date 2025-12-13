@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`50ed42c0f`](https://github.com/OmniBlocks/scratch-gui/commit/50ed42c0fe2e02c4b8af93f036adc9a7dc90f46c) - 2025-12-13 18:38:49 -0500
+
+**Update test.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`f40120456`](https://github.com/OmniBlocks/scratch-gui/commit/f40120456d282243b596060125c9726bab74d45f) - 2025-12-13 17:31:24 +0000
 
 **rounded**

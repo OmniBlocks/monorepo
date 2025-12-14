@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`913fcb697`](https://github.com/OmniBlocks/scratch-gui/commit/913fcb69708f460f5090c9bbdebef11f4015b959) - 2025-12-14 10:33:43 +0000
+
+**dumb copilot commit messages but anyways remove incompatible confirmation**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`50ed42c0f`](https://github.com/OmniBlocks/scratch-gui/commit/50ed42c0fe2e02c4b8af93f036adc9a7dc90f46c) - 2025-12-13 18:38:49 -0500
 
 **Update test.yml**

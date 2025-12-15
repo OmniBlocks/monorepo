@@ -15,14 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Find and process stale PRs
+      - name: Find and remind stale PRs
         uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           script: |
             const STALE_DAYS = 7;
-            const DIFF_SIZE_LIMIT = 5000; // bytes
+            const DIFF_SIZE_LIMIT = 5000;
             
-            // Get all open PRs
             const { data: prs } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -36,10 +37,8 @@ jobs:
               const updatedAt = new Date(pr.updated_at);
               const daysSinceUpdate = Math.floor((now - updatedAt) / (1000 * 60 * 60 * 24));
               
-              // Skip if not stale
               if (daysSinceUpdate < STALE_DAYS) continue;
               
-              // Check if we already reminded them recently (within last 7 days)
               const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -59,7 +58,6 @@ jobs:
               
               console.log(`Processing stale PR #${pr.number}: ${pr.title}`);
               
-              // Get PR diff
               let diffContext = '';
               try {
                 const { data: diff } = await github.rest.pulls.get({
@@ -73,8 +71,7 @@ jobs:
                 console.log(`Diff size: ${diffSize} bytes`);
                 
                 if (diffSize < DIFF_SIZE_LIMIT) {
-                  // Include truncated diff in context
-                  const maxChars = 8000; // Leave room for prompt
+                  const maxChars = 8000;
                   diffContext = diff.length > maxChars 
                     ? diff.substring(0, maxChars) + '\n\n[... diff truncated ...]'
                     : diff;
@@ -83,69 +80,38 @@ jobs:
                 console.log(`Could not fetch diff: ${e.message}`);
               }
               
-              // Get recent comment context
               const recentCommentContext = comments.length > 0
                 ? `Last comment ${Math.floor((new Date() - new Date(comments[comments.length - 1].created_at)) / (1000 * 60 * 60 * 24))} days ago by @${comments[comments.length - 1].user.login}`
                 : 'No recent comments';
               
-              // Build AI prompt
-              const prompt = `You're a friendly, playful AI bot for OmniBlocks/scratch-gui (a Scratch editor fork).
-
-Write a personalized stale PR reminder for:
-- PR #${pr.number} by @${pr.author.login}
-- Title: "${pr.title}"
-- Days since last update: ${daysSinceUpdate}
-- ${recentCommentContext}
-${diffContext ? `Here's the PR diff:\n\`\`\`diff\n${diffContext}\n\`\`\`` : '(Diff too large to include)'}
-Write a friendly 2-3 sentence reminder that:
-- Acknowledges what the PR is trying to do
-- Gently asks if they need help or if something is blocking progress
-- Uses the playful OmniBlocks tone (emojis welcome! 🎨)
-- Is encouraging, not pushy
-
-Keep it under 200 words!`;
+              const promptLines = [
+                "You're a friendly, playful AI bot for OmniBlocks/scratch-gui (a Scratch editor fork).",
+                "",
+                "Write a personalized stale PR reminder for:",
+                `* PR #${pr.number} by @${pr.user.login}`,
+                `* Title: "${pr.title}"`,
+                `* Days since last update: ${daysSinceUpdate}`,
+                `* ${recentCommentContext}`
+              ];
               
-              // Write prompt to file for ai-inference action
-              const fs = require('fs');
-              fs.writeFileSync(`pr-${pr.number}-prompt.txt`, prompt);
+              if (diffContext) {
+                promptLines.push("", "Here's the PR diff:", "```diff", diffContext, "```");
+              } else {
+                promptLines.push("", "(Diff too large to include)");
+              }
               
-              // Store PR info for later
-              fs.appendFileSync('stale-prs.json', JSON.stringify({
-                number: pr.number,
-                author: pr.author.login
-              }) + '\n');
-            }
-      
-      - name: Generate AI response for each stale PR
-        id: ai_responses
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            
-            // Read list of stale PRs
-            if (!fs.existsSync('stale-prs.json')) {
-              console.log('No stale PRs found!');
-              return;
-            }
-            
-            const stalePRs = fs.readFileSync('stale-prs.json', 'utf8')
-              .trim()
-              .split('\n')
-              .filter(line => line)
-              .map(line => JSON.parse(line));
-            
-            console.log(`Found ${stalePRs.length} stale PRs to process`);
-            
-            for (const pr of stalePRs) {
-              console.log(`Generating AI message for PR #${pr.number}...`);
+              promptLines.push(
+                "",
+                "Write a friendly 2-3 sentence reminder that:",
+                "* Acknowledges what the PR is trying to do",
+                "* Gently asks if they need help or if something is blocking progress",
+                "* Uses the playful OmniBlocks tone (emojis welcome! 🎨)",
+                "* Is encouraging, not pushy",
+                "",
+                "Keep it under 200 words!"
+              );
               
-              // Read prompt
-              const prompt = fs.readFileSync(`pr-${pr.number}-prompt.txt`, 'utf8');
-              
-              // Call AI inference action by writing a step file
-              // (GitHub Actions doesn't support dynamic action calls in scripts)
-              // So we'll do the API call directly like summary.yml does
+              const prompt = promptLines.join('\n');
               
               try {
                 const response = await fetch('https://models.inference.ai.azure.com/chat/completions', {
@@ -178,9 +144,6 @@ Keep it under 200 words!`;
                 const data = await response.json();
                 const aiMessage = data.choices[0].message.content.trim();
                 
-                console.log(`Generated message for PR #${pr.number}`);
-                
-                // Post the AI-generated comment!
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -191,14 +154,13 @@ Keep it under 200 words!`;
                 console.log(`✅ Posted AI reminder to PR #${pr.number}`);
                 
               } catch (error) {
-                console.error(`Failed to generate/post message for PR #${pr.number}:`, error);
+                console.error(`Failed to generate/post AI message for PR #${pr.number}:`, error);
                 
-                // Fallback to generic message if AI fails
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: pr.number,
-                  body: `## 🕐 Stale PR Reminder\n\nHey @${pr.author}! 👋 This PR has been quiet for a while. Need any help getting it across the finish line? Feel free to ask! 🚀\n\n---\n\n_This is an automated friendly reminder. No pressure! 💙_`
+                  body: `## 🕐 Stale PR Reminder\n\nHey @${pr.user.login}! 👋 This PR has been quiet for a while. Need any help getting it across the finish line? Feel free to ask! 🚀\n\n---\n\n_This is an automated friendly reminder. No pressure! 💙_`
                 });
               }
             }

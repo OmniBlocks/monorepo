@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`0b44c0adf`](https://github.com/OmniBlocks/scratch-gui/commit/0b44c0adf96633dc3266f37080173ece856bcd96) - 2025-12-14 23:30:29 -0500
+
+**Update .eslintignore**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`913fcb697`](https://github.com/OmniBlocks/scratch-gui/commit/913fcb69708f460f5090c9bbdebef11f4015b959) - 2025-12-14 10:33:43 +0000
 
 **dumb copilot commit messages but anyways remove incompatible confirmation**

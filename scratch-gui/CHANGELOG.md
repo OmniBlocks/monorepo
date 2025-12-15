@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`b5797e041`](https://github.com/OmniBlocks/scratch-gui/commit/b5797e041b091413bf81200219810705f90582f2) - 2025-12-15 00:57:57 -0500
+
+**fix: (ci) fix syntax error (probably)**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`0b44c0adf`](https://github.com/OmniBlocks/scratch-gui/commit/0b44c0adf96633dc3266f37080173ece856bcd96) - 2025-12-14 23:30:29 -0500
 
 **Update .eslintignore**

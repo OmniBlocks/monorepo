@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`3c4324780`](https://github.com/OmniBlocks/scratch-gui/commit/3c432478029f39e4900c2ee89bafdac056765b2d) - 2025-12-15 01:09:47 -0500
+
+**Update stale-pr-checker.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`8717a4fb4`](https://github.com/OmniBlocks/scratch-gui/commit/8717a4fb4ea012a02ebe48ed9a7bc216c33a7ae6) - 2025-12-15 01:05:12 -0500
 
 **Update stale-pr-checker.yml**

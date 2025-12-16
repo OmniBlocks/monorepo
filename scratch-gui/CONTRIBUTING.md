@@ -16,7 +16,7 @@ Contributions are welcome!
 
 To contribute to OmniBlocks, you must know JavaScript, and prefferably, React too. If you don't know what these are, well, go ahead and learn it! There are many resources online for you to learn any languages. If you feel stuck, feel free to reach out in the Discussions tab and we might help you a little.
 
-For other packages, such as scratch-vm or scratch-blocks, you might need to know some other languages, such as Python, but it isn't strictly necessary.
+For other packages, such as scratch-vm or scratch-blocks, you might need to install some other runtimes, such as Python, but it isn't strictly necessary to know them.
 
 ## Development Environment
 

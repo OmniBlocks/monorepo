@@ -1,13 +1,13 @@
 {
   "name": "scratch-gui",
   "version": "0.6.0-alpha",
-  "description": "Graphical User Interface for creating and running Scratch 3.0 projects",
-  "author": "Massachusetts Institute of Technology",
-  "license": "GPL-3.0",
-  "homepage": "https://github.com/LLK/scratch-gui#readme",
+  "description": "An upcoming in-development MultiLanguage IDE called OmniBlocks, based on TurboWarp for the block editor.",
+  "author": "Massachusetts Institute of Technology, and the OmniBlocks Team",
+  "license": "AGPL-3.0",
+  "homepage": "https://github.com/OmniBlocks/scratch-gui#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LLK/scratch-gui.git"
+    "url": "https://github.com/OmniBlocks/scratch-gui.git"
   },
   "main": "./dist/scratch-gui.js",
   "scripts": {

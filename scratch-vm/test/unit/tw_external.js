@@ -50,6 +50,13 @@ test('evalAndReturn', t => {
     });
 });
 
+test('evalAndReturn with a trailing comment without newline', t => {
+    external.evalAndReturn('data:text/plain;,var%20x=20 // whatever', 'x').then(result => {
+        t.equal(result, 20);
+        t.end();
+    });
+});
+
 test('relative URL throws', t => {
     external.fetch('./test.js').catch(err => {
         t.equal(err.message, `Unsupported URL: ./test.js`);

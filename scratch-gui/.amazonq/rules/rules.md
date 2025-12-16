@@ -774,5 +774,5 @@ Before submitting ANY PR or code:
 
 ---
 
-*This document is for AI assistants working on OmniBlocks. Last updated: December 2024*
+*This document is for AI assistants working on OmniBlocks. Last updated: December 15, 2025*
 *Maintainer: @supervoidcoder*

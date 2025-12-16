@@ -282,7 +282,7 @@ jobs:
         env:
           NODE_ENV: production
           SOURCEMAP: source-map  # 👈 Enables source maps in CI builds!
-          NODE_OPTIONS: --max-old-space-size=2048
+ 
 
       # ============================================================
       # DEPLOYMENT PHASE (MOVED UP BEFORE TESTS)
@@ -396,12 +396,10 @@ jobs:
       # TESTING PHASE
       # ============================================================
 
-      # 🔥 NEW: Fixed ESLint OOM with memory limit!
+
       - name: Run ESLint
         id: lint
         continue-on-error: true
-        env:
-          NODE_OPTIONS: --max-old-space-size=2048  # 👈 2GB limit prevents OOM!
         run: |
           npm run test:lint 2>&1 | tee lint-output.txt
           EXIT_CODE=${PIPESTATUS[0]}

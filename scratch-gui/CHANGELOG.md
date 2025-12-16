@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`c196cfce1`](https://github.com/OmniBlocks/scratch-gui/commit/c196cfce18cbe73587b01582bd0e90a62bd51268) - 2025-12-15 21:58:37 -0500
+
+**fix: (ci) fix js heap errors by removing 2gb heap limit**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`24258d01f`](https://github.com/OmniBlocks/scratch-gui/commit/24258d01f035c560874967d296f8d409e010988b) - 2025-12-15 21:20:44 -0500
 
 **docs: changed package names in package.json**

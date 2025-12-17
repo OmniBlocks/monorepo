@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`c71e9912a`](https://github.com/OmniBlocks/scratch-gui/commit/c71e9912aeb09fbc1deda5e938cf68c92f060d46) - 2025-12-16 21:36:53 -0500
+
+**Create start.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`bd70e29e3`](https://github.com/OmniBlocks/scratch-gui/commit/bd70e29e372a055b6425b4dced07054a6967d9c9) - 2025-12-16 13:31:00 +0000
 
 **scratch-blocks only uses python for the build script**

@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`0b3f1af0c`](https://github.com/OmniBlocks/scratch-gui/commit/0b3f1af0c9db5d5ffb167daf1523d141d0a159c0) - 2025-12-16 21:53:19 -0500
+
+**Delete .github/workflows/start.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`c71e9912a`](https://github.com/OmniBlocks/scratch-gui/commit/c71e9912aeb09fbc1deda5e938cf68c92f060d46) - 2025-12-16 21:36:53 -0500
 
 **Create start.yml**

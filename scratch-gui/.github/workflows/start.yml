@@ -1,0 +1,14 @@
+name: idkk npm start test
+on: workflow_dispatch
+jobs:
+
+  put-the-fries-in-the-npm-start:
+    runs-on: ubuntu-latest
+    name: do the thing
+    steps:
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v6
+      with:
+        node-version: 24
+    - run: npm ci
+    - run: npm start

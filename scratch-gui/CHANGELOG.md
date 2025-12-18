@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`a9d8c06e4`](https://github.com/OmniBlocks/scratch-gui/commit/a9d8c06e49afad0145460a207b572867a65e0516) - 2025-12-18 11:42:00 -0500
+
+**fix: (ci) yes**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`a0b005619`](https://github.com/OmniBlocks/scratch-gui/commit/a0b005619b0e8c79240b1b0cbcf9d0fa1af42f4f) - 2025-12-18 10:19:25 -0500
 
 **feat: add github annotations to prtest (this probably works or not idk)**

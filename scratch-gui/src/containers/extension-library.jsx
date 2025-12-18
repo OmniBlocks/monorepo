@@ -179,12 +179,12 @@ class ExtensionLibrary extends React.PureComponent {
         if (!this.state.galleryTW) {
             loadGalleryWithTimeout(
                 fetchLibraryTW,
-                () => this.setState({ galleryTWTimedOut: true }),
+                () => this.setState({galleryTWTimedOut: true}),
                 gallery => {
                     cachedGalleryTW = gallery;
-                    this.setState({ galleryTW: gallery });
+                    this.setState({galleryTW: gallery});
                 },
-                error => this.setState({ galleryTWError: error })
+                error => this.setState({galleryTWError: error})
             );
         }
 
@@ -192,12 +192,12 @@ class ExtensionLibrary extends React.PureComponent {
         if (!this.state.galleryOB) {
             loadGalleryWithTimeout(
                 fetchLibraryOB,
-                () => this.setState({ galleryOBTimedOut: true }),
+                () => this.setState({galleryOBTimedOut: true}),
                 gallery => {
                     cachedGalleryOB = gallery;
-                    this.setState({ galleryOB: gallery });
+                    this.setState({galleryOB: gallery});
                 },
-                error => this.setState({ galleryOBError: error })
+                error => this.setState({galleryOBError: error})
             );
         }
     }
@@ -237,7 +237,7 @@ class ExtensionLibrary extends React.PureComponent {
         }
     }
     render () {
-        let library = extensionLibraryContent.map(toLibraryItem);
+        const library = extensionLibraryContent.map(toLibraryItem);
         library.push('---');
         
         const locale = this.props.intl.locale;

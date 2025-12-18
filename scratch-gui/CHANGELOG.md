@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`62d77822d`](https://github.com/OmniBlocks/scratch-gui/commit/62d77822dba444258caa9ed5fbe02acdb3750b21) - 2025-12-18 14:34:21 -0500
+
+**Update autofix-lint.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`9404574c0`](https://github.com/OmniBlocks/scratch-gui/commit/9404574c064ee2e42e841c222077ae84b3e31c25) - 2025-12-18 12:40:34 -0500
 
 **7uhisfdgbhe**

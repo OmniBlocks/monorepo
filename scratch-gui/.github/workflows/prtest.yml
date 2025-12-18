@@ -397,19 +397,22 @@ jobs:
       # ============================================================
 
 
+ 
+
+
       - name: Run ESLint
         id: lint
         continue-on-error: true
         env:
           NODE_OPTIONS: --max-old-space-size=8912
         run: |
-          npm run test:lint 2>&1 | tee lint-output.txt
+          
+          npm run test:lint -- --format stylish 2>&1 | tee lint-output.txt
+          
           EXIT_CODE=${PIPESTATUS[0]}
           
           if [ $EXIT_CODE -eq 0 ]; then
             echo "lint_status=passed" >> $GITHUB_OUTPUT
-            echo "lint_errors=0" >> $GITHUB_OUTPUT
-            echo "lint_warnings=0" >> $GITHUB_OUTPUT
           else
             echo "lint_status=failed" >> $GITHUB_OUTPUT
             ERRORS=$(grep -E '^\s+[0-9]+:[0-9]+\s+error\s+' lint-output.txt | wc -l || echo "0")
@@ -417,6 +420,7 @@ jobs:
             echo "lint_errors=${ERRORS:-0}" >> $GITHUB_OUTPUT
             echo "lint_warnings=${WARNINGS:-0}" >> $GITHUB_OUTPUT
           fi
+
 
       - name: Update comment - Running Unit Tests
         uses: actions/github-script@v7

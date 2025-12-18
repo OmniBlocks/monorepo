@@ -1,13 +1,13 @@
 {
   "name": "scratch-gui",
-  "version": "3.2.37",
-  "description": "Graphical User Interface for creating and running Scratch 3.0 projects",
-  "author": "Massachusetts Institute of Technology",
-  "license": "GPL-3.0",
-  "homepage": "https://github.com/LLK/scratch-gui#readme",
+  "version": "0.6.0-alpha",
+  "description": "An upcoming in-development MultiLanguage IDE called OmniBlocks, based on TurboWarp for the block editor.",
+  "author": "Massachusetts Institute of Technology, and the OmniBlocks Team",
+  "license": "AGPL-3.0",
+  "homepage": "https://github.com/OmniBlocks/scratch-gui#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LLK/scratch-gui.git"
+    "url": "https://github.com/OmniBlocks/scratch-gui.git"
   },
   "main": "./dist/scratch-gui.js",
   "scripts": {
@@ -116,6 +116,7 @@
     "@babel/plugin-transform-async-to-generator": "7.14.5",
     "@babel/preset-env": "7.14.8",
     "@babel/preset-react": "7.14.5",
+    "@playwright/test": "^1.57.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.3.0",

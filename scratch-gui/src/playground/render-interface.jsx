@@ -47,7 +47,7 @@ import {setProjectTitle} from '../reducers/project-title';
 
 import styles from './interface.css';
 
-const isInvalidEmbed = window.parent !== window;
+const isInvalidEmbed = process.env.NODE_ENV === 'production' && window.parent !== window;
 
 const handleClickAddonSettings = addonId => {
     // addonId might be a string of the addon to focus on, undefined, or an event (treat like undefined)
@@ -206,6 +206,13 @@ const Footer = () => (
                             defaultMessage="OmniBlocks Wiki"
                             description="Link in footer to OmniBlocks wiki"
                             id="tw.footer.wiki"
+                        />
+                    </a>
+                    <a href="https://omniblocks.github.io/NotebookWriter">
+                        <FormattedMessage
+                            defaultMessage="OmniBlocks Writer"
+                            description="Link in footer to OmniBlocks Writer, our word processor"
+                            id="tw.footer.writer"
                         />
                     </a>
                 </div>

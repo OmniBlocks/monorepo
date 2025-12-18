@@ -1,7 +1,7 @@
 language: en-US
 tone_instructions: ''
 early_access: true
-enable_free_tier: true
+enable_free_tier: false
 reviews:
   profile: chill
   request_changes_workflow: true
@@ -70,7 +70,7 @@ reviews:
       enabled: true
     github-checks:
       enabled: true
-      timeout_ms: 90000
+      timeout_ms: 900000
     languagetool:
       enabled: true
       enabled_rules: []

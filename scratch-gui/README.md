@@ -36,51 +36,40 @@
 
 > A fork of the Scratch 3.0 GUI, modified and enhanced for the [TurboWarp](https://turbowarp.org/) compiler and the [OmniBlocks](https://omniblocks.github.io) multi-language IDE.
 
-This repository contains the frontend interface of the Block-Based editor for OmniBlocks and TurboWarp. It builds upon Scratch and TurboWarp's foundation with significant performance improvements, addons, themes, and other features for an amazing coding experience.
+This repository contains the frontend interface of the Block-Based editor for OmniBlocks and TurboWarp. It builds upon Scratch and TurboWarp's foundation with improvements, addons, themes, and other features for an amazing coding experience.
 
-## 📑 Table of Contents
-- [🎮 Try It Out](#-try-it-out)
-- [✨ Features & Enhancements](#-features--enhancements)
-- [🚀 Quick Start](#-quick-start)
-  - [Prerequisites](#prerequisites)
-  - [Dependencies](#dependencies)
-  - [Installation & Running](#installation--running)
-- [🏗️ Project Architecture & Development Guide](#%EF%B8%8F-project-architecture--development-guide)
-  - [Data Flow & Structure](#data-flow--structure)
-  - [Key Workflows](#key-workflows)
-  - [Integration Points](#integration-points)
-- [📜 Licensing](#-licensing)
-- [🤝 Contributing](#-contributing)
-- [📝 The Super Strict Style Guide of Doom 😈](#-the-super-strict-style-guide-of-doom-)
-- [❓ Frequently Asked Questions (FAQ)](#-frequently-asked-questions-faq)
-  - [General Questions](#general-questions)
-  - [Compatibility](#compatibility)
-  - [Features & Development](#features--development)
-  - [Technical Questions](#technical-questions)
-  - [Contributions](#contributions)
-- [Roadmap](#roadmap)
-  - [Current Focus](#current-focus)
-  - [Short-term Goals (Next 3-6 months)](#short-term-goals-next-3-6-months)
-  - [Long-term Vision](#long-term-vision)
-  - [Completed ✅](#completed-)
-- [Feature Comparison](#feature-comparison)
+## Important for Developers!
+If you want to fork this repo or contribute with PR's (or modify OmniBlocks as your own), you must follow the following rules from the AGPLv3 license, or you are in violation of it.
+* 1. Your fork/mod must be public and open-source.
+* 2. Your fork/mod can be paid, but must be licensed under the same AGPLv3 license.
+### Notice about rule 2
+While it does say your fork/mod can be paid, the <b>main software</b> cannot be paid. Here are acceptable uses for requiring payment:
+* 1. Premium features
+  2. Support services
+  3. Subscriptions.
 
-## 🎮 Try It Out
-Experience OmniBlocks live: [https://omniblocks.github.io](https://omniblocks.github.io)
 
-## ✨ Features & Enhancements
+## Try It Out
+Try out OmniBlocks: [https://omniblocks.github.io](https://omniblocks.github.io)
 
-### 📱 **Full Offline PWA Support** ⭐ NEW!
-*   **Complete Offline Functionality:** Work on projects without internet connection
-*   **Progressive Web App:** Install OmniBlocks as an app on desktop and mobile
-*   **Automatic Caching:** All resources cached for instant offline access
-*   **Local Storage:** Projects saved locally with existing Restore Points system for reliability
-*   **Offline Indicators:** Clear visual feedback for connection status
-*   **See the [Offline PWA Guide](docs/OFFLINE_PWA_GUIDE.md) for detailed information**
 
-### 🎨 **Enhanced IDE Experience**
+### Installation as PWA
+
+1. Open OmniBlocks in Chrome, Edge, or another Chromium-based browser</br>
+2. Open the 3 dots menu and hover over "Cast, save, and share." GitHub is used here as an example.</br>
+<img width="519" height="652" alt="Screenshot 2025-11-25 2 47 56 PM" src="https://github.com/user-attachments/assets/52bd3c88-8238-4cdb-878a-e4f9cd018e0b" /></br>
+3. Click "Install" to add OmniBlocks to your desktop</br>
+<img width="407" height="166" alt="Screenshot 2025-11-25 2 48 03 PM" src="https://github.com/user-attachments/assets/9fb2b478-4ee3-498d-a771-d586d3a7a8fe" /></br>
+4. The app will now work offline and can be launched like a native application
+
+https://github.com/user-attachments/assets/986de6a3-47e3-436b-91f5-e169a6a67a4a
+
+We are working on a desktop app for more native access and integration, but this is the best you can get for now, but it is quite great for what it has.
+
+### Enhancements and Improvements
 *   **Plenty of Addons:** Dozens of community-built addons for custom blocks, UI tweaks, and new functionality. Many are inherited from TurboWarp and other mods from now, but we will implement some new ones soon.
-*   **Themes:** Multiple color themes (Aqua, Blue, Rainbow, Red, Purple) to personalize your editor. The Aqua theme is the default, as it is the main brand color of OmniBlocks.
+<!--*   **Themes:** Multiple color themes (Aqua, Blue, Rainbow, Red, Purple) to personalize your editor. The Aqua theme is the default, as it is the main brand color of OmniBlocks.
+note: this part of the readme got removed because we didn't really make the theme system, turbowarp did, and we just inherited it and added our Aqua theme-->
 *   **OmniBlocks IDE:** OmniBlocks plans to be a full-featured IDE extending beyond blocks. There will be editors for text languages like Python and C in the future!
 *   **Integrated Tools:** Includes a custom music editor and other quality-of-life improvements. Keep in mind that if you're seeing this, it means the music editor is currently not fully implemented. It works, you can go try it out, but it doesn't fully integrate with OmniBlocks just yet.
 *   **Quality of Life**: As said earlier, we add a bunch of subtle, but definitely cool or useful quality-of-life additions, even if they seem niche or workaroundable. Most of these stem from mild annoyances that we ourselves have had, and don't hesitate to report yours too in the issues tab!
@@ -88,7 +77,7 @@ Experience OmniBlocks live: [https://omniblocks.github.io](https://omniblocks.gi
 ### A great feature inherited from TurboWarp: 
 *   **High Performance:** This is a fork of TurboWarp, meaning it uses the compiler that TurboWarp uses, making projects run way faster than other projects. This isn't listed as an enhancement/feature since we didn't implement it; the team at TurboWarp did, and we don't claim to have written the TurboWarp compiler that makes OmniBlocks projects run so fast. 
 
-## 🚀 Quick Start
+## Quick Start
 
 Want to create your own modification/fork of OmniBlocks, or help contribute to it? Follow the following steps:
 
@@ -96,10 +85,10 @@ Want to create your own modification/fork of OmniBlocks, or help contribute to i
 ### Prerequisites
 
 *   Node.js version Node.js v22 (versions v18 or newer will probably work, but we can’t guarantee it)
-*   npm (duhh)
-*   Git
+*   npm 
+*   Git (duhh) 
 If you're using a GitHub Codespace, all these things come preinstalled.
-**Note about GitHub Codespaces: to create a GitHub codespace, make sure you are on the repo you want to code in, such as your fork of OmniBlocks. When you are there, click the big green button that says "Code". On the Codespace tab, click the button saying "Create codespace on main". Now, just wait a few minutes, and it will install everything for you. 
+**Note about GitHub Codespaces**: to create a GitHub codespace, make sure you are on the repo you want to code in, such as your fork of OmniBlocks. When you are there, click the big green button that says "Code". On the Codespace tab, click the button saying "Create codespace on main". Now, just wait a few minutes, and it will install everything for you. 
 <!-- wait like 6 or 7 minutes lol !-->
 ### Dependencies
 Some packages may want some additional things installed, so check the README in each package you want to develop.
@@ -175,15 +164,15 @@ To actually mod Scratch, you need to build the GUI, as it is the main package th
     Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow to push to a website or something like that. If you go to our [site build repo,](https://github.com/OmniBlocks/omniblocks.github.io) you can use the `sh` script and `yml` workflow from there 😁
 
 
-## 🏗️ Project Architecture & Development Guide
+## Development Guide
 
 This section is for developers looking to understand, modify, or contribute to the codebase.
 
 ### Data Flow & Structure
 - **State Management:** Uses Redux. Reducers are located in `src/reducers/`.
 - **Core GUI Logic:** Located in `src/`.
-- **Addons:** Managed in `src/addons/`. Synced and patched from upstream repositories using `pull.js`. If you try hard enough you can make your own by making all the files you need yourself.
-- **Extensions:** Custom blocks and hardware integrations are in `src/lib/libraries/extensions/`. Extensions are in scratch-vm, an external dependency. You'll need to fork that separate repository with your changes there, and link the new forked repository to scratch-vm. This isn't very easy if you don't know much about NPM, so we're sorry about this, although we might move to the monorepo that doesn't require all these repos someday. You can still do it manually by editing thr `package.json` file.
+- **Addons:** Managed in `src/addons/`. Synced and patched from upstream repositories using `pull.js`. If you try hard enough you can make your own by making all the files you need yourself, which is what we do here.
+- **Extensions:** Custom blocks and hardware integrations are in `src/lib/libraries/extensions/`. Extensions are in scratch-vm, an external dependency. You'll need to fork that separate repository with your changes there, and link the new forked repository to scratch-vm. This isn't very easy if you don't know much about NPM, so we're sorry about this, although we might move to the monorepo that doesn't require all these repos someday. You can still do it manually by editing the `package.json` file.
 - **Translations:** Located in `src/lib/tw-translations/`.
 - **Theming:** Theme definitions (Aqua, Blue, etc.) are in `src/lib/themes/accent/<theme>.js`. Global color variables are set in `src/css/colors.css` and overridden in JS as needed.
 
@@ -199,7 +188,7 @@ This section is for developers looking to understand, modify, or contribute to t
 - **Extensions:** `src/lib/libraries/extensions/`
 - **Translations:** `src/lib/tw-translations/`
 - **Static Assets:**  `static/`.
-
+<!--
 ### Component Documentation
 For detailed information about specific components and development tools:
 
@@ -208,13 +197,13 @@ For detailed information about specific components and development tools:
 - **[Music Player](static/player/README.md)** - BeepBox-based music creation tool
 - **[Testing Infrastructure](test/README.md)** - Comprehensive testing suite and guidelines
 - **[Addon System](src/addons/README.md)** - Addon management and development
+-->
 
-
-## 📜 Licensing
+## Licensing
 
 This project is licensed under multiple agreements due to its forked nature.
 
-- **OmniBlocks & TurboWarp Modifications:** Licensed under the **GNU General Public License v3.0**. See the `LICENSE` file or [gnu.org/licenses](https://www.gnu.org/licenses/) for details.
+- **OmniBlocks & TurboWarp Modifications:** Licensed under the **GNU Affero General Public License v3.0**. See the `LICENSE` file or [gnu.org/licenses](https://www.gnu.org/licenses/) for details.
 
 - **Original Scratch Code (BSD License):** Copyright (c) 2016, Massachusetts Institute of Technology. The original license text is retained below as required.
 
@@ -222,6 +211,8 @@ This project is licensed under multiple agreements due to its forked nature.
   - `src/lib/default-project/dango.svg`: Based on Twemoji, licensed under CC BY 4.0.
   - **OmniBlocks Logo:** Licensed under CC BY-SA 4.0. Incorporates the Python logo (a trademark of the Python Software Foundation) for referential purposes. This project is not affiliated with or endorsed by the Python Software Foundation.
   - **OmniBlocks Mascot "Boxy":** Licensed under CC BY-SA 4.0.
+ 
+While the Logo and Mascot are open source, please do not attempt to impersonate us or try to act on "our behalf" and claim something is endorsed by us when it is not.
 
 <details>
 <summary>Original Scratch (BSD) License</summary>
@@ -240,7 +231,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 </details>
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! We are especially interested in addons, bug fixes, and new features!
 
@@ -268,7 +259,7 @@ Other than that, Code On! We don't require much other than these rules. Have fun
 ### General Questions
 
 **Q: What is OmniBlocks?**  
-A: OmniBlocks is an enhanced fork of TurboWarp for faster project execution, adds quality-of-life features, and constant updates.
+A: OmniBlocks is an enhanced fork of TurboWarp for faster project execution, adds quality-of-life features, and constant updates. We hope to become a full-fledged IDE one day
 
 **Q: How is OmniBlocks different from TurboWarp?**  
 A: While we use TurboWarp's excellent compiler and extra features, OmniBlocks focuses on providing a more advanced, mature IDE. We plan to be able to be used by kids and adults alike, adding new advanced features for already knowledgeable coders, as well as being able to be booted up by children and/or beginners to explore programming. We will also be exploring additional features like alternative language editors (Python/C) in the future.
@@ -279,14 +270,14 @@ A: Yes! OmniBlocks is open-source and free forever! Unless you count paying your
 ### Compatibility
 
 **Q: Can I use my Scratch account with OmniBlocks?**  
-A: You can't log in with your Scratch Accounts for integration with OmniBlocks, and we don't have any planned features that would use such a thing. Please remember that giving your Scratch password to ANY site, even if it seems good, could be used as bait and take over your Scratch account. If we ever do implement such integration, it will be through secure Auths. 
+A: You can't log in with your Scratch Accounts for integration with OmniBlocks, and we don't have any planned features that would use such a thing. Please remember that giving your Scratch password to ANY site, even if it seems good, could be used as bait and take over your Scratch account. If we ever do implement such integration, it will be through secure authentication services, such as ScratchAuth. 
 Anyways, you can import/export `.sb3` project files to load a Scratch project into OmniBlocks and code there, and even use the new tools and features to aid development.
 
 **Q: Will projects created in OmniBlocks work in vanilla Scratch?**  
 A: Yes! As long as you don't use extensions that add custom blocks not available in vanilla Scratch, your projects will work perfectly. The TurboWarp compiler only affects runtime performance, not project compatibility.
 
 **Q: Can I import my existing Scratch projects?**  
-A: Absolutely! Just click "File > Load from your computer" and select your `.sb3` or `.sb2` file.
+A: Absolutely! Just click "File > Load from your computer" and select your `.sb3` or `.sb2` file. Or even `.sb` if you still use 1.x, ~unc~.
 
 **Q: What about projects with cloud variables? Can I still play online games with OmniBlocks?**
 A: Yup! The TurboWarp cloud data server is used to ensure that you can still play your favorite online games in OmniBlocks. Keep in mind that since we don't integrate with Scratch, you can choose any username that exists in Scratch (except for Scratch Team member names), so if you see someone claiming to be a famous Scratcher (e.g., griffpatch), it is most likely not actually that person.
@@ -355,8 +346,9 @@ A: Ignore lint. It's only there because it is from upstream, but we don't actual
 
 ### Current Focus
 - [ ] JavaScript Extension
-- [ ] Complete music editor integration
-      Update: As of 11/12/2025, there is even better integration with the music editor, but it is still largely lacking. The music editor still doesn't have blocks to play your songs with or are stored in the project, but the Iframe is styled way better so it doesn't look like an iframe anymore, and using postmessage, it allows for you to download your songs using the existing export buttons in the song editor, as well as a fullscreen button, so it is far more usable than before where you had to go to omniblocks.github.io/songeditor just for it to be useful (as it's the standalone html instead of the iframe.) We got this working by using a function in the HTML that if detected it was an iframe, it intercepted incoming downloaded files and sent them using postmessage to the mainwindow as payload to be downloaded.
+- [ ] Complete music editor integration 
+
+Update: As of 11/12/2025, there is even better integration with the music editor, but it is still largely lacking. The music editor still doesn't have blocks to play your songs with or are stored in the project, but the Iframe is styled way better so it doesn't look like an iframe anymore, and using postmessage, it allows for you to download your songs using the existing export buttons in the song editor, as well as a fullscreen button, so it is far more usable than before where you had to go to omniblocks.github.io/songeditor just for it to be useful (as it's the standalone html instead of the iframe.) We got this working by using a function in the HTML that if detected it was an iframe, it intercepted incoming downloaded files and sent them using postmessage to the mainwindow as payload to be downloaded.
 
 
 ### Short-term Goals (Next 3-6 months)
@@ -373,37 +365,7 @@ A: Ignore lint. It's only there because it is from upstream, but we don't actual
 - [x] Add a bunch of small QoL features
 
 
-Have ideas for the roadmap? [Open a discussion](https://github.com/OmniBlocks/scratch-gui/discussions)!
 
-## Feature Comparison
-
-| Feature | Scratch 3.0 | TurboWarp | OmniBlocks |
-|---------|-------------|-----------|------------|
-| **Performance** |
-| Compiler | ❌ | ✅ | ✅ |
-| 60 FPS Mode | ❌ | ✅ | ✅ |
-| Interpolation | ❌ | ✅ | ✅ |
-| **Customization** |
-| Custom Themes | ❌ | ⚠️ Limited | ✅ Multiple Built-in |
-| Addon Support | ❌ | ✅ | ✅ |
-| Custom Splash | ❌ | ✅ | ✅ Unique |
-| **Editors** |
-| Block Editor | ✅ | ✅ | ✅ |
-| Text Code Viewer | ❌ | ⚠️ Limited | ✅ |
-| Python Editor | ❌ | ❌ | ✅ In Progress |
-| C/C++ Editor | ❌ | ❌ | ✅ In Progress |
-| Music Editor | ❌ | ❌ | ✅ Planned |
-| **Development** |
-| Open Source | ✅ | ✅ | ✅ |
-| Active Development | ✅ | ✅ | ✅ |
-| Community Driven | ✅ | ✅ | ✅ |
-
-**Legend:**
-- ✅ Fully Supported
-- ⚠️ Partially Supported  
-- ❌ Not Available
-
----
 
 **Still have questions?** Feel free to open an issue here or start a discussion on our GitHub organization!
 
@@ -416,4 +378,4 @@ As you can tell by some of the slop in this codebase, I have, for the past month
 If you are planning to contribute to OmniBlocks, please don't vibe code large features, or preferably, anything at all. From my experience, AI is best for repetitive, mild tasks, like updating things across files quickly or adding small features, but even these have to go through a review process that takes about 2 days for me. Please don't make PRs with features that are entirely AI-generated, especially if you didn't test the code or review it.
 
 
-**Note:** This is a fork designed specifically for OmniBlocks. If you want to make your own Scratch or TurboWarp mod, please refer to the [upstream scratch-gui repository](https://github.com/LLK/scratch-gui) or the [turbowarp scratch-gui repository](https://github.com/TurboWarp/scratch-gui) instead.
+**Note:** This is a fork designed specifically for OmniBlocks. If you want to make your own Scratch or TurboWarp mod, please refer to the [upstream scratch-gui repository](https://github.com/LLK/scratch-gui) or the [TurboWarp scratch-gui repository](https://github.com/TurboWarp/scratch-gui) instead.

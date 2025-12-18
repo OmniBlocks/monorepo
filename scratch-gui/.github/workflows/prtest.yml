@@ -11,9 +11,10 @@ permissions:
   pull-requests: write
   id-token: write
   issues: write
+  checks: write  # 👈 NEW: Required for creating Check annotations!
 
 jobs:
-  dependabot-skip-notice:
+  skip-notice:
     if: >-
       (github.actor == 'dependabot[bot]') &&
       ((github.event_name == 'pull_request') ||
@@ -35,21 +36,73 @@ jobs:
               repo: context.repo.repo,
               pull_number: prNumber
             });
-            return {
-              number: pr.data.number
-            };
+            const username = context.eventName === 'issue_comment'
+            ? context.payload.comment.user.login
+            : context.payload.pull_request.user.login;
+              
+            core.setOutput('number', pr.data.number);
+            core.setOutput('sha', pr.data.head.sha);
+            core.setOutput('base_sha', pr.data.base.sha);
+            core.setOutput('username', username);
 
-      - name: Post skip notice
+
+      - name: Post dependabot skip notice
         uses: actions/github-script@v7
         with:
           script: |
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: ${{ fromJSON(steps.pr.outputs.result).number }},
-              body: `ℹ️ **Mega PR Test Skipped**\n\n` +
+                issue_number: ${{ steps.pr.outputs.number }},
+              body: `# ℹ️ **Mega PR Test Skipped**\n\n` +
                     `The comprehensive PR test & analysis has been skipped for this pull request because it was created by Dependabot.\n\n` +
                     `Dependency update PRs are automatically excluded from the mega test workflow to avoid unnecessary CI resource usage.`
+            });
+
+      - name: Check changed files
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ steps.pr.outputs.number }};
+            
+            // Fetch list of changed files via GitHub API
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 100
+            });
+            
+            console.log(`Found ${files.length} changed file(s)`);
+            files.forEach(f => console.log(`  - ${f.filename}`));
+            
+            // Check if any non-doc/config files changed
+            const hasCodeChanges = files.some(f => 
+              !f.filename.match(/\.(md|txt|yml|yaml)$/)
+            );
+            
+            if (hasCodeChanges) {
+              console.log("✅ Code changes detected - Mega PR test should run");
+              core.setOutput('should_run', 'true');
+            } else {
+              console.log("📝 Only docs/config changed - skipping Mega PR test");
+              core.setOutput('should_run', 'false');
+            }
+
+      - name: Post skip notice
+        if: steps.check.outputs.should_run == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const username = '${{ steps.pr.outputs.username }}';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.pr.outputs.number }},
+              body: `# ℹ️ **Mega PR Test Skipped**
+                    `Hi @${username}! The comprehensive Mega PR test was skipped because this PR only changes documentation or configuration files (.md, .txt, .yml).
+                    `_To force the Mega PR test to run, comment \`/test pr\` on this PR._`
             });
 
   mega-test:
@@ -157,7 +210,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Update comment - Installing Dependencies
@@ -223,10 +276,13 @@ jobs:
                     `⬜ Accessibility testing`
             });
 
+      # 🗺️ NEW: Enable source maps for better error reporting!
       - name: Build website
         run: npm run build
         env:
           NODE_ENV: production
+          SOURCEMAP: source-map  # 👈 Enables source maps in CI builds!
+ 
 
       # ============================================================
       # DEPLOYMENT PHASE (MOVED UP BEFORE TESTS)
@@ -340,24 +396,124 @@ jobs:
       # TESTING PHASE
       # ============================================================
 
+      # 🎯 NEW: Get changed JavaScript files before linting
+      - name: Get changed JavaScript files
+        id: changed-files
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.eventName === 'issue_comment'
+              ? context.issue.number
+              : context.payload.number;
+            
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 100
+            });
+            
+            // Filter for JS/JSX files only
+            const jsFiles = files
+              .filter(f => f.status !== 'removed')
+              .filter(f => /\.(js|jsx)$/.test(f.filename))
+              .map(f => f.filename)
+              .join(' ');
+            
+            console.log(`Found ${jsFiles.split(' ').filter(Boolean).length} JS/JSX files to lint`);
+            
+            return jsFiles;
+          result-encoding: string
+
+      # 🎯 UPDATED: Run ESLint with JSON format and lint only changed files
       - name: Run ESLint
         id: lint
         continue-on-error: true
+        env:
+          NODE_OPTIONS: --max-old-space-size=8912
         run: |
-          npm run test:lint 2>&1 | tee lint-output.txt
-          EXIT_CODE=${PIPESTATUS[0]}
+          FILES="${{ steps.changed-files.outputs.result }}"
           
-          if [ $EXIT_CODE -eq 0 ]; then
+          if [ -z "$FILES" ] || [ "$FILES" = "" ]; then
+            echo "No JS/JSX files changed, skipping lint"
+            echo "lint_status=skipped" >> $GITHUB_OUTPUT
+            echo "[]" > lint-output.json
+            exit 0
+          fi
+          
+          # Run ESLint with JSON format for easy parsing
+          npx eslint $FILES --format json --output-file lint-output.json || true
+          
+          # Also create human-readable output for logs
+          npx eslint $FILES --format stylish 2>&1 | tee lint-output.txt || true
+          
+          # Parse results
+          TOTAL=$(jq 'map(.errorCount + .warningCount) | add // 0' lint-output.json)
+          
+          if [ "$TOTAL" -eq 0 ]; then
             echo "lint_status=passed" >> $GITHUB_OUTPUT
-            echo "lint_errors=0" >> $GITHUB_OUTPUT
-            echo "lint_warnings=0" >> $GITHUB_OUTPUT
           else
             echo "lint_status=failed" >> $GITHUB_OUTPUT
-            ERRORS=$(grep -E '^\s+[0-9]+:[0-9]+\s+error\s+' lint-output.txt | wc -l || echo "0")
-            WARNINGS=$(grep -E '^\s+[0-9]+:[0-9]+\s+warning\s+' lint-output.txt | wc -l || echo "0")
-            echo "lint_errors=${ERRORS:-0}" >> $GITHUB_OUTPUT
-            echo "lint_warnings=${WARNINGS:-0}" >> $GITHUB_OUTPUT
+            ERRORS=$(jq 'map(.errorCount) | add // 0' lint-output.json)
+            WARNINGS=$(jq 'map(.warningCount) | add // 0' lint-output.json)
+            echo "lint_errors=${ERRORS}" >> $GITHUB_OUTPUT
+            echo "lint_warnings=${WARNINGS}" >> $GITHUB_OUTPUT
           fi
+
+      # 🎯 NEW: Create ESLint annotations from JSON output
+      - name: Create ESLint annotations
+        if: steps.lint.outputs.lint_status == 'failed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const lintResults = JSON.parse(fs.readFileSync('lint-output.json', 'utf8'));
+            
+            const annotations = [];
+            
+            for (const file of lintResults) {
+              if (file.messages.length === 0) continue;
+              
+              for (const msg of file.messages) {
+                annotations.push({
+                  path: file.filePath.replace(process.env.GITHUB_WORKSPACE + '/', ''),
+                  start_line: msg.line || 1,
+                  end_line: msg.endLine || msg.line || 1,
+                  start_column: msg.column,
+                  end_column: msg.endColumn || msg.column,
+                  annotation_level: msg.severity === 2 ? 'failure' : 'warning',
+                  message: `${msg.message}${msg.ruleId ? ` (${msg.ruleId})` : ''}`,
+                  title: msg.ruleId || 'ESLint'
+                });
+              }
+            }
+            
+            console.log(`📝 Found ${annotations.length} ESLint issues`);
+            
+            if (annotations.length > 0) {
+              // GitHub allows max 50 annotations per request
+              const uniqueAnnotations = annotations.slice(0, 50);
+              
+              try {
+                await github.rest.checks.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: '🎨 ESLint Results',
+                  head_sha: context.payload.pull_request?.head?.sha || context.sha,
+                  status: 'completed',
+                  conclusion: annotations.some(a => a.annotation_level === 'failure') ? 'failure' : 'neutral',
+                  output: {
+                    title: `Found ${annotations.length} ESLint issue${annotations.length === 1 ? '' : 's'}`,
+                    summary: `Detected ${annotations.filter(a => a.annotation_level === 'failure').length} errors and ${annotations.filter(a => a.annotation_level === 'warning').length} warnings.\n\n` +
+                             `> 💡 Check the **Files Changed** tab for inline annotations!`,
+                    annotations: uniqueAnnotations
+                  }
+                });
+                console.log(`✅ Created ${uniqueAnnotations.length} inline ESLint annotations!`);
+              } catch (error) {
+                console.error('Failed to create annotations:', error.message);
+              }
+            }
 
       - name: Update comment - Running Unit Tests
         uses: actions/github-script@v7
@@ -468,6 +624,145 @@ jobs:
           echo "integration_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
           echo "integration_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
 
+      # 🎯 NEW: Create inline annotations from test errors!
+      - name: Create GitHub Check annotations from test errors
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const annotations = [];
+            
+            // Parse unit test output for errors with stack traces
+            if (fs.existsSync('unit-test-output.txt')) {
+              const unitOutput = fs.readFileSync('unit-test-output.txt', 'utf8');
+              
+              // Pattern to match JavaScript stack trace locations: at file.js:line:column
+              const errorPattern = /at\s+.*?\(([^)]+):(\d+):(\d+)\)/g;
+              const lines = unitOutput.split('\n');
+              
+              for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                
+                // Check if this is an error line
+                if (line.includes('Error:') || line.includes('FAIL')) {
+                  let errorMessage = line.trim();
+                  
+                  // Look ahead for stack trace
+                  let match;
+                  for (let j = i; j < Math.min(i + 10, lines.length); j++) {
+                    const stackLine = lines[j];
+                    
+                    while ((match = errorPattern.exec(stackLine)) !== null) {
+                      let [_, filePath, lineNum, column] = match;
+                      
+                      // Clean up webpack:// URLs
+                      if (filePath.startsWith('webpack:///')) {
+                        filePath = filePath.replace('webpack:///', '');
+                      }
+                      
+                      // Skip node_modules, external files, and non-src files
+                      if (filePath.includes('node_modules') || 
+                          filePath.startsWith('http') ||
+                          (!filePath.startsWith('src/') && !filePath.startsWith('test/'))) {
+                        continue;
+                      }
+                      
+                      annotations.push({
+                        path: filePath,
+                        start_line: parseInt(lineNum) || 1,
+                        end_line: parseInt(lineNum) || 1,
+                        annotation_level: 'failure',
+                        message: errorMessage,
+                        title: '🧪 Unit Test Failure'
+                      });
+                    }
+                  }
+                }
+              }
+            }
+            
+            // Parse integration test output
+            if (fs.existsSync('integration-test-output.txt')) {
+              const integrationOutput = fs.readFileSync('integration-test-output.txt', 'utf8');
+              const errorPattern = /at\s+.*?\(([^)]+):(\d+):(\d+)\)/g;
+              const lines = integrationOutput.split('\n');
+              
+              for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                
+                if (line.includes('Error:') || line.includes('FAIL')) {
+                  let errorMessage = line.trim();
+                  
+                  let match;
+                  for (let j = i; j < Math.min(i + 10, lines.length); j++) {
+                    const stackLine = lines[j];
+                    
+                    while ((match = errorPattern.exec(stackLine)) !== null) {
+                      let [_, filePath, lineNum, column] = match;
+                      
+                      if (filePath.startsWith('webpack:///')) {
+                        filePath = filePath.replace('webpack:///', '');
+                      }
+                      
+                      if (filePath.includes('node_modules') || 
+                          filePath.startsWith('http') ||
+                          (!filePath.startsWith('src/') && !filePath.startsWith('test/'))) {
+                        continue;
+                      }
+                      
+                      annotations.push({
+                        path: filePath,
+                        start_line: parseInt(lineNum) || 1,
+                        end_line: parseInt(lineNum) || 1,
+                        annotation_level: 'failure',
+                        message: errorMessage,
+                        title: '🎭 Integration Test Failure'
+                      });
+                    }
+                  }
+                }
+              }
+            }
+            
+            // Create GitHub Check with annotations (max 50 per request)
+            if (annotations.length > 0) {
+              const sha = '${{ fromJSON(steps.pr.outputs.result).sha }}';
+              
+              // Remove duplicates
+              const uniqueAnnotations = annotations.filter((annotation, index, self) =>
+                index === self.findIndex((a) => (
+                  a.path === annotation.path && 
+                  a.start_line === annotation.start_line &&
+                  a.message === annotation.message
+                ))
+              );
+              
+              try {
+                await github.rest.checks.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: 'Test Failures & Console Errors',
+                  head_sha: sha,
+                  status: 'completed',
+                  conclusion: 'neutral',
+                  output: {
+                    title: `🎯 Found ${uniqueAnnotations.length} issue${uniqueAnnotations.length === 1 ? '' : 's'} in tests`,
+                    summary: `Detected ${uniqueAnnotations.length} test failures or console errors with source-mapped locations.\n\n` +
+                             `These have been annotated inline in the **Files Changed** tab! 🎉\n\n` +
+                             `Check the exact lines where errors occurred to fix them faster! ⚡`,
+                    annotations: uniqueAnnotations.slice(0, 50)  // GitHub limit: 50 per request
+                  }
+                });
+                
+                console.log(`✅ Created ${uniqueAnnotations.length} inline annotations!`);
+              } catch (error) {
+                console.error('Failed to create annotations:', error.message);
+              }
+            } else {
+              console.log('🎉 No test errors found to annotate!');
+            }
+
       - name: Upload test outputs
         if: always()
         uses: actions/upload-artifact@v4
@@ -475,6 +770,7 @@ jobs:
           name: test-results
           path: |
             lint-output.txt
+            lint-output.json
             unit-test-output.txt
             integration-test-output.txt
           if-no-files-found: warn
@@ -860,6 +1156,8 @@ jobs:
             // ESLint Results
             if (lintStatus === 'passed') {
               testSection += `**ESLint:** ✅ All checks passed!\n`;
+            } else if (lintStatus === 'skipped') {
+              testSection += `**ESLint:** ⏭️ Skipped (no JS/JSX files changed)\n`;
             } else {
               testSection += `**ESLint:** ❌ Found issues\n`;
               testSection += `- Errors: ${lintErrors}\n`;
@@ -882,6 +1180,12 @@ jobs:
             testSection += `- ❌ Failed: ${integrationFailed}\n`;
             if (integrationSkipped !== '0') {
               testSection += `- ⏭️ Skipped: ${integrationSkipped}\n`;
+            }
+            
+            // 🎯 NEW: Add note about inline annotations!
+            const hasFailures = unitStatus !== 'passed' || integrationStatus !== 'passed' || lintStatus === 'failed';
+            if (hasFailures) {
+              testSection += `\n> 💡 **Pro Tip:** Check the **Files Changed** tab for inline annotations showing exactly where errors occurred! 🎯\n`;
             }
             
             // Bundle analysis

@@ -1,85 +1,1533 @@
-name: Build Monitor
+name: Main Branch Test Monitor + Chaos Testing 🌪️
+
 permissions:
-  contents: read
+  contents: write
   issues: write
+  models: read
+
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-monitor:
+  main-branch-test-and-chaos:
     runs-on: ubuntu-latest
+    outputs:
+      start_timestamp: ${{ steps.start_time.outputs.timestamp }}
+      build_status: ${{ steps.build.outputs.build_status }}
+      lint_status: ${{ steps.lint.outputs.lint_status }}
+      lint_errors: ${{ steps.lint.outputs.lint_errors }}
+      lint_warnings: ${{ steps.lint.outputs.lint_warnings }}
+      unit_status: ${{ steps.unit_tests.outputs.unit_status }}
+      unit_total: ${{ steps.unit_tests.outputs.unit_total }}
+      unit_passed: ${{ steps.unit_tests.outputs.unit_passed }}
+      unit_failed: ${{ steps.unit_tests.outputs.unit_failed }}
+      unit_skipped: ${{ steps.unit_tests.outputs.unit_skipped }}
+      integration_status: ${{ steps.integration_tests.outputs.integration_status }}
+      integration_total: ${{ steps.integration_tests.outputs.integration_total }}
+      integration_passed: ${{ steps.integration_tests.outputs.integration_passed }}
+      integration_failed: ${{ steps.integration_tests.outputs.integration_failed }}
+      integration_skipped: ${{ steps.integration_tests.outputs.integration_skipped }}
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-        
-    - name: Install dependencies
-      id: install
-      run: |
-        echo "install_status=success" >> $GITHUB_OUTPUT
-        install_output=$(npm ci 2>&1) || {
-          echo "install_status=failure" >> $GITHUB_OUTPUT
-          echo "error_output<<EOF" >> $GITHUB_OUTPUT
-          echo "$install_output" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        }
-        
-    - name: Run build
-      id: build
-      if: steps.install.outputs.install_status == 'success'
-      run: |
-        echo "build_status=success" >> $GITHUB_OUTPUT
-        build_output=$(npm run build 2>&1) || {
-          echo "build_status=failure" >> $GITHUB_OUTPUT
-          echo "error_output<<EOF" >> $GITHUB_OUTPUT
-          echo "$build_output" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        }
-        
-    - name: Create issue if failed
-      if: steps.install.outputs.install_status == 'failure' || steps.build.outputs.build_status == 'failure'
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const failedStep = process.env.INSTALL_STATUS === 'failure' ? 'dependency installation' : 'build';
-          const errorOutput = `\`\`\`\n${process.env.ERROR_OUTPUT}\n\`\`\``;
+      - name: Record start time
+        id: start_time
+        run: echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ============================================================
+      # BUILD PHASE
+      # ============================================================
+
+      - name: Install dependencies
+        id: install
+        run: |
+          echo "install_status=success" >> $GITHUB_OUTPUT
+          npm ci 2>&1 | tee install-output.txt || {
+            echo "install_status=failure" >> $GITHUB_OUTPUT
+            exit 1
+          }
+
+      - name: Build project
+        id: build
+        if: steps.install.outputs.install_status == 'success'
+        run: |
+          echo "build_status=success" >> $GITHUB_OUTPUT
+          npm run build 2>&1 | tee build-output.txt || {
+            echo "build_status=failure" >> $GITHUB_OUTPUT
+            exit 1
+          }
+        env:
+          NODE_ENV: production
+
+      - name: Upload build artifact
+        if: steps.build.outputs.build_status == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: build/
+          retention-days: 1
+
+      # ============================================================
+      # TESTING PHASE
+      # ============================================================
+
+      - name: Run linter
+        id: lint
+        if: steps.build.outputs.build_status == 'success'
+        env:
+          NODE_OPTIONS: --max-old-space-size=8912 
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm run test:lint 2>&1 | tee lint-output.txt
+          EXIT_CODE=$?
           
-          const { data: issues } = await github.rest.issues.listForRepo({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            state: 'open',
-            labels: 'build-failure'
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "lint_status=passed" >> $GITHUB_OUTPUT
+            echo "lint_errors=0" >> $GITHUB_OUTPUT
+            echo "lint_warnings=0" >> $GITHUB_OUTPUT
+          else
+            echo "lint_status=failed" >> $GITHUB_OUTPUT
+            ERRORS=$(grep -E '^\s+[0-9]+:[0-9]+\s+error\s+' lint-output.txt | wc -l || echo "0")
+            WARNINGS=$(grep -E '^\s+[0-9]+:[0-9]+\s+warning\s+' lint-output.txt | wc -l || echo "0")
+            echo "lint_errors=${ERRORS:-0}" >> $GITHUB_OUTPUT
+            echo "lint_warnings=${WARNINGS:-0}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run unit tests
+        id: unit_tests
+        if: steps.build.outputs.build_status == 'success'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm run test:unit 2>&1 | tee unit-test-output.txt
+          EXIT_CODE=$?
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "unit_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "unit_status=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          TOTAL=$(grep -oP '\d+(?= tests?)' unit-test-output.txt | head -1)
+          PASSED=$(grep -oP '\d+(?= passed)' unit-test-output.txt | head -1)
+          FAILED=$(grep -oP '\d+(?= failed)' unit-test-output.txt | head -1)
+          SKIPPED=$(grep -oP '\d+(?= skipped)' unit-test-output.txt | head -1)
+          
+          echo "unit_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
+          echo "unit_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
+          echo "unit_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
+          echo "unit_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
+
+      - name: Run integration tests
+        id: integration_tests
+        if: steps.build.outputs.build_status == 'success'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm run test:integration 2>&1 | tee integration-test-output.txt
+          EXIT_CODE=$?
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "integration_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "integration_status=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          TOTAL=$(grep -oP '\d+(?= tests?)' integration-test-output.txt | head -1)
+          PASSED=$(grep -oP '\d+(?= passed)' integration-test-output.txt | head -1)
+          FAILED=$(grep -oP '\d+(?= failed)' integration-test-output.txt | head -1)
+          SKIPPED=$(grep -oP '\d+(?= skipped)' integration-test-output.txt | head -1)
+          
+          echo "integration_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
+          echo "integration_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
+          echo "integration_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
+          echo "integration_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            install-output.txt
+            build-output.txt
+            lint-output.txt
+            unit-test-output.txt
+            integration-test-output.txt
+          retention-days: 1
+
+  # ============================================================
+  # MATRIX JOB: SCREENSHOTS + CHAOS TESTING
+  # ============================================================
+  chaos-matrix:
+    needs: main-branch-test-and-chaos
+    if: needs.main-branch-test-and-chaos.outputs.build_status == 'success'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            browser: chromium
+            primary: true
+          - os: windows-latest
+            browser: firefox
+          - os: windows-latest
+            browser: webkit
+          - os: ubuntu-latest
+            browser: chromium
+          - os: ubuntu-latest
+            browser: firefox
+          - os: macos-latest
+            browser: chromium
+          - os: macos-latest
+            browser: webkit
+    
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: build/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --save-dev @playwright/test@latest
+
+      - name: Install Playwright browsers (Linux)
+        if: runner.os == 'Linux'
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Install Playwright browsers (macOS/Windows)
+        if: runner.os != 'Linux'
+        run: npx playwright install ${{ matrix.browser }}
+
+      - name: Create Playwright config
+        shell: bash
+        run: |
+          cat > playwright.config.js << 'EOF'
+          const { defineConfig, devices } = require('@playwright/test');
+
+          module.exports = defineConfig({
+            testDir: '.',
+            outputDir: 'test-results',
+            timeout: 120000,
+            fullyParallel: false,
+            forbidOnly: !!process.env.CI,
+            retries: 0,
+            workers: 1,
+            reporter: [['list'], ['json', { outputFile: 'test-results.json' }]],
+            use: {
+              trace: 'on',
+              screenshot: 'on',
+              video: 'on',
+              baseURL: 'http://localhost:8080',
+            },
+            projects: [
+              {
+                name: 'chromium',
+                use: { 
+                  ...devices['Desktop Chrome'],
+                  permissions: ['midi', 'midi-sysex'],
+                },
+              },
+              {
+                name: 'firefox',
+                use: { 
+                  ...devices['Desktop Firefox'],
+                },
+              },
+              {
+                name: 'webkit',
+                use: { 
+                  ...devices['Desktop Safari'],
+                },
+              },
+            ],
+          });
+          EOF
+
+      - name: Create screenshot test
+        shell: bash
+        run: |
+          cat > screenshot-test.spec.js << 'EOF'
+          const { test } = require('@playwright/test');
+
+          test.describe('Main Branch Screenshots', () => {
+            test('Stage and Sprites', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(5000);
+              
+              const stageWrapper = await page.locator('[class*="stage-and-target-wrapper"]').first();
+              if (await stageWrapper.count() > 0) {
+                await stageWrapper.screenshot({ path: 'screenshots/stage-sprites.png' });
+              } else {
+                await page.screenshot({ path: 'screenshots/stage-sprites.png', clip: { x: 0, y: 0, width: 600, height: 800 } });
+              }
+            });
+
+            test('Blocks Workspace', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(5000);
+              
+              const editorWrapper = await page.locator('[class*="editor-wrapper"]').first();
+              if (await editorWrapper.count() > 0) {
+                await editorWrapper.screenshot({ path: 'screenshots/blocks-workspace.png' });
+              } else {
+                await page.screenshot({ path: 'screenshots/blocks-workspace.png', fullPage: false });
+              }
+            });
+
+            test('Player View', async ({ page }) => {
+              await page.goto('/');
+              await page.waitForLoadState('networkidle');
+              await page.waitForTimeout(3000);
+              await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
+            });
+
+            test('Editor Initial (Code Tab)', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(4000);
+              await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
+            });
+
+            test('Code Tab', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
+              
+              const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
+              const codeTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(0);
+              await codeTab.click();
+              await page.waitForTimeout(2000);
+              
+              await page.screenshot({ path: 'screenshots/code-tab.png', fullPage: true });
+            });
+
+            test('Costumes Tab', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
+              
+              const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
+              const costumesTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(1);
+              await costumesTab.click();
+              await page.waitForTimeout(2000);
+              
+              await page.screenshot({ path: 'screenshots/costumes-tab.png', fullPage: true });
+            });
+
+            test('Sounds Tab', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
+              
+              const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
+              const soundsTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(2);
+              await soundsTab.click();
+              await page.waitForTimeout(2000);
+              
+              await page.screenshot({ path: 'screenshots/sounds-tab.png', fullPage: true });
+            });
+
+            test('Songs Tab', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
+              
+              const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
+              const songsTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(3);
+              await songsTab.click();
+              await page.waitForTimeout(2000);
+              
+              await page.screenshot({ path: 'screenshots/songs-tab.png', fullPage: true });
+            });
+
+            test('Extension Library', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
+              
+              const extensionButton = page.locator('[class*="extension-button"]').first()
+                .or(page.locator('button:has-text("Add Extension")'))
+                .or(page.locator('[aria-label*="extension" i]').first());
+              
+              if (await extensionButton.count() > 0) {
+                await extensionButton.click();
+                await page.waitForTimeout(2000);
+              }
+              
+              await page.screenshot({ path: 'screenshots/extension-library.png', fullPage: true });
+            });
+
+            test('Advanced Settings', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Dismiss browser compat modal (Firefox)
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
+                if (await closeButton.count() > 0) {
+                  await closeButton.click({ timeout: 2000 }).catch(() => {});
+                  await page.waitForTimeout(500);
+                }
+              }
+              
+              const settingsButton = page.locator('[class*="menu-bar"]')
+                .locator('[class*="settings"], [aria-label*="settings" i], [aria-label*="advanced" i]')
+                .first()
+                .or(page.locator('button:has-text("Settings")'))
+                .or(page.locator('button:has-text("Advanced")'));
+              
+              if (await settingsButton.count() > 0) {
+                await settingsButton.click();
+                await page.waitForTimeout(2000);
+              }
+              
+              await page.screenshot({ path: 'screenshots/advanced-settings.png', fullPage: true });
+            });
+          });
+          EOF
+
+      - name: Checkout repo for chaos tests
+        uses: actions/checkout@v4
+        with:
+          path: repo-source
+
+      - name: Create chaos tests directory
+        shell: bash
+        run: |
+          mkdir -p .github/chaos-tests
+          
+          if [ -d "repo-source/.github/chaos-tests" ]; then
+            cp -r repo-source/.github/chaos-tests/* .github/chaos-tests/ 2>/dev/null || true
+          fi
+          
+          if [ ! "$(ls -A .github/chaos-tests/*.json 2>/dev/null)" ]; then
+            cat > .github/chaos-tests/sample-tabs.json << 'JSONEOF'
+          {
+            "name": "Sample Tab Navigation",
+            "description": "Navigate through all tabs",
+            "actions": [
+              { "type": "goto", "url": "/editor.html" },
+              { "type": "wait", "duration": 3000 },
+              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 1 },
+              { "type": "wait", "duration": 2000 },
+              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 2 },
+              { "type": "wait", "duration": 2000 },
+              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 0 },
+              { "type": "wait", "duration": 2000 }
+            ]
+          }
+          JSONEOF
+          fi
+
+      - name: Generate chaos and recorded tests
+        shell: bash
+        run: |
+          # ✅ FIX: NO service worker filtering - catch ALL errors!
+          cat > chaos-test.spec.js << 'EOF'
+          const { test } = require('@playwright/test');
+          const fs = require('fs');
+
+          test.describe('🌪️ Chaos Testing', () => {
+            test('Random Click Spam', async ({ page, context, browserName }) => {
+              if (browserName === 'chromium') {
+                try {
+                  await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                } catch (e) {
+                  console.log('MIDI permissions not available');
+                }
+              }
+              
+              const consoleErrors = [];
+              const eventLog = [];
+              
+              page.on('console', msg => {
+                if (msg.type() === 'error') {
+                  const text = msg.text();
+                  consoleErrors.push({
+                    text: text,
+                    timestamp: Date.now(),
+                    location: msg.location()
+                  });
+                }
+              });
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              const duration = 30000;
+              const startTime = Date.now();
+              let clickCount = 0;
+              
+              while (Date.now() - startTime < duration) {
+                const clickableSelectors = [
+                  'button',
+                  '[role="button"]',
+                  'a',
+                  '[class*="menu"]',
+                  '[class*="tab"]',
+                  '[class*="block"]',
+                  '[class*="sprite"]',
+                  '[class*="costume"]'
+                ];
+                
+                const randomSelector = clickableSelectors[Math.floor(Math.random() * clickableSelectors.length)];
+                const elements = await page.locator(randomSelector).all();
+                
+                if (elements.length > 0) {
+                  const randomElement = elements[Math.floor(Math.random() * elements.length)];
+                  try {
+                    const elementClass = await randomElement.getAttribute('class') || 'unknown';
+                    await randomElement.click({ timeout: 1000, force: true });
+                    clickCount++;
+                    eventLog.push({
+                      action: 'click',
+                      element: elementClass,
+                      time: Date.now() - startTime,
+                      clickNumber: clickCount
+                    });
+                  } catch (e) {
+                    // Element disappeared, that's chaos!
+                  }
+                }
+                
+                await page.waitForTimeout(100 + Math.random() * 400);
+              }
+              
+              const results = {
+                testName: 'Random Click Spam',
+                browser: browserName,
+                clickCount,
+                errors: consoleErrors,
+                events: eventLog
+              };
+              
+              fs.writeFileSync('chaos-results.json', JSON.stringify(results, null, 2));
+              
+              if (consoleErrors.length > 0) {
+                throw new Error(`Found ${consoleErrors.length} console errors during chaos testing`);
+              }
+            });
+          });
+          EOF
+          
+          # ✅ FIX: NO service worker filtering - catch ALL errors!
+          cat > generate-custom-tests.js << 'GENEOF'
+          const fs = require('fs');
+          const path = require('path');
+          
+          const testDir = '.github/chaos-tests';
+          const testFiles = fs.readdirSync(testDir).filter(f => f.endsWith('.json'));
+          
+          let allTests = '';
+          
+          testFiles.forEach(file => {
+            const testConfig = JSON.parse(fs.readFileSync(path.join(testDir, file), 'utf8'));
+            const testName = testConfig.name || file.replace('.json', '');
+            const testSlug = file.replace('.json', '');
+            
+            allTests += `
+              test('${testName}', async ({ page, context, browserName }) => {
+                if (browserName === 'chromium') {
+                  try {
+                    await context.grantPermissions(['midi', 'midi-sysex'], { origin: 'http://localhost:8080' });
+                  } catch (e) {
+                    console.log('MIDI permissions not available');
+                  }
+                }
+                
+                const consoleErrors = [];
+                const eventLog = [];
+                
+                page.on('console', msg => {
+                  if (msg.type() === 'error') {
+                    const text = msg.text();
+                    consoleErrors.push({
+                      text: text,
+                      timestamp: Date.now(),
+                      location: msg.location()
+                    });
+                  }
+                });
+                
+                const actions = ${JSON.stringify(testConfig.actions)};
+                
+                for (const action of actions) {
+                  eventLog.push({ ...action, executedAt: Date.now() });
+                  
+                  switch(action.type) {
+                    case 'goto':
+                      await page.goto(action.url);
+                      await page.waitForLoadState('networkidle');
+                      break;
+                    case 'click':
+                      if (action.index !== undefined) {
+                        await page.locator(action.selector).nth(action.index).click();
+                      } else {
+                        await page.locator(action.selector).click();
+                      }
+                      break;
+                    case 'type':
+                      await page.locator(action.selector).fill(action.text);
+                      break;
+                    case 'wait':
+                      await page.waitForTimeout(action.duration);
+                      break;
+                  }
+                }
+                
+                const results = {
+                  testName: '${testName}',
+                  testFile: '${file}',
+                  browser: browserName,
+                  actionsExecuted: actions.length,
+                  errors: consoleErrors,
+                  events: eventLog
+                };
+                
+                fs.writeFileSync('recorded-${testSlug}-results.json', JSON.stringify(results, null, 2));
+                
+                if (consoleErrors.length > 0) {
+                  throw new Error(\`Found \${consoleErrors.length} console errors during ${testName}\`);
+                }
+              });
+            `;
           });
           
-          const existingIssue = issues.find(issue => 
-            issue.title.includes('Build Failure') && 
-            issue.labels.some(label => label.name === 'build-failure')
-          );
+          const fullTestFile = `
+          const { test } = require('@playwright/test');
+          const fs = require('fs');
+
+          test.describe('🎬 Recorded Actions Playback', () => {
+            ${allTests}
+          });
+          `;
           
-          const title = `Build Failure - ${new Date().toISOString()}`;
-          const body = `The latest commit (${context.sha}) failed during ${failedStep}.\n\n**Error Output:**\n${errorOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+          fs.writeFileSync('recorded-actions-test.spec.js', fullTestFile);
+          GENEOF
           
-          if (!existingIssue) {
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['build-failure', 'bug']
-            });
-          } else {
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: existingIssue.number,
-              body: `Another failure detected in commit ${context.sha} during ${failedStep}.\n\n**Error Output:**\n${errorOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
-            });
+          node generate-custom-tests.js
+
+      - name: Start HTTP server
+        shell: bash
+        run: |
+          npx http-server build -p 8080 &
+          echo $! > server.pid
+          
+          for i in {1..30}; do
+            if curl -f -s http://localhost:8080/ > /dev/null 2>&1; then
+              echo "Server is ready!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Server failed to start within 30 seconds"
+              exit 1
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 1
+          done
+
+      - name: Capture screenshots
+        id: screenshots
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p screenshots
+          npx playwright test screenshot-test.spec.js --project=${{ matrix.browser }} 2>&1 | tee screenshot-output.txt
+          if [ $? -eq 0 ]; then
+            echo "screenshot_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "screenshot_status=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "📸 Screenshots captured:"
+          ls -lh screenshots/ 2>/dev/null || echo "No screenshots directory"
+
+      - name: Run chaos tests with video recording
+        id: chaos_tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          set -o pipefail
+          mkdir -p test-results chaos-reports
+          
+          npx playwright test chaos-test.spec.js --project=${{ matrix.browser }} 2>&1 | tee chaos-test-output.txt
+          CHAOS_EXIT=${PIPESTATUS[0]}
+          
+          npx playwright test recorded-actions-test.spec.js --project=${{ matrix.browser }} 2>&1 | tee recorded-actions-output.txt
+          RECORDED_EXIT=${PIPESTATUS[0]}
+          
+          set -e
+          
+          echo "🎬 Searching for test videos..."
+          echo "Directory structure:"
+          find test-results -type f 2>/dev/null | head -30
+          
+          VIDEO_COUNT=$(find test-results -type f -name "*.webm" 2>/dev/null | wc -l)
+          echo "Found $VIDEO_COUNT video files"
+          
+          if [ $VIDEO_COUNT -gt 0 ]; then
+            echo "Video files:"
+            find test-results -type f -name "*.webm" -exec ls -lh {} \;
+          else
+            echo "⚠️ WARNING: No video files found!"
+            echo "Contents of test-results:"
+            ls -R test-results/ 2>/dev/null || echo "test-results directory not found"
+          fi
+          
+          if [ $CHAOS_EXIT -eq 0 ] && [ $RECORDED_EXIT -eq 0 ]; then
+            echo "chaos_status=passed" >> $GITHUB_OUTPUT
+            echo "errors_found=false" >> $GITHUB_OUTPUT
+          else
+            echo "chaos_status=failed" >> $GITHUB_OUTPUT
+            echo "errors_found=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop HTTP server
+        if: always()
+        shell: bash
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi
+
+      - name: Create platform summary
+        shell: bash
+        run: |
+          cat > platform-summary.json << EOF
+          {
+            "os": "${{ matrix.os }}",
+            "browser": "${{ matrix.browser }}",
+            "chaos_status": "${{ steps.chaos_tests.outputs.chaos_status }}",
+            "screenshot_status": "${{ steps.screenshots.outputs.screenshot_status }}",
+            "errors_found": "${{ steps.chaos_tests.outputs.errors_found }}"
           }
-      env:
-        ERROR_OUTPUT: ${{ steps.install.outputs.error_output || steps.build.outputs.error_output }}
-        INSTALL_STATUS: ${{ steps.install.outputs.install_status }}
-        BUILD_STATUS: ${{ steps.build.outputs.build_status }}
+          EOF
+
+      - name: Upload matrix results
+        uses: actions/upload-artifact@v4
+        with:
+          name: chaos-results-${{ matrix.os }}-${{ matrix.browser }}
+          path: |
+            screenshots/
+            chaos-results.json
+            recorded-*-results.json
+            test-results/
+            screenshot-output.txt
+            chaos-test-output.txt
+            recorded-actions-output.txt
+            platform-summary.json
+          retention-days: 1
+
+  # ============================================================
+  # ANALYZE + CREATE/UPDATE ISSUES (Windows+Chromium only)
+  # ============================================================
+  analyze-and-report:
+    needs: [main-branch-test-and-chaos, chaos-matrix]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download test logs
+        uses: actions/download-artifact@v4
+        with:
+          name: test-logs
+        continue-on-error: true
+
+      - name: Download Windows+Chromium results (primary)
+        uses: actions/download-artifact@v4
+        with:
+          name: chaos-results-windows-latest-chromium
+          path: windows-results/
+        continue-on-error: true
+
+      - name: Download all matrix results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: chaos-results-*
+          path: all-matrix-results/
+          merge-multiple: false
+        continue-on-error: true
+
+      - name: Analyze Windows chaos test errors (for issues)
+        id: analyze_chaos_errors
+        continue-on-error: true
+        run: |
+          cd windows-results || exit 0
+          
+          FOUND_ERRORS=false
+          
+          if [ -f chaos-results.json ]; then
+            ERROR_COUNT=$(jq '.errors | length' chaos-results.json)
+            if [ "$ERROR_COUNT" -gt 0 ]; then
+              FOUND_ERRORS=true
+              echo "chaos_has_errors=true" >> $GITHUB_OUTPUT
+              
+              ERRORS=$(jq -r '.errors[] | "[\(.timestamp)] \(.text)"' chaos-results.json | head -20)
+              EVENTS=$(jq -r '.events[-10:] | .[] | "[\(.time)ms] Click #\(.clickNumber): \(.element)"' chaos-results.json)
+              
+              COMBINED="${ERRORS}\n\nLast 10 events:\n${EVENTS}"
+              TOKEN_ESTIMATE=$((${#COMBINED} / 4))
+              
+              echo "chaos_token_estimate=$TOKEN_ESTIMATE" >> $GITHUB_OUTPUT
+              
+              {
+                echo "chaos_errors<<EOF"
+                echo "$ERRORS"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+              
+              {
+                echo "chaos_events<<EOF"
+                echo "$EVENTS"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+          for result_file in recorded-*-results.json; do
+            if [ -f "$result_file" ]; then
+              ERROR_COUNT=$(jq '.errors | length' "$result_file")
+              if [ "$ERROR_COUNT" -gt 0 ]; then
+                FOUND_ERRORS=true
+                TEST_NAME=$(jq -r '.testName' "$result_file")
+                TEST_FILE=$(jq -r '.testFile' "$result_file")
+                
+                echo "recorded_has_errors=true" >> $GITHUB_OUTPUT
+                echo "recorded_test_name=$TEST_NAME" >> $GITHUB_OUTPUT
+                echo "recorded_test_file=$TEST_FILE" >> $GITHUB_OUTPUT
+                
+                ERRORS=$(jq -r '.errors[] | "[\(.timestamp)] \(.text)"' "$result_file" | head -20)
+                EVENTS=$(jq -r '.events | .[] | "[\(.executedAt)] \(.type): \(.selector // .url // "")"' "$result_file")
+                
+                COMBINED="${ERRORS}\n\nActions:\n${EVENTS}"
+                TOKEN_ESTIMATE=$((${#COMBINED} / 4))
+                
+                echo "recorded_token_estimate=$TOKEN_ESTIMATE" >> $GITHUB_OUTPUT
+                
+                {
+                  echo "recorded_errors<<EOF"
+                  echo "$ERRORS"
+                  echo "EOF"
+                } >> $GITHUB_OUTPUT
+                
+                {
+                  echo "recorded_events<<EOF"
+                  echo "$EVENTS"
+                  echo "EOF"
+                } >> $GITHUB_OUTPUT
+                
+                break
+              fi
+            fi
+          done
+          
+          echo "found_errors=$FOUND_ERRORS" >> $GITHUB_OUTPUT
+
+      - name: Install FFmpeg
+        if: steps.analyze_chaos_errors.outputs.found_errors == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Upload videos to chaos-videos branch
+        if: steps.analyze_chaos_errors.outputs.found_errors == 'true'
+        id: upload_to_branch
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          if git ls-remote --heads https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git chaos-videos | grep -q chaos-videos; then
+            git clone --single-branch --branch chaos-videos --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git chaos-videos
+            cd chaos-videos
+          else
+            mkdir -p chaos-videos
+            cd chaos-videos
+            git init -b chaos-videos
+            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            echo "# Chaos Test Videos" > README.md
+            git add README.md
+            git commit -m "Initialize chaos-videos branch"
+            git push origin chaos-videos || git push -u origin chaos-videos
+          fi
+          
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          RUN_ID="${{ github.run_id }}"
+          VIDEO_DIR="${TIMESTAMP}-${RUN_ID}"
+          
+          mkdir -p "$VIDEO_DIR"
+          
+          # ✅ FIX: Simplified video discovery - find by prefix
+          echo "🔍 Searching for test videos in Windows+Chromium results..."
+          echo ""
+          
+          echo "🌪️ Looking for chaos test video..."
+          CHAOS_DIR=$(find ../windows-results/test-results -type d -name "chaos-test-*" 2>/dev/null | head -1)
+          if [ -n "$CHAOS_DIR" ] && [ -d "$CHAOS_DIR" ]; then
+            echo "Found chaos test directory: $CHAOS_DIR"
+            CHAOS_VIDEO="$CHAOS_DIR/video.webm"
+            if [ -f "$CHAOS_VIDEO" ]; then
+              cp "$CHAOS_VIDEO" "$VIDEO_DIR/chaos-test-chromium-video.webm"
+              echo "✅ Copied chaos video from: $CHAOS_VIDEO"
+            else
+              echo "⚠️ No video.webm in chaos directory"
+              ls -la "$CHAOS_DIR" 2>/dev/null || echo "Can't list directory"
+            fi
+          else
+            echo "❌ No chaos test directory found"
+            echo "Directories in test-results:"
+            ls ../windows-results/test-results 2>/dev/null || echo "test-results not found"
+          fi
+          
+          echo ""
+          echo "🎬 Looking for recorded actions video..."
+          RECORDED_DIR=$(find ../windows-results/test-results -type d -name "recorded-actions-test-*" 2>/dev/null | head -1)
+          if [ -n "$RECORDED_DIR" ] && [ -d "$RECORDED_DIR" ]; then
+            echo "Found recorded actions directory: $RECORDED_DIR"
+            RECORDED_VIDEO="$RECORDED_DIR/video.webm"
+            if [ -f "$RECORDED_VIDEO" ]; then
+              cp "$RECORDED_VIDEO" "$VIDEO_DIR/recorded-actions-chromium-video.webm"
+              echo "✅ Copied recorded actions video from: $RECORDED_VIDEO"
+            else
+              echo "⚠️ No video.webm in recorded actions directory"
+              ls -la "$RECORDED_DIR" 2>/dev/null || echo "Can't list directory"
+            fi
+          else
+            echo "❌ No recorded actions directory found"
+          fi
+          
+          echo ""
+          echo "📦 Videos collected in $VIDEO_DIR:"
+          ls -lh "$VIDEO_DIR"/*.webm 2>/dev/null || echo "⚠️ No videos found!"
+          
+          echo ""
+          echo "🎨 Converting videos to GIF..."
+          for webm in "$VIDEO_DIR"/*.webm; do
+            if [ -f "$webm" ]; then
+              gif="${webm%.webm}.gif"
+              echo "Converting $(basename "$webm")..."
+              ffmpeg -i "$webm" -vf "fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=256[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5" -loop 0 "$gif" -y 2>&1 | tail -5
+            fi
+          done
+          
+          echo "video_timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "video_dir=$VIDEO_DIR" >> $GITHUB_OUTPUT
+          
+          git add .
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Add chaos test videos from run $RUN_ID"
+            git push origin chaos-videos
+            echo "✅ Videos pushed to chaos-videos branch!"
+          else
+            echo "⚠️ No changes to push"
+          fi
+
+      - name: AI analysis for chaos test errors
+        id: ai_chaos_analysis
+        if: steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true' && steps.analyze_chaos_errors.outputs.chaos_token_estimate < 8000
+        continue-on-error: true
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            You are analyzing console errors found during chaos testing (random click spam) of the OmniBlocks scratch-gui editor.
+            
+            **Console Errors Detected:**
+            ${{ steps.analyze_chaos_errors.outputs.chaos_errors }}
+            
+            **Events Leading to Errors (Last 10 clicks):**
+            ${{ steps.analyze_chaos_errors.outputs.chaos_events }}
+            
+            **Your Task:**
+            Provide a concise hypothesis (2-3 paragraphs) about:
+            1. What likely caused these errors
+            2. Which UI components or interactions are problematic
+            3. Suggested areas to investigate for fixes
+            
+            Be specific about element classes, timing issues, or race conditions if visible.
+
+      - name: AI analysis for recorded actions errors
+        id: ai_recorded_analysis
+        if: steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true' && steps.analyze_chaos_errors.outputs.recorded_token_estimate < 8000
+        continue-on-error: true
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            You are analyzing console errors found during recorded action playback testing of the OmniBlocks scratch-gui editor.
+            
+            **Console Errors Detected:**
+            ${{ steps.analyze_chaos_errors.outputs.recorded_errors }}
+            
+            **Actions Executed:**
+            ${{ steps.analyze_chaos_errors.outputs.recorded_events }}
+            
+            **Your Task:**
+            Provide a concise hypothesis (2-3 paragraphs) about:
+            1. What likely caused these errors
+            2. Which specific action or sequence triggered the problem
+            3. Suggested areas to investigate for fixes
+            
+            Be specific about the action sequence and timing.
+
+      - name: Search for existing chaos test issue
+        if: steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true'
+        id: search_chaos_issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'chaos-testing,console-error',
+              per_page: 100
+            });
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes('🌪️ Console Errors During Chaos Testing')
+            );
+            
+            if (existingIssue) {
+              console.log(`Found existing issue: #${existingIssue.number}`);
+              core.setOutput('issue_number', existingIssue.number);
+              core.setOutput('issue_exists', 'true');
+            } else {
+              console.log('No existing issue found');
+              core.setOutput('issue_exists', 'false');
+            }
+
+      - name: Create or update chaos test issue
+        if: steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true'
+        uses: actions/github-script@v7
+        env:
+          ERRORS: ${{ steps.analyze_chaos_errors.outputs.chaos_errors }}
+          EVENTS: ${{ steps.analyze_chaos_errors.outputs.chaos_events }}
+          AI_ANALYSIS: ${{ steps.ai_chaos_analysis.outputs.response }}
+          TOKEN_ESTIMATE: ${{ steps.analyze_chaos_errors.outputs.chaos_token_estimate }}
+          VIDEO_DIR: ${{ steps.upload_to_branch.outputs.video_dir }}
+          ISSUE_EXISTS: ${{ steps.search_chaos_issue.outputs.issue_exists }}
+          ISSUE_NUMBER: ${{ steps.search_chaos_issue.outputs.issue_number }}
+        with:
+          script: |
+            const errors = process.env.ERRORS;
+            const events = process.env.EVENTS;
+            const aiAnalysis = process.env.AI_ANALYSIS;
+            const tokenEstimate = process.env.TOKEN_ESTIMATE;
+            const videoDir = process.env.VIDEO_DIR;
+            const runId = context.runId;
+            const sha = context.sha;
+            const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
+            const issueExists = process.env.ISSUE_EXISTS === 'true';
+            const issueNumber = process.env.ISSUE_NUMBER;
+            
+            const assignees = ['supervoidcoder'];
+            if (commitAuthor && commitAuthor !== 'unknown' && commitAuthor !== 'supervoidcoder') {
+              assignees.push(commitAuthor);
+            }
+            
+            let aiSection = '';
+            if (aiAnalysis && tokenEstimate < 8000) {
+              aiSection = `### 🤖 AI Analysis\n\n${aiAnalysis}\n\n`;
+            } else if (tokenEstimate >= 8000) {
+              aiSection = `### ⚠️ AI Analysis Skipped\n\nLog too large (${tokenEstimate} tokens).\n\n`;
+            }
+            
+            let videoSection = `### 📹 Video\n\n`;
+            if (videoDir) {
+              const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
+              const webmUrl = `${videoBranchUrl}/chaos-test-chromium-video.webm`;
+              const gifUrl = `${videoBranchUrl}/chaos-test-chromium-video.gif`;
+              
+              videoSection += `![Chaos Test Recording](${gifUrl})\n\n`;
+              videoSection += `📥 [Download original video (WebM)](${webmUrl})\n`;
+              videoSection += `🗂️ [Browse all files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
+            } else {
+              videoSection += `[Workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})\n\n`;
+            }
+            
+            const bodyContent = `## 🐛 Chaos Test Errors (New Occurrence)\n\n**Platform:** <img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows + Chromium\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor}\n**Date:** ${new Date().toUTCString()}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎯 Last 10 Clicks\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-updated from [run ${runId}](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})*`;
+            
+            if (issueExists && issueNumber) {
+              console.log(`💬 Commenting on existing issue #${issueNumber}`);
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: parseInt(issueNumber),
+                body: bodyContent
+              });
+              console.log(`✅ Added comment to issue #${issueNumber}`);
+            } else {
+              console.log('📝 Creating new issue');
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🌪️ Console Errors During Chaos Testing (Windows)`,
+                body: bodyContent.replace('## 🐛 Chaos Test Errors (New Occurrence)', '## 🐛 Chaos Test Errors'),
+                labels: ['bug', 'automated-test', 'console-error', 'chaos-testing'],
+                assignees: assignees
+              });
+              console.log('✅ Created new issue');
+            }
+
+      - name: Search for existing recorded actions issue
+        if: steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true'
+        id: search_recorded_issue
+        uses: actions/github-script@v7
+        env:
+          TEST_NAME: ${{ steps.analyze_chaos_errors.outputs.recorded_test_name }}
+        with:
+          script: |
+            const testName = process.env.TEST_NAME;
+            
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'recorded-actions,console-error',
+              per_page: 100
+            });
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes(`🎬 Errors in "${testName}" Test`)
+            );
+            
+            if (existingIssue) {
+              console.log(`Found existing issue: #${existingIssue.number}`);
+              core.setOutput('issue_number', existingIssue.number);
+              core.setOutput('issue_exists', 'true');
+            } else {
+              console.log('No existing issue found');
+              core.setOutput('issue_exists', 'false');
+            }
+
+      - name: Create or update recorded actions issue
+        if: steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true'
+        uses: actions/github-script@v7
+        env:
+          ERRORS: ${{ steps.analyze_chaos_errors.outputs.recorded_errors }}
+          EVENTS: ${{ steps.analyze_chaos_errors.outputs.recorded_events }}
+          AI_ANALYSIS: ${{ steps.ai_recorded_analysis.outputs.response }}
+          TOKEN_ESTIMATE: ${{ steps.analyze_chaos_errors.outputs.recorded_token_estimate }}
+          TEST_NAME: ${{ steps.analyze_chaos_errors.outputs.recorded_test_name }}
+          TEST_FILE: ${{ steps.analyze_chaos_errors.outputs.recorded_test_file }}
+          VIDEO_DIR: ${{ steps.upload_to_branch.outputs.video_dir }}
+          ISSUE_EXISTS: ${{ steps.search_recorded_issue.outputs.issue_exists }}
+          ISSUE_NUMBER: ${{ steps.search_recorded_issue.outputs.issue_number }}
+        with:
+          script: |
+            const errors = process.env.ERRORS;
+            const events = process.env.EVENTS;
+            const aiAnalysis = process.env.AI_ANALYSIS;
+            const tokenEstimate = process.env.TOKEN_ESTIMATE;
+            const testName = process.env.TEST_NAME;
+            const testFile = process.env.TEST_FILE;
+            const videoDir = process.env.VIDEO_DIR;
+            const runId = context.runId;
+            const sha = context.sha;
+            const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
+            const issueExists = process.env.ISSUE_EXISTS === 'true';
+            const issueNumber = process.env.ISSUE_NUMBER;
+            
+            const assignees = ['supervoidcoder'];
+            if (commitAuthor && commitAuthor !== 'unknown' && commitAuthor !== 'supervoidcoder') {
+              assignees.push(commitAuthor);
+            }
+            
+            let aiSection = '';
+            if (aiAnalysis && tokenEstimate < 8000) {
+              aiSection = `### 🤖 AI Analysis\n\n${aiAnalysis}\n\n`;
+            } else if (tokenEstimate >= 8000) {
+              aiSection = `### ⚠️ AI Analysis Skipped\n\nLog too large (${tokenEstimate} tokens).\n\n`;
+            }
+            
+            let videoSection = `### 📹 Video\n\n`;
+            if (videoDir) {
+              const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
+              const webmUrl = `${videoBranchUrl}/recorded-actions-chromium-video.webm`;
+              const gifUrl = `${videoBranchUrl}/recorded-actions-chromium-video.gif`;
+              
+              videoSection += `![Recorded Actions Test](${gifUrl})\n\n`;
+              videoSection += `📥 [Download original video (WebM)](${webmUrl})\n`;
+              videoSection += `🗂️ [Browse all files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
+            } else {
+              videoSection += `[Workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})\n\n`;
+            }
+            
+            const bodyContent = `## 🐛 Recorded Actions Errors (New Occurrence)\n\n**Test:** ${testName}\n**File:** \`.github/chaos-tests/${testFile}\`\n**Platform:** <img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows + Chromium\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor}\n**Date:** ${new Date().toUTCString()}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎬 Actions\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-updated from [run ${runId}](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})*`;
+            
+            if (issueExists && issueNumber) {
+              console.log(`💬 Commenting on existing issue #${issueNumber}`);
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: parseInt(issueNumber),
+                body: bodyContent
+              });
+              console.log(`✅ Added comment to issue #${issueNumber}`);
+            } else {
+              console.log('📝 Creating new issue');
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🎬 Errors in "${testName}" Test (Windows)`,
+                body: bodyContent.replace('## 🐛 Recorded Actions Errors (New Occurrence)', '## 🐛 Recorded Actions Errors'),
+                labels: ['bug', 'automated-test', 'console-error', 'recorded-actions'],
+                assignees: assignees
+              });
+              console.log('✅ Created new issue');
+            }
+
+      - name: Calculate duration
+        id: duration
+        if: always()
+        run: |
+          END_TIME=$(date +%s)
+          START_TIME=${{ needs.main-branch-test-and-chaos.outputs.start_timestamp }}
+          DURATION=$((END_TIME - START_TIME))
+          MINUTES=$((DURATION / 60))
+          SECONDS=$((DURATION % 60))
+          echo "duration=${MINUTES}m ${SECONDS}s" >> $GITHUB_OUTPUT
+
+      - name: Generate enhanced HTML dashboard
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          BUILD_STATUS: ${{ needs.main-branch-test-and-chaos.outputs.build_status }}
+          LINT_STATUS: ${{ needs.main-branch-test-and-chaos.outputs.lint_status }}
+          LINT_ERRORS: ${{ needs.main-branch-test-and-chaos.outputs.lint_errors }}
+          LINT_WARNINGS: ${{ needs.main-branch-test-and-chaos.outputs.lint_warnings }}
+          UNIT_STATUS: ${{ needs.main-branch-test-and-chaos.outputs.unit_status }}
+          UNIT_TOTAL: ${{ needs.main-branch-test-and-chaos.outputs.unit_total }}
+          UNIT_PASSED: ${{ needs.main-branch-test-and-chaos.outputs.unit_passed }}
+          UNIT_FAILED: ${{ needs.main-branch-test-and-chaos.outputs.unit_failed }}
+          UNIT_SKIPPED: ${{ needs.main-branch-test-and-chaos.outputs.unit_skipped }}
+          INTEGRATION_STATUS: ${{ needs.main-branch-test-and-chaos.outputs.integration_status }}
+          INTEGRATION_TOTAL: ${{ needs.main-branch-test-and-chaos.outputs.integration_total }}
+          INTEGRATION_PASSED: ${{ needs.main-branch-test-and-chaos.outputs.integration_passed }}
+          INTEGRATION_FAILED: ${{ needs.main-branch-test-and-chaos.outputs.integration_failed }}
+          INTEGRATION_SKIPPED: ${{ needs.main-branch-test-and-chaos.outputs.integration_skipped }}
+          DURATION: ${{ steps.duration.outputs.duration }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          mkdir -p dashboard
+          
+          echo "📸 Copying screenshots from all platforms..."
+          SCREENSHOT_COUNT=0
+          
+          for platform_dir in all-matrix-results/chaos-results-*/; do
+            if [ -d "$platform_dir" ]; then
+              platform_name=$(basename "$platform_dir" | sed 's/chaos-results-//')
+              echo "  Processing platform: $platform_name"
+              
+              if [ -d "$platform_dir/screenshots" ]; then
+                target_dir="dashboard/screenshots-${platform_name}"
+                mkdir -p "$target_dir"
+                
+                if ls "$platform_dir/screenshots"/*.png 1> /dev/null 2>&1; then
+                  cp "$platform_dir/screenshots"/*.png "$target_dir/" 2>/dev/null
+                  copied=$(ls "$target_dir"/*.png 2>/dev/null | wc -l)
+                  SCREENSHOT_COUNT=$((SCREENSHOT_COUNT + copied))
+                  echo "    ✅ Copied $copied screenshots to $target_dir"
+                else
+                  echo "    ⚠️ No PNG files in screenshots directory"
+                fi
+              else
+                echo "    ⚠️ No screenshots directory found"
+              fi
+            fi
+          done
+          
+          echo ""
+          echo "📊 Screenshot summary: $SCREENSHOT_COUNT total files copied"
+          echo "📁 Dashboard directories created:"
+          find dashboard -type d -name "screenshots-*" | while read dir; do
+            count=$(ls "$dir"/*.png 2>/dev/null | wc -l)
+            echo "  $dir: $count images"
+          done
+          
+          python3 .github/scripts/generate-dashboard.py dashboard
+
+      - name: Deploy to gh-pages
+        if: always()
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          if git ls-remote --heads https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages | grep -q gh-pages; then
+            git clone --single-branch --branch gh-pages --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
+            cd gh-pages
+          else
+            mkdir -p gh-pages
+            cd gh-pages
+            git init -b gh-pages
+            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          fi
+          
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          mkdir -p "tests/$TIMESTAMP"
+          cp -r ../dashboard/* "tests/$TIMESTAMP/"
+          
+          cd tests
+          rm -f latest
+          ln -s "$TIMESTAMP" latest
+          
+          cat > index.html << 'INDEXEOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Test Results - OmniBlocks 🌪️</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 40px;
+                text-align: center;
+              }
+              
+              .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+              }
+              
+              h1 {
+                font-size: 3em;
+                margin-bottom: 20px;
+              }
+              
+              .button {
+                display: inline-block;
+                padding: 15px 40px;
+                margin: 10px;
+                background: white;
+                color: #667eea;
+                text-decoration: none;
+                border-radius: 50px;
+                font-weight: bold;
+                font-size: 1.1em;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+              }
+              
+              .button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+              }
+              
+              .note {
+                margin-top: 30px;
+                opacity: 0.8;
+              }
+              
+              .chaos {
+                font-size: 2em;
+                margin: 20px 0;
+              }
+              
+              .browsers {
+                font-size: 1.2em;
+                margin: 15px 0;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>🚀 OmniBlocks</h1>
+              <h2>Main Branch Test Results</h2>
+              <div class="chaos">🌪️ ULTRA CHAOS TESTING! 🌪️</div>
+              <div class="browsers">🌐 Multi-Browser Testing: Chromium • Firefox • WebKit</div>
+              <p>Comprehensive chaos testing across Windows, Ubuntu, and macOS with multiple browsers!</p>
+              <a href="latest/index.html" class="button">📊 View Latest Dashboard</a>
+              <p class="note">Now featuring Firefox 🦊 and WebKit 🧭 alongside Chromium! 🎉</p>
+            </div>
+          </body>
+          </html>
+          INDEXEOF
+          
+          cd ..
+          git add tests/
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Update test results with multi-browser chaos testing 🌪️🦊🧭 - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git push origin gh-pages || git push -u origin gh-pages
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Create issue on build failure
+        if: needs.main-branch-test-and-chaos.result == 'failure'
+        uses: actions/github-script@v7
+        env:
+          DURATION: ${{ steps.duration.outputs.duration }}
+        with:
+          script: |
+            const script = require('./.github/scripts/create-failure-issue.js');
+            await script({github, context, core});

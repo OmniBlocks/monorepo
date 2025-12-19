@@ -52,12 +52,17 @@ jobs:
               return { shouldRun: false };
             }
             
+            core.setOutput('method', isCheckbox ? 'checkbox' : 'command');
+            core.setOutput('is_slash_command', isSlashCommand.toString());
+            
             return {
               method: isCheckbox ? 'checkbox' : 'command',
               shouldRun: isSlashCommand || isCheckbox
             };
 
       - name: Check user permissions
+        # ⬇️ ONLY RUN FOR SLASH COMMANDS (can't verify checkbox clicker)
+        if: steps.trigger.outputs.is_slash_command == 'true'
         id: permission_check
         uses: actions/github-script@v7
         with:
@@ -119,7 +124,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const triggerMethod = ${{ steps.trigger.outputs.result }}.method;
+            const triggerMethod = '${{ steps.trigger.outputs.method }}';
             const reaction = triggerMethod === 'checkbox' ? 'eyes' : 'rocket';
             
             await github.rest.reactions.createForIssueComment({
@@ -134,7 +139,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const triggerMethod = ${{ steps.trigger.outputs.result }}.method;
+            const triggerMethod = '${{ steps.trigger.outputs.method }}';
             const triggerText = triggerMethod === 'checkbox' 
               ? 'checkbox selection' 
               : '`/fix lint` command';
@@ -144,7 +149,7 @@ jobs:
               repo: context.repo.repo,
               issue_number: context.issue.number,
               body: `🎨 **ESLint Autofix Started!**\n\n` +
-                    `Triggered by @${context.payload.comment.user.login} via ${triggerText}\n\n` +
+                    `Triggered via ${triggerText}\n\n` +
                     `🔄 Running ESLint with \`--fix\` on changed files...`
             });
             
@@ -273,7 +278,7 @@ jobs:
           path: eslint-autofix.patch
 
       - name: Update checkbox (if used)
-        if: steps.trigger.outputs.result.method == 'checkbox' && always()
+        if: steps.trigger.outputs.method == 'checkbox' && always()
         uses: actions/github-script@v7
         with:
           script: |
@@ -336,8 +341,7 @@ jobs:
               body: `🎨✨ **ESLint Autofix Complete!**\n\n` +
                     `The following lint issues were automatically fixed:\n\n` +
                     `${rulesTable || 'No fixable issues found.'}\n\n` +
-                    `✅ Changes committed to branch. Check the latest commit for details.\n\n` +
-                    `Triggered by @${{ github.event.comment.user.login }}`
+                    `✅ Changes committed to branch. Check the latest commit for details.`
             });
 
       - name: Post patch comment (fork PR)
@@ -364,7 +368,7 @@ jobs:
                     `git commit -m "Fix ESLint issues"\n` +
                     `git push\n` +
                     `\`\`\`\n\n` +
-                    `Triggered by @${{ github.event.comment.user.login }} ⚡`
+                    `⚡ Autofix complete!`
             });
 
       - name: Post no-changes comment
@@ -386,8 +390,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: ${{ steps.status_comment.outputs.result }},
-              body: `✨ **No Fixes Needed!**\n\n${message}\n\n` +
-                    `Triggered by @${{ github.event.comment.user.login }}`
+              body: `✨ **No Fixes Needed!**\n\n${message}`
             });
 
       - name: Post failure comment
@@ -401,6 +404,5 @@ jobs:
               comment_id: ${{ steps.status_comment.outputs.result }},
               body: `❌ **ESLint Autofix Failed!**\n\n` +
                     `Something went wrong during the autofix process.\n\n` +
-                    `Check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.\n\n` +
-                    `Triggered by @${{ github.event.comment.user.login }}`
+                    `Check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
             });

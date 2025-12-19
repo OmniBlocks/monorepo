@@ -237,19 +237,15 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add .
           
-          # Generate detailed commit message
-          cat > commit_message.txt << 'EOF'
-🎨 Auto-fix ESLint issues
-
-Fixed the following:
-${{ steps.autofix.outputs.fixed_rules }}
-
-Triggered by @${{ github.event.comment.user.login }}
-Co-authored-by: ${{ github.event.comment.user.login }} <${{ github.event.comment.user.id }}+${{ github.event.comment.user.login }}@users.noreply.github.com>
-EOF
+          # Using echo instead of heredoc
+          echo -e "🎨 Auto-fix ESLint issues\n\nFixed the following:\n${{ steps.autofix.outputs.fixed_rules }}\n\nTriggered by @${{ github.event.comment.user.login }}\nCo-authored-by: ${{ github.event.comment.user.login }} <${{ github.event.comment.user.id }}+${{ github.event.comment.user.login }}@users.noreply.github.com>" > commit_message.txt
           
           git commit -F commit_message.txt
           git push
+
+          
+          
+
 
 
       - name: Create patch for fork PRs

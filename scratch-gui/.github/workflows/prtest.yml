@@ -79,18 +79,23 @@ jobs:
             const prNumber = context.eventName === 'issue_comment'
               ? context.issue.number
               : context.payload.number;
-            return prNumber;
+            
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            
+            return { prNumber, username };
 
 
       - name: Post skip notice
         if: github.actor == 'dependabot[bot]'
         uses: actions/github-script@v7
         with:
-          script: |
+            const username = '${{ fromJSON(steps.pr.outputs.result).username }}';
             const username = '${{ steps.pr.outputs.username }}';
             await github.rest.issues.createComment({
               owner: context.repo.owner,
-              repo: context.repo.repo,
+              issue_number: ${{ fromJSON(steps.pr.outputs.result).prNumber }},
               issue_number: ${{ steps.pr.outputs.result }},
               body: `# ℹ️ **Mega PR Test Skipped**\n\n` +
                     `The comprehensive PR test & analysis has been skipped for this pull request because it was created by Dependabot.\n\n` +
@@ -107,7 +112,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: ${{ steps.pr.outputs.result }},
-              body: `# ℹ️ **Mega PR Test Skipped**\n\n` +
+              issue_number: ${{ fromJSON(steps.pr.outputs.result).prNumber }},
                     `Hi @${username}! The comprehensive Mega PR test was skipped because this PR only changes documentation or configuration files (.md, .txt, .yml, .yaml).\n\n` +
                     `_To force the Mega PR test to run, comment \`/test pr\` on this PR._`
             });

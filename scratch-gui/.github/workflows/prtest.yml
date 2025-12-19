@@ -91,17 +91,17 @@ jobs:
         if: github.actor == 'dependabot[bot]'
         uses: actions/github-script@v7
         with:
-script: |
-            const username = '${{ fromJSON(steps.pr.outputs.result).username }}'
-            const username = '${{ steps.pr.outputs.username }}';
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              issue_number: ${{ fromJSON(steps.pr.outputs.result).prNumber }},
-
-              body: `# ℹ️ **Mega PR Test Skipped**\n\n` +
-                    `The comprehensive PR test & analysis has been skipped for this pull request because it was created by Dependabot.\n\n` +
-                    `Dependency update PRs are automatically excluded from the mega test workflow to avoid unnecessary CI resource usage.`
-            });
+            script: |
+              const username = '${{ fromJSON(steps.pr.outputs.result).username }}'
+              const username = '${{ steps.pr.outputs.username }}';
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                issue_number: ${{ fromJSON(steps.pr.outputs.result).prNumber }},
+  
+                body: `# ℹ️ **Mega PR Test Skipped**\n\n` +
+                      `The comprehensive PR test & analysis has been skipped for this pull request because it was created by Dependabot.\n\n` +
+                      `Dependency update PRs are automatically excluded from the mega test workflow to avoid unnecessary CI resource usage.`
+              });
 
       - name: Post doc-only skip notice
         if: needs.check-files.outputs.should_skip == 'true' && github.actor != 'dependabot[bot]'
@@ -112,8 +112,8 @@ script: |
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: ${{ steps.pr.outputs.result }},
               issue_number: ${{ fromJSON(steps.pr.outputs.result).prNumber }},
+              const username = '${{ fromJSON(steps.pr.outputs.result).username }}';
                     `Hi @${username}! The comprehensive Mega PR test was skipped because this PR only changes documentation or configuration files (.md, .txt, .yml, .yaml).\n\n` +
                     `_To force the Mega PR test to run, comment \`/test pr\` on this PR._`
             });

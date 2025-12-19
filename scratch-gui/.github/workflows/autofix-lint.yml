@@ -185,7 +185,11 @@ jobs:
           result-encoding: string
           
       - name: Install jq
-        run: sudo apt-get install -y jq
+        run: |
+          if ! sudo apt-get install -y jq; then
+            echo "Error: Failed to install jq"
+            exit 1
+          fi
 
 
       - name: Run ESLint --fix and capture output
@@ -203,7 +207,7 @@ jobs:
       
           # Run ESLint and save JSON output
           echo "🔧 Running ESLint --fix..."
-          npx eslint $FILES --format=json --fix > eslint-report.json || true
+          npx eslint "$FILES" --format=json --fix > eslint-report.json || true
       
           # Check if fixes were made
           if [[ -z $(git status --porcelain) ]]; then
@@ -215,7 +219,12 @@ jobs:
             echo "has_changes=true" >> $GITHUB_OUTPUT
             
             # Parse JSON to count fixed rules
-            FIXED_RULES=$(jq -r '.[] | .messages[] | select(.fix != null) | .ruleId' eslint-report.json | sort | uniq -c)
+            if [ -f "eslint-report.json" ] && [ -s "eslint-report.json" ]; then
+              FIXED_RULES=$(jq -r '.[] | .messages[] | select(.fix != null) | .ruleId' eslint-report.json 2>/dev/null | sort | uniq -c || echo "")
+            else
+              FIXED_RULES=""
+            fi
+            
             echo "fixed_rules<<EOF" >> $GITHUB_OUTPUT
             echo "$FIXED_RULES" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
@@ -229,15 +238,17 @@ jobs:
           git add .
           
           # Generate detailed commit message
-          COMMIT_MSG="🎨 Auto-fix ESLint issues
+          cat > commit_message.txt << 'EOF'
+🎨 Auto-fix ESLint issues
+
+Fixed the following:
+${{ steps.autofix.outputs.fixed_rules }}
+
+Triggered by @${{ github.event.comment.user.login }}
+Co-authored-by: ${{ github.event.comment.user.login }} <${{ github.event.comment.user.id }}+${{ github.event.comment.user.login }}@users.noreply.github.com>
+EOF
           
-          Fixed the following:
-          ${{ steps.autofix.outputs.fixed_rules }}
-          
-          Triggered by @${{ github.event.comment.user.login }}
-          Co-authored-by: ${{ github.event.comment.user.login }} <${{ github.event.comment.user.id }}+${{ github.event.comment.user.login }}@users.noreply.github.com>"
-          
-          git commit -m "$COMMIT_MSG"
+          git commit -F commit_message.txt
           git push
 
 
@@ -306,8 +317,12 @@ jobs:
             if (fixedRules) {
               rulesTable = '| Rule | Fixes Applied |\n|------|--------------:|\n';
               rulesTable += fixedRules.split('\n').map(line => {
-                const [count, rule] = line.trim().split(/\s+/);
-                return `| ${rule} | ${count} |`;
+                const match = line.trim().match(/^\s*(\d+)\s+(.+)$/);
+                if (match) {
+                  const [, count, rule] = match;
+                  return `| ${rule} | ${count} |`;
+                }
+                return `| ${line.trim()} | - |`;
               }).join('\n');
             }
             

@@ -1171,7 +1171,7 @@ jobs:
               testSection += `- Warnings: ${lintWarnings}\n`;
 
               
-              `To fix, click the checkbox below or type \`/fix lint\`: \n[] 🎨 Auto-fix ESLint issues\n`
+              testSection += `\nTo fix, click the checkbox below or type \`/fix lint\`:\n- [ ] 🎨 Auto-fix ESLint issues\n`;
             }
             
             // Unit Test Results

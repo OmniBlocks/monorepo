@@ -14,12 +14,19 @@ jobs:
     # Trigger on EITHER slash command OR checkbox
     if: >-
       github.event_name == 'issue_comment' && 
-      github.event.issue.pull_request && 
-      github.event.sender.type == 'User' &&
+      github.event.issue.pull_request &&
       (
-        contains(github.event.comment.body, '/fix lint') ||
-        contains(github.event.comment.body, '[x] 🎨 Auto-fix ESLint issues') ||
-        contains(github.event.comment.body, '[X] 🎨 Auto-fix ESLint issues')
+        (
+          github.event.sender.type == 'User' &&
+          contains(github.event.comment.body, '/fix lint')
+        ) ||
+        (
+          github.event.comment.user.login == 'github-actions[bot]' &&
+          (
+            contains(github.event.comment.body, '[x] 🎨 Auto-fix ESLint issues') ||
+            contains(github.event.comment.body, '[X] 🎨 Auto-fix ESLint issues')
+          )
+        )
       )
     runs-on: ubuntu-latest
 

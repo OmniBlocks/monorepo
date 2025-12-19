@@ -289,7 +289,7 @@ jobs:
               } else {
                 body = body.replace(
                   /- $$x$$ 🎨 Auto-fix ESLint issues/i,
-                  '- [x] ~~🎨 Auto-fix ESLint issues~~ ⚠️ **No fixes needed**'
+                  '- [x] ~~🎨 Auto-fix ESLint issues~~ ⚠️ **No fixes needed or eslint failed**'
                 );
               }
               
@@ -373,7 +373,7 @@ jobs:
               : `ESLint ran with \`--fix\` but no changes were made. Either:\n` +
                 `- ✅ All issues are already fixed! 🎉\n` +
                 `- ⚠️ The remaining issues can't be auto-fixed (require manual intervention)\n\n` +
-                `Check the [inline annotations](https://github.com/${{ github.repository }}/pulls/${{ github.event.issue.number }}/files) for details!`;
+                `Check the [inline annotations](https://github.com/${{ github.repository }}/pull/${{ github.event.issue.number }}/changes) for details!`;
             
             await github.rest.issues.updateComment({
               owner: context.repo.owner,

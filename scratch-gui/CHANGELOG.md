@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`aa9a1a7e5`](https://github.com/OmniBlocks/scratch-gui/commit/aa9a1a7e592819eeaeaaa60dc968742336325c66) - 2025-12-18 23:20:49 -0500
+
+**Merge pull request #556 from OmniBlocks/Q-DEV-issue-555-1766117182**
+
+autofix-lint.yml: Checkbox triggers fail sender type check when clicked in bot comments
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`a113a6f44`](https://github.com/OmniBlocks/scratch-gui/commit/a113a6f449e08d4051fe34ec6d2f0da2d909f742) - 2025-12-18 22:49:55 -0500
 
 **Update autofix-lint.yml**

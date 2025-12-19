@@ -111,7 +111,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: ${{ fromJSON(steps.pr.outputs.result).prNumber }},
-                
+                body: `# 📝 **Mega PR Test Skipped**\n\n` +
                       `Hi @${username}! The comprehensive Mega PR test was skipped because this PR only changes documentation or configuration files (.md, .txt, .yml, .yaml).\n\n` +
                       `_To force the Mega PR test to run, comment \`/test pr\` on this PR._`
               });

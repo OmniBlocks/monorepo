@@ -1162,6 +1162,9 @@ jobs:
               testSection += `**ESLint:** ❌ Found issues\n`;
               testSection += `- Errors: ${lintErrors}\n`;
               testSection += `- Warnings: ${lintWarnings}\n`;
+
+              
+              `To fix, click the checkbox below or type \`/fix lint\`: \n[] 🎨 Auto-fix ESLint issues\n`
             }
             
             // Unit Test Results

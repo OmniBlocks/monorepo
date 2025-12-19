@@ -2,7 +2,7 @@ name: ESLint Autofix
 
 on:
   issue_comment:
-    types: [created, edited]  # 'edited' catches checkbox changes!
+    types: [created, edited]
 
 permissions:
   contents: write
@@ -11,7 +11,6 @@ permissions:
 
 jobs:
   autofix-lint:
-    # Trigger on EITHER slash command OR checkbox
     if: >-
       github.event_name == 'issue_comment' && 
       github.event.issue.pull_request &&
@@ -31,21 +30,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 👇 FIXED: Improved slash command detection to avoid false positives 👇
       - name: Detect trigger method
         id: trigger
         uses: actions/github-script@v7
         with:
           script: |
             const body = context.payload.comment.body;
-            const isSlashCommand = body.includes('/fix lint');
-            const isCheckbox = body.includes('[x] 🎨 Auto-fix ESLint issues') || 
-                               body.includes('[X] 🎨 Auto-fix ESLint issues');
+            const lines = body.split('\n');
+
+            // Check for a slash command at the beginning of any line
+            const isSlashCommand = lines.some(line => line.trimStart().startsWith('/fix lint'));
             
-            console.log(`Slash command: ${isSlashCommand}`);
-            console.log(`Checkbox: ${isCheckbox}`);
+            // Check for the specific checkbox string
+            const isCheckbox = lines.some(line => line.includes('[x] 🎨 Auto-fix ESLint issues') || line.includes('[X] 🎨 Auto-fix ESLint issues'));
+            
+            console.log(`Slash command detected: ${isSlashCommand}`);
+            console.log(`Checkbox detected: ${isCheckbox}`);
             console.log(`Action: ${context.payload.action}`);
-            
-            // Prevent double-trigger: only run on 'edited' if checkbox is checked
+
             if (context.payload.action === 'edited' && !isCheckbox) {
               console.log('Edit action but checkbox not checked - skipping');
               core.setFailed('Checkbox not checked - ignoring edit');
@@ -61,13 +64,11 @@ jobs:
             };
 
       - name: Check user permissions
-        # ⬇️ ONLY RUN FOR SLASH COMMANDS (can't verify checkbox clicker)
         if: steps.trigger.outputs.is_slash_command == 'true'
         id: permission_check
         uses: actions/github-script@v7
         with:
           script: |
-            // Only allow collaborators/maintainers to trigger autofix
             const permission = await github.rest.repos.getCollaboratorPermissionLevel({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -171,7 +172,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-      
 
       - name: Get changed JS/JSX files
         id: changed_files
@@ -203,13 +203,11 @@ jobs:
             exit 1
           fi
 
-
       - name: Run ESLint --fix and capture output
         id: autofix
         run: |
           FILES="${{ steps.changed_files.outputs.result }}"
           
-          # Exit if no JS files
           if [ -z "$FILES" ]; then
             echo "No JS/JSX files to fix!"
             echo "has_changes=false" >> $GITHUB_OUTPUT
@@ -217,11 +215,9 @@ jobs:
             exit 0
           fi
       
-          # Run ESLint and save JSON output
           echo "🔧 Running ESLint --fix..."
           npx eslint "$FILES" --format=json --fix > eslint-report.json || true
       
-          # Check if fixes were made
           if [[ -z $(git status --porcelain) ]]; then
             echo "✨ No fixes needed!"
             echo "has_changes=false" >> $GITHUB_OUTPUT
@@ -230,7 +226,6 @@ jobs:
             echo "🎉 Files were fixed!"
             echo "has_changes=true" >> $GITHUB_OUTPUT
             
-            # Parse JSON to count fixed rules
             if [ -f "eslint-report.json" ] && [ -s "eslint-report.json" ]; then
               FIXED_RULES=$(jq -r '.[] | .messages[] | select(.fix != null) | .ruleId' eslint-report.json 2>/dev/null | sort | uniq -c || echo "")
             else
@@ -249,16 +244,10 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add .
           
-          # Using echo instead of heredoc
           echo -e "🎨 Auto-fix ESLint issues\n\nFixed the following:\n${{ steps.autofix.outputs.fixed_rules }}\n\nTriggered by @${{ github.event.comment.user.login }}\nCo-authored-by: ${{ github.event.comment.user.login }} <${{ github.event.comment.user.id }}+${{ github.event.comment.user.login }}@users.noreply.github.com>" > commit_message.txt
           
           git commit -F commit_message.txt
           git push
-
-          
-          
-
-
 
       - name: Create patch for fork PRs
         if: >-
@@ -294,12 +283,12 @@ jobs:
               
               if (success) {
                 body = body.replace(
-                  /- \[x\] 🎨 Auto-fix ESLint issues/i,
+                  /- $$x$$ 🎨 Auto-fix ESLint issues/i,
                   '- [x] ~~🎨 Auto-fix ESLint issues~~ ✅ **Complete!**'
                 );
               } else {
                 body = body.replace(
-                  /- \[x\] 🎨 Auto-fix ESLint issues/i,
+                  /- $$x$$ 🎨 Auto-fix ESLint issues/i,
                   '- [x] ~~🎨 Auto-fix ESLint issues~~ ⚠️ **No fixes needed**'
                 );
               }
@@ -393,15 +382,16 @@ jobs:
               body: `✨ **No Fixes Needed!**\n\n${message}`
             });
 
+      # 👇 FIXED: Use createComment to avoid errors on early job failure 👇
       - name: Post failure comment
         if: failure()
         uses: actions/github-script@v7
         with:
           script: |
-            await github.rest.issues.updateComment({
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              comment_id: ${{ steps.status_comment.outputs.result }},
+              issue_number: context.issue.number,
               body: `❌ **ESLint Autofix Failed!**\n\n` +
                     `Something went wrong during the autofix process.\n\n` +
                     `Check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`

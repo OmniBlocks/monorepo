@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`6f57654d5`](https://github.com/OmniBlocks/scratch-gui/commit/6f57654d5565887cc8fb211f31fab1ea4dd52e4c) - 2025-12-19 08:49:34 -0500
+
+**Merge pull request #557 from OmniBlocks/fix-link-typo-eslint-autofix-yml**
+
+fix: link typo  eslint autofix
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`9e84f2a0d`](https://github.com/OmniBlocks/scratch-gui/commit/9e84f2a0de9ecc5fbf3e459575a9674443185ddb) - 2025-12-19 00:44:33 -0500
 
 **Update autofix-lint.yml**

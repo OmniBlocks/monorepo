@@ -169,28 +169,47 @@ jobs:
             echo "no_files=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-      
-          echo "🔧 Running ESLint --fix..."
-          npx eslint $FILES --format=json --fix > eslint-report.json || true
-      
+
+          REPORT_FILE="eslint-report.json"
+
+          echo "🔎 Scanning for fixable ESLint issues..."
+          # Pass 1: Get a report of all fixable issues BEFORE fixing them
+          npx eslint $FILES --format=json > $REPORT_FILE
+
+          # Parse the report to get the rules that are fixable
+          POTENTIAL_FIXES=""
+          if [ -f "$REPORT_FILE" ] && [ -s "$REPORT_FILE" ]; then
+            POTENTIAL_FIXES=$(jq -r '.[] | .messages[] | select(.fix != null) | .ruleId' "$REPORT_FILE" | sort | uniq -c || echo "")
+          fi
+
+          echo "🔧 Applying fixes..."
+          # Pass 2: Now actually apply the fixes
+          # We redirect output to /dev/null because we only care about the file changes, not the final report
+          npx eslint $FILES --fix > /dev/null 2>&1 || true 
+
+          # Check if fixes were ACTUALLY made by looking at git status
           if [[ -z $(git status --porcelain) ]]; then
-            echo "✨ No fixes needed!"
+            echo "✨ No changes were made by ESLint."
             echo "has_changes=false" >> $GITHUB_OUTPUT
             echo "no_files=false" >> $GITHUB_OUTPUT
+            
+            # Even if we found potential fixes, if git status is clean, nothing was actually changed.
+            FIXED_RULES=""
           else
             echo "🎉 Files were fixed!"
             echo "has_changes=true" >> $GITHUB_OUTPUT
             
-            if [ -f "eslint-report.json" ] && [ -s "eslint-report.json" ]; then
-              FIXED_RULES=$(jq -r '.[] | .messages[] | select(.fix != null) | .ruleId' eslint-report.json | sort | uniq -c || echo "")
-            else
-              FIXED_RULES=""
-            fi
-            
-            echo "fixed_rules<<EOF" >> $GITHUB_OUTPUT
-            echo "$FIXED_RULES" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
+            # Since files WERE changed, we can safely report the rules we found earlier.
+            FIXED_RULES="$POTENTIAL_FIXES"
           fi
+
+          # Set the final output for subsequent steps (commit message, PR comment)
+          echo "fixed_rules<<EOF" >> $GITHUB_OUTPUT
+          echo "$FIXED_RULES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # Clean up the report file
+          rm -f "$REPORT_FILE"
 
       - name: Commit and push fixes
         if: steps.autofix.outputs.has_changes == 'true' && fromJSON(steps.pr.outputs.result).isFork == false

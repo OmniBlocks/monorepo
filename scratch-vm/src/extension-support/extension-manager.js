@@ -65,10 +65,6 @@ const coreExtensionList = Object.getOwnPropertyNames(defaultBuiltinExtensions);
 
 const preload = [];
 
-if (IsLocal || IsLiveTests) {
-    preload.push("jgDev");
-}
-
 /**
  * @typedef {object} ArgumentInfo - Information about an extension block argument
  * @property {ArgumentType} type - the type of value this argument can take

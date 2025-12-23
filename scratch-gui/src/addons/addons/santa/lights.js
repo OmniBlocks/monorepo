@@ -37,12 +37,21 @@ export default function({addon, console, msg}) {
         canvas.style.top = menuHeight + 'px';
     }
 
+    // Cache color conversions to avoid DOM manipulation in animation loop
+    const colorCache = new Map();
+    
     function cssColorToRgb(color) {
+        if (colorCache.has(color)) {
+            return colorCache.get(color);
+        }
+        
         const div = document.createElement('div');
         div.style.color = color;
         document.body.appendChild(div);
         const rgb = getComputedStyle(div).color.match(/\d+/g).map(Number);
         document.body.removeChild(div);
+        
+        colorCache.set(color, rgb);
         return rgb;
     }
 

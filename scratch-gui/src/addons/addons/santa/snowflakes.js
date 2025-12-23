@@ -56,8 +56,16 @@ export default async function ({addon, console, msg}) {
     animate();
 
     window.addEventListener('resize', () => {
+        const oldWidth = canvas.width;
+        const oldHeight = canvas.height;
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        
+        // Adjust snowflake positions proportionally
+        for (const flake of snowflakes) {
+            flake.x = (flake.x / oldWidth) * canvas.width;
+            flake.y = (flake.y / oldHeight) * canvas.height;
+        }
     });
 
     // --- Utility: parse stylesheets for class names with a prefix ---
@@ -111,8 +119,6 @@ export default async function ({addon, console, msg}) {
 
             menu.appendChild(li);
         }
-
-        requestAnimationFrame(injectMenuItem);
     }
 
     injectMenuItem();

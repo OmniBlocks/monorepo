@@ -22,9 +22,9 @@ Blockly.BlockSvg.START_HAT_PATH = "M0,0";
     if (!this.santaHat_) {
       // Create a group and position it. 
       // We translate it to -25 to move it up onto the hat area and scale it down.
-this.santaHat_ = Blockly.utils.createSvgElement("g", {
-  "transform": "translate(-70, -97) scale(0.4)"
-}, this.svgFace_);
+      this.santaHat_ = Blockly.utils.createSvgElement("g", {
+        "transform": "translate(-70, -97) scale(0.4)"
+      }, this.svgFace_);
 
 
       // Red Hat Body

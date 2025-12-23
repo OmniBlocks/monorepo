@@ -1,5 +1,4 @@
 import defaultProject from '!!arraybuffer-loader!./christmas-default-project.sb3';
-import AddonHooks from '../../hooks.js';
 
 export default async function ({ addon, console, msg }) {
     const vm = addon.tab.traps.vm;

@@ -3,32 +3,20 @@ import AddonHooks from '../../hooks.js';
 
 export default async function ({ addon, console, msg }) {
     const vm = addon.tab.traps.vm;
-    try {
-        // nuke vm first so it stops everything
-        if (vm && typeof vm.quit === 'function') vm.quit();
+async function waitForProjectState(addon) {
+    let currentState;
+    while (true) {
+        currentState = addon.tab.redux.state.scratchGui.projectState.loadingState;
 
-        // If any targets remain, delete them by id (vm.deleteSprite expects an id)
-        if (vm && vm.runtime && Array.isArray(vm.runtime.targets)) {
-            const ids = vm.runtime.targets.slice().map(t => t.id).filter(Boolean);
-            for (const id of ids) {
-                try {
-                    // deleteSprite may return a restore function; ignore return value here
-                    vm.deleteSprite(id);
-                } catch (e) {
-                    // Non-fatal: log and continue deleting other targets
-                    if (console && console.warn) console.warn('Failed to delete sprite', id, e);
-                }
-            }
-        }
+        if (currentState === "SHOWING_WITHOUT_ID") break;
 
-        // let my try something
-        AddonHooks.willLoadDefaultProject = false;
+        await new Promise(resolve => setTimeout(resolve, 0)); // this works actually
+    }
+}
 
-// this isn't the problem, the import is wrong
-        // hi 8to16 speaking here idk whats going on lol
-        // void do you have an idea maybe a state hack or something
-        // let me steal something from scratch addons
-        // Load the new project (arraybuffer)
+// Usage
+await waitForProjectState(addon);
+        // let me find the state we use
         await vm.loadProject(defaultProject);
 
         // draw once to ensure renderer shows the loaded project
@@ -36,7 +24,7 @@ export default async function ({ addon, console, msg }) {
             // allow renderer time to settle
             setTimeout(() => vm.renderer.draw(), 0);
         }
-
+try {
         // Start the project
         if (vm && typeof vm.greenFlag === 'function') vm.greenFlag(); // i know wwe probably, um PROBABLY shouldn't auto-start but c'mon it's christmas and cool animation thingy in the proect ;)
     } catch (err) {

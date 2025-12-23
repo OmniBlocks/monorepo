@@ -10,6 +10,7 @@ export default function({addon, console, msg}) {
     const ctx = canvas.getContext('2d');
 
     let lights = [];
+    let colorOffset = 0;
 
     function initLights() {
         const count = Math.floor(window.innerWidth / 30);
@@ -17,7 +18,8 @@ export default function({addon, console, msg}) {
         for (let i = 0; i < count; i++) {
             lights.push({
                 x: i * 30 + 15,
-                color: colors[Math.floor(Math.random() * colors.length)]
+                // store a base color index so lights cycle in a pattern
+                baseIndex: Math.floor(Math.random() * colors.length)
             });
         }
     }
@@ -26,7 +28,7 @@ export default function({addon, console, msg}) {
         const menus = document.querySelectorAll('[class^="menu-bar_menu-bar_"]');
         const menuHeight = menus.length ? menus[0].offsetHeight : 40;
         canvas.width = window.innerWidth;
-        canvas.height = 20; // small strip
+        canvas.height = 30; // slightly taller so glow fits
         canvas.style.top = menuHeight + 'px';
     }
 
@@ -36,15 +38,23 @@ export default function({addon, console, msg}) {
 
         lights.forEach(light => {
             ctx.beginPath();
-            ctx.arc(light.x, canvas.height / 2, 1, 0, Math.PI * 2);
-            ctx.fillStyle = light.color;
-            ctx.shadowColor = light.color;
-            ctx.shadowBlur = 8;
+            // slightly bigger lights and stronger glow
+            const radius = 3;
+            const color = colors[(light.baseIndex + colorOffset) % colors.length];
+            ctx.arc(light.x, canvas.height / 2 - 3, radius, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 14;
             ctx.fill();
         });
 
         requestAnimationFrame(draw);
     }
+
+    // Advance color offset once per second so lights alternate like real strings
+    setInterval(() => {
+        colorOffset = (colorOffset + 1) % colors.length;
+    }, 1000);
 
     initLights();
     draw();

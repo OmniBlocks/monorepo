@@ -79,7 +79,9 @@ import _tw_remove_feedback from "../addons/tw-remove-feedback/_manifest_entry.js
 import _tw_disable_cloud_variables from "../addons/tw-disable-cloud-variables/_manifest_entry.js";
 import _tw_disable_compiler from "../addons/tw-disable-compiler/_manifest_entry.js";
 import _editor_stepping from "../addons/editor-stepping/_manifest_entry.js";
+import santa from "../addons/santa/_manifest_entry.js";
 export default {
+  santa,
   "cat-blocks": _cat_blocks,
   "editor-devtools": _editor_devtools,
   "find-bar": _find_bar,

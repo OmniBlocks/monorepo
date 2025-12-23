@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`04a15c5b4`](https://github.com/OmniBlocks/scratch-gui/commit/04a15c5b4419d396c9d8f797566b9f76a4c06187) - 2025-12-23 21:49:31 +0000
+
+**Merge pull request #565 from OmniBlocks/christmas-addon-yay**
+
+New Christmas Addon!!!!! 🎉🎄🎅❄️
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`268a47335`](https://github.com/OmniBlocks/scratch-gui/commit/268a473353c4dde3254a956a1f62252418e6b3a0) - 2025-12-23 21:21:54 +0000
 
 **old code**

@@ -342,3 +342,37 @@ $fade-out-distance: 15px;
     /* overridden by JS; this will be used if the browser can't understand that color */
     background-color: white;
 }
+
+/* Mobile support */
+@media (max-width: 768px) {
+    .flex-wrapper {
+        flex-direction: column;
+    }
+
+    .editor-wrapper {
+        flex-basis: auto;
+        min-height: 50vh;
+        flex-shrink: 1;
+    }
+
+    .stage-and-target-wrapper {
+        flex-basis: auto;
+        min-height: 50vh;
+        flex-shrink: 1;
+    }
+
+    .tab-list {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .tab {
+        flex-grow: 0;
+        width: 25%;
+        height: 2rem !important;
+        padding: 0.25rem;
+        font-size: 0.7rem;
+    }
+}

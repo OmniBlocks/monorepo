@@ -4,7 +4,8 @@ const AddonHooks = {
     blockly: null,
     blocklyWorkspace: null,
     blocklyCallbacks: [],
-    recolorCallbacks: []
+    recolorCallbacks: [],
+    willLoadDefaultProject: true
 };
 
 export default AddonHooks;

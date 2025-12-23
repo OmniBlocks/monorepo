@@ -1,0 +1,17 @@
+.sa-menu-bar-christmas-lights {
+    display: flex;
+    gap: 4px;
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+}
+.sa-menu-bar-christmas-lights span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+@keyframes sa-blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0.3; }
+}

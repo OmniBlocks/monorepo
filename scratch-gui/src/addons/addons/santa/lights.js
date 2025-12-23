@@ -5,7 +5,8 @@ export default function({addon, console, msg}) {
     canvas.style.position = 'absolute';
     canvas.style.left = '0';
     canvas.style.pointerEvents = 'none';
-    canvas.style.zIndex = '9999';
+    // make it below modal
+    canvas.style.zIndex = '500'; // peak css z-index  
     document.body.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 

@@ -79,7 +79,7 @@ external.blob = async url => {
 external.evalAndReturn = async (url, returnExpression) => {
     const res = await external.fetch(url);
     const text = await res.text();
-    const js = `${text};return ${returnExpression}`;
+    const js = `${text}\nreturn ${returnExpression};`;
     const fn = new Function(js);
     return fn();
 };

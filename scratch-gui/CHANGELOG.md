@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`f7ba37993`](https://github.com/OmniBlocks/scratch-gui/commit/f7ba3799365c3f6507af502f1c2ba281f48e0b50) - 2025-12-26 17:25:29 +0000
+
+**Delete pwa-file-icon-integration.md**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`581d3f9d0`](https://github.com/OmniBlocks/scratch-gui/commit/581d3f9d0aed901988a711646c66d141e4629786) - 2025-12-24 14:21:49 -0500
 
 **Merge pull request #570 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-19f73ae**

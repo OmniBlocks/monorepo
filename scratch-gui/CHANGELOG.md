@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`803945ede`](https://github.com/OmniBlocks/scratch-gui/commit/803945ede8c7cfacf645750acb5e95684e40cf3d) - 2025-12-26 18:29:37 -0500
+
+**Merge pull request #574 from OmniBlocks/improve-search-block-addon**
+
+Improve block search addon
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`53d6deb39`](https://github.com/OmniBlocks/scratch-gui/commit/53d6deb398b21d1d91b2e6d62f0ebdc3fd5ebc92) - 2025-12-26 15:03:31 -0500
 
 **readd mailmap**

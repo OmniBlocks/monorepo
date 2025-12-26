@@ -1246,11 +1246,28 @@ export default class WorkspaceQuerier {
     for (const result of results) if (checkValidity(result.token)) validResults.push(result);
 
     validResults = validResults.sort((a, b) => {
-      const aLengths = a.getLengths();
-      const bLengths = b.getLengths();
-      if (aLengths.stringLength != bLengths.stringLength) return aLengths.stringLength - bLengths.stringLength;
-      return aLengths.tokenLength - bLengths.tokenLength;
-    });
+    const aLengths = a.getLengths();
+    const bLengths = b.getLengths();
+    
+    // First, prioritize built-in blocks over extension blocks
+    const builtInCategories = ['motion', 'looks', 'sound', 'events', 'control', 'sensing', 'operators', 'variables', 'lists', 'my blocks']; // Built in categories
+    // ^^^ The 'Lists' category will only show up if you have the 'Data category tweaks' addon enabled, which separates the Variables category into Variables and Lists.
+    // I'm not exactly sure what would happen if that addon isn't enabled, but in OmniBlocks, we have it enabled by default.
+    // TODO: Test what happens when that addon isn't enabled.
+    
+    const aBlock = a.getBlock();
+    const bBlock = b.getBlock();
+    const aIsBuiltIn = builtInCategories.includes(aBlock.typeInfo.category.name);
+    const bIsBuiltIn = builtInCategories.includes(bBlock.typeInfo.category.name);
+    
+    if (aIsBuiltIn !== bIsBuiltIn) {
+      return bIsBuiltIn ? 1 : -1; // Built-in blocks come first
+    }
+    
+    // Then sort by string length and token length as before
+    if (aLengths.stringLength != bLengths.stringLength) return aLengths.stringLength - bLengths.stringLength;
+    return aLengths.tokenLength - bLengths.tokenLength;
+  });
 
     return {
       results: validResults,

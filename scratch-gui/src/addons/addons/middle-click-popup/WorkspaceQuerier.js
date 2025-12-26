@@ -1170,18 +1170,19 @@ export default class WorkspaceQuerier {
 
   // Built in categories
   
-  static BUILT_IN_CATEGORIES = new Set([
-    'motion',
-    'looks',
-    'sound',
-    'events',
-    'control',
-    'sensing',
-    'operators',
-    'variables',
-    'lists',
-    'my blocks',
-  ]);
+ static BUILT_IN_CATEGORIES = new Set([
+  'motion',
+  'looks',
+  'sound',
+  'events',
+  'control',
+  'sensing',
+  'operators',
+  'data',        
+  'data-lists',  
+  'more',        
+  'pen',         
+]);
   // ^^^ The 'Lists' category will only show up if you have the 'Data category tweaks' addon enabled, which separates the Variables category into Variables and Lists.
 
   /**

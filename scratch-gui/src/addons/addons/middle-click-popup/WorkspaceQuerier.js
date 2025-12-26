@@ -1241,6 +1241,13 @@ export default class WorkspaceQuerier {
     //  This step removes silly suggestions like `if <(1 + 1) = "2 then"> then`
     const canBeString = Array(queryStr.length).fill(true);
 
+    /**
+     * Recursively marks character positions in the current query that cannot be interpreted as plain string input according to tokens that are proper, non-truncated, and are defining features.
+     * 
+     * Traverses the token tree using each token's subtokens; for a leaf token that is not a string literal and meets the `isProper`, `!isTruncated`, and `isDefiningFeature` conditions, it sets the corresponding entries in the surrounding `canBeString` array to `false` for the token's character range.
+     * 
+     * @param {Token} token - The token to inspect and recurse into.
+     */
     function searchToken(token) {
       const subtokens = token.type.getSubtokens(token, query);
       if (subtokens) for (const subtoken of subtokens) searchToken(subtoken);

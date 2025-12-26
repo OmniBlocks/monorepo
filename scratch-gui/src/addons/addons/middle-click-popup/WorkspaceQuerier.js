@@ -2,6 +2,8 @@
  * @file Contains all the logic for the parsing of queries by the {@link WorkspaceQuerier}.
  * I'm really sorry if somebody other than me ever has to debug this.
  * Wish you luck <3
+ * 
+ *
  *
  * Once you *think* you understand the function of the major classes, read the docs on
  * {@link WorkspaceQuerier._createTokenGroups} for some more specifics on the algorithm works,
@@ -1166,6 +1168,22 @@ export default class WorkspaceQuerier {
    */
   static MAX_TOKENS = 10000;
 
+  // Built in categories
+  
+  static BUILT_IN_CATEGORIES = new Set([
+    'motion',
+    'looks',
+    'sound',
+    'events',
+    'control',
+    'sensing',
+    'operators',
+    'variables',
+    'lists',
+    'my blocks',
+  ]);
+  // ^^^ The 'Lists' category will only show up if you have the 'Data category tweaks' addon enabled, which separates the Variables category into Variables and Lists.
+
   /**
    * Indexes a workspace in preparation for querying it.
    * @param {BlockTypeInfo[]} blocks The list of blocks in the workspace.
@@ -1226,7 +1244,7 @@ export default class WorkspaceQuerier {
     function searchToken(token) {
       const subtokens = token.type.getSubtokens(token, query);
       if (subtokens) for (const subtoken of subtokens) searchToken(subtoken);
-      else if (!(token.type instanceof TokenTypeStringLiteral) && token.isProper && !token.isTruncated)
+      else if (!(token.type instanceof TokenTypeStringLiteral) && token.isProper && !token.isTruncated && token.isDefiningFeature)
         for (let i = token.start; i < token.end; i++) {
           canBeString[i] = false;
         }
@@ -1250,16 +1268,11 @@ export default class WorkspaceQuerier {
     const bLengths = b.getLengths();
     
     // First, prioritize built-in blocks over extension blocks
-    const builtInCategories = ['motion', 'looks', 'sound', 'events', 'control', 'sensing', 'operators', 'variables', 'lists', 'my blocks']; // Built in categories
-    // ^^^ The 'Lists' category will only show up if you have the 'Data category tweaks' addon enabled, which separates the Variables category into Variables and Lists.
-    // I'm not exactly sure what would happen if that addon isn't enabled, but in OmniBlocks, we have it enabled by default.
-    // TODO: Test what happens when that addon isn't enabled.
-    
     const aBlock = a.getBlock();
     const bBlock = b.getBlock();
-    const aIsBuiltIn = builtInCategories.includes(aBlock.typeInfo.category.name);
-    const bIsBuiltIn = builtInCategories.includes(bBlock.typeInfo.category.name);
-    
+    const aIsBuiltIn = WorkspaceQuerier.BUILT_IN_CATEGORIES.has(aBlock.typeInfo.category.name);
+    const bIsBuiltIn = WorkspaceQuerier.BUILT_IN_CATEGORIES.has(bBlock.typeInfo.category.name);
+
     if (aIsBuiltIn !== bIsBuiltIn) {
       return bIsBuiltIn ? 1 : -1; // Built-in blocks come first
     }

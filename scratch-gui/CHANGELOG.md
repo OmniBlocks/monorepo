@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`53d6deb39`](https://github.com/OmniBlocks/scratch-gui/commit/53d6deb398b21d1d91b2e6d62f0ebdc3fd5ebc92) - 2025-12-26 15:03:31 -0500
+
+**readd mailmap**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`f7ba37993`](https://github.com/OmniBlocks/scratch-gui/commit/f7ba3799365c3f6507af502f1c2ba281f48e0b50) - 2025-12-26 17:25:29 +0000
 
 **Delete pwa-file-icon-integration.md**

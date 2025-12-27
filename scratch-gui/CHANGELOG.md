@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`2bbb6cbf8`](https://github.com/OmniBlocks/scratch-gui/commit/2bbb6cbf89e395e55c00e68782c8aa75c5d50dfe) - 2025-12-27 17:14:56 -0500
+
+**Merge pull request #583 from OmniBlocks/chore/remove-pull-js-add-do-not-run-warnings-in-docs**
+
+docs: remove pull.js and warn against running it; delete upstream sync script
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`3c4de162d`](https://github.com/OmniBlocks/scratch-gui/commit/3c4de162d1384a253cc6aa0282a054cfd1a7e345) - 2025-12-27 15:28:22 -0500
 
 **Merge pull request #582 from OmniBlocks/fix-ci-ubuntu-firefox-reactmodal-dismiss-screenshots-testyml**

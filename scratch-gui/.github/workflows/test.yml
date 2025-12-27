@@ -1369,45 +1369,90 @@ jobs:
           DURATION: ${{ steps.duration.outputs.duration }}
           REPO: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
+          VIDEO_DIR: ${{ steps.upload_to_branch.outputs.video_dir }}
         run: |
+          set -e
           mkdir -p dashboard
-          
+
+          echo "📥 Listing downloaded matrix artifacts..."
+          find all-matrix-results -maxdepth 3 -type d -print 2>/dev/null || true
+
           echo "📸 Copying screenshots from all platforms..."
           SCREENSHOT_COUNT=0
-          
+
+          shopt -s nullglob
           for platform_dir in all-matrix-results/chaos-results-*/; do
-            if [ -d "$platform_dir" ]; then
-              platform_name=$(basename "$platform_dir" | sed 's/chaos-results-//')
-              echo "  Processing platform: $platform_name"
-              
-              if [ -d "$platform_dir/screenshots" ]; then
-                target_dir="dashboard/screenshots-${platform_name}"
-                mkdir -p "$target_dir"
-                
-                if ls "$platform_dir/screenshots"/*.png 1> /dev/null 2>&1; then
-                  cp "$platform_dir/screenshots"/*.png "$target_dir/" 2>/dev/null
-                  copied=$(ls "$target_dir"/*.png 2>/dev/null | wc -l)
-                  SCREENSHOT_COUNT=$((SCREENSHOT_COUNT + copied))
-                  echo "    ✅ Copied $copied screenshots to $target_dir"
-                else
-                  echo "    ⚠️ No PNG files in screenshots directory"
-                fi
+            [ -d "$platform_dir" ] || continue
+            platform_name=$(basename "$platform_dir" | sed 's/^chaos-results-//')
+            src_dir="$platform_dir/screenshots"
+            if [ -d "$src_dir" ]; then
+              target_dir="dashboard/screenshots-${platform_name}"
+              mkdir -p "$target_dir"
+              copied=0
+              for png in "$src_dir"/*.png; do
+                [ -f "$png" ] || continue
+                cp "$png" "$target_dir/"
+                copied=$((copied+1))
+              done
+              if [ "$copied" -gt 0 ]; then
+                echo "    ✅ $platform_name: $copied screenshots"
+                SCREENSHOT_COUNT=$((SCREENSHOT_COUNT + copied))
               else
-                echo "    ⚠️ No screenshots directory found"
+                echo "    ⚠️  $platform_name: screenshots dir exists but no PNGs"
               fi
+            else
+              echo "    ⚠️  $platform_name: no screenshots dir"
             fi
           done
-          
+          shopt -u nullglob
+
+          # Fallback: copy Windows+Chromium screenshots if matrix artifacts were empty
+          if [ "$SCREENSHOT_COUNT" -eq 0 ] && [ -d "windows-results/screenshots" ]; then
+            echo "↩️  Fallback: copying screenshots from windows-results/"
+            mkdir -p dashboard/screenshots-windows-latest-chromium
+            cp -n windows-results/screenshots/*.png dashboard/screenshots-windows-latest-chromium/ 2>/dev/null || true
+            FALLBACK_COPIED=$(ls -1 dashboard/screenshots-windows-latest-chromium/*.png 2>/dev/null | wc -l || echo 0)
+            SCREENSHOT_COUNT=$((SCREENSHOT_COUNT + FALLBACK_COPIED))
+            echo "    ✅ Fallback copied: $FALLBACK_COPIED"
+          fi
+
+          # Compose the env status for the HTML generator
+          if [ "$SCREENSHOT_COUNT" -gt 0 ]; then
+            export SCREENSHOT_STATUS=success
+          else
+            export SCREENSHOT_STATUS=missing
+          fi
+
+          # Pull chaos status from Windows+Chromium summary if present
+          if [ -f windows-results/platform-summary.json ]; then
+            CHAOS_STATUS_VAL=$(jq -r '.chaos_status // empty' windows-results/platform-summary.json 2>/dev/null || echo "")
+            CHAOS_ERRORS_VAL=$(jq -r '.errors_found // false' windows-results/platform-summary.json 2>/dev/null || echo "false")
+            [ -n "$CHAOS_STATUS_VAL" ] && export CHAOS_STATUS="$CHAOS_STATUS_VAL"
+            [ -n "$CHAOS_ERRORS_VAL" ] && export CHAOS_ERRORS_FOUND="$CHAOS_ERRORS_VAL"
+          fi
+
+          # Aggregate logs so the dashboard can display them
+          : > screenshot-output.txt
+          : > chaos-test-output.txt
+          : > recorded-actions-output.txt
+          find all-matrix-results -type f -name "screenshot-output.txt" -exec sh -c 'echo "=== {} ==="; cat "{}"; echo' \; >> screenshot-output.txt 2>/dev/null || true
+          find windows-results -type f -name "screenshot-output.txt" -exec sh -c 'echo "=== {} ==="; cat "{}"; echo' \; >> screenshot-output.txt 2>/dev/null || true
+          find all-matrix-results -type f -name "chaos-test-output.txt" -exec sh -c 'echo "=== {} ==="; cat "{}"; echo' \; >> chaos-test-output.txt 2>/dev/null || true
+          find windows-results -type f -name "chaos-test-output.txt" -exec sh -c 'echo "=== {} ==="; cat "{}"; echo' \; >> chaos-test-output.txt 2>/dev/null || true
+          find all-matrix-results -type f -name "recorded-actions-output.txt" -exec sh -c 'echo "=== {} ==="; cat "{}"; echo' \; >> recorded-actions-output.txt 2>/dev/null || true
+          find windows-results -type f -name "recorded-actions-output.txt" -exec sh -c 'echo "=== {} ==="; cat "{}"; echo' \; >> recorded-actions-output.txt 2>/dev/null || true
+
           echo ""
           echo "📊 Screenshot summary: $SCREENSHOT_COUNT total files copied"
           echo "📁 Dashboard directories created:"
-          find dashboard -type d -name "screenshots-*" | while read dir; do
+          find dashboard -maxdepth 1 -type d -name "screenshots-*" -print | while read dir; do
             count=$(ls "$dir"/*.png 2>/dev/null | wc -l)
             echo "  $dir: $count images"
           done
-          
-          python3 .github/scripts/generate-dashboard.py dashboard
 
+          # Generate the dashboard HTML (reads env + aggregated logs from cwd)
+          python3 .github/scripts/generate-dashboard.py dashboard
+          
       - name: Deploy to gh-pages
         if: always()
         run: |

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`3c4de162d`](https://github.com/OmniBlocks/scratch-gui/commit/3c4de162d1384a253cc6aa0282a054cfd1a7e345) - 2025-12-27 15:28:22 -0500
+
+**Merge pull request #582 from OmniBlocks/fix-ci-ubuntu-firefox-reactmodal-dismiss-screenshots-testyml**
+
+Robustly dismiss ReactModal on Ubuntu+Firefox to unblock screenshots and test interactions
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`39b0e00ac`](https://github.com/OmniBlocks/scratch-gui/commit/39b0e00acc5f0d055c9f8cf9540e6a72b691a0a6) - 2025-12-27 14:30:26 -0500
 
 **fix: (ci) robust chaos video discovery and enhanced logging in GitHub Actions workflow**

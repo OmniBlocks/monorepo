@@ -177,7 +177,6 @@ This section is for developers looking to understand, modify, or contribute to t
 - **Theming:** Theme definitions (Aqua, Blue, etc.) are in `src/lib/themes/accent/<theme>.js`. Global color variables are set in `src/css/colors.css` and overridden in JS as needed.
 
 ### Key Workflows
-- **Syncing Addons:** Run `node pull.js` to fetch and patch the latest addons from upstream sources. This, unfortunately, will overwrite any hand-written addons you had before.
 - **Adding a New Addon:** Create a new directory within `src/addons/` with all necessary files and ensure it's imported in `src/addons/entry.js`.
 - **Modifying Themes:** Make a new file and title it "<color-name>.js". For example, if you want to make a new yellow theme, you can do "yellow.js". Then look for all the other JS files where the themes are imported, such as scratch-gui/src/lib/themes/index.js.
 - **Debugging:** For build issues, inspect the output in the `build/` directory or check the console output from `npm run build`.

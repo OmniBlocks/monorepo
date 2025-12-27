@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`54b6eafb0`](https://github.com/OmniBlocks/scratch-gui/commit/54b6eafb05708a1fe2f6eddd1825ba80ec6b2308) - 2025-12-26 22:51:50 -0500
+
+**fix: show screenshots on dashboard html thign g (not tested)**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`803945ede`](https://github.com/OmniBlocks/scratch-gui/commit/803945ede8c7cfacf645750acb5e95684e40cf3d) - 2025-12-26 18:29:37 -0500
 
 **Merge pull request #574 from OmniBlocks/improve-search-block-addon**

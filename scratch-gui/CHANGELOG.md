@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`39b0e00ac`](https://github.com/OmniBlocks/scratch-gui/commit/39b0e00acc5f0d055c9f8cf9540e6a72b691a0a6) - 2025-12-27 14:30:26 -0500
+
+**fix: (ci) robust chaos video discovery and enhanced logging in GitHub Actions workflow**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`1d1380af8`](https://github.com/OmniBlocks/scratch-gui/commit/1d1380af81bd2811ae5e2dabb7136615132c5cd2) - 2025-12-27 14:25:44 -0500
 
 **Reduce timeout_ms from 900000 to 899999**

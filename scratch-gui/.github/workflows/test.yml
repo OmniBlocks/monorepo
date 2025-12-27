@@ -1018,14 +1018,29 @@ jobs:
           
           mkdir -p "$VIDEO_DIR"
           
-          # ✅ FIX: Simplified video discovery - find by prefix
+          # ✅ FIX: Enhanced video discovery with better pattern matching
           echo "🔍 Searching for test videos in Windows+Chromium results..."
           echo ""
-          
+
+          # Log all available directories for debugging
+          echo "📂 All test result directories:"
+          find ../windows-results/test-results -type d -maxdepth 1 2>/dev/null | sort || echo "No directories found"
+
+          echo ""
           echo "🌪️ Looking for chaos test video..."
-          CHAOS_DIR=$(find ../windows-results/test-results -type d -name "chaos-test-*" 2>/dev/null | head -1)
+          # Search for chaos test directories - Playwright creates dirs based on test.describe() name
+          # Pattern: 🌪️-Chaos-Testing-* or *Chaos* or containing "Random Click Spam"
+          CHAOS_DIR=$(find ../windows-results/test-results -type d \( \
+            -name "*Chaos*" -o \
+            -name "*Random*Click*" -o \
+            -name "*Click*Spam*" \
+          \) 2>/dev/null | grep -v ".git" | head -1)
+
+          echo "  Search pattern used: *Chaos*, *Random*Click*, *Click*Spam*"
+          echo "  Found directory: $CHAOS_DIR"
+
           if [ -n "$CHAOS_DIR" ] && [ -d "$CHAOS_DIR" ]; then
-            echo "Found chaos test directory: $CHAOS_DIR"
+            echo "✅ Found chaos test directory: $CHAOS_DIR"
             CHAOS_VIDEO="$CHAOS_DIR/video.webm"
             if [ -f "$CHAOS_VIDEO" ]; then
               cp "$CHAOS_VIDEO" "$VIDEO_DIR/chaos-test-chromium-video.webm"
@@ -1036,15 +1051,24 @@ jobs:
             fi
           else
             echo "❌ No chaos test directory found"
-            echo "Directories in test-results:"
-            ls ../windows-results/test-results 2>/dev/null || echo "test-results not found"
+            echo "  Checking for any directories with video files:"
+            find ../windows-results/test-results -type f -name "video.webm" 2>/dev/null | head -5 || echo "    No video files found"
           fi
-          
+
           echo ""
           echo "🎬 Looking for recorded actions video..."
-          RECORDED_DIR=$(find ../windows-results/test-results -type d -name "recorded-actions-test-*" 2>/dev/null | head -1)
+          # Search for recorded actions test directories
+          RECORDED_DIR=$(find ../windows-results/test-results -type d \( \
+            -name "recorded-actions-test-*" -o \
+            -name "*Recorded*Actions*" -o \
+            -name "*Actions*Playback*" \
+          \) 2>/dev/null | grep -v ".git" | head -1)
+
+          echo "  Search pattern used: recorded-actions-test-*, *Recorded*Actions*, *Actions*Playback*"
+          echo "  Found directory: $RECORDED_DIR"
+
           if [ -n "$RECORDED_DIR" ] && [ -d "$RECORDED_DIR" ]; then
-            echo "Found recorded actions directory: $RECORDED_DIR"
+            echo "✅ Found recorded actions directory: $RECORDED_DIR"
             RECORDED_VIDEO="$RECORDED_DIR/video.webm"
             if [ -f "$RECORDED_VIDEO" ]; then
               cp "$RECORDED_VIDEO" "$VIDEO_DIR/recorded-actions-chromium-video.webm"

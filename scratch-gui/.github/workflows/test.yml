@@ -269,6 +269,129 @@ jobs:
           cat > screenshot-test.spec.js << 'EOF'
           const { test } = require('@playwright/test');
 
+          // ✅ FIX: Improved modal dismissal helper for Ubuntu+Firefox
+          async function dismissModal(page, browserName) {
+            const isUbuntu = process.platform === 'linux';
+            const isFirefox = browserName === 'firefox';
+            const isTargetPlatform = isUbuntu && isFirefox;
+            
+            if (isTargetPlatform) {
+              console.log('🎯 Detected Ubuntu+Firefox - applying enhanced modal dismissal');
+            }
+
+            // Try to capture screenshot before dismissal
+            try {
+              const preDismissalPath = `screenshots/pre-modal-dismissal-${Date.now()}.png`;
+              await page.screenshot({ path: preDismissalPath });
+              if (isTargetPlatform) {
+                console.log(`📸 Pre-dismissal screenshot saved: ${preDismissalPath}`);
+              }
+            } catch (e) {
+              console.log('Could not capture pre-dismissal screenshot:', e.message);
+            }
+
+            let modalDismissed = false;
+
+            // Strategy 1: Click close button inside modal
+            try {
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                console.log('🔍 Found ReactModal overlay');
+                
+                const closeButton = page.locator('.ReactModal__Content button').first()
+                  .or(page.locator('[class*="modal"] button').first())
+                  .or(page.locator('button[aria-label*="close" i]').first());
+                
+                if (await closeButton.count() > 0) {
+                  console.log('✓ Attempting to click close button');
+                  await closeButton.click({ timeout: 2000, force: true });
+                  await page.waitForTimeout(500);
+                  modalDismissed = true;
+                  console.log('✓ Close button clicked');
+                }
+              }
+            } catch (e) {
+              console.log('Close button click failed:', e.message);
+            }
+
+            // Strategy 2: Click outside modal (on overlay)
+            if (!modalDismissed) {
+              try {
+                const modalOverlay = page.locator('.ReactModal__Overlay');
+                if (await modalOverlay.count() > 0) {
+                  console.log('✓ Attempting to click overlay (outside modal)');
+                  await modalOverlay.click({ position: { x: 10, y: 10 }, timeout: 2000 });
+                  await page.waitForTimeout(500);
+                  modalDismissed = true;
+                  console.log('✓ Overlay clicked');
+                }
+              } catch (e) {
+                console.log('Overlay click failed:', e.message);
+              }
+            }
+
+            // Strategy 3: Press Escape key
+            if (!modalDismissed) {
+              try {
+                console.log('✓ Attempting Escape key');
+                await page.keyboard.press('Escape');
+                await page.waitForTimeout(500);
+                modalDismissed = true;
+                console.log('✓ Escape key pressed');
+              } catch (e) {
+                console.log('Escape key failed:', e.message);
+              }
+            }
+
+            // Strategy 4: Force remove modal (last resort)
+            if (!modalDismissed) {
+              try {
+                console.log('⚠️ Attempting force removal of modal');
+                await page.evaluate(() => {
+                  const overlay = document.querySelector('.ReactModal__Overlay');
+                  if (overlay) {
+                    overlay.remove();
+                    console.log('Modal forcibly removed from DOM');
+                  }
+                });
+                await page.waitForTimeout(300);
+                modalDismissed = true;
+                console.log('✓ Modal forcibly removed');
+              } catch (e) {
+                console.log('Force removal failed:', e.message);
+              }
+            }
+
+            // Check if modal is still present
+            try {
+              const modalStillPresent = await page.locator('.ReactModal__Overlay').count() > 0;
+              if (modalStillPresent) {
+                console.log('⚠️ Modal still present after all dismissal attempts');
+              } else {
+                console.log('✅ Modal successfully dismissed');
+              }
+            } catch (e) {
+              // Ignore check errors
+            }
+
+            // Capture screenshot after dismissal attempts
+            try {
+              const postDismissalPath = `screenshots/post-modal-dismissal-${Date.now()}.png`;
+              await page.screenshot({ path: postDismissalPath });
+              if (isTargetPlatform) {
+                console.log(`📸 Post-dismissal screenshot saved: ${postDismissalPath}`);
+              }
+            } catch (e) {
+              console.log('Could not capture post-dismissal screenshot:', e.message);
+            }
+
+            if (isTargetPlatform) {
+              console.log(`🎯 Ubuntu+Firefox modal dismissal complete. Dismissed: ${modalDismissed}`);
+            }
+
+            return modalDismissed;
+          }
+
           test.describe('Main Branch Screenshots', () => {
             test('Stage and Sprites', async ({ page, context, browserName }) => {
               if (browserName === 'chromium') {
@@ -283,6 +406,9 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(5000);
+              
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
               
               const stageWrapper = await page.locator('[class*="stage-and-target-wrapper"]').first();
               if (await stageWrapper.count() > 0) {
@@ -306,6 +432,9 @@ jobs:
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(5000);
               
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
+              
               const editorWrapper = await page.locator('[class*="editor-wrapper"]').first();
               if (await editorWrapper.count() > 0) {
                 await editorWrapper.screenshot({ path: 'screenshots/blocks-workspace.png' });
@@ -314,10 +443,14 @@ jobs:
               }
             });
 
-            test('Player View', async ({ page }) => {
+            test('Player View', async ({ page, browserName }) => {
               await page.goto('/');
               await page.waitForLoadState('networkidle');
               await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
+              
               await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
             });
 
@@ -334,6 +467,10 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(4000);
+              
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
+              
               await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
             });
 
@@ -351,15 +488,8 @@ jobs:
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // ✅ FIX: Dismiss browser compat modal (Firefox)
-              const modalOverlay = page.locator('.ReactModal__Overlay');
-              if (await modalOverlay.count() > 0) {
-                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
-                if (await closeButton.count() > 0) {
-                  await closeButton.click({ timeout: 2000 }).catch(() => {});
-                  await page.waitForTimeout(500);
-                }
-              }
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
               
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const codeTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(0);
@@ -383,15 +513,8 @@ jobs:
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // ✅ FIX: Dismiss browser compat modal (Firefox)
-              const modalOverlay = page.locator('.ReactModal__Overlay');
-              if (await modalOverlay.count() > 0) {
-                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
-                if (await closeButton.count() > 0) {
-                  await closeButton.click({ timeout: 2000 }).catch(() => {});
-                  await page.waitForTimeout(500);
-                }
-              }
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
               
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const costumesTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(1);
@@ -415,15 +538,8 @@ jobs:
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // ✅ FIX: Dismiss browser compat modal (Firefox)
-              const modalOverlay = page.locator('.ReactModal__Overlay');
-              if (await modalOverlay.count() > 0) {
-                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
-                if (await closeButton.count() > 0) {
-                  await closeButton.click({ timeout: 2000 }).catch(() => {});
-                  await page.waitForTimeout(500);
-                }
-              }
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
               
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const soundsTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(2);
@@ -447,15 +563,8 @@ jobs:
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // ✅ FIX: Dismiss browser compat modal (Firefox)
-              const modalOverlay = page.locator('.ReactModal__Overlay');
-              if (await modalOverlay.count() > 0) {
-                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
-                if (await closeButton.count() > 0) {
-                  await closeButton.click({ timeout: 2000 }).catch(() => {});
-                  await page.waitForTimeout(500);
-                }
-              }
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
               
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const songsTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(3);
@@ -479,15 +588,8 @@ jobs:
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // ✅ FIX: Dismiss browser compat modal (Firefox)
-              const modalOverlay = page.locator('.ReactModal__Overlay');
-              if (await modalOverlay.count() > 0) {
-                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
-                if (await closeButton.count() > 0) {
-                  await closeButton.click({ timeout: 2000 }).catch(() => {});
-                  await page.waitForTimeout(500);
-                }
-              }
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
               
               const extensionButton = page.locator('[class*="extension-button"]').first()
                 .or(page.locator('button:has-text("Add Extension")'))
@@ -515,15 +617,8 @@ jobs:
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // ✅ FIX: Dismiss browser compat modal (Firefox)
-              const modalOverlay = page.locator('.ReactModal__Overlay');
-              if (await modalOverlay.count() > 0) {
-                const closeButton = page.locator('.ReactModal__Content button, [class*="modal"] button').first();
-                if (await closeButton.count() > 0) {
-                  await closeButton.click({ timeout: 2000 }).catch(() => {});
-                  await page.waitForTimeout(500);
-                }
-              }
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
               
               const settingsButton = page.locator('[class*="menu-bar"]')
                 .locator('[class*="settings"], [aria-label*="settings" i], [aria-label*="advanced" i]')
@@ -582,6 +677,129 @@ jobs:
           const { test } = require('@playwright/test');
           const fs = require('fs');
 
+          // ✅ FIX: Improved modal dismissal helper for Ubuntu+Firefox
+          async function dismissModal(page, browserName) {
+            const isUbuntu = process.platform === 'linux';
+            const isFirefox = browserName === 'firefox';
+            const isTargetPlatform = isUbuntu && isFirefox;
+            
+            if (isTargetPlatform) {
+              console.log('🎯 Detected Ubuntu+Firefox - applying enhanced modal dismissal');
+            }
+
+            // Try to capture screenshot before dismissal
+            try {
+              const preDismissalPath = `screenshots/chaos-pre-modal-dismissal-${Date.now()}.png`;
+              await page.screenshot({ path: preDismissalPath });
+              if (isTargetPlatform) {
+                console.log(`📸 Pre-dismissal screenshot saved: ${preDismissalPath}`);
+              }
+            } catch (e) {
+              console.log('Could not capture pre-dismissal screenshot:', e.message);
+            }
+
+            let modalDismissed = false;
+
+            // Strategy 1: Click close button inside modal
+            try {
+              const modalOverlay = page.locator('.ReactModal__Overlay');
+              if (await modalOverlay.count() > 0) {
+                console.log('🔍 Found ReactModal overlay');
+                
+                const closeButton = page.locator('.ReactModal__Content button').first()
+                  .or(page.locator('[class*="modal"] button').first())
+                  .or(page.locator('button[aria-label*="close" i]').first());
+                
+                if (await closeButton.count() > 0) {
+                  console.log('✓ Attempting to click close button');
+                  await closeButton.click({ timeout: 2000, force: true });
+                  await page.waitForTimeout(500);
+                  modalDismissed = true;
+                  console.log('✓ Close button clicked');
+                }
+              }
+            } catch (e) {
+              console.log('Close button click failed:', e.message);
+            }
+
+            // Strategy 2: Click outside modal (on overlay)
+            if (!modalDismissed) {
+              try {
+                const modalOverlay = page.locator('.ReactModal__Overlay');
+                if (await modalOverlay.count() > 0) {
+                  console.log('✓ Attempting to click overlay (outside modal)');
+                  await modalOverlay.click({ position: { x: 10, y: 10 }, timeout: 2000 });
+                  await page.waitForTimeout(500);
+                  modalDismissed = true;
+                  console.log('✓ Overlay clicked');
+                }
+              } catch (e) {
+                console.log('Overlay click failed:', e.message);
+              }
+            }
+
+            // Strategy 3: Press Escape key
+            if (!modalDismissed) {
+              try {
+                console.log('✓ Attempting Escape key');
+                await page.keyboard.press('Escape');
+                await page.waitForTimeout(500);
+                modalDismissed = true;
+                console.log('✓ Escape key pressed');
+              } catch (e) {
+                console.log('Escape key failed:', e.message);
+              }
+            }
+
+            // Strategy 4: Force remove modal (last resort)
+            if (!modalDismissed) {
+              try {
+                console.log('⚠️ Attempting force removal of modal');
+                await page.evaluate(() => {
+                  const overlay = document.querySelector('.ReactModal__Overlay');
+                  if (overlay) {
+                    overlay.remove();
+                    console.log('Modal forcibly removed from DOM');
+                  }
+                });
+                await page.waitForTimeout(300);
+                modalDismissed = true;
+                console.log('✓ Modal forcibly removed');
+              } catch (e) {
+                console.log('Force removal failed:', e.message);
+              }
+            }
+
+            // Check if modal is still present
+            try {
+              const modalStillPresent = await page.locator('.ReactModal__Overlay').count() > 0;
+              if (modalStillPresent) {
+                console.log('⚠️ Modal still present after all dismissal attempts');
+              } else {
+                console.log('✅ Modal successfully dismissed');
+              }
+            } catch (e) {
+              // Ignore check errors
+            }
+
+            // Capture screenshot after dismissal attempts
+            try {
+              const postDismissalPath = `screenshots/chaos-post-modal-dismissal-${Date.now()}.png`;
+              await page.screenshot({ path: postDismissalPath });
+              if (isTargetPlatform) {
+                console.log(`📸 Post-dismissal screenshot saved: ${postDismissalPath}`);
+              }
+            } catch (e) {
+              console.log('Could not capture post-dismissal screenshot:', e.message);
+            }
+
+            if (isTargetPlatform) {
+              console.log(`🎯 Ubuntu+Firefox modal dismissal complete. Dismissed: ${modalDismissed}`);
+            }
+
+            return modalDismissed;
+          }
+
           test.describe('🌪️ Chaos Testing', () => {
             test('Random Click Spam', async ({ page, context, browserName }) => {
               if (browserName === 'chromium') {
@@ -610,6 +828,9 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
+              
+              // ✅ FIX: Improved modal dismissal for Ubuntu+Firefox
+              await dismissModal(page, browserName);
               
               const duration = 30000;
               const startTime = Date.now();
@@ -708,6 +929,132 @@ jobs:
                 
                 const actions = ${JSON.stringify(testConfig.actions)};
                 
+                // ✅ FIX: Improved modal dismissal helper for Ubuntu+Firefox
+                async function dismissModal(page, browserName) {
+                  const isUbuntu = process.platform === 'linux';
+                  const isFirefox = browserName === 'firefox';
+                  const isTargetPlatform = isUbuntu && isFirefox;
+                  
+                  if (isTargetPlatform) {
+                    console.log('🎯 Recorded test detected Ubuntu+Firefox - applying enhanced modal dismissal');
+                  }
+
+                  // Try to capture screenshot before dismissal
+                  try {
+                    const preDismissalPath = \`screenshots/recorded-\${testSlug}-pre-modal-dismissal-\${Date.now()}.png\`;
+                    await page.screenshot({ path: preDismissalPath });
+                    if (isTargetPlatform) {
+                      console.log(\`📸 Pre-dismissal screenshot saved: \${preDismissalPath}\`);
+                    }
+                  } catch (e) {
+                    console.log('Could not capture pre-dismissal screenshot:', e.message);
+                  }
+
+                  let modalDismissed = false;
+
+                  // Strategy 1: Click close button inside modal
+                  try {
+                    const modalOverlay = page.locator('.ReactModal__Overlay');
+                    if (await modalOverlay.count() > 0) {
+                      console.log('🔍 Found ReactModal overlay');
+                      
+                      const closeButton = page.locator('.ReactModal__Content button').first()
+                        .or(page.locator('[class*="modal"] button').first())
+                        .or(page.locator('button[aria-label*="close" i]').first());
+                      
+                      if (await closeButton.count() > 0) {
+                        console.log('✓ Attempting to click close button');
+                        await closeButton.click({ timeout: 2000, force: true });
+                        await page.waitForTimeout(500);
+                        modalDismissed = true;
+                        console.log('✓ Close button clicked');
+                      }
+                    }
+                  } catch (e) {
+                    console.log('Close button click failed:', e.message);
+                  }
+
+                  // Strategy 2: Click outside modal (on overlay)
+                  if (!modalDismissed) {
+                    try {
+                      const modalOverlay = page.locator('.ReactModal__Overlay');
+                      if (await modalOverlay.count() > 0) {
+                        console.log('✓ Attempting to click overlay (outside modal)');
+                        await modalOverlay.click({ position: { x: 10, y: 10 }, timeout: 2000 });
+                        await page.waitForTimeout(500);
+                        modalDismissed = true;
+                        console.log('✓ Overlay clicked');
+                      }
+                    } catch (e) {
+                      console.log('Overlay click failed:', e.message);
+                    }
+                  }
+
+                  // Strategy 3: Press Escape key
+                  if (!modalDismissed) {
+                    try {
+                      console.log('✓ Attempting Escape key');
+                      await page.keyboard.press('Escape');
+                      await page.waitForTimeout(500);
+                      modalDismissed = true;
+                      console.log('✓ Escape key pressed');
+                    } catch (e) {
+                      console.log('Escape key failed:', e.message);
+                    }
+                  }
+
+                  // Strategy 4: Force remove modal (last resort)
+                  if (!modalDismissed) {
+                    try {
+                      console.log('⚠️ Attempting force removal of modal');
+                      await page.evaluate(() => {
+                        const overlay = document.querySelector('.ReactModal__Overlay');
+                        if (overlay) {
+                          overlay.remove();
+                          console.log('Modal forcibly removed from DOM');
+                        }
+                      });
+                      await page.waitForTimeout(300);
+                      modalDismissed = true;
+                      console.log('✓ Modal forcibly removed');
+                    } catch (e) {
+                      console.log('Force removal failed:', e.message);
+                    }
+                  }
+
+                  // Check if modal is still present
+                  try {
+                    const modalStillPresent = await page.locator('.ReactModal__Overlay').count() > 0;
+                    if (modalStillPresent) {
+                      console.log('⚠️ Modal still present after all dismissal attempts');
+                    } else {
+                      console.log('✅ Modal successfully dismissed');
+                    }
+                  } catch (e) {
+                    // Ignore check errors
+                  }
+
+                  // Capture screenshot after dismissal attempts
+                  try {
+                    const postDismissalPath = \`screenshots/recorded-\${testSlug}-post-modal-dismissal-\${Date.now()}.png\`;
+                    await page.screenshot({ path: postDismissalPath });
+                    if (isTargetPlatform) {
+                      console.log(\`📸 Post-dismissal screenshot saved: \${postDismissalPath}\`);
+                    }
+                  } catch (e) {
+                    console.log('Could not capture post-dismissal screenshot:', e.message);
+                  }
+
+                  if (isTargetPlatform) {
+                    console.log(\`🎯 Ubuntu+Firefox modal dismissal complete. Dismissed: \${modalDismissed}\`);
+                  }
+
+                  return modalDismissed;
+                }
+                
+                // Apply modal dismissal after initial page load
+                await dismissModal(page, browserName);
+                
                 for (const action of actions) {
                   eventLog.push({ ...action, executedAt: Date.now() });
                   
@@ -715,8 +1062,12 @@ jobs:
                     case 'goto':
                       await page.goto(action.url);
                       await page.waitForLoadState('networkidle');
+                      // ✅ FIX: Dismiss modal after page navigation
+                      await dismissModal(page, browserName);
                       break;
                     case 'click':
+                      // ✅ FIX: Dismiss modal before click attempts
+                      await dismissModal(page, browserName);
                       if (action.index !== undefined) {
                         await page.locator(action.selector).nth(action.index).click();
                       } else {

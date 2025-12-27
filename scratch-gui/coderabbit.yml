@@ -70,7 +70,7 @@ reviews:
       enabled: true
     github-checks:
       enabled: true
-      timeout_ms: 900000
+      timeout_ms: 899999
     languagetool:
       enabled: true
       enabled_rules: []

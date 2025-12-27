@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`1d1380af8`](https://github.com/OmniBlocks/scratch-gui/commit/1d1380af81bd2811ae5e2dabb7136615132c5cd2) - 2025-12-27 14:25:44 -0500
+
+**Reduce timeout_ms from 900000 to 899999**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`54b6eafb0`](https://github.com/OmniBlocks/scratch-gui/commit/54b6eafb05708a1fe2f6eddd1825ba80ec6b2308) - 2025-12-26 22:51:50 -0500
 
 **fix: show screenshots on dashboard html thign g (not tested)**

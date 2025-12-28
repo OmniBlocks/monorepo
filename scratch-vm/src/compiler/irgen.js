@@ -520,6 +520,7 @@ class ScriptTreeGenerator {
             }
 
             if (object.isConstant('_stage_')) {
+                // We assume that the stage always exists, so these don't need to be able to return 0.
                 switch (property) {
                 case 'background #': // fallthrough for scratch 1.0 compatibility
                 case 'backdrop #':
@@ -528,6 +529,7 @@ class ScriptTreeGenerator {
                     return new IntermediateInput(InputOpcode.SENSING_OF_BACKDROP_NAME, InputType.STRING);
                 }
             } else {
+                // If the target sprite does not exist, these may all return 0, even the costume name one.
                 switch (property) {
                 case 'x position':
                     return new IntermediateInput(InputOpcode.SENSING_OF_POS_X, InputType.NUMBER, {object});
@@ -536,11 +538,11 @@ class ScriptTreeGenerator {
                 case 'direction':
                     return new IntermediateInput(InputOpcode.SENSING_OF_DIRECTION, InputType.NUMBER_REAL, {object});
                 case 'costume #':
-                    return new IntermediateInput(InputOpcode.SENSING_OF_COSTUME_NUMBER, InputType.NUMBER_POS_INT, {object});
+                    return new IntermediateInput(InputOpcode.SENSING_OF_COSTUME_NUMBER, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO, {object});
                 case 'costume name':
-                    return new IntermediateInput(InputOpcode.SENSING_OF_COSTUME_NAME, InputType.STRING, {object});
+                    return new IntermediateInput(InputOpcode.SENSING_OF_COSTUME_NAME, InputType.STRING | InputType.NUMBER_ZERO, {object});
                 case 'size':
-                    return new IntermediateInput(InputOpcode.SENSING_OF_SIZE, InputType.NUMBER_POS, {object});
+                    return new IntermediateInput(InputOpcode.SENSING_OF_SIZE, InputType.NUMBER_POS | InputType.NUMBER_ZERO, {object});
                 }
             }
 

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`de9af6b32`](https://github.com/OmniBlocks/scratch-gui/commit/de9af6b329fe536453c09d61a5e3937be28a0174) - 2025-12-29 15:34:03 -0500
+
+**Merge pull request #590 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-fb00bb6**
+
+build(deps): bump scratch-vm from `19f73ae` to `fb00bb6`
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`2bbb6cbf8`](https://github.com/OmniBlocks/scratch-gui/commit/2bbb6cbf89e395e55c00e68782c8aa75c5d50dfe) - 2025-12-27 17:14:56 -0500
 
 **Merge pull request #583 from OmniBlocks/chore/remove-pull-js-add-do-not-run-warnings-in-docs**

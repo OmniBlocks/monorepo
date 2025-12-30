@@ -662,7 +662,7 @@ class ScriptTreeGenerator {
             // Dirty hack: automatically enable warp timer for this block if it uses timer
             // This fixes project that do things like "repeat until timer > 0.5"
             this.usesTimer = false;
-            const condition = this.descendInputOfBlock(block, 'CONDITION');
+            const condition = this.descendInputOfBlock(block, 'CONDITION').toType(InputType.BOOLEAN);
             const needsWarpTimer = this.usesTimer;
             return new IntermediateStackBlock(StackOpcode.CONTROL_WHILE, {
                 condition: new IntermediateInput(InputOpcode.OP_NOT, InputType.BOOLEAN, {

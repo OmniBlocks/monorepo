@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`4c78d686c`](https://github.com/OmniBlocks/scratch-gui/commit/4c78d686c10998775011b726fd2c8166e230e48b) - 2025-12-31 19:21:01 -0500
+
+**Merge pull request #593 from OmniBlocks/dependabot/npm_and_yarn/turbowarp/nanolog-1.0.1**
+
+build(deps): bump @turbowarp/nanolog from 0.2.0 to 1.0.1
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`de9af6b32`](https://github.com/OmniBlocks/scratch-gui/commit/de9af6b329fe536453c09d61a5e3937be28a0174) - 2025-12-29 15:34:03 -0500
 
 **Merge pull request #590 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-fb00bb6**

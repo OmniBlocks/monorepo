@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`52aac1766`](https://github.com/OmniBlocks/scratch-gui/commit/52aac1766d97dfaf393b5d272a08a034bbb19580) - 2026-01-02 22:14:48 +0000
+
+**Create Google Translate.yaml**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`7154dfdc6`](https://github.com/OmniBlocks/scratch-gui/commit/7154dfdc669d16b6b9c6c2322f978fbefd07b1d5) - 2026-01-02 22:13:50 +0000
 
 **Add GitHub Actions workflow for issue refinement**

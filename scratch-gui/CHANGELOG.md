@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`8e30dd452`](https://github.com/OmniBlocks/scratch-gui/commit/8e30dd452b33366dfc551615073b6877d8c82d62) - 2026-01-02 23:22:59 +0000
+
+**Rename README.md to Home.md**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`1f2df12af`](https://github.com/OmniBlocks/scratch-gui/commit/1f2df12af07a6d5e9efa1c2ab42866712adcb59d) - 2026-01-02 23:21:42 +0000
 
 **Create README.md**

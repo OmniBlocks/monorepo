@@ -1,53 +1,61 @@
-name: Issue Refiner
+name: AI Issue Polisher
 
 on:
   issues:
     types: [opened, edited]
 
+permissions:
+  contents: read
+  issues: write
+  models: read # 👈 Required to use the GitHub Models inference API
+
 jobs:
-  refine:
+  polish:
     runs-on: ubuntu-latest
-    # Don't run on the bot's own edits to avoid an infinite loop!
     if: github.actor != 'github-actions[bot]'
 
     steps:
-      - name: Refine Grammar and Clarity
+      - name: AI Inference
+        id: ai
+        uses: actions/ai-inference@v2
+        with:
+          model: gpt-4o # You can also use 'meta/llama-3-70b' or others
+          system-prompt: |
+            You are a technical editor for the OmniBlocks project.
+            Perform the following tasks on the provided issue text:
+            1. If it's not in English, translate it to English.
+            2. Fix all grammar and spelling mistakes.
+            3. If the idea is very short, expand it into a professional summary.
+            4. Keep the output strictly in Markdown format.
+          prompt: |
+            Please polish the following issue content:
+            ---
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ github.event.issue.body }}
+
+      - name: Update Issue
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const body = context.payload.issue.body;
-            if (!body || body.length < 5) return;
-
-            // PROMPT FOR THE AI
-            // In a real setup, you'd call an LLM API here. 
-            // For now, we simulate the logic.
-            const prompt = `
-              Professionalize this GitHub issue. 
-              1. Fix grammar/spelling.
-              2. Expand 1-sentence ideas into structured points.
-              3. Keep it technical and concise.
-            `;
-
-            const polishedBody = "## Refined Proposal\n" + 
-                                 "This is where the AI-corrected text goes.";
+            const polishedText = `${{ steps.ai.outputs.response }}`;
+            const originalBody = context.payload.issue.body;
 
             const finalBody = `
-            ${polishedBody}
+            ${polishedText}
 
             ---
             <details>
-            <summary>View original "Clanker" text</summary>
+            <summary>View original unedited text</summary>
 
-            ${body}
+            ${originalBody}
 
             </details>
             
-            _Revised by OmniGrammar Bot_`;
+            _Polished and Translated by GitHub Models AI_`;
 
             await github.rest.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              issue_number: context.payload.issue.number,
               body: finalBody
             });

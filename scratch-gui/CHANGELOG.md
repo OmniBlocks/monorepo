@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`7154dfdc6`](https://github.com/OmniBlocks/scratch-gui/commit/7154dfdc669d16b6b9c6c2322f978fbefd07b1d5) - 2026-01-02 22:13:50 +0000
+
+**Add GitHub Actions workflow for issue refinement**
+
+This workflow automates the refinement of grammar and clarity in GitHub issues using a simulated AI prompt.
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`22138f482`](https://github.com/OmniBlocks/scratch-gui/commit/22138f482bca779497d898b1f1e4d43c10d042cd) - 2026-01-02 21:48:10 +0000
 
 **Merge pull request #637 from OmniBlocks/cto-task-595**

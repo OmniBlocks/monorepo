@@ -23,6 +23,7 @@ import {MenuItem, MenuSection} from '../menu/menu.jsx';
 import ProjectTitleInput from './project-title-input.jsx';
 import AuthorInfo from './author-info.jsx';
 import SB3Downloader from '../../containers/sb3-downloader.jsx';
+import SB3FolderExporter from '../../containers/sb3-folder-exporter.jsx';
 import DeletionRestorer from '../../containers/deletion-restorer.jsx';
 import TurboMode from '../../containers/turbo-mode.jsx';
 import MenuBarHOC from '../../containers/menu-bar-hoc.jsx';
@@ -341,9 +342,9 @@ class MenuBar extends React.Component {
         if (modifier) {
             if (event.key.toLowerCase() === 's') {
                 this.props.handleSaveProject();
-                event.preventDefault();    
+                event.preventDefault();
             } else if (event.key.toLowerCase() === 'o') {
-                event.preventDefault();    
+                event.preventDefault();
                 this.props.onStartSelectingFileUpload();
             }
         }
@@ -687,6 +688,22 @@ class MenuBar extends React.Component {
                                                 </React.Fragment>
                                             )}
                                         </SB3Downloader>
+                                        <SB3FolderExporter>
+                                            {exportProjectToFolder => (
+                                                exportProjectToFolder ? (
+                                                    <MenuItem
+                                                        onClick={this.getSaveToComputerHandler(exportProjectToFolder)}
+                                                    >
+                                                        <FormattedMessage
+                                                            defaultMessage="Export project as folder"
+                                                            // eslint-disable-next-line max-len
+                                                            description="Menu bar item to export project files to a folder"
+                                                            id="tw.exportProjectAsFolder"
+                                                        />
+                                                    </MenuItem>
+                                                ) : null
+                                            )}
+                                        </SB3FolderExporter>
                                     </MenuSection>
                                     {this.props.onClickPackager && (
                                         <MenuSection>

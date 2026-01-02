@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`fc58854d8`](https://github.com/OmniBlocks/scratch-gui/commit/fc58854d888d542ec9a7ece9af27b8faac3ca693) - 2026-01-02 12:14:58 +0000
+
+**allow telewarp to iframe the editor**
+
+*Author: kRxZy*
+
+---
+
+
 ### Commit [`4c78d686c`](https://github.com/OmniBlocks/scratch-gui/commit/4c78d686c10998775011b726fd2c8166e230e48b) - 2025-12-31 19:21:01 -0500
 
 **Merge pull request #593 from OmniBlocks/dependabot/npm_and_yarn/turbowarp/nanolog-1.0.1**

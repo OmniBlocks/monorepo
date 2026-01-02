@@ -1,0 +1,62 @@
+name: AI Generate Feature Issues from README
+
+on:
+  schedule:
+    - cron: "0 2 * * *"  # runs daily at 02:00 UTC
+  workflow_dispatch: {}  # manual trigger
+
+permissions:
+  contents: read   # read repo contents, including README.md
+  issues: write    # create issues
+  models: read     # call GitHub AI inference
+
+jobs:
+  generate-issues:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Read README content
+      id: readme
+      run: |
+        # Capture the README.md file into an output variable
+        README_CONTENT=$(sed 's/"/\\"/g' README.md)
+        echo "::set-output name=content::$README_CONTENT"
+
+    - name: AI inference to generate issues
+      id: ai
+      uses: actions/ai-inference@v1
+      with:
+        prompt: |
+          You are an expert product manager and developer assistant.
+          The following is the README content for this repository:
+          
+          ${{ steps.readme.outputs.content }}
+
+          Based on this README, generate 5 **creative, actionable, and concise** feature ideas
+          for this project. Output them in JSON array form with objects containing:
+            - "title": a short title for the feature
+            - "description": a detailed description
+
+          **Only output valid JSON.**
+      # No extra token needed; "permissions.models: read" covers inference
+
+    - name: Parse AI JSON and create issues
+      run: |
+        echo "${{ steps.ai.outputs.response }}" > ai_output.json
+        # Convert each JSON object into base64 for safe iteration
+        jq -r '.[] | @base64' ai_output.json > ideas.txt
+        while read row; do
+          IDEA=$(echo "$row" | base64 --decode)
+          TITLE=$(echo "$IDEA" | jq -r .title)
+          BODY=$(echo "$IDEA" | jq -r .description)
+          echo "Creating GitHub issue: $TITLE"
+          gh issue create \
+            --title "$TITLE" \
+            --body "$BODY" \
+            --label "auto-generated"
+        done < ideas.txt
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -734,6 +734,49 @@ jobs:
           echo "${{ steps.parse-response.outputs.full_response }}" > response.txt
           gh issue comment "$ISSUE_NUMBER" --body-file response.txt
 
+      # ------------------------------------------------------
+      # 🎭 POEM GENERATOR: Generate creative poem for issue
+      # ------------------------------------------------------
+      - name: Generate Issue Poem with AI
+        id: generate-poem
+        if: ${{ steps.parse-response.outputs.keyword == '' && !contains(steps.parse-response.outputs.full_response, '[SECURITY]') }}
+        uses: actions/ai-inference@v1
+        with:
+          model: 'gpt-4o-mini'
+          prompt: |
+            You are a creative poet for the OmniBlocks scratch-gui project.
+
+            Write a short, playful poem (4-8 lines) about this issue:
+
+            **Issue Title:** ${{ github.event.issue.title }}
+            **Issue Body:**
+            ${{ github.event.issue.body }}
+
+            Guidelines:
+            - Keep it fun, lighthearted, and encouraging
+            - Reference the issue topic creatively
+            - Use emojis sparingly (1-2 max)
+            - Make it rhyme or have rhythm
+            - Keep it under 100 words
+            - Be respectful and professional
+
+            Output only the poem, no explanations or metadata.
+
+      - name: Post Poem Comment
+        if: ${{ steps.generate-poem.outputs.response != '' && steps.parse-response.outputs.keyword == '' && !contains(steps.parse-response.outputs.full_response, '[SECURITY]') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          POEM: ${{ steps.generate-poem.outputs.response }}
+        run: |
+          COMMENT="## 🎭 Issue Poem
+
+          $POEM
+
+          ---
+          _Generated with ❤️ by the OmniBlocks Poetry Bot_"
+
+          echo "$COMMENT" | gh issue comment ${{ github.event.issue.number }} --body-file -
+
       # =================================================================
       # 🏷️ Added: Categorizer (kept EXACT prompt; just appended here)
       # Runs only for issue events (opened/edited), not on comments

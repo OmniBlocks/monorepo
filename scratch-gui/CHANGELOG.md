@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`22138f482`](https://github.com/OmniBlocks/scratch-gui/commit/22138f482bca779497d898b1f1e4d43c10d042cd) - 2026-01-02 21:48:10 +0000
+
+**Merge pull request #637 from OmniBlocks/cto-task-595**
+
+feat(workflows): add Issue Poem Generator and PR Poem Generator workflows
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`fc58854d8`](https://github.com/OmniBlocks/scratch-gui/commit/fc58854d888d542ec9a7ece9af27b8faac3ca693) - 2026-01-02 12:14:58 +0000
 
 **allow telewarp to iframe the editor**

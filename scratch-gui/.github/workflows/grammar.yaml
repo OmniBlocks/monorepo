@@ -1,0 +1,53 @@
+name: Issue Refiner
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    # Don't run on the bot's own edits to avoid an infinite loop!
+    if: github.actor != 'github-actions[bot]'
+
+    steps:
+      - name: Refine Grammar and Clarity
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const body = context.payload.issue.body;
+            if (!body || body.length < 5) return;
+
+            // PROMPT FOR THE AI
+            // In a real setup, you'd call an LLM API here. 
+            // For now, we simulate the logic.
+            const prompt = `
+              Professionalize this GitHub issue. 
+              1. Fix grammar/spelling.
+              2. Expand 1-sentence ideas into structured points.
+              3. Keep it technical and concise.
+            `;
+
+            const polishedBody = "## Refined Proposal\n" + 
+                                 "This is where the AI-corrected text goes.";
+
+            const finalBody = `
+            ${polishedBody}
+
+            ---
+            <details>
+            <summary>View original "Clanker" text</summary>
+
+            ${body}
+
+            </details>
+            
+            _Revised by OmniGrammar Bot_`;
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: finalBody
+            });

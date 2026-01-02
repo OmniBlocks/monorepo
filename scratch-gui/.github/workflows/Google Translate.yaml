@@ -1,0 +1,24 @@
+name: 'Issue Translator'
+
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    # Don't translate the bot's own posts!
+    if: github.actor != 'github-actions[bot]'
+    
+    steps:
+      - name: Auto Translate to English
+        uses: usthe/issues-translate-action@v2.7
+        with:
+          # This token allows the bot to edit the issue
+          BOT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Keep the original title, or set to true to translate that too
+          IS_MODIFY_TITLE: true
+          # A polite note the bot leaves behind
+          CUSTOM_BOT_NOTE: "Translation provided for the OmniBlocks team."

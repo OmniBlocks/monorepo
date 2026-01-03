@@ -29,6 +29,7 @@ jobs:
       id: ai
       uses: actions/ai-inference@v1
       with:
+        max-tokens: 6700
         prompt: |
           You are an expert product manager and developer assistant.
           The following is the README content for this repository:

@@ -638,7 +638,7 @@ class MenuBar extends React.Component {
                                             {importProjectFromFolder => (
                                                 importProjectFromFolder ? (
                                                     <MenuItem
-                                                        onClick={this.getSaveToComputerHandler(importProjectFromFolder)}
+                                                        onClick={importProjectFromFolder}
                                                     >
                                                         <FormattedMessage
                                                             defaultMessage="Import from folder"

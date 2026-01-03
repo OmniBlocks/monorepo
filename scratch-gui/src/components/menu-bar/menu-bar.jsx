@@ -24,6 +24,7 @@ import ProjectTitleInput from './project-title-input.jsx';
 import AuthorInfo from './author-info.jsx';
 import SB3Downloader from '../../containers/sb3-downloader.jsx';
 import SB3FolderExporter from '../../containers/sb3-folder-exporter.jsx';
+import SB3FolderImporter from '../../containers/sb3-folder-importer.jsx';
 import DeletionRestorer from '../../containers/deletion-restorer.jsx';
 import TurboMode from '../../containers/turbo-mode.jsx';
 import MenuBarHOC from '../../containers/menu-bar-hoc.jsx';
@@ -633,6 +634,22 @@ class MenuBar extends React.Component {
                                         >
                                             {this.props.intl.formatMessage(sharedMessages.loadFromComputerTitle)}
                                         </MenuItem>
+                                        <SB3FolderImporter>
+                                            {importProjectFromFolder => (
+                                                importProjectFromFolder ? (
+                                                    <MenuItem
+                                                        onClick={this.getSaveToComputerHandler(importProjectFromFolder)}
+                                                    >
+                                                        <FormattedMessage
+                                                            defaultMessage="Import from folder"
+                                                            // eslint-disable-next-line max-len
+                                                            description="Menu bar item to import project files from a folder"
+                                                            id="tw.importProjectFromFolder"
+                                                        />
+                                                    </MenuItem>
+                                                ) : null
+                                            )}
+                                        </SB3FolderImporter>
                                         <SB3Downloader
                                             showSaveFilePicker={this.props.showSaveFilePicker}
                                         >

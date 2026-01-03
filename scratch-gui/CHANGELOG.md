@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`2eb9285d2`](https://github.com/OmniBlocks/scratch-gui/commit/2eb9285d2ade930246dd7d3e0bc7b08788fe98c5) - 2026-01-03 02:01:24 +0000
+
+**large tool you should outsource from somewhere else**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`6db93bf7d`](https://github.com/OmniBlocks/scratch-gui/commit/6db93bf7df2fa61a6ce2ea09c9d8cb218e619013) - 2026-01-03 00:12:37 +0000
 
 **Merge pull request #672 from OmniBlocks/cto-task-670**

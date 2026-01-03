@@ -43,16 +43,15 @@ jobs:
 
           **Only output valid JSON.**
       # No extra token needed; "permissions.models: read" covers inference
-
     - name: Parse AI JSON and create issues
       run: |
         # Save AI response
-        echo "${{ steps.ai.outputs.response }}" > ai_output.json
+        echo '${{ steps.ai.outputs.response }}' > ai_output.json
     
-        # Validate JSON before proceeding
+        # Validate JSON first
         jq empty ai_output.json || { echo "Invalid JSON from AI step"; exit 1; }
     
-        # Iterate over each object safely
+        # Iterate over each idea and create an issue
         jq -c '.[]' ai_output.json | while read IDEA; do
           TITLE=$(echo "$IDEA" | jq -r .title)
           BODY=$(echo "$IDEA" | jq -r .description)
@@ -64,4 +63,3 @@ jobs:
         done
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

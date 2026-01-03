@@ -44,24 +44,24 @@ jobs:
           **Only output valid JSON.**
       # No extra token needed; "permissions.models: read" covers inference
 
-      - name: Parse AI JSON and create issues
-        run: |
-          # Save AI response
-          echo "${{ steps.ai.outputs.response }}" > ai_output.json
-      
-          # Validate JSON before proceeding
-          jq empty ai_output.json || { echo "Invalid JSON from AI step"; exit 1; }
-      
-          # Iterate over each object safely
-          jq -c '.[]' ai_output.json | while read IDEA; do
-            TITLE=$(echo "$IDEA" | jq -r .title)
-            BODY=$(echo "$IDEA" | jq -r .description)
-            echo "Creating GitHub issue: $TITLE"
-            gh issue create \
-              --title "$TITLE" \
-              --body "$BODY" \
-              --label "auto-generated"
-          done
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Parse AI JSON and create issues
+      run: |
+        # Save AI response
+        echo "${{ steps.ai.outputs.response }}" > ai_output.json
+    
+        # Validate JSON before proceeding
+        jq empty ai_output.json || { echo "Invalid JSON from AI step"; exit 1; }
+    
+        # Iterate over each object safely
+        jq -c '.[]' ai_output.json | while read IDEA; do
+          TITLE=$(echo "$IDEA" | jq -r .title)
+          BODY=$(echo "$IDEA" | jq -r .description)
+          echo "Creating GitHub issue: $TITLE"
+          gh issue create \
+            --title "$TITLE" \
+            --body "$BODY" \
+            --label "auto-generated"
+        done
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

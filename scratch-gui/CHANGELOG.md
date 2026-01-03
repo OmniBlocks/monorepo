@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`85400ea4b`](https://github.com/OmniBlocks/scratch-gui/commit/85400ea4ba501814c6b908c56edf9ea14677ba88) - 2026-01-03 14:57:54 +0000
+
+**fix inference**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`2eb9285d2`](https://github.com/OmniBlocks/scratch-gui/commit/2eb9285d2ade930246dd7d3e0bc7b08788fe98c5) - 2026-01-03 02:01:24 +0000
 
 **large tool you should outsource from somewhere else**

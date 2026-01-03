@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ff5e69419`](https://github.com/OmniBlocks/scratch-gui/commit/ff5e69419800262c8a3a5b0f49dec757faf26dbb) - 2026-01-03 17:37:41 +0000
+
+**Update ideas.yaml**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`c3e072865`](https://github.com/OmniBlocks/scratch-gui/commit/c3e0728659011bf22be9fef43cf085a4a2bdb94c) - 2026-01-03 15:00:49 +0000
 
 **Merge pull request #671 from OmniBlocks/cto-task-667**

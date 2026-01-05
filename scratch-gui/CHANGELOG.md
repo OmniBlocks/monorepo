@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`f3d3cabc7`](https://github.com/OmniBlocks/scratch-gui/commit/f3d3cabc78bb680bb925df458f71569c1aa4a427) - 2026-01-05 00:14:30 -0500
+
+**Delete .github/workflows/ideas.yaml**
+
+this thing fills up issues tab
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`dd7d6d313`](https://github.com/OmniBlocks/scratch-gui/commit/dd7d6d3137f78a80a8713a729daa1a5d19930f7a) - 2026-01-03 17:40:10 +0000
 
 **Update ideas.yaml**

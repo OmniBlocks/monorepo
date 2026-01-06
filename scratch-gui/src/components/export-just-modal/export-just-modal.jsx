@@ -1,4 +1,4 @@
-import {defineMessages, FormattedMessage, intlShape, injectIntl} from 'react-intl';
+import {defineMessages, FormattedMessage, injectIntl, intlShape} from 'react-intl';
 import PropTypes from 'prop-types';
 import React from 'react';
 import Modal from '../../containers/modal.jsx';
@@ -33,7 +33,7 @@ const messages = defineMessages({
         id: 'gui.exportJustModal.sounds'
     },
     exporting: {
-        defaultMessage: 'Exporting...',
+        defaultMessage: 'Exporting... {progress}%',
         description: 'Text shown while exporting',
         id: 'gui.exportJustModal.exporting'
     },
@@ -66,9 +66,7 @@ const ExportJustModal = props => (
                     />
                     <div className={styles.progressText}>
                         <FormattedMessage
-                            defaultMessage={`${messages.exporting.defaultMessage} ${props.progress}%`}
-                            description={messages.exporting.description}
-                            id={messages.exporting.id}
+                            {...messages.exporting}
                             values={{
                                 progress: props.progress
                             }}
@@ -78,11 +76,7 @@ const ExportJustModal = props => (
             ) : (
                 <React.Fragment>
                     <p className={styles.description}>
-                        <FormattedMessage
-                            defaultMessage={messages.description.defaultMessage}
-                            description={messages.description.description}
-                            id={messages.description.id}
-                        />
+                        <FormattedMessage {...messages.description} />
                     </p>
                     
                     <div className={styles.selectRow}>
@@ -90,11 +84,7 @@ const ExportJustModal = props => (
                             className={styles.label}
                             htmlFor="export-type-select"
                         >
-                            <FormattedMessage
-                                defaultMessage={messages.exportLabel.defaultMessage}
-                                description={messages.exportLabel.description}
-                                id={messages.exportLabel.id}
-                            />
+                            <FormattedMessage {...messages.exportLabel} />
                         </label>
                         <select
                             id="export-type-select"
@@ -103,18 +93,10 @@ const ExportJustModal = props => (
                             onChange={props.onChangeExportType}
                         >
                             <option value="costumes">
-                                <FormattedMessage
-                                    defaultMessage={messages.costumes.defaultMessage}
-                                    description={messages.costumes.description}
-                                    id={messages.costumes.id}
-                                />
+                                {props.intl.formatMessage(messages.costumes)}
                             </option>
                             <option value="sounds">
-                                <FormattedMessage
-                                    defaultMessage={messages.sounds.defaultMessage}
-                                    description={messages.sounds.description}
-                                    id={messages.sounds.id}
-                                />
+                                {props.intl.formatMessage(messages.sounds)}
                             </option>
                         </select>
                     </div>
@@ -124,21 +106,13 @@ const ExportJustModal = props => (
                             className={styles.cancelButton}
                             onClick={props.onCancel}
                         >
-                            <FormattedMessage
-                                defaultMessage={messages.cancel.defaultMessage}
-                                description={messages.cancel.description}
-                                id={messages.cancel.id}
-                            />
+                            <FormattedMessage {...messages.cancel} />
                         </button>
                         <button
                             className={styles.exportButton}
                             onClick={props.onExport}
                         >
-                            <FormattedMessage
-                                defaultMessage={messages.export.defaultMessage}
-                                description={messages.export.description}
-                                id={messages.export.id}
-                            />
+                            <FormattedMessage {...messages.export} />
                         </button>
                     </div>
                 </React.Fragment>

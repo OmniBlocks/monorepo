@@ -73,10 +73,6 @@
     transition: background-color 0.2s;
 }
 
-.button-row button:hover {
-    background-color: $ui-gray;
-}
-
 .button-row button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -96,14 +92,6 @@
     color: white;
 }
 
-.button-row button.export-button:hover {
-    background: $looks-secondary-dark;
-}
-
 .button-row button.cancel-button {
     color: black;
-}
-
-.button-row button.cancel-button:hover {
-    background-color: $ui-gray-light;
 }

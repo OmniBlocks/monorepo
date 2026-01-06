@@ -55,51 +55,51 @@ const SpriteSelectorItem = props => (
             />
         ) : null }
         {props.onDuplicateButtonClick || props.onDeleteButtonClick ||
-         props.onExportButtonClick || props.onExportJustButtonClick ? (
-             <ContextMenu id={`${props.name}-${contextMenuId++}`}>
+            props.onExportButtonClick || props.onExportJustButtonClick ? (
+                <ContextMenu id={`${props.name}-${contextMenuId++}`}>
                     {props.onDuplicateButtonClick ? (
-                     <MenuItem onClick={props.onDuplicateButtonClick}>
+                        <MenuItem onClick={props.onDuplicateButtonClick}>
                             <FormattedMessage
-                             defaultMessage="duplicate"
-                             description="Menu item to duplicate in the right click menu"
-                             id="gui.spriteSelectorItem.contextMenuDuplicate"
-                         />
+                                defaultMessage="duplicate"
+                                description="Menu item to duplicate in the right click menu"
+                                id="gui.spriteSelectorItem.contextMenuDuplicate"
+                            />
                         </MenuItem>
                     ) : null}
                     {props.onExportButtonClick ? (
-                     <MenuItem onClick={props.onExportButtonClick}>
+                        <MenuItem onClick={props.onExportButtonClick}>
                             <FormattedMessage
-                             defaultMessage="export"
-                             description="Menu item to export the selected item"
-                             id="gui.spriteSelectorItem.contextMenuExport"
-                         />
+                                defaultMessage="export"
+                                description="Menu item to export the selected item"
+                                id="gui.spriteSelectorItem.contextMenuExport"
+                            />
                         </MenuItem>
                     ) : null }
                     {props.onRenameButtonClick ? (
-                     <MenuItem onClick={props.onRenameButtonClick}>
+                        <MenuItem onClick={props.onRenameButtonClick}>
                             <FormattedMessage
-                             defaultMessage="rename"
-                             description="Menu item to rename an item"
-                             id="tw.spriteSelectorItem.rename"
-                         />
+                                defaultMessage="rename"
+                                description="Menu item to rename an item"
+                                id="tw.spriteSelectorItem.rename"
+                            />
                         </MenuItem>
                     ) : null}
                     {props.onExportJustButtonClick ? (
-                     <MenuItem onClick={props.onExportJustButtonClick}>
+                        <MenuItem onClick={props.onExportJustButtonClick}>
                             <FormattedMessage
-                             defaultMessage="export just..."
-                             description="Menu item to open export modal for costumes or sounds"
-                             id="gui.spriteSelectorItem.exportJust"
-                         />
+                                defaultMessage="export just..."
+                                description="Menu item to open export modal for costumes or sounds"
+                                id="gui.spriteSelectorItem.exportJust"
+                            />
                         </MenuItem>
                     ) : null}
                     {props.onDeleteButtonClick ? (
-                     <DangerousMenuItem onClick={props.onDeleteButtonClick}>
+                        <DangerousMenuItem onClick={props.onDeleteButtonClick}>
                             <FormattedMessage
-                             defaultMessage="delete"
-                             description="Menu item to delete in the right click menu"
-                             id="gui.spriteSelectorItem.contextMenuDelete"
-                         />
+                                defaultMessage="delete"
+                                description="Menu item to delete in the right click menu"
+                                id="gui.spriteSelectorItem.contextMenuDelete"
+                            />
                         </DangerousMenuItem>
                     ) : null }
                 </ContextMenu>

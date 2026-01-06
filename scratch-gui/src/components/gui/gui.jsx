@@ -162,7 +162,6 @@ const GUIComponent = props => {
         unknownPlatformModalVisible,
         invalidProjectModalVisible,
         exportJustModalVisible,
-        exportingSpriteId,
         vm,
         ...componentProps
     } = omit(props, 'dispatch');
@@ -197,7 +196,7 @@ const GUIComponent = props => {
                 {fontsModalVisible && <TWFontsModal />}
                 {unknownPlatformModalVisible && <TWUnknownPlatformModal />}
                 {invalidProjectModalVisible && <TWInvalidProjectModal />}
-                {exportJustModalVisible && <ExportJustModal spriteId={exportingSpriteId} />}
+                {exportJustModalVisible && <ExportJustModal />}
             </React.Fragment>
         );
 
@@ -561,7 +560,6 @@ GUIComponent.propTypes = {
     unknownPlatformModalVisible: PropTypes.bool,
     invalidProjectModalVisible: PropTypes.bool,
     exportJustModalVisible: PropTypes.bool,
-    exportingSpriteId: PropTypes.string,
     vm: PropTypes.instanceOf(VM).isRequired
 };
 GUIComponent.defaultProps = {

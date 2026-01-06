@@ -183,7 +183,6 @@ const mapStateToProps = state => {
         unknownPlatformModalVisible: state.scratchGui.modals.unknownPlatformModal,
         invalidProjectModalVisible: state.scratchGui.modals.invalidProjectModal,
         exportJustModalVisible: state.scratchGui.modals.exportJustModal,
-        exportingSpriteId: state.scratchGui.targetPane ? state.scratchGui.targetPane.exportingSpriteId : null,
         vm: state.scratchGui.vm
     };
 };

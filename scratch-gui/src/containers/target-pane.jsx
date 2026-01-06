@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {intlShape, injectIntl} from 'react-intl';
-import JSZip from 'jszip';
 
 import {
     openSpriteLibrary,
@@ -12,6 +11,7 @@ import {
 } from '../reducers/modals';
 import {activateTab, COSTUMES_TAB_INDEX, BLOCKS_TAB_INDEX} from '../reducers/editor-tab';
 import {setReceivedBlocks} from '../reducers/hovered-target';
+import {setExportJustId} from '../reducers/export-just';
 import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 import {setRestore} from '../reducers/restore-deletion';
 import DragConstants from '../lib/drag-constants';
@@ -30,9 +30,6 @@ import {placeInViewport} from '../lib/backpack/code-payload.js';
 class TargetPane extends React.Component {
     constructor (props) {
         super(props);
-        this.state = {
-            exportingSpriteId: null
-        };
         bindAll(this, [
             'handleActivateBlocksTab',
             'handleBlockDragEnd',
@@ -99,9 +96,9 @@ class TargetPane extends React.Component {
     }
 
 
-    /* To avoid confusion, please know that the following function is NOT the regular export sound function 
+    /* To avoid confusion, please know that the following function is NOT the regular export sound function
     that you would find while normally exporting an individual sound from the sounds tab. This is the extra
-    "export all sounds" function to add to the sprite menu. The original individual export can be found in 
+    "export all sounds" function to add to the sprite menu. The original individual export can be found in
     sound-tab.jsx at lines 94-98. */
 
     /*
@@ -127,13 +124,12 @@ class TargetPane extends React.Component {
     }
 
     async handleExportSounds (id) {
-        // ... existing implementation moved to export-just-modal.jsx  
+        // ... existing implementation moved to export-just-modal.jsx
     }
     */
 
     handleOpenExportJustModal (id) {
-        this.setState({exportingSpriteId: id});
-        this.props.onOpenExportJustModal();
+        this.props.onOpenExportJustModal(id);
     }
 
     handleSelectSprite (id) {
@@ -305,9 +301,9 @@ const mapStateToProps = state => ({
     editingTarget: state.scratchGui.targets.editingTarget,
     hoveredTarget: {
         ...state.scratchGui.hoveredTarget,
-        sprite: state.scratchGui.hoveredTarget.sprite != null
-            ? String(state.scratchGui.hoveredTarget.sprite)
-            : null
+        sprite: state.scratchGui.hoveredTarget.sprite === null ?
+            null :
+            String(state.scratchGui.hoveredTarget.sprite)
     },
     isRtl: state.locales.isRtl,
     spriteLibraryVisible: state.scratchGui.modals.spriteLibrary,
@@ -315,7 +311,7 @@ const mapStateToProps = state => ({
     stage: state.scratchGui.targets.stage,
     raiseSprites: state.scratchGui.blockDrag,
     workspaceMetrics: state.scratchGui.workspaceMetrics,
-    exportingSpriteId: state.scratchGui.targetPane ? state.scratchGui.targetPane.exportingSpriteId : null
+    exportingSpriteId: state.scratchGui.exportJust.exportingSpriteId
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -326,7 +322,8 @@ const mapDispatchToProps = dispatch => ({
     onRequestCloseSpriteLibrary: () => {
         dispatch(closeSpriteLibrary());
     },
-    onOpenExportJustModal: () => {
+    onOpenExportJustModal: id => {
+        dispatch(setExportJustId(id));
         dispatch(openExportJustModal());
     },
     onActivateTab: tabIndex => {

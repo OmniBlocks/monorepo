@@ -54,55 +54,56 @@ const SpriteSelectorItem = props => (
                 onClick={props.onDeleteButtonClick}
             />
         ) : null }
-        {props.onDuplicateButtonClick || props.onDeleteButtonClick || props.onExportButtonClick || props.onExportCostumesButtonClick ? (
-            <ContextMenu id={`${props.name}-${contextMenuId++}`}>
-                {props.onDuplicateButtonClick ? (
-                    <MenuItem onClick={props.onDuplicateButtonClick}>
-                        <FormattedMessage
-                            defaultMessage="duplicate"
-                            description="Menu item to duplicate in the right click menu"
-                            id="gui.spriteSelectorItem.contextMenuDuplicate"
-                        />
-                    </MenuItem>
-                ) : null}
-                {props.onExportButtonClick ? (
-                    <MenuItem onClick={props.onExportButtonClick}>
-                        <FormattedMessage
-                            defaultMessage="export"
-                            description="Menu item to export the selected item"
-                            id="gui.spriteSelectorItem.contextMenuExport"
-                        />
-                    </MenuItem>
-                ) : null }
-                {props.onRenameButtonClick ? (
-                    <MenuItem onClick={props.onRenameButtonClick}>
-                        <FormattedMessage
-                            defaultMessage="rename"
-                            description="Menu item to rename an item"
-                            id="tw.spriteSelectorItem.rename"
-                        />
-                    </MenuItem>
-                ) : null}
-                {props.onExportCostumesButtonClick ? (
-                    <MenuItem onClick={props.onExportCostumesButtonClick}>
-                        <FormattedMessage
-                            defaultMessage="export costumes"
-                            description="Menu item to export the costumes of the selected item"
-                            id="ob.SpriteSelectorItem.exportCostumes"
-                        />
-                    </MenuItem>
-                ) : null}
-                {props.onDeleteButtonClick ? (
-                    <DangerousMenuItem onClick={props.onDeleteButtonClick}>
-                        <FormattedMessage
-                            defaultMessage="delete"
-                            description="Menu item to delete in the right click menu"
-                            id="gui.spriteSelectorItem.contextMenuDelete"
-                        />
-                    </DangerousMenuItem>
-                ) : null }
-            </ContextMenu>
-        ) : null}
+        {props.onDuplicateButtonClick || props.onDeleteButtonClick ||
+         props.onExportButtonClick || props.onExportJustButtonClick ? (
+             <ContextMenu id={`${props.name}-${contextMenuId++}`}>
+                    {props.onDuplicateButtonClick ? (
+                     <MenuItem onClick={props.onDuplicateButtonClick}>
+                            <FormattedMessage
+                             defaultMessage="duplicate"
+                             description="Menu item to duplicate in the right click menu"
+                             id="gui.spriteSelectorItem.contextMenuDuplicate"
+                         />
+                        </MenuItem>
+                    ) : null}
+                    {props.onExportButtonClick ? (
+                     <MenuItem onClick={props.onExportButtonClick}>
+                            <FormattedMessage
+                             defaultMessage="export"
+                             description="Menu item to export the selected item"
+                             id="gui.spriteSelectorItem.contextMenuExport"
+                         />
+                        </MenuItem>
+                    ) : null }
+                    {props.onRenameButtonClick ? (
+                     <MenuItem onClick={props.onRenameButtonClick}>
+                            <FormattedMessage
+                             defaultMessage="rename"
+                             description="Menu item to rename an item"
+                             id="tw.spriteSelectorItem.rename"
+                         />
+                        </MenuItem>
+                    ) : null}
+                    {props.onExportJustButtonClick ? (
+                     <MenuItem onClick={props.onExportJustButtonClick}>
+                            <FormattedMessage
+                             defaultMessage="export just..."
+                             description="Menu item to open export modal for costumes or sounds"
+                             id="gui.spriteSelectorItem.exportJust"
+                         />
+                        </MenuItem>
+                    ) : null}
+                    {props.onDeleteButtonClick ? (
+                     <DangerousMenuItem onClick={props.onDeleteButtonClick}>
+                            <FormattedMessage
+                             defaultMessage="delete"
+                             description="Menu item to delete in the right click menu"
+                             id="gui.spriteSelectorItem.contextMenuDelete"
+                         />
+                        </DangerousMenuItem>
+                    ) : null }
+                </ContextMenu>
+            ) : null}
     </ContextMenuTrigger>
 );
 
@@ -118,7 +119,7 @@ SpriteSelectorItem.propTypes = {
     onDeleteButtonClick: PropTypes.func,
     onDuplicateButtonClick: PropTypes.func,
     onExportButtonClick: PropTypes.func,
-    onExportCostumesButtonClick: PropTypes.func,
+    onExportJustButtonClick: PropTypes.func,
     onRenameButtonClick: PropTypes.func,
     onMouseDown: PropTypes.func,
     onMouseEnter: PropTypes.func,

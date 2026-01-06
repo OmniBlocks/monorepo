@@ -7,7 +7,8 @@ import JSZip from 'jszip';
 
 import {
     openSpriteLibrary,
-    closeSpriteLibrary
+    closeSpriteLibrary,
+    openExportJustModal
 } from '../reducers/modals';
 import {activateTab, COSTUMES_TAB_INDEX, BLOCKS_TAB_INDEX} from '../reducers/editor-tab';
 import {setReceivedBlocks} from '../reducers/hovered-target';
@@ -29,6 +30,9 @@ import {placeInViewport} from '../lib/backpack/code-payload.js';
 class TargetPane extends React.Component {
     constructor (props) {
         super(props);
+        this.state = {
+            exportingSpriteId: null
+        };
         bindAll(this, [
             'handleActivateBlocksTab',
             'handleBlockDragEnd',
@@ -43,8 +47,7 @@ class TargetPane extends React.Component {
             'handleDrop',
             'handleDuplicateSprite',
             'handleExportSprite',
-            'handleExportCostumes', 
-            'handleExportSounds',
+            'handleOpenExportJustModal',
             'handleNewSprite',
             'handleSelectSprite',
             'handleSurpriseSpriteClick',
@@ -101,52 +104,11 @@ class TargetPane extends React.Component {
     "export all sounds" function to add to the sprite menu. The original individual export can be found in 
     sound-tab.jsx at lines 94-98. */
 
+    /*
     async handleExportSounds(id) { // literally just reskined handleexportcostumes with sounds instead
-    console.log('TargetPane.handleExportSounds called for sprite id:', id);
-    const zip = new JSZip();
-
-    const target = this.props.vm.runtime.getTargetById(id);
-    if (!target || !target.sprite || !target.sprite.sounds) {
-        alert('No target or sounds found for this sprite.');
-        console.warn('No target or sounds found for id:', id, target);
-        return;
+    // ... existing implementation moved to export-just-modal.jsx
     }
-
-    let addedCount = 0;
-    const soundPromises = target.sprite.sounds.map(async (item, idx) => {
-        try {
-            // item.asset.data is usually a Uint8Array or ArrayBuffer
-            if (!item.asset || !item.asset.data) {
-                console.warn(`No data for sound ${item.name} at index ${idx}`, item);
-                return;
-            }
-            zip.file(
-                `${item.name}.${item.asset.dataFormat}`,
-                item.asset.data,
-                {binary: true}
-            );
-            addedCount++;
-        } catch (err) {
-            console.error(`Error exporting sound ${item.name}:`, err);
-        }
-    });
-
-    await Promise.all(soundPromises);
-
-    if (addedCount === 0 || Object.keys(zip.files).length === 0) {
-        alert('No sounds could be exported for this sprite.'); // i wish i knew how to do the react-style vanilla scratch alerts
-        console.warn('No files added to zip, aborting download.');
-        return;
-    }
-
-    zip.generateAsync({type: 'blob'}).then((content) => {
-        const filename = `${target.getName()}-sounds.zip`;
-        downloadBlob(filename, content);
-    }).catch((err) => {
-        alert('Error generating zip file.');
-        console.error('Error generating zip:', err);
-    });
-}
+    */
     handleExportSprite (id) {
         const spriteName = this.props.vm.runtime.getTargetById(id).getName();
         const saveLink = document.createElement('a');
@@ -156,81 +118,24 @@ class TargetPane extends React.Component {
             downloadBlob(`${spriteName}.sprite3`, content);
         });
     }
-async handleExportCostumes (id) {
-    console.log('TargetPane.handleExportCostumes called for sprite id:', id);
-    console.log("about to create zip");
-    const zip = new JSZip();
-    console.log("created zip");
-    // Log just the keys of sprites prop
-    try {
-        console.log('All sprites prop keys:', Object.keys(this.props.sprites));
-    } catch (e) {
-        console.error('Error logging sprite keys:', e);
+
+    // handleExportCostumes and handleExportSounds methods have been moved to the ExportJustModal container
+    // These are kept for reference and can be removed once the modal is confirmed working
+    /*
+    async handleExportCostumes (id) {
+        // ... existing implementation moved to export-just-modal.jsx
     }
 
-    // Log all VM target IDs and names
-    const allTargets = this.props.vm.runtime.targets;
-    console.log('All VM targets:', allTargets.map(t => ({
-        id: t.id,
-        name: t.getName && t.getName()
-    })));
+    async handleExportSounds (id) {
+        // ... existing implementation moved to export-just-modal.jsx  
+    }
+    */
 
-    const target = this.props.vm.runtime.getTargetById(id);
-    console.log('Result of getTargetById:', target);
-
-    if (!target || !target.sprite || !target.sprite.costumes) {
-        alert('No target or costumes found for this sprite.');
-        console.warn('No target or costumes found for id:', id, target);
-        return;
+    handleOpenExportJustModal (id) {
+        this.setState({exportingSpriteId: id});
+        this.props.onOpenExportJustModal();
     }
 
-    // Log all costume info
-    console.log('Costumes:', target.sprite.costumes);
-
-    let addedCount = 0;
-    const costumePromises = target.sprite.costumes.map(async (item, idx) => {
-        try {
-            const data = await this.props.vm.getExportedCostume(item);
-            if (!data) {
-                console.warn(`No data for costume ${item.name} at index ${idx}`, item);
-            } else {
-                console.log(`Adding costume to zip: ${item.name}.${item.asset.dataFormat}`, data);
-                zip.file(
-                    `${item.name}.${item.asset.dataFormat}`,
-                    data,
-                    {binary: true}
-                );
-                addedCount++;
-            }
-        } catch (err) {
-            console.error(`Error exporting costume ${item.name}:`, err);
-        }
-    });
-
-    await Promise.all(costumePromises);
-
-    // Check zip contents before generating
-    if (addedCount === 0 || Object.keys(zip.files).length === 0) {
-        alert('No costumes could be exported for this sprite.');
-        console.warn('No files added to zip, aborting download.');
-        return;
-    }
-
-    zip.generateAsync({type: 'blob'}).then((content) => {
-        console.log('Zip blob generated:', content);
-        if (!content || !(content instanceof Blob)) {
-            alert('Failed to generate zip file for download.');
-            console.error('Generated content is not a Blob:', content);
-            return;
-        }
-        const filename = `${target.getName()}-costumes.zip`;
-        console.log('Calling downloadBlob with:', filename, content);
-        downloadBlob(filename, content);
-    }).catch((err) => {
-        alert('Error generating zip file.');
-        console.error('Error generating zip:', err);
-    });
-}
     handleSelectSprite (id) {
         this.props.vm.setEditingTarget(id);
         if (this.props.stage && id !== this.props.stage.id) {
@@ -372,7 +277,7 @@ async handleExportCostumes (id) {
                 onDrop={this.handleDrop}
                 onDuplicateSprite={this.handleDuplicateSprite}
                 onExportSprite={this.handleExportSprite}
-                onExportCostumesButtonClick={this.handleExportCostumes}
+                onExportJustButtonClick={this.handleOpenExportJustModal}
                 onFileUploadClick={this.handleFileUploadClick}
                 onPaintSpriteClick={this.handlePaintSpriteClick}
                 onSelectSprite={this.handleSelectSprite}
@@ -409,7 +314,8 @@ const mapStateToProps = state => ({
     sprites: state.scratchGui.targets.sprites,
     stage: state.scratchGui.targets.stage,
     raiseSprites: state.scratchGui.blockDrag,
-    workspaceMetrics: state.scratchGui.workspaceMetrics
+    workspaceMetrics: state.scratchGui.workspaceMetrics,
+    exportingSpriteId: state.scratchGui.targetPane ? state.scratchGui.targetPane.exportingSpriteId : null
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -419,6 +325,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onRequestCloseSpriteLibrary: () => {
         dispatch(closeSpriteLibrary());
+    },
+    onOpenExportJustModal: () => {
+        dispatch(openExportJustModal());
     },
     onActivateTab: tabIndex => {
         dispatch(activateTab(tabIndex));

@@ -183,6 +183,7 @@ SpriteSelectorItem.propTypes = {
     name: PropTypes.any,
     onClick: PropTypes.func,
     onDeleteButtonClick: PropTypes.func,
+    onExportJustButtonClick: PropTypes.func,
     onRenameButtonClick: PropTypes.func,
     onDrag: PropTypes.func.isRequired,
     onDuplicateButtonClick: PropTypes.func,

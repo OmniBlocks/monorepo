@@ -48,7 +48,7 @@ class ExportJustModal extends React.Component {
         }
     }
 
-    async handleExport () {
+    handleExport () {
         if (this.state.isExporting) return;
 
         this.setState({
@@ -57,88 +57,91 @@ class ExportJustModal extends React.Component {
             error: null
         });
 
-        try {
-            const target = this.props.vm.runtime.getTargetById(this.props.spriteId);
-            if (!target || !target.sprite) {
-                throw new Error('Target not found');
-            }
+        const target = this.props.vm.runtime.getTargetById(this.props.spriteId);
+        if (!target || !target.sprite) {
+            this.setState({
+                error: 'Target not found',
+                isExporting: false
+            });
+            return;
+        }
 
-            const zip = new JSZip();
-            let totalItems = 0;
-            let processedItems = 0;
+        const zip = new JSZip();
+        let totalItems = 0;
+        let processedItems = 0;
 
-            if (this.state.exportType === 'costumes') {
-                if (!target.sprite.costumes || target.sprite.costumes.length === 0) {
-                    throw new Error('No costumes found');
-                }
-                totalItems = target.sprite.costumes.length;
-
-                const costumePromises = target.sprite.costumes.map(async item => {
-                    try {
-                        const data = await this.props.vm.getExportedCostume(item);
-                        if (data) {
-                            zip.file(
-                                `${item.name}.${item.asset.dataFormat}`,
-                                data,
-                                {binary: true}
-                            );
-                        }
-                        processedItems++;
-                        this.updateProgress(Math.floor((processedItems / totalItems) * 100));
-                    } catch (err) {
-                        console.error(`Error exporting costume ${item.name}:`, err);
-                        processedItems++;
-                        this.updateProgress(Math.floor((processedItems / totalItems) * 100));
-                    }
-                });
-
-                await Promise.all(costumePromises);
-            } else if (this.state.exportType === 'sounds') {
-                if (!target.sprite.sounds || target.sprite.sounds.length === 0) {
-                    throw new Error('No sounds found');
-                }
-                totalItems = target.sprite.sounds.length;
-
-                target.sprite.sounds.forEach(item => {
-                    try {
-                        if (item.asset && item.asset.data) {
-                            zip.file(
-                                `${item.name}.${item.asset.dataFormat}`,
-                                item.asset.data,
-                                {binary: true}
-                            );
-                        }
-                        processedItems++;
-                        this.updateProgress(Math.floor((processedItems / totalItems) * 100));
-                    } catch (err) {
-                        console.error(`Error exporting sound ${item.name}:`, err);
-                        processedItems++;
-                        this.updateProgress(Math.floor((processedItems / totalItems) * 100));
-                    }
-                });
-            }
-
+        const onComplete = () => {
             if (Object.keys(zip.files).length === 0) {
-                throw new Error('No items could be exported');
+                this.setState({
+                    error: 'No items could be exported',
+                    isExporting: false
+                });
+                return;
             }
 
             this.updateProgress(100);
 
-            const content = await zip.generateAsync({type: 'blob'});
-            const filename = `${target.getName()}-${this.state.exportType}.zip`;
-            downloadBlob(filename, content);
+            zip.generateAsync({type: 'blob'})
+                .then(content => {
+                    const filename = `${target.getName()}-${this.state.exportType}.zip`;
+                    downloadBlob(filename, content);
+                    this.props.onClose();
+                })
+                .catch(err => {
+                    console.error('Zip generation failed:', err);
+                    this.setState({
+                        error: err.message,
+                        isExporting: false
+                    });
+                });
+        };
 
-            // Close modal on success
-            this.props.onClose();
-        } catch (err) {
-            console.error('Export failed:', err);
-            this.setState({
-                error: err.message,
-                isExporting: false,
-                progress: 0
+        if (this.state.exportType === 'costumes') {
+            if (!target.sprite.costumes || target.sprite.costumes.length === 0) {
+                this.setState({
+                    error: 'No costumes found',
+                    isExporting: false
+                });
+                return;
+            }
+            totalItems = target.sprite.costumes.length;
+
+            const costumePromises = target.sprite.costumes.map(item =>
+                this.props.vm.getExportedCostume(item)
+                    .then(data => {
+                        if (data) {
+                            zip.file(`${item.name}.${item.asset.dataFormat}`, data, {binary: true});
+                        }
+                        processedItems++;
+                        this.updateProgress(Math.floor((processedItems / totalItems) * 100));
+                    })
+                    .catch(err => {
+                        console.error(`Error exporting costume ${item.name}:`, err);
+                        processedItems++;
+                        this.updateProgress(Math.floor((processedItems / totalItems) * 100));
+                    })
+            );
+
+            Promise.all(costumePromises).then(onComplete);
+        } else if (this.state.exportType === 'sounds') {
+            if (!target.sprite.sounds || target.sprite.sounds.length === 0) {
+                this.setState({
+                    error: 'No sounds found',
+                    isExporting: false
+                });
+                return;
+            }
+            totalItems = target.sprite.sounds.length;
+
+            target.sprite.sounds.forEach(item => {
+                if (item.asset && item.asset.data) {
+                    zip.file(`${item.name}.${item.asset.dataFormat}`, item.asset.data, {binary: true});
+                }
+                processedItems++;
+                this.updateProgress(Math.floor((processedItems / totalItems) * 100));
             });
-        } finally {
-            this.setState({isExporting: false});
+
+            onComplete();
         }
     }
 
@@ -163,7 +166,8 @@ ExportJustModal.propTypes = {
 };
 
 const mapStateToProps = state => ({
-    vm: state.scratchGui.vm
+    vm: state.scratchGui.vm,
+    spriteId: state.scratchGui.exportJust.exportingSpriteId
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -497,12 +497,13 @@ jobs:
 
             CODERS:
             You will be able to see the association of each commenter. Associations are: member, none, contributor, etc.
+            These people should not be treated as a normal user.
             Here are some of the main maintainers/members you should know about (and their nicknames at the right side):
-            -supervoidcoder, void
-            -ampelectrecuted, amp
-            -Graison-P, Graison
-            -NotTheBaton, TheBaton
-            -kRzYkRzY, meca
+            -@supervoidcoder, void
+            -@8to16, amp
+            -@Graison-P, Graison
+            -@NotTheBaton, TheBaton
+            -@kRzYkRzY, meca
 
             KEYWORDS:
             - If you decide to close the issue, include "[CLOSE]" in your response

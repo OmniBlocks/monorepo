@@ -84,7 +84,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install dependencies
         run: |
@@ -632,7 +632,7 @@ jobs:
                   
                   body += `<tr>\n`;
                   body += `  <td><code>${label}</code><br/><small>${comp.file}:${comp.line}</small></td>\n`;
-                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}"></td>\n`;
+                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none;">Screenshot not available</span></td>\n`;
                   body += `</tr>\n`;
                 }
                 

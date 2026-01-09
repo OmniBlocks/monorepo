@@ -14,6 +14,11 @@ const messages = defineMessages({
         description: 'Title of the export modal',
         id: 'gui.exportJustModal.title'
     },
+    error: {
+        defaultMessage: 'Error: {message}',
+        description: 'Error message displayed when export fails',
+        id: 'gui.exportJustModal.error'
+    },
     costumes: {
         defaultMessage: 'Costumes',
         description: 'Export costumes option',
@@ -52,6 +57,29 @@ const ExportJustModal = props => (
                         />
                     </div>
                 </div>
+            ) : props.error ? (
+                <React.Fragment>
+                    <div className={styles.errorMessage}>
+                        <FormattedMessage
+                            {...messages.error}
+                            values={{
+                                message: props.error
+                            }}
+                        />
+                    </div>
+                    <div className={styles.buttonRow}>
+                        <button
+                            className={styles.cancelButton}
+                            onClick={props.onCancel}
+                        >
+                            <FormattedMessage
+                                defaultMessage="Close"
+                                description="Close button text when there's an error"
+                                id="gui.exportJustModal.close"
+                            />
+                        </button>
+                    </div>
+                </React.Fragment>
             ) : (
                 <React.Fragment>
                     <p className={styles.description}>
@@ -121,6 +149,7 @@ ExportJustModal.propTypes = {
     exportType: PropTypes.oneOf(['costumes', 'sounds']).isRequired,
     isExporting: PropTypes.bool.isRequired,
     progress: PropTypes.number.isRequired,
+    error: PropTypes.string,
     onCancel: PropTypes.func.isRequired,
     onChangeExportType: PropTypes.func.isRequired,
     onExport: PropTypes.func.isRequired

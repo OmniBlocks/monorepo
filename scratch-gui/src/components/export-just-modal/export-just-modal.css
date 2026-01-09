@@ -95,3 +95,13 @@
 .button-row button.cancel-button {
     color: black;
 }
+
+.error-message {
+    color: #d32f2f;
+    background-color: #ffebee;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}

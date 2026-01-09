@@ -311,7 +311,6 @@ const mapStateToProps = state => ({
     stage: state.scratchGui.targets.stage,
     raiseSprites: state.scratchGui.blockDrag,
     workspaceMetrics: state.scratchGui.workspaceMetrics
-});
 
 const mapDispatchToProps = dispatch => ({
     onNewSpriteClick: e => {

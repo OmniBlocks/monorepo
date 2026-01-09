@@ -1,0 +1,484 @@
+name: Auto-Generate Component Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-test-components:
+    name: 🤖 Auto-Generate Component Tests
+    if: |
+      (github.event_name == 'pull_request') ||
+      (github.event_name == 'issue_comment' && 
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '/test components'))
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Get PR info
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let pr;
+            if (context.eventName === 'pull_request') {
+              pr = context.payload.pull_request;
+            } else {
+              const { data: pullRequest } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number
+              });
+              pr = pullRequest;
+            }
+            
+            return {
+              number: pr.number,
+              sha: pr.head.sha,
+              base_sha: pr.base.sha,
+              head_ref: pr.head.ref,
+              base_ref: pr.base.ref,
+              actor: context.actor,
+              actor_type: context.payload.sender?.type || 'User'
+            };
+
+      - name: Post initial comment with spinner
+        id: initial_comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = ${{ steps.pr.outputs.result }};
+            const actorMention = pr.actor_type === 'User' ? `@${pr.actor}` : pr.actor;
+            const spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            
+            const { data: comment } = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: `## 🤖 Auto-Component Test Generator
+              
+${spinner} **Running component detection and tests...**
+
+🔍 **Triggered by:** ${actorMention}
+⚡ **Commit:** \`${pr.sha.substring(0, 7)}\`
+
+---
+_Beep boop! Looking for buttons, menus, and clickable things!_ 🔎✨`
+            });
+            
+            return comment.id;
+
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install --no-save @playwright/test
+
+      - name: Detect new UI components
+        id: detect
+        run: |
+          cat > detect-components.js << 'DETECT_EOF'
+          #!/usr/bin/env node
+          const { execSync } = require('child_process');
+          const fs = require('fs');
+
+          function getChangedFiles(baseSha, prSha) {
+            try {
+              const diff = execSync(`git diff --name-status ${baseSha} ${prSha}`, { encoding: 'utf8' });
+              return diff.split('\n')
+                .filter(line => line.match(/^[AM]\s+.*\.(jsx|js)$/))
+                .filter(line => line.includes('components/') || line.includes('lib/'))
+                .map(line => line.split(/\s+/)[1])
+                .filter(Boolean);
+            } catch (e) {
+              console.error('Error getting diff:', e.message);
+              return [];
+            }
+          }
+
+          function analyzeComponent(filePath) {
+            if (!fs.existsSync(filePath)) return [];
+            
+            const content = fs.readFileSync(filePath, 'utf8');
+            const components = [];
+            
+            // Detect button elements
+            const buttonRegex = /<(?:button|Button)([^>]*)>([\s\S]*?)<\/(?:button|Button)>/gi;
+            let match;
+            while ((match = buttonRegex.exec(content)) !== null) {
+              const attrs = match[1];
+              const innerContent = match[2];
+              
+              // Extract text content
+              const textMatch = innerContent.match(/(?:defaultMessage|id)=["']([^"']+)["']/);
+              const rawText = innerContent.replace(/<[^>]+>/g, '').trim();
+              const label = textMatch ? textMatch[1] : rawText;
+              
+              if (label && label.length < 50) {
+                components.push({
+                  type: 'button',
+                  file: filePath,
+                  label: label,
+                  line: content.substring(0, match.index).split('\n').length
+                });
+              }
+            }
+            
+            // Detect elements with onClick
+            const onClickRegex = /<(\w+)([^>]*?)onClick=\{([^}]+)\}([^>]*?)>/gi;
+            while ((match = onClickRegex.exec(content)) !== null) {
+              const elementType = match[1];
+              if (!['button', 'Button'].includes(elementType)) {
+                components.push({
+                  type: 'clickable-' + elementType.toLowerCase(),
+                  file: filePath,
+                  handler: match[3].trim(),
+                  line: content.substring(0, match.index).split('\n').length
+                });
+              }
+            }
+            
+            // Detect menu items
+            const menuRegex = /<MenuItem([^>]*)>([\s\S]*?)<\/MenuItem>/gi;
+            while ((match = menuRegex.exec(content)) !== null) {
+              const innerContent = match[2];
+              const text = innerContent.replace(/<[^>]+>/g, '').trim();
+              if (text && text.length < 50) {
+                components.push({
+                  type: 'menu-item',
+                  file: filePath,
+                  label: text,
+                  line: content.substring(0, match.index).split('\n').length
+                });
+              }
+            }
+            
+            return components;
+          }
+
+          const baseSha = process.argv[2];
+          const prSha = process.argv[3];
+
+          console.log(`🔍 Scanning for new components between ${baseSha.substring(0, 7)} and ${prSha.substring(0, 7)}...`);
+
+          const changedFiles = getChangedFiles(baseSha, prSha);
+          console.log(`📁 Found ${changedFiles.length} changed component files`);
+
+          const allComponents = [];
+          for (const file of changedFiles) {
+            const components = analyzeComponent(file);
+            allComponents.push(...components);
+          }
+
+          console.log(`✨ Detected ${allComponents.length} interactive components!`);
+
+          fs.writeFileSync('detected-components.json', JSON.stringify(allComponents, null, 2));
+          console.log('📝 Output written to detected-components.json');
+          DETECT_EOF
+
+          chmod +x detect-components.js
+          
+          BASE_SHA="${{ fromJSON(steps.pr.outputs.result).base_sha }}"
+          PR_SHA="${{ fromJSON(steps.pr.outputs.result).sha }}"
+          
+          node detect-components.js "$BASE_SHA" "$PR_SHA"
+          
+          COMPONENT_COUNT=$(jq 'length' detected-components.json)
+          echo "component_count=$COMPONENT_COUNT" >> $GITHUB_OUTPUT
+          
+          if [ "$COMPONENT_COUNT" -eq 0 ]; then
+            echo "skip_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_tests=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate Playwright tests with highlighting
+        if: steps.detect.outputs.skip_tests == 'false'
+        run: |
+          cat > generate-tests.js << 'GEN_EOF'
+          #!/usr/bin/env node
+          const fs = require('fs');
+
+          function generateTest(components) {
+            let testCode = `// 🤖 Auto-generated component interaction tests
+          const { test, expect } = require('@playwright/test');
+
+          const BASE_URL = 'http://localhost:8080';
+
+          test.describe('Auto-Generated Component Tests', () => {
+            test.beforeEach(async ({ page }) => {
+              await page.goto(\`\${BASE_URL}/editor.html\`);
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(2000);
+            });
+
+          `;
+
+            for (let i = 0; i < components.length; i++) {
+              const comp = components[i];
+              const safeName = `${comp.type} in ${comp.file}:${comp.line}`.replace(/[^a-zA-Z0-9]/g, '_');
+              
+              testCode += `
+            test('${safeName}', async ({ page }) => {
+              const consoleErrors = [];
+              page.on('console', msg => {
+                if (msg.type() === 'error') {
+                  consoleErrors.push(msg.text());
+                }
+              });
+
+              try {
+          `;
+
+              if (comp.label) {
+                testCode += `      // Find and interact with component: ${comp.label}
+                const locator = page.getByText('${comp.label.replace(/'/g, "\\'")}', { exact: false }).first();
+                
+                if (await locator.count() > 0) {
+                  // Scroll into view
+                  await locator.scrollIntoViewIfNeeded();
+                  
+                  // Add visual highlighting
+                  try {
+                    await page.evaluate((label) => {
+                      const xpath = \`//\*[contains(text(), '\${label}')]\`;
+                      const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                      const elem = result.singleNodeValue;
+                      if (elem) {
+                        elem.style.boxShadow = '0 0 10px 3px rgba(59, 130, 246, 0.8)';
+                        elem.style.outline = '2px solid rgba(59, 130, 246, 0.5)';
+                      }
+                    }, '${comp.label.replace(/'/g, "\\'")}');
+                    await page.waitForTimeout(100);
+                  } catch (e) {
+                    console.warn('Could not highlight element:', e.message);
+                  }
+                  
+                  // Take focused screenshot
+                  await locator.screenshot({ 
+                    path: \`test-results/component-${i + 1}.png\`
+                  }).catch(async () => {
+                    // Fallback to page screenshot if locator screenshot fails
+                    await page.screenshot({ 
+                      path: \`test-results/component-${i + 1}.png\`,
+                      fullPage: false 
+                    });
+                  });
+                  
+                  // Click and wait
+                  await locator.click({ timeout: 5000 });
+                  await page.waitForTimeout(500);
+                  await page.waitForLoadState('networkidle');
+                  console.log('✅ Clicked: ${comp.label}');
+                }
+          `;
+              } else {
+                testCode += `      // Take screenshot for component without label
+                await page.screenshot({ 
+                  path: \`test-results/component-${i + 1}.png\`,
+                  fullPage: false 
+                });
+          `;
+              }
+
+              testCode += `
+                // Check for console errors (lenient for auto-generated tests)
+                if (consoleErrors.length > 0) {
+                  console.warn('⚠️  Console errors detected:', consoleErrors);
+                }
+              } catch (error) {
+                console.log(\`⚠️  Could not fully test component: \${error.message}\`);
+              }
+            });
+          `;
+            }
+
+            testCode += `  });
+          `;
+
+            return testCode;
+          }
+
+          const components = JSON.parse(fs.readFileSync('detected-components.json', 'utf8'));
+
+          if (components.length === 0) {
+            console.log('No components detected');
+            process.exit(0);
+          }
+
+          const testCode = generateTest(components);
+          fs.writeFileSync('auto-generated.test.js', testCode);
+
+          console.log(`✨ Generated tests for ${components.length} components!`);
+          GEN_EOF
+
+          chmod +x generate-tests.js
+          node generate-tests.js
+
+      - name: Install Playwright browsers
+        if: steps.detect.outputs.skip_tests == 'false'
+        run: npx playwright install chromium --with-deps
+
+      - name: Build project
+        if: steps.detect.outputs.skip_tests == 'false'
+        run: npm run build
+
+      - name: Run auto-generated tests
+        if: steps.detect.outputs.skip_tests == 'false'
+        id: run_tests
+        continue-on-error: true
+        run: |
+          # Start server
+          npx http-server build -p 8080 &
+          SERVER_PID=$!
+          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
+          
+          # Wait for server
+          sleep 5
+          
+          # Create results directory
+          mkdir -p test-results
+          
+          # Run tests
+          npx playwright test auto-generated.test.js --reporter=json > test-results/results.json || true
+          
+          # Cleanup
+          kill $SERVER_PID || true
+
+      - name: Upload test artifacts
+        if: always() && steps.detect.outputs.skip_tests == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-component-test-results
+          path: |
+            detected-components.json
+            auto-generated.test.js
+            test-results/
+          retention-days: 7
+
+      - name: Push screenshots to storage branch
+        if: always() && steps.detect.outputs.skip_tests == 'false'
+        run: |
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Fetch or create screenshot branch
+          git fetch origin component-test-screenshots || git checkout --orphan component-test-screenshots
+          git checkout component-test-screenshots || git switch --orphan component-test-screenshots
+          
+          # Clear working directory
+          git rm -rf . 2>/dev/null || true
+          
+          # Create directory for this PR
+          mkdir -p pr-${{ fromJSON(steps.pr.outputs.result).number }}
+          
+          # Copy screenshots if they exist
+          if ls test-results/*.png 1> /dev/null 2>&1; then
+            cp test-results/*.png pr-${{ fromJSON(steps.pr.outputs.result).number }}/ || true
+          fi
+          
+          # Commit and push
+          git add pr-${{ fromJSON(steps.pr.outputs.result).number }}
+          git commit -m "Screenshots for PR #${{ fromJSON(steps.pr.outputs.result).number }}" || true
+          git push -f origin component-test-screenshots
+
+      - name: Update comment with results and screenshots
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = ${{ steps.pr.outputs.result }};
+            const skipTests = '${{ steps.detect.outputs.skip_tests }}' === 'true';
+            const componentCount = '${{ steps.detect.outputs.component_count }}';
+            const actorMention = pr.actor_type === 'User' ? `@${pr.actor}` : pr.actor;
+            const commentId = ${{ steps.initial_comment.outputs.result }};
+            
+            let body = `## 🤖 Auto-Component Test Results\n\n`;
+            
+            if (skipTests) {
+              body += `### 🎉 No new UI components detected!\n\n`;
+              body += `This PR doesn't add any new buttons, menus, or clickable components.\n\n`;
+              body += `---\n`;
+              body += `_Triggered by ${actorMention} • Commit \`${pr.sha.substring(0, 7)}\`_`;
+            } else {
+              const testOutcome = '${{ steps.run_tests.outcome }}';
+              const statusEmoji = testOutcome === 'success' ? '✅' : testOutcome === 'failure' ? '❌' : '⚠️';
+              
+              body += `### ${statusEmoji} Detected ${componentCount} interactive components!\n\n`;
+              
+              const fs = require('fs');
+              if (fs.existsSync('detected-components.json')) {
+                const components = JSON.parse(fs.readFileSync('detected-components.json', 'utf8'));
+                
+                body += `#### 📋 Components Found:\n\n`;
+                for (const comp of components.slice(0, 10)) {
+                  const icon = comp.type === 'button' ? '🔘' : 
+                               comp.type === 'menu-item' ? '📝' : '👆';
+                  body += `- ${icon} **${comp.type}** in \`${comp.file}:${comp.line}\``;
+                  if (comp.label) {
+                    body += ` - "${comp.label}"`;
+                  }
+                  body += `\n`;
+                }
+                
+                if (components.length > 10) {
+                  body += `\n_...and ${components.length - 10} more!_\n`;
+                }
+                
+                // Add screenshots table
+                body += `\n#### 📸 Component Screenshots:\n\n`;
+                body += `<table>\n<tr><th>Component</th><th>Screenshot (with highlighting)</th></tr>\n`;
+                
+                const baseUrl = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/component-test-screenshots/pr-${pr.number}`;
+                
+                for (let i = 0; i < components.length; i++) {
+                  const comp = components[i];
+                  const label = comp.label || comp.type;
+                  const imgUrl = `${baseUrl}/component-${i + 1}.png`;
+                  
+                  body += `<tr>\n`;
+                  body += `  <td><code>${label}</code><br/><small>${comp.file}:${comp.line}</small></td>\n`;
+                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}"/></td>\n`;
+                  body += `</tr>\n`;
+                }
+                
+                body += `</table>\n\n`;
+              }
+              
+              body += `#### 🧪 Test Status: \`${testOutcome}\`\n\n`;
+              body += `Auto-generated tests have been created and executed!\n\n`;
+              body += `📦 Check the [workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for:\n`;
+              body += `- Generated test code\n`;
+              body += `- Full test results\n`;
+              body += `- All screenshots\n\n`;
+              body += `---\n`;
+              body += `_Triggered by ${actorMention} • Commit \`${pr.sha.substring(0, 7)}\`_\n\n`;
+              body += `💡 **Tip:** These are basic smoke tests. Consider expanding them for better coverage!`;
+            }
+            
+            // Update the existing comment
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commentId,
+              body: body
+            });

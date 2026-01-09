@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`2c9392bbe`](https://github.com/OmniBlocks/scratch-gui/commit/2c9392bbe0181f777a02936962edab0ad9f7199f) - 2026-01-07 10:18:22 -0600
+
+**Update maintainer usernames in ulti.yaml**
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`f3d3cabc7`](https://github.com/OmniBlocks/scratch-gui/commit/f3d3cabc78bb680bb925df458f71569c1aa4a427) - 2026-01-05 00:14:30 -0500
 
 **Delete .github/workflows/ideas.yaml**

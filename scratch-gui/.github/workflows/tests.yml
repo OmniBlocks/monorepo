@@ -62,12 +62,12 @@ jobs:
               issue_number: pr.number,
               body: `## 🤖 Auto-Component Test Generator
               
-🎯 **Status:** Scanning PR for new UI components...
-🔍 **Triggered by:** ${actorMention}
-⚡ **Commit:** \`${pr.sha.substring(0, 7)}\`
-
----
-_Beep boop! Looking for buttons, menus, and clickable things!_ 🔎✨`
+            🎯 **Status:** Scanning PR for new UI components...
+            🔍 **Triggered by:** ${actorMention}
+            ⚡ **Commit:** \`${pr.sha.substring(0, 7)}\`
+            
+            ---
+            _Beep boop! Looking for buttons, menus, and clickable things!_ 🔎✨`
             });
 
       - name: Checkout PR code

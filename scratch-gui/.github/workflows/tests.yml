@@ -7,7 +7,7 @@ on:
     types: [created]
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   issues: write
 
@@ -49,26 +49,31 @@ jobs:
               actor_type: context.payload.sender?.type || 'User'
             };
 
-      - name: Post start comment
+      - name: Post initial comment with spinner
+        id: initial_comment
         uses: actions/github-script@v7
         with:
           script: |
             const pr = ${{ steps.pr.outputs.result }};
             const actorMention = pr.actor_type === 'User' ? `@${pr.actor}` : pr.actor;
+            const spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
             
-            await github.rest.issues.createComment({
+            const { data: comment } = await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
               body: `## 🤖 Auto-Component Test Generator
               
-            🎯 **Status:** Scanning PR for new UI components...
-            🔍 **Triggered by:** ${actorMention}
-            ⚡ **Commit:** \`${pr.sha.substring(0, 7)}\`
-            
-            ---
-            _Beep boop! Looking for buttons, menus, and clickable things!_ 🔎✨`
+${spinner} **Running component detection and tests...**
+
+🔍 **Triggered by:** ${actorMention}
+⚡ **Commit:** \`${pr.sha.substring(0, 7)}\`
+
+---
+_Beep boop! Looking for buttons, menus, and clickable things!_ 🔎✨`
             });
+            
+            return comment.id;
 
       - name: Checkout PR code
         uses: actions/checkout@v4
@@ -204,7 +209,7 @@ jobs:
             echo "skip_tests=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Generate Playwright tests
+      - name: Generate Playwright tests with highlighting
         if: steps.detect.outputs.skip_tests == 'false'
         run: |
           cat > generate-tests.js << 'GEN_EOF'
@@ -244,22 +249,57 @@ jobs:
           `;
 
               if (comp.label) {
-                testCode += `      // Try to find and click component with label: ${comp.label}
-                const selector = page.getByText('${comp.label.replace(/'/g, "\\'")}', { exact: false }).first();
-                if (await selector.count() > 0) {
-                  await selector.click({ timeout: 5000 });
+                testCode += `      // Find and interact with component: ${comp.label}
+                const locator = page.getByText('${comp.label.replace(/'/g, "\\'")}', { exact: false }).first();
+                
+                if (await locator.count() > 0) {
+                  // Scroll into view
+                  await locator.scrollIntoViewIfNeeded();
+                  
+                  // Add visual highlighting
+                  try {
+                    await page.evaluate((label) => {
+                      const xpath = \`//\*[contains(text(), '\${label}')]\`;
+                      const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                      const elem = result.singleNodeValue;
+                      if (elem) {
+                        elem.style.boxShadow = '0 0 10px 3px rgba(59, 130, 246, 0.8)';
+                        elem.style.outline = '2px solid rgba(59, 130, 246, 0.5)';
+                      }
+                    }, '${comp.label.replace(/'/g, "\\'")}');
+                    await page.waitForTimeout(100);
+                  } catch (e) {
+                    console.warn('Could not highlight element:', e.message);
+                  }
+                  
+                  // Take focused screenshot
+                  await locator.screenshot({ 
+                    path: \`test-results/component-${i + 1}.png\`
+                  }).catch(async () => {
+                    // Fallback to page screenshot if locator screenshot fails
+                    await page.screenshot({ 
+                      path: \`test-results/component-${i + 1}.png\`,
+                      fullPage: false 
+                    });
+                  });
+                  
+                  // Click and wait
+                  await locator.click({ timeout: 5000 });
                   await page.waitForTimeout(500);
+                  await page.waitForLoadState('networkidle');
                   console.log('✅ Clicked: ${comp.label}');
                 }
           `;
-              }
-
-              testCode += `
+              } else {
+                testCode += `      // Take screenshot for component without label
                 await page.screenshot({ 
                   path: \`test-results/component-${i + 1}.png\`,
                   fullPage: false 
                 });
+          `;
+              }
 
+              testCode += `
                 // Check for console errors (lenient for auto-generated tests)
                 if (consoleErrors.length > 0) {
                   console.warn('⚠️  Console errors detected:', consoleErrors);
@@ -334,7 +374,34 @@ jobs:
             test-results/
           retention-days: 7
 
-      - name: Post results comment
+      - name: Push screenshots to storage branch
+        if: always() && steps.detect.outputs.skip_tests == 'false'
+        run: |
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Fetch or create screenshot branch
+          git fetch origin component-test-screenshots || git checkout --orphan component-test-screenshots
+          git checkout component-test-screenshots || git switch --orphan component-test-screenshots
+          
+          # Clear working directory
+          git rm -rf . 2>/dev/null || true
+          
+          # Create directory for this PR
+          mkdir -p pr-${{ fromJSON(steps.pr.outputs.result).number }}
+          
+          # Copy screenshots if they exist
+          if ls test-results/*.png 1> /dev/null 2>&1; then
+            cp test-results/*.png pr-${{ fromJSON(steps.pr.outputs.result).number }}/ || true
+          fi
+          
+          # Commit and push
+          git add pr-${{ fromJSON(steps.pr.outputs.result).number }}
+          git commit -m "Screenshots for PR #${{ fromJSON(steps.pr.outputs.result).number }}" || true
+          git push -f origin component-test-screenshots
+
+      - name: Update comment with results and screenshots
         if: always()
         uses: actions/github-script@v7
         with:
@@ -343,6 +410,7 @@ jobs:
             const skipTests = '${{ steps.detect.outputs.skip_tests }}' === 'true';
             const componentCount = '${{ steps.detect.outputs.component_count }}';
             const actorMention = pr.actor_type === 'User' ? `@${pr.actor}` : pr.actor;
+            const commentId = ${{ steps.initial_comment.outputs.result }};
             
             let body = `## 🤖 Auto-Component Test Results\n\n`;
             
@@ -352,7 +420,10 @@ jobs:
               body += `---\n`;
               body += `_Triggered by ${actorMention} • Commit \`${pr.sha.substring(0, 7)}\`_`;
             } else {
-              body += `### ✨ Detected ${componentCount} interactive components!\n\n`;
+              const testOutcome = '${{ steps.run_tests.outcome }}';
+              const statusEmoji = testOutcome === 'success' ? '✅' : testOutcome === 'failure' ? '❌' : '⚠️';
+              
+              body += `### ${statusEmoji} Detected ${componentCount} interactive components!\n\n`;
               
               const fs = require('fs');
               if (fs.existsSync('detected-components.json')) {
@@ -372,22 +443,42 @@ jobs:
                 if (components.length > 10) {
                   body += `\n_...and ${components.length - 10} more!_\n`;
                 }
+                
+                // Add screenshots table
+                body += `\n#### 📸 Component Screenshots:\n\n`;
+                body += `<table>\n<tr><th>Component</th><th>Screenshot (with highlighting)</th></tr>\n`;
+                
+                const baseUrl = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/component-test-screenshots/pr-${pr.number}`;
+                
+                for (let i = 0; i < components.length; i++) {
+                  const comp = components[i];
+                  const label = comp.label || comp.type;
+                  const imgUrl = `${baseUrl}/component-${i + 1}.png`;
+                  
+                  body += `<tr>\n`;
+                  body += `  <td><code>${label}</code><br/><small>${comp.file}:${comp.line}</small></td>\n`;
+                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}"/></td>\n`;
+                  body += `</tr>\n`;
+                }
+                
+                body += `</table>\n\n`;
               }
               
-              body += `\n#### 🧪 Test Status: \`${{ steps.run_tests.outcome }}\`\n\n`;
+              body += `#### 🧪 Test Status: \`${testOutcome}\`\n\n`;
               body += `Auto-generated tests have been created and executed!\n\n`;
               body += `📦 Check the [workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for:\n`;
               body += `- Generated test code\n`;
-              body += `- Screenshots of components\n`;
-              body += `- Detailed test results\n\n`;
+              body += `- Full test results\n`;
+              body += `- All screenshots\n\n`;
               body += `---\n`;
               body += `_Triggered by ${actorMention} • Commit \`${pr.sha.substring(0, 7)}\`_\n\n`;
               body += `💡 **Tip:** These are basic smoke tests. Consider expanding them for better coverage!`;
             }
             
-            await github.rest.issues.createComment({
+            // Update the existing comment
+            await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: pr.number,
+              comment_id: commentId,
               body: body
             });

@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`7d311f457`](https://github.com/OmniBlocks/scratch-gui/commit/7d311f457bea285cd07a23c7695c736b1bfe7111) - 2026-01-09 23:43:38 +0000
+
+**fix: upgrade workflow files to node 22**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`654d032bb`](https://github.com/OmniBlocks/scratch-gui/commit/654d032bb290a68f436e1fdec90856849c8325da) - 2026-01-09 13:34:29 -0500
 
 **Update tests.yml**

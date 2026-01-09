@@ -1,5 +1,12 @@
 # 🏠 OmniBlocks Wiki Home
 
+## This is AI-generated.
+
+The real wiki is at omniblocks.miraheze.org, go there for real human-written wiki, even if it's very unfinished.
+This 'wiki" was created by a maintainer of this project who requested an AI agent to do it. This is not officially endorsed by OmniBlocks, so there may be inaccurate parts. The only reason this is kept is because there might be some useful things in there given how extensive the "documentation" is, and could help in writing our own real documentation.
+
+## Continue to read your slop below! :D
+
 Welcome to the OmniBlocks Wiki! This is your comprehensive guide to understanding, using, and contributing to OmniBlocks - the ultimate multi-language IDE based on Scratch 3.0 and TurboWarp.
 
 ## 📚 Documentation Overview
@@ -57,7 +64,7 @@ OmniBlocks is a powerful fork of TurboWarp that enhances the Scratch 3.0 experie
 
 ## 🚧 Work in Progress
 
-This wiki is continuously evolving. If you notice missing information or have suggestions for improvement, please:
+This wiki is ~continuously evolving~ never gonna evolve because this is AI. If you notice missing information or have suggestions for improvement, please:
 
 1. Open an issue on GitHub
 2. Submit a pull request with your improvements

@@ -403,8 +403,6 @@ jobs:
                 await element.click({ timeout: 5000, force: true });
                 await page.waitForTimeout(1000);
                 
-                // Check for any changes after click
-                const urlChange = page.url();
                 console.log('✅ Successfully interacted with:', targetText);
           `;
               } else {
@@ -510,8 +508,8 @@ jobs:
           npx playwright test auto-generated.test.js --reporter=list --output=test-results || true
           
           # Check if test results exist
-          if [ -f "test-results/results.json" ]; then
-            echo "📊 Test results generated"
+          if [ -d test-results ] && [ "$(ls -A test-results)" ]; then
+            echo "✅ Test results found"
           else
             echo "⚠️  No test results found"
           fi
@@ -639,8 +637,8 @@ jobs:
                   
                   body += `<tr>\n`;
                   body += `  <td><code>${label}</code><br/><small>${comp.file}:${comp.line}</small></td>\n`;
-                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"/></td>\n`;
-                  body += `  <td style="display:none; color: #666; font-size: 12px;">Screenshot not available</td>\n`;
+                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"> \n`;
+                  body += `  <span style="display:none;">Screenshot not available</span></td>\n`;
                   body += `</tr>\n`;
                 }
                 

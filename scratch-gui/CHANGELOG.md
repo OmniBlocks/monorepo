@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`8309003dd`](https://github.com/OmniBlocks/scratch-gui/commit/8309003dd936de5abb25c51500a3e75e7997d596) - 2026-01-09 18:56:18 -0500
+
+**Merge pull request #688 from OmniBlocks/cto-task-687**
+
+fix(tester): stabilize auto-generated component tests and screenshot workflow
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`7d311f457`](https://github.com/OmniBlocks/scratch-gui/commit/7d311f457bea285cd07a23c7695c736b1bfe7111) - 2026-01-09 23:43:38 +0000
 
 **fix: upgrade workflow files to node 22**

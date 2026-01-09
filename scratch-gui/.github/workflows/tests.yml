@@ -254,13 +254,9 @@ jobs:
               testCode += `
             test('${safeName}', async ({ page }) => {
               const consoleErrors = [];
-              const consoleLogs = [];
-              
               page.on('console', msg => {
                 if (msg.type() === 'error') {
                   consoleErrors.push(msg.text());
-                } else {
-                  consoleLogs.push(msg.text());
                 }
               });
 
@@ -506,9 +502,9 @@ jobs:
           echo "🧪 Running component tests..."
           npx playwright test auto-generated.test.js --reporter=list --output=test-results || true
           
-          # Check if test results exist
-          if [ -d test-results ] && [ "$(ls -A test-results)" ]; then
-            echo "✅ Test results found"
+          # Check if test results exist (Playwright generates test-results directory structure)
+          if [ -d "test-results" ] && [ "$(ls -A test-results 2>/dev/null)" ]; then
+            echo "📊 Test results generated"
           else
             echo "⚠️  No test results found"
           fi
@@ -636,8 +632,7 @@ jobs:
                   
                   body += `<tr>\n`;
                   body += `  <td><code>${label}</code><br/><small>${comp.file}:${comp.line}</small></td>\n`;
-                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"> \n`;
-                  body += `  <span style="display:none;">Screenshot not available</span></td>\n`;
+                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}"></td>\n`;
                   body += `</tr>\n`;
                 }
                 

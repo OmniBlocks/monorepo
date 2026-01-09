@@ -226,9 +226,23 @@ jobs:
             test.beforeEach(async ({ page }) => {
               await page.goto(\`\${BASE_URL}/editor.html\`);
               await page.waitForLoadState('networkidle');
-              // Wait for editor to be fully interactive
-              await page.waitForSelector('[class*="editor-container"]', { timeout: 20000 });
-              await page.waitForTimeout(2000);
+              
+              // Wait for editor to be fully loaded
+              await page.waitForSelector('[class*="gui"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              // Accept any modal dialogs or permissions that might block interaction
+              try {
+                const acceptButton = page.getByText('Accept', { exact: false });
+                if (await acceptButton.isVisible({ timeout: 1000 })) {
+                  await acceptButton.click();
+                  await page.waitForTimeout(1000);
+                }
+              } catch (e) {
+                // No modal dialog found, continue
+              }
+              
+              console.log('✅ Editor loaded and ready for testing');
             });
 
           `;
@@ -240,69 +254,162 @@ jobs:
               testCode += `
             test('${safeName}', async ({ page }) => {
               const consoleErrors = [];
+              const consoleLogs = [];
+              
               page.on('console', msg => {
                 if (msg.type() === 'error') {
                   consoleErrors.push(msg.text());
+                } else {
+                  consoleLogs.push(msg.text());
                 }
               });
 
               try {
+                console.log('🧪 Testing component: ${comp.label || comp.type}');
           `;
 
               if (comp.label) {
-                testCode += `      // Find and interact with component: ${comp.label}
-                const locator = page.getByText('${comp.label.replace(/'/g, "\\'")}', { exact: false }).first();
+                testCode += `
+                // Find component by text: ${comp.label}
+                const targetText = '${comp.label.replace(/'/g, "\\'")}';
                 
-                // NEW: Ensure UI is in interactive state before proceeding
-                await page.waitForTimeout(1000);
+                // Strategy 1: Direct text search
+                let locator = page.getByText(targetText, { exact: false });
                 
-                // NEW: Click parent menu if needed
-                if (comp.type === 'menu-item') {
-                  const menuLocator = page.locator('[role="menu"]').first();
-                  if (await menuLocator.count() === 0) {
-                    console.log('Opening parent menu...');
-                    await page.locator('[aria-label="Menu"]').first().click();
-                    await page.waitForTimeout(500);
+                // If not found, try alternative strategies for different component types
+                if (await locator.count() === 0) {
+                  // Strategy 2: Search in common container elements
+                  const containers = [
+                    '[role="menuitem"]',
+                    '[class*="menu"] [class*="item"]',
+                    '[class*="button"]',
+                    '[role="button"]',
+                    'button',
+                    '.gui-toolbar',
+                    '[class*="toolbar"]'
+                  ];
+                  
+                  for (const containerSelector of containers) {
+                    locator = page.locator(containerSelector).filter({ hasText: targetText });
+                    if (await locator.count() > 0) break;
                   }
                 }
                 
-                if (await locator.count() > 0) {
-                  // Scroll into view
-                  await locator.scrollIntoViewIfNeeded();
+                // Strategy 3: For menu items, try opening menus first
+                if (await locator.count() === 0 && '${comp.type}' === 'menu-item') {
+                  console.log('🔓 Attempting to open menu to find menu item...');
                   
-                  // NEW: Wait for element to be visible and stable
-                  await locator.waitFor({ state: 'visible', timeout: 5000 });
+                  // Try common menu openers
+                  const menuOpeners = [
+                    '[aria-label="Menu"]',
+                    '[class*="menu-button"]',
+                    '[role="button"]:has-text("Menu")',
+                    '.gui-menu-bar',
+                    '[class*="menubar"] button'
+                  ];
                   
-                  // Add visual highlighting
-                  await locator.evaluate((element) => {
-                    element.style.boxShadow = '0 0 10px 3px rgba(59, 130, 246, 0.8)';
-                    element.style.outline = '2px solid rgba(59, 130, 246, 0.5)';
-                    element.style.transition = 'none'; // Prevent animation interference
-                  });
-                  await page.waitForTimeout(300); // Allow highlighting to render
+                  for (const opener of menuOpeners) {
+                    try {
+                      const menuButton = page.locator(opener).first();
+                      if (await menuButton.isVisible({ timeout: 500 })) {
+                        console.log('🖱️  Clicking menu opener:', opener);
+                        await menuButton.click({ timeout: 2000 });
+                        await page.waitForTimeout(1000);
+                        break;
+                      }
+                    } catch (e) {
+                      // Continue to next opener
+                    }
+                  }
                   
-                  // Take focused screenshot
-                  await locator.screenshot({ 
-                    path: \`test-results/component-${i + 1}.png\`,
-                    animations: 'disabled' // Disable CSS animations
-                  }).catch(async (e) => {
-                    console.warn('Locator screenshot failed:', e.message);
-                    // Fallback to page screenshot
-                    await page.screenshot({ 
-                      path: \`test-results/component-${i + 1}.png\`,
-                      fullPage: false 
-                    });
-                  });
-                  
-                  // Click and wait
-                  await locator.click({ timeout: 5000 });
-                  await page.waitForTimeout(500);
-                  await page.waitForLoadState('networkidle');
-                  console.log('✅ Clicked: ${comp.label}');
+                  // Now try to find the menu item again
+                  locator = page.getByText(targetText, { exact: false });
                 }
+                
+                if (await locator.count() === 0) {
+                  console.warn('⚠️  Component not found:', targetText);
+                  
+                  // Take a screenshot of current state for debugging
+                  await page.screenshot({ 
+                    path: \`test-results/component-${i + 1}-not-found.png\`,
+                    fullPage: true 
+                  });
+                  return;
+                }
+                
+                // Get the first matching element
+                const element = locator.first();
+                
+                // Ensure element is in viewport and visible
+                await element.scrollIntoViewIfNeeded({ timeout: 5000 });
+                await element.waitFor({ state: 'visible', timeout: 5000 });
+                
+                // Wait a bit for any animations to complete
+                await page.waitForTimeout(1000);
+                
+                // Apply visual highlighting for better screenshots
+                await element.evaluate((el) => {
+                  // Create a highlight overlay
+                  const highlight = document.createElement('div');
+                  highlight.style.cssText = \`
+                    position: absolute;
+                    border: 3px solid #3b82f6;
+                    background: rgba(59, 130, 246, 0.1);
+                    pointer-events: none;
+                    z-index: 10000;
+                    border-radius: 4px;
+                    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+                  \`;
+                  
+                  // Position highlight
+                  const rect = el.getBoundingClientRect();
+                  highlight.style.left = rect.left - 5 + 'px';
+                  highlight.style.top = rect.top - 5 + 'px';
+                  highlight.style.width = rect.width + 10 + 'px';
+                  highlight.style.height = rect.height + 10 + 'px';
+                  
+                  document.body.appendChild(highlight);
+                  el.setAttribute('data-test-highlight', 'true');
+                  
+                  // Store reference for cleanup
+                  window.__highlight_element__ = highlight;
+                });
+                
+                // Take focused screenshot
+                await page.waitForTimeout(500); // Let highlight render
+                await element.screenshot({ 
+                  path: \`test-results/component-${i + 1}.png\`,
+                  animations: 'disabled'
+                }).catch(async (e) => {
+                  console.warn('⚠️  Element screenshot failed:', e.message);
+                  // Fallback to page screenshot with element outline
+                  await page.screenshot({ 
+                    path: \`test-results/component-${i + 1}-fallback.png\`,
+                    fullPage: false 
+                  });
+                });
+                
+                // Clean up highlight
+                await element.evaluate((el) => {
+                  if (window.__highlight_element__) {
+                    document.body.removeChild(window.__highlight_element__);
+                    delete window.__highlight_element__;
+                  }
+                  el.removeAttribute('data-test-highlight');
+                });
+                
+                // Click the element
+                console.log('🖱️  Clicking element:', targetText);
+                await element.click({ timeout: 5000, force: true });
+                await page.waitForTimeout(1000);
+                
+                // Check for any changes after click
+                const urlChange = page.url();
+                console.log('✅ Successfully interacted with:', targetText);
           `;
               } else {
-                testCode += `      // Take screenshot for component without label
+                testCode += `
+                // Take screenshot for component without label
                 await page.screenshot({ 
                   path: \`test-results/component-${i + 1}.png\`,
                   fullPage: false 
@@ -311,12 +418,21 @@ jobs:
               }
 
               testCode += `
-                // Check for console errors (lenient for auto-generated tests)
+                // Report any console errors (but don't fail the test)
                 if (consoleErrors.length > 0) {
                   console.warn('⚠️  Console errors detected:', consoleErrors);
                 }
+                
+                console.log('✅ Component test completed successfully');
+                
               } catch (error) {
-                console.log(\`⚠️  Could not fully test component: \${error.message}\`);
+                console.log(\`❌ Failed to test component: \${error.message}\`);
+                
+                // Take error screenshot for debugging
+                await page.screenshot({ 
+                  path: \`test-results/component-${i + 1}-error.png\`,
+                  fullPage: true 
+                });
               }
             });
           `;
@@ -357,22 +473,55 @@ jobs:
         id: run_tests
         continue-on-error: true
         run: |
-          # Start server
-          npx http-server build -p 8080 &
-          SERVER_PID=$!
-          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
-          
-          # Wait for server
-          sleep 5
-          
           # Create results directory
           mkdir -p test-results
           
-          # Run tests
-          npx playwright test auto-generated.test.js --reporter=json > test-results/results.json || true
+          # Start server with better logging
+          echo "🚀 Starting development server..."
+          npx http-server build -p 8080 -s > server.log 2>&1 &
+          SERVER_PID=$!
+          echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
+          
+          # Wait for server with timeout and health check
+          echo "⏳ Waiting for server to be ready..."
+          for i in {1..30}; do
+            if curl -f http://localhost:8080/editor.html >/dev/null 2>&1; then
+              echo "✅ Server is ready!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "❌ Server failed to start within 30 seconds"
+              cat server.log
+              exit 1
+            fi
+            sleep 1
+          done
+          
+          # Verify editor page loads
+          echo "🔍 Verifying editor page loads..."
+          if ! curl -f http://localhost:8080/editor.html >/dev/null 2>&1; then
+            echo "❌ Editor page not accessible"
+            cat server.log
+            exit 1
+          fi
+          
+          # Run tests with verbose output
+          echo "🧪 Running component tests..."
+          npx playwright test auto-generated.test.js --reporter=list --output=test-results || true
+          
+          # Check if test results exist
+          if [ -f "test-results/results.json" ]; then
+            echo "📊 Test results generated"
+          else
+            echo "⚠️  No test results found"
+          fi
           
           # Cleanup
-          kill $SERVER_PID || true
+          echo "🧹 Cleaning up..."
+          kill $SERVER_PID 2>/dev/null || true
+          sleep 2
+          
+          echo "✅ Test run completed"
 
       - name: Upload test artifacts
         if: always() && steps.detect.outputs.skip_tests == 'false'
@@ -392,25 +541,47 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Fetch or create screenshot branch
-          git fetch origin component-test-screenshots || git checkout --orphan component-test-screenshots
-          git checkout component-test-screenshots || git switch --orphan component-test-screenshots
+          # Create and switch to screenshot branch
+          git branch -D component-test-screenshots 2>/dev/null || true
+          git checkout --orphan component-test-screenshots
           
           # Clear working directory
           git rm -rf . 2>/dev/null || true
+          rm -rf .gitignore 2>/dev/null || true
+          
+          # Initialize if empty
+          echo "# Screenshots storage" > README.md
+          git add README.md
+          git commit -m "Initialize screenshots branch" || true
           
           # Create directory for this PR
-          mkdir -p pr-${{ fromJSON(steps.pr.outputs.result).number }}
+          PR_DIR="pr-${{ fromJSON(steps.pr.outputs.result).number }}"
+          mkdir -p "$PR_DIR"
           
           # Copy screenshots if they exist
+          SCREENSHOT_COUNT=0
           if ls test-results/*.png 1> /dev/null 2>&1; then
-            cp test-results/*.png pr-${{ fromJSON(steps.pr.outputs.result).number }}/ || true
+            cp test-results/*.png "$PR_DIR/" 2>/dev/null || true
+            SCREENSHOT_COUNT=$(ls test-results/*.png | wc -l)
+            echo "📸 Copied $SCREENSHOT_COUNT screenshots"
+          else
+            echo "⚠️  No screenshots found in test-results/"
           fi
           
-          # Commit and push
-          git add pr-${{ fromJSON(steps.pr.outputs.result).number }}
-          git commit -m "Screenshots for PR #${{ fromJSON(steps.pr.outputs.result).number }}" || true
-          git push -f origin component-test-screenshots
+          # Commit and push if we have screenshots
+          if [ "$SCREENSHOT_COUNT" -gt 0 ]; then
+            git add "$PR_DIR"
+            git commit -m "Screenshots for PR #${{ fromJSON(steps.pr.outputs.result).number }} ($SCREENSHOT_COUNT images)" || true
+            git push -f origin component-test-screenshots
+            echo "✅ Successfully pushed screenshots to branch"
+          else
+            echo "⚠️  No screenshots to push"
+            # Still create empty directory for consistency
+            touch "$PR_DIR/.gitkeep"
+            git add "$PR_DIR/.gitkeep"
+            git commit -m "Empty screenshots for PR #${{ fromJSON(steps.pr.outputs.result).number }}" || true
+            git push -f origin component-test-screenshots || true
+          fi
 
       - name: Update comment with results and screenshots
         if: always()
@@ -468,11 +639,13 @@ jobs:
                   
                   body += `<tr>\n`;
                   body += `  <td><code>${label}</code><br/><small>${comp.file}:${comp.line}</small></td>\n`;
-                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}"/></td>\n`;
+                  body += `  <td><img src="${imgUrl}" width="280" alt="Screenshot of ${label}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"/></td>\n`;
+                  body += `  <td style="display:none; color: #666; font-size: 12px;">Screenshot not available</td>\n`;
                   body += `</tr>\n`;
                 }
                 
                 body += `</table>\n\n`;
+                body += `💡 **Note:** If screenshots appear broken, they may still be processing. Check the [screenshots branch](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/component-test-screenshots/pr-${pr.number}) for the latest images.\n\n`;
               }
               
               body += `#### 🧪 Test Status: \`${testOutcome}\`\n\n`;

@@ -400,11 +400,8 @@ jobs:
                 
                 // Click the element
                 console.log('🖱️  Clicking element:', targetText);
-console.log('🖱️  Clicking element:', targetText);
-await element.click({ timeout: 5000 });
-await page.waitForTimeout(1000);
+                await element.click({ timeout: 5000 });
                 await page.waitForTimeout(1000);
-                
                 console.log('✅ Successfully interacted with:', targetText);
           `;
               } else {

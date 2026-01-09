@@ -226,7 +226,8 @@ jobs:
             test.beforeEach(async ({ page }) => {
               await page.goto(\`\${BASE_URL}/editor.html\`);
               await page.waitForLoadState('networkidle');
-              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              // Wait for editor to be fully interactive
+              await page.waitForSelector('[class*="editor-container"]', { timeout: 20000 });
               await page.waitForTimeout(2000);
             });
 
@@ -252,31 +253,41 @@ jobs:
                 testCode += `      // Find and interact with component: ${comp.label}
                 const locator = page.getByText('${comp.label.replace(/'/g, "\\'")}', { exact: false }).first();
                 
+                // NEW: Ensure UI is in interactive state before proceeding
+                await page.waitForTimeout(1000);
+                
+                // NEW: Click parent menu if needed
+                if (comp.type === 'menu-item') {
+                  const menuLocator = page.locator('[role="menu"]').first();
+                  if (await menuLocator.count() === 0) {
+                    console.log('Opening parent menu...');
+                    await page.locator('[aria-label="Menu"]').first().click();
+                    await page.waitForTimeout(500);
+                  }
+                }
+                
                 if (await locator.count() > 0) {
                   // Scroll into view
                   await locator.scrollIntoViewIfNeeded();
                   
+                  // NEW: Wait for element to be visible and stable
+                  await locator.waitFor({ state: 'visible', timeout: 5000 });
+                  
                   // Add visual highlighting
-                  try {
-                    await page.evaluate((label) => {
-                      const xpath = \`//\*[contains(text(), '\${label}')]\`;
-                      const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-                      const elem = result.singleNodeValue;
-                      if (elem) {
-                        elem.style.boxShadow = '0 0 10px 3px rgba(59, 130, 246, 0.8)';
-                        elem.style.outline = '2px solid rgba(59, 130, 246, 0.5)';
-                      }
-                    }, '${comp.label.replace(/'/g, "\\'")}');
-                    await page.waitForTimeout(100);
-                  } catch (e) {
-                    console.warn('Could not highlight element:', e.message);
-                  }
+                  await locator.evaluate((element) => {
+                    element.style.boxShadow = '0 0 10px 3px rgba(59, 130, 246, 0.8)';
+                    element.style.outline = '2px solid rgba(59, 130, 246, 0.5)';
+                    element.style.transition = 'none'; // Prevent animation interference
+                  });
+                  await page.waitForTimeout(300); // Allow highlighting to render
                   
                   // Take focused screenshot
                   await locator.screenshot({ 
-                    path: \`test-results/component-${i + 1}.png\`
-                  }).catch(async () => {
-                    // Fallback to page screenshot if locator screenshot fails
+                    path: \`test-results/component-${i + 1}.png\`,
+                    animations: 'disabled' // Disable CSS animations
+                  }).catch(async (e) => {
+                    console.warn('Locator screenshot failed:', e.message);
+                    // Fallback to page screenshot
                     await page.screenshot({ 
                       path: \`test-results/component-${i + 1}.png\`,
                       fullPage: false 
@@ -332,7 +343,7 @@ jobs:
 
           chmod +x generate-tests.js
           node generate-tests.js
-
+          
       - name: Install Playwright browsers
         if: steps.detect.outputs.skip_tests == 'false'
         run: npx playwright install chromium --with-deps

@@ -106,23 +106,15 @@ class ExportJustModal extends React.Component {
             }
             totalItems = target.sprite.costumes.length;
 
-            const costumePromises = target.sprite.costumes.map(item =>
-                this.props.vm.getExportedCostume(item)
-                    .then(data => {
-                        if (data) {
-                            zip.file(`${item.name}.${item.asset.dataFormat}`, data, {binary: true});
-                        }
-                        processedItems++;
-                        this.updateProgress(Math.floor((processedItems / totalItems) * 100));
-                    })
-                    .catch(err => {
-                        console.error(`Error exporting costume ${item.name}:`, err);
-                        processedItems++;
-                        this.updateProgress(Math.floor((processedItems / totalItems) * 100));
-                    })
-            );
+            target.sprite.costumes.forEach(item => {
+                if (item.asset && item.asset.data) {
+                    zip.file(`${item.name}.${item.asset.dataFormat}`, item.asset.data, {binary: true});
+                }
+                processedItems++;
+                this.updateProgress(Math.floor((processedItems / totalItems) * 100));
+            });
 
-            Promise.all(costumePromises).then(onComplete);
+            onComplete();
         } else if (this.state.exportType === 'sounds') {
             if (!target.sprite.sounds || target.sprite.sounds.length === 0) {
                 this.setState({
@@ -151,6 +143,7 @@ class ExportJustModal extends React.Component {
                 exportType={this.state.exportType}
                 isExporting={this.state.isExporting}
                 progress={this.state.progress}
+                error={this.state.error}
                 onChangeExportType={this.handleChangeExportType}
                 onCancel={this.handleCancel}
                 onExport={this.handleExport}

@@ -115,44 +115,44 @@ class Monitor extends React.Component {
             newX,
             newY
         );
-        this.props.vm.runtime.requestUpdateMonitor(Map({
+        this.props.vm.runtime.requestUpdateMonitor({
             id: this.props.id,
             x: newX,
             y: newY
-        }));
+        });
     }
     handleHide () {
-        this.props.vm.runtime.requestUpdateMonitor(Map({
+        this.props.vm.runtime.requestUpdateMonitor({
             id: this.props.id,
             visible: false
-        }));
+        });
     }
     handleNextMode () {
         const modes = availableModes(this.props.opcode);
         const modeIndex = modes.indexOf(this.props.mode);
         const newMode = modes[(modeIndex + 1) % modes.length];
-        this.props.vm.runtime.requestUpdateMonitor(Map({
+        this.props.vm.runtime.requestUpdateMonitor({
             id: this.props.id,
             mode: newMode
-        }));
+        });
     }
     handleSetModeToDefault () {
-        this.props.vm.runtime.requestUpdateMonitor(Map({
+        this.props.vm.runtime.requestUpdateMonitor({
             id: this.props.id,
             mode: 'default'
-        }));
+        });
     }
     handleSetModeToLarge () {
-        this.props.vm.runtime.requestUpdateMonitor(Map({
+        this.props.vm.runtime.requestUpdateMonitor({
             id: this.props.id,
             mode: 'large'
-        }));
+        });
     }
     handleSetModeToSlider () {
-        this.props.vm.runtime.requestUpdateMonitor(Map({
+        this.props.vm.runtime.requestUpdateMonitor({
             id: this.props.id,
             mode: 'slider'
-        }));
+        });
     }
     handleSliderPromptClose () {
         this.setState({sliderPrompt: false});
@@ -163,12 +163,12 @@ class Monitor extends React.Component {
     handleSliderPromptOk (min, max, isDiscrete) {
         const realMin = Math.min(min, max);
         const realMax = Math.max(min, max);
-        this.props.vm.runtime.requestUpdateMonitor(Map({
+        this.props.vm.runtime.requestUpdateMonitor({
             id: this.props.id,
             sliderMin: realMin,
             sliderMax: realMax,
             isDiscrete: isDiscrete
-        }));
+        });
         this.handleSliderPromptClose();
     }
     setElement (monitorElt) {

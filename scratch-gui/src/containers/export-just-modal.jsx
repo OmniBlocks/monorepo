@@ -107,9 +107,14 @@ class ExportJustModal extends React.Component {
             totalItems = target.sprite.costumes.length;
 
             target.sprite.costumes.forEach(item => {
-                if (item.asset && item.asset.data) {
-                    zip.file(`${item.name}.${item.asset.dataFormat}`, item.asset.data, {binary: true});
-                }
+            target.sprite.costumes.forEach((item, idx) => {
+                try {
+                    const data = this.props.vm.getExportedCostume(item);
+                    if (data) {
+                        zip.file(`${item.name}.${item.asset.dataFormat}`, data, {binary: true});
+                    }
+                } catch (err) {
+                    console.error(`Error exporting costume ${item.name}:`, err);
                 processedItems++;
                 this.updateProgress(Math.floor((processedItems / totalItems) * 100));
             });

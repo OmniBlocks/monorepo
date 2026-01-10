@@ -310,6 +310,7 @@ const mapStateToProps = state => ({
     sprites: state.scratchGui.targets.sprites,
     stage: state.scratchGui.targets.stage,
     raiseSprites: state.scratchGui.blockDrag,
+    exportingSpriteId: state.scratchGui.exportJust.exportingSpriteId,
     workspaceMetrics: state.scratchGui.workspaceMetrics
 });
 

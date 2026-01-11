@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`41972e87a`](https://github.com/OmniBlocks/scratch-gui/commit/41972e87a9a44ea3c0818e10b099bcdfe4cacd93) - 2026-01-11 17:30:56 -0500
+
+**Update .coderabbit.yaml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`16cabe849`](https://github.com/OmniBlocks/scratch-gui/commit/16cabe8493944e69fd427181b4a4277f2ba8113e) - 2026-01-11 22:09:23 +0000
 
 **Update CONTRIBUTING.md**

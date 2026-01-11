@@ -14,7 +14,7 @@ Contributions are welcome!
 
 ## Note for maintainers: Pranks
 
-Pranks that intentionally damage the repo are now banned, see #701.
+Pranks that intentionally damage the repo are now banned, see https://github.com/OmniBlocks/scratch-gui/issues/701.
 
 ## Languages
 

@@ -52,9 +52,11 @@ jobs:
       - name: Post initial comment with spinner
         id: initial_comment
         uses: actions/github-script@v7
+        env:
+          PR_JSON: ${{ steps.pr.outputs.result }}
         with:
           script: |
-            const pr = ${{ steps.pr.outputs.result }};
+            const pr = JSON.parse(process.env.PR_JSON);
             const actorMention = pr.actor_type === 'User' ? `@${pr.actor}` : pr.actor;
             const spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
             
@@ -67,7 +69,7 @@ jobs:
             ${spinner} **Running component detection and tests...**
             
             🔍 **Triggered by:** ${actorMention}
-            ⚡ **Commit:** \`${pr.sha.substring(0, 7)}\`
+            ⚡ **Commit:** \`${pr.sha ? pr.sha.substring(0, 7) : 'unknown'}\`
             
             ---
             _Beep boop! Looking for buttons, menus, and clickable things!_ 🔎✨`
@@ -579,9 +581,11 @@ jobs:
       - name: Update comment with results and screenshots
         if: always()
         uses: actions/github-script@v7
+        env:
+          PR_JSON: ${{ steps.pr.outputs.result }}
         with:
           script: |
-            const pr = ${{ steps.pr.outputs.result }};
+            const pr = JSON.parse(process.env.PR_JSON);
             const skipTests = '${{ steps.detect.outputs.skip_tests }}' === 'true';
             const componentCount = '${{ steps.detect.outputs.component_count }}';
             const actorMention = pr.actor_type === 'User' ? `@${pr.actor}` : pr.actor;
@@ -593,7 +597,7 @@ jobs:
               body += `### 🎉 No new UI components detected!\n\n`;
               body += `This PR doesn't add any new buttons, menus, or clickable components.\n\n`;
               body += `---\n`;
-              body += `_Triggered by ${actorMention} • Commit \`${pr.sha.substring(0, 7)}\`_`;
+              body += `_Triggered by ${actorMention} • Commit \`${pr.sha ? pr.sha.substring(0, 7) : 'unknown'}\`_`;
             } else {
               const testOutcome = '${{ steps.run_tests.outcome }}';
               const statusEmoji = testOutcome === 'success' ? '✅' : testOutcome === 'failure' ? '❌' : '⚠️';
@@ -647,7 +651,7 @@ jobs:
               body += `- Full test results\n`;
               body += `- All screenshots\n\n`;
               body += `---\n`;
-              body += `_Triggered by ${actorMention} • Commit \`${pr.sha.substring(0, 7)}\`_\n\n`;
+              body += `_Triggered by ${actorMention} • Commit \`${pr.sha ? pr.sha.substring(0, 7) : 'unknown'}\`_\n\n`;
               body += `💡 **Tip:** These are basic smoke tests. Consider expanding them for better coverage!`;
             }
             

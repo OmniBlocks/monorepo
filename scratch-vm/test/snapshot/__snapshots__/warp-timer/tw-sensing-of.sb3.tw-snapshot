@@ -35,7 +35,7 @@ runtime.ext_scratch3_looks._say("pass direction", target);
 if (((b1 ? b1.currentCostume + 1 : 0) === 3)) {
 runtime.ext_scratch3_looks._say("pass costume #", target);
 }
-if (((b1 ? b1.getCostumes()[b1.currentCostume].name : 0).toLowerCase() === "Costume name test".toLowerCase())) {
+if ((("" + (b1 ? b1.getCostumes()[b1.currentCostume].name : 0)).toLowerCase() === "Costume name test".toLowerCase())) {
 runtime.ext_scratch3_looks._say("pass costume name", target);
 }
 if (((b1 ? b1.size : 0) === 76.01)) {

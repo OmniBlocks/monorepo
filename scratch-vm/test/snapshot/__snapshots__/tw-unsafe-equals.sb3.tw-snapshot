@@ -57,13 +57,13 @@ runtime.ext_scratch3_looks._say("pass 14", target);
 }
 yield;
 }
-if ((0 === 1)) {
+if (("".toLowerCase() === "1".toLowerCase())) {
 runtime.ext_scratch3_looks._say("fail", target);
 }
-if ((1 === 0)) {
+if (("1".toLowerCase() === "".toLowerCase())) {
 runtime.ext_scratch3_looks._say("fail", target);
 }
-if ((0 === 1)) {
+if ((" ".toLowerCase() === "1".toLowerCase())) {
 runtime.ext_scratch3_looks._say("fail", target);
 }
 if ((" ".toLowerCase() === "0".toLowerCase())) {

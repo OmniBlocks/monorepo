@@ -24,7 +24,7 @@ const SpriteList = function (props) {
         onDeleteSprite,
         onDuplicateSprite,
         onExportSprite,
-        onExportCostumesButtonClick,
+        onExportJustButtonClick,
         onSelectSprite,
         onAddSortable,
         onRemoveSortable,
@@ -94,7 +94,7 @@ const SpriteList = function (props) {
                                 onClick={onSelectSprite}
                                 onDeleteButtonClick={onDeleteSprite}
                                 onDuplicateButtonClick={onDuplicateSprite}
-                                onExportCostumesButtonClick={onExportCostumesButtonClick}
+                                onExportJustButtonClick={onExportJustButtonClick}
                                 onExportButtonClick={onExportSprite}
                             />
                         </SortableAsset>
@@ -130,7 +130,7 @@ SpriteList.propTypes = {
     onDeleteSprite: PropTypes.func,
     onDuplicateSprite: PropTypes.func,
     onExportSprite: PropTypes.func,
-    onExportCostumesButtonClick: PropTypes.func,
+    onExportJustButtonClick: PropTypes.func,
     onRemoveSortable: PropTypes.func,
     onSelectSprite: PropTypes.func,
     ordering: PropTypes.arrayOf(PropTypes.number),
@@ -139,7 +139,7 @@ SpriteList.propTypes = {
 };
 
 SpriteList.defaultProps = {
-    onExportCostumesButtonClick: () => {}
+    onExportJustButtonClick: () => {}
 };
 
 export default SortableHOC(SpriteList);

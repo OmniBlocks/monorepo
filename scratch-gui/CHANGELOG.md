@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`26026255c`](https://github.com/OmniBlocks/scratch-gui/commit/26026255c9d8de66dc688cd209e8abcad5b1cdfc) - 2026-01-11 20:50:06 +0000
+
+**RBG bot**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`ab53c5c1f`](https://github.com/OmniBlocks/scratch-gui/commit/ab53c5c1f7891d8cd4f6e78d940b3902751b9a76) - 2026-01-11 15:03:04 -0500
 
 **Merge pull request #700 from OmniBlocks/change-order-file-menu**

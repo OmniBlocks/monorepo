@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`4ceaf971a`](https://github.com/OmniBlocks/scratch-gui/commit/4ceaf971a41c799e2e2410d89f63c618eeb4668a) - 2026-01-11 01:52:23 +0000
+
+**Rename coderabbit.yml to .coderabbit.yaml**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`8309003dd`](https://github.com/OmniBlocks/scratch-gui/commit/8309003dd936de5abb25c51500a3e75e7997d596) - 2026-01-09 18:56:18 -0500
 
 **Merge pull request #688 from OmniBlocks/cto-task-687**

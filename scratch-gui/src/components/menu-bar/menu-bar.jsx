@@ -634,22 +634,7 @@ class MenuBar extends React.Component {
                                         >
                                             {this.props.intl.formatMessage(sharedMessages.loadFromComputerTitle)}
                                         </MenuItem>
-                                        <SB3FolderImporter>
-                                            {importProjectFromFolder => (
-                                                importProjectFromFolder ? (
-                                                    <MenuItem
-                                                        onClick={importProjectFromFolder}
-                                                    >
-                                                        <FormattedMessage
-                                                            defaultMessage="Import from folder"
-                                                            // eslint-disable-next-line max-len
-                                                            description="Menu bar item to import project files from a folder"
-                                                            id="tw.importProjectFromFolder"
-                                                        />
-                                                    </MenuItem>
-                                                ) : null
-                                            )}
-                                        </SB3FolderImporter>
+                                        
                                         <SB3Downloader
                                             showSaveFilePicker={this.props.showSaveFilePicker}
                                         >
@@ -705,6 +690,22 @@ class MenuBar extends React.Component {
                                                 </React.Fragment>
                                             )}
                                         </SB3Downloader>
+                                        <SB3FolderImporter>
+                                            {importProjectFromFolder => (
+                                                importProjectFromFolder ? (
+                                                    <MenuItem
+                                                        onClick={importProjectFromFolder}
+                                                    >
+                                                        <FormattedMessage
+                                                            defaultMessage="Import from folder"
+                                                            // eslint-disable-next-line max-len
+                                                            description="Menu bar item to import project files from a folder"
+                                                            id="tw.importProjectFromFolder"
+                                                        />
+                                                    </MenuItem>
+                                                ) : null
+                                            )}
+                                        </SB3FolderImporter>
                                         <SB3FolderExporter>
                                             {exportProjectToFolder => (
                                                 exportProjectToFolder ? (

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`d7d725132`](https://github.com/OmniBlocks/scratch-gui/commit/d7d7251327886f631e0129419f612940a8f5ef46) - 2026-01-11 15:01:18 -0500
+
+**Merge pull request #681 from OmniBlocks/cto-task-259**
+
+feat(export-just-modal): introduce Export Just modal to replace 'Export costumes' with unified export flow
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`5f4e5e83a`](https://github.com/OmniBlocks/scratch-gui/commit/5f4e5e83a65fd2840782ca7f44f428deb9bbf54f) - 2026-01-11 19:41:55 +0000
 
 **Merge branch 'main' of https://github.com/OmniBlocks/scratch-gui**

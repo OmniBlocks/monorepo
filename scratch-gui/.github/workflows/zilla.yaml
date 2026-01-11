@@ -29,7 +29,7 @@ jobs:
             else if (rand < 0.10) bug = "blue bug godzilla"; // next 5%
 
             // Post the quoted comment reply
-            await github.issues.createComment({
+            await github.rest.issues.createComment({
               owner: repoOwner,
               repo: repoName,
               issue_number: issueNumber,

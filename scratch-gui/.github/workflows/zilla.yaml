@@ -1,0 +1,79 @@
+name: Bug Godzilla Bot
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  reply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const commentAuthor = context.payload.comment.user.login;
+            const repoOwner = context.repo.owner;
+            const repoName = context.repo.repo;
+            const issueNumber = context.issue.number;
+
+            // Avoid replying to bot itself
+            if (commentAuthor === repoOwner) return;
+
+            // Original comment quote
+            const originalComment = context.payload.comment.body;
+
+            // Decide bug type
+            let bug = "red bug godzilla";
+            const rand = Math.random();
+            if (rand < 0.05) bug = "green bug godzilla";  // 5% chance
+            else if (rand < 0.10) bug = "blue bug godzilla"; // next 5%
+
+            // Post the quoted comment reply
+            await github.issues.createComment({
+              owner: repoOwner,
+              repo: repoName,
+              issue_number: issueNumber,
+              body: `> ${originalComment}\n\n${bug}`
+            });
+
+            // Handle Bug Godzilla Watch issue
+            const title = "Bug Godzilla Watch";
+
+            // Search for an existing issue with that title
+            const { data: issues } = await github.issues.listForRepo({
+              owner: repoOwner,
+              repo: repoName,
+              state: "all"
+            });
+
+            let watchIssue = issues.find(i => i.title === title);
+
+            if (!watchIssue) {
+              // Create it if it doesn't exist
+              watchIssue = await github.issues.create({
+                owner: repoOwner,
+                repo: repoName,
+                title: title,
+                body: "Tracking Bug Godzilla appearances: 0"
+              });
+            } else if (watchIssue.state === "closed") {
+              // Reopen if closed
+              await github.issues.update({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: watchIssue.number,
+                state: "open"
+              });
+            }
+
+            // Update the counter in the issue body
+            const counterMatch = watchIssue.body.match(/Tracking Bug Godzilla appearances: (\d+)/);
+            const currentCount = counterMatch ? parseInt(counterMatch[1]) : 0;
+            const newCount = currentCount + 1;
+
+            await github.issues.update({
+              owner: repoOwner,
+              repo: repoName,
+              issue_number: watchIssue.number,
+              body: `Tracking Bug Godzilla appearances: ${newCount}`
+            });

@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ef910c6f1`](https://github.com/OmniBlocks/scratch-gui/commit/ef910c6f1f3303290af814ee040fc7da8d461993) - 2026-01-11 21:00:46 +0000
+
+**Update zilla.yaml**
+
+*Author: 8to16*
+
+---
+
+
 ### Commit [`26026255c`](https://github.com/OmniBlocks/scratch-gui/commit/26026255c9d8de66dc688cd209e8abcad5b1cdfc) - 2026-01-11 20:50:06 +0000
 
 **RBG bot**

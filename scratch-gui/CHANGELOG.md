@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`b1ade30a4`](https://github.com/OmniBlocks/scratch-gui/commit/b1ade30a4d102157f209a1153cd8e1806ba20bfa) - 2026-01-11 16:23:00 -0500
+
+**Delete .github/workflows/zilla.yaml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`ef910c6f1`](https://github.com/OmniBlocks/scratch-gui/commit/ef910c6f1f3303290af814ee040fc7da8d461993) - 2026-01-11 21:00:46 +0000
 
 **Update zilla.yaml**

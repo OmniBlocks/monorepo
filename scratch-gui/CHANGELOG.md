@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ab53c5c1f`](https://github.com/OmniBlocks/scratch-gui/commit/ab53c5c1f7891d8cd4f6e78d940b3902751b9a76) - 2026-01-11 15:03:04 -0500
+
+**Merge pull request #700 from OmniBlocks/change-order-file-menu**
+
+Change order of file menu to be more familiar and consistent
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`d7d725132`](https://github.com/OmniBlocks/scratch-gui/commit/d7d7251327886f631e0129419f612940a8f5ef46) - 2026-01-11 15:01:18 -0500
 
 **Merge pull request #681 from OmniBlocks/cto-task-259**

@@ -497,12 +497,13 @@ jobs:
 
             CODERS:
             You will be able to see the association of each commenter. Associations are: member, none, contributor, etc.
+            These people should not be treated as a normal user.
             Here are some of the main maintainers/members you should know about (and their nicknames at the right side):
-            -supervoidcoder, void
-            -ampelectrecuted, amp
-            -Graison-P, Graison
-            -NotTheBaton, TheBaton
-            -kRzYkRzY, meca
+            -@supervoidcoder, void
+            -@8to16, amp
+            -@Graison-P, Graison
+            -@NotTheBaton, TheBaton
+            -@kRzYkRzY, meca
 
             KEYWORDS:
             - If you decide to close the issue, include "[CLOSE]" in your response
@@ -734,6 +735,49 @@ jobs:
           echo "${{ steps.parse-response.outputs.full_response }}" > response.txt
           gh issue comment "$ISSUE_NUMBER" --body-file response.txt
 
+      # ------------------------------------------------------
+      # 🎭 POEM GENERATOR: Generate creative poem for issue
+      # ------------------------------------------------------
+      - name: Generate Issue Poem with AI
+        id: generate-poem
+        if: ${{ steps.parse-response.outputs.keyword == '' && !contains(steps.parse-response.outputs.full_response, '[SECURITY]') }}
+        uses: actions/ai-inference@v1
+        with:
+          model: 'gpt-4o-mini'
+          prompt: |
+            You are a creative poet for the OmniBlocks scratch-gui project.
+
+            Write a short, playful poem (4-8 lines) about this issue:
+
+            **Issue Title:** ${{ github.event.issue.title }}
+            **Issue Body:**
+            ${{ github.event.issue.body }}
+
+            Guidelines:
+            - Keep it fun, lighthearted, and encouraging
+            - Reference the issue topic creatively
+            - Use emojis sparingly (1-2 max)
+            - Make it rhyme or have rhythm
+            - Keep it under 100 words
+            - Be respectful and professional
+
+            Output only the poem, no explanations or metadata.
+
+      - name: Post Poem Comment
+        if: ${{ steps.generate-poem.outputs.response != '' && steps.parse-response.outputs.keyword == '' && !contains(steps.parse-response.outputs.full_response, '[SECURITY]') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          POEM: ${{ steps.generate-poem.outputs.response }}
+        run: |
+          COMMENT="## 🎭 Issue Poem
+
+          $POEM
+
+          ---
+          _Generated with ❤️ by the OmniBlocks Poetry Bot_"
+
+          echo "$COMMENT" | gh issue comment ${{ github.event.issue.number }} --body-file -
+
       # =================================================================
       # 🏷️ Added: Categorizer (kept EXACT prompt; just appended here)
       # Runs only for issue events (opened/edited), not on comments
@@ -749,12 +793,12 @@ jobs:
             bug, question, enhancement, documentation, dependencies, 
             help-wanted, High-Priority, Medium-Priority, Low-Priority, 
             invalid, javascript, wontfix, addon, ci, upstream, tests, configuration-change.
-            Always add at least one priority one.
+            While you can put as many labels as you want (it relevant), make sure to only put ONE priority related one.
             Respond ONLY with comma-separated label names. No explanations. No extra characters.
 
             This issue is from the OmniBlocks/scratch-gui repository. This repository is a mod of Scratch 3 that adds various features like a music editor, extra blocks, and performance improvements, with the goal of becoming a full Multi‑Language IDE in the future.
             When prioritizing issues, consider the following:
-            - High-Priority: Critical bugs affecting many users, security vulnerabilities, or issues blocking major features. Is this a security vulnerability? Is this a major crash or data loss issue? If so, it's high priority.
+            - High-Priority: Critical bugs affecting many users, security vulnerabilities, or issues blocking major features. Is this a security vulnerability? Is this a major crash or data loss issue? If so, it's high priority. 
             - Medium-Priority: Important bugs that impact usability but have workarounds, or significant feature requests. Is this a bug that affects some users but has a workaround? Is this a useful feature request that would improve the app significantly? If so, it's medium priority.
             - Low-Priority: Minor bugs, documentation improvements, or feature requests that are not urgent. Is this a simple typo, a small UI glitch, or a nice-to-have feature? If so, it's low priority.
 

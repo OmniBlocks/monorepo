@@ -2,6 +2,8 @@
  * @file Contains all the logic for the parsing of queries by the {@link WorkspaceQuerier}.
  * I'm really sorry if somebody other than me ever has to debug this.
  * Wish you luck <3
+ * 
+ *
  *
  * Once you *think* you understand the function of the major classes, read the docs on
  * {@link WorkspaceQuerier._createTokenGroups} for some more specifics on the algorithm works,
@@ -1166,6 +1168,23 @@ export default class WorkspaceQuerier {
    */
   static MAX_TOKENS = 10000;
 
+  // Built in categories
+  
+ static BUILT_IN_CATEGORIES = new Set([
+  'motion',
+  'looks',
+  'sound',
+  'events',
+  'control',
+  'sensing',
+  'operators',
+  'data',        
+  'data-lists',  
+  'more',        
+  'pen',         
+]);
+  // ^^^ The 'Lists' category will only show up if you have the 'Data category tweaks' addon enabled, which separates the Variables category into Variables and Lists.
+
   /**
    * Indexes a workspace in preparation for querying it.
    * @param {BlockTypeInfo[]} blocks The list of blocks in the workspace.
@@ -1223,10 +1242,17 @@ export default class WorkspaceQuerier {
     //  This step removes silly suggestions like `if <(1 + 1) = "2 then"> then`
     const canBeString = Array(queryStr.length).fill(true);
 
+    /**
+     * Recursively marks character positions in the current query that cannot be interpreted as plain string input according to tokens that are proper, non-truncated, and are defining features.
+     * 
+     * Traverses the token tree using each token's subtokens; for a leaf token that is not a string literal and meets the `isProper`, `!isTruncated`, and `isDefiningFeature` conditions, it sets the corresponding entries in the surrounding `canBeString` array to `false` for the token's character range.
+     * 
+     * @param {Token} token - The token to inspect and recurse into.
+     */
     function searchToken(token) {
       const subtokens = token.type.getSubtokens(token, query);
       if (subtokens) for (const subtoken of subtokens) searchToken(subtoken);
-      else if (!(token.type instanceof TokenTypeStringLiteral) && token.isProper && !token.isTruncated)
+      else if (!(token.type instanceof TokenTypeStringLiteral) && token.isProper && !token.isTruncated && token.isDefiningFeature)
         for (let i = token.start; i < token.end; i++) {
           canBeString[i] = false;
         }
@@ -1246,11 +1272,23 @@ export default class WorkspaceQuerier {
     for (const result of results) if (checkValidity(result.token)) validResults.push(result);
 
     validResults = validResults.sort((a, b) => {
-      const aLengths = a.getLengths();
-      const bLengths = b.getLengths();
-      if (aLengths.stringLength != bLengths.stringLength) return aLengths.stringLength - bLengths.stringLength;
-      return aLengths.tokenLength - bLengths.tokenLength;
-    });
+    const aLengths = a.getLengths();
+    const bLengths = b.getLengths();
+    
+    // First, prioritize built-in blocks over extension blocks
+    const aBlock = a.getBlock();
+    const bBlock = b.getBlock();
+    const aIsBuiltIn = WorkspaceQuerier.BUILT_IN_CATEGORIES.has(aBlock.typeInfo.category.name);
+    const bIsBuiltIn = WorkspaceQuerier.BUILT_IN_CATEGORIES.has(bBlock.typeInfo.category.name);
+
+    if (aIsBuiltIn !== bIsBuiltIn) {
+      return bIsBuiltIn ? 1 : -1; // Built-in blocks come first
+    }
+    
+    // Then sort by string length and token length as before
+    if (aLengths.stringLength != bLengths.stringLength) return aLengths.stringLength - bLengths.stringLength;
+    return aLengths.tokenLength - bLengths.tokenLength;
+  });
 
     return {
       results: validResults,

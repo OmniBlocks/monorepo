@@ -1,6 +1,7 @@
 import ScratchStorage from '@turbowarp/scratch-storage';
 
 import defaultProject from './default-project';
+import AddonHooks from '../addons/hooks';
 
 /**
  * Wrapper for ScratchStorage which adds default web sources.
@@ -73,6 +74,7 @@ class Storage extends ScratchStorage {
         this.cacheDefaultProject();
     }
     cacheDefaultProject () {
+        if (!AddonHooks.willLoadDefaultProject) return;
         const defaultProjectAssets = defaultProject(this.translator);
         defaultProjectAssets.forEach(asset => this.builtinHelper._store(
             this.AssetType[asset.assetType],

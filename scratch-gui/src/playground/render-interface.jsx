@@ -47,7 +47,7 @@ import {setProjectTitle} from '../reducers/project-title';
 
 import styles from './interface.css';
 
-const isInvalidEmbed = process.env.NODE_ENV === 'production' && window.parent !== window;
+const isInvalidEmbed = false;
 
 const handleClickAddonSettings = addonId => {
     // addonId might be a string of the addon to focus on, undefined, or an event (treat like undefined)

@@ -1,11 +1,13 @@
 language: en-US
 tone_instructions: ''
 early_access: true
-enable_free_tier: false
+enable_free_tier: true
+inheritance: false
 reviews:
   profile: chill
   request_changes_workflow: true
   high_level_summary: true
+  high_level_summary_instructions: ''
   high_level_summary_placeholder: '@coderabbitai summary'
   high_level_summary_in_walkthrough: true
   auto_title_placeholder: '@coderabbitai'
@@ -27,6 +29,7 @@ reviews:
   auto_assign_reviewers: true
   in_progress_fortune: true
   poem: true
+  enable_prompt_for_ai_agents: true
   path_filters: []
   path_instructions: []
   abort_on_close: true
@@ -106,6 +109,8 @@ reviews:
       enabled: true
     flake8:
       enabled: true
+    fortitudeLint:
+      enabled: true
     rubocop:
       enabled: true
     buf:
@@ -184,3 +189,14 @@ code_generation:
     path_instructions: []
   unit_tests:
     path_instructions: []
+issue_enrichment:
+  auto_enrich:
+    enabled: false
+  planning:
+    enabled: false
+    auto_planning:
+      enabled: false
+      labels: []
+  labeling:
+    labeling_instructions: []
+    auto_apply_labels: false

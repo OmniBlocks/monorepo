@@ -1,0 +1,28 @@
+name: Sync Docs to Wiki
+
+on:
+  push:
+    branches:
+      - main  # or 'develop' depending on your active branch
+    paths:
+      - 'docs/**'  # Only triggers when files in /docs change
+
+permissions:
+  contents: write
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Sync to Wiki
+        uses: Andrew-Chen-Wang/github-wiki-action@v4
+        with:
+          # The folder in your repo to sync
+          path: docs
+          # Optional: Automatically converts README.md to Home.md for the Wiki homepage
+          preprocess: true
+          # Uses the default GITHUB_TOKEN for authentication
+          token: ${{ secrets.GITHUB_TOKEN }}

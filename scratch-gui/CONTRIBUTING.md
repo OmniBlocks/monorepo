@@ -12,6 +12,10 @@ Contributions are welcome!
 6. Open a Pull Request.
 7. Sit and wait as it gets reviewed :)
 
+## Note for maintainers: Pranks
+
+Pranks that intentionally damage the repo are now banned, see https://github.com/OmniBlocks/scratch-gui/issues/701.
+
 ## Languages
 
 To contribute to OmniBlocks, you must know JavaScript, and prefferably, React too. If you don't know what these are, well, go ahead and learn it! There are many resources online for you to learn any languages. If you feel stuck, feel free to reach out in the Discussions tab and we might help you a little.

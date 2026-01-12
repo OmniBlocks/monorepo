@@ -206,6 +206,10 @@ async function handleRequest(request) {
     const url = new URL(request.url);
     
     try {
+        // In handleRequest() - add BEFORE the cache-first check:
+            if (url.endsWith('.js')) {
+            return networkFirst(request);
+        }
         // Strategy 1: Cache-first for static assets
         if (isStaticAsset(request)) {
             return await cacheFirst(request, STATIC_CACHE);

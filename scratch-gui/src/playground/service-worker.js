@@ -1,4 +1,5 @@
 // Service Worker for OmniBlocks - Full Offline PWA Support
+/* eslint-disable func-style, require-jsdoc, no-use-before-define */
 const CACHE_NAME = 'omniblocks-v1';
 // bump to clear old entries with bad paths
 const STATIC_CACHE = 'omniblocks-static-v4';
@@ -52,8 +53,57 @@ const EXTERNAL_RESOURCES = [
     'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js'
 ];
 
+// Helper functions for request type detection (defined first to avoid "used before defined" errors)
+function isHTMLPage (request) {
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+    
+    return (
+        request.headers.get('accept')?.includes('text/html') ||
+        pathname.endsWith('.html') ||
+        pathname === '/' ||
+        pathname.endsWith('/editor') ||
+        pathname.endsWith('/fullscreen') ||
+        pathname.endsWith('/embed')
+    );
+}
+
+function isStaticAsset (request) {
+    const u = new URL(request.url);
+    // compare normalized absolute string URLs
+    const requestURL = toURL(u.pathname);
+    
+    return (
+        STATIC_ASSETS.includes(requestURL) ||
+        u.pathname.includes('/static/') ||
+        u.pathname.endsWith('.js') ||
+        u.pathname.endsWith('.css') ||
+        u.pathname.endsWith('.png') ||
+        u.pathname.endsWith('.jpg') ||
+        u.pathname.endsWith('.jpeg') ||
+        u.pathname.endsWith('.gif') ||
+        u.pathname.endsWith('.svg') ||
+        u.pathname.endsWith('.ico') ||
+        u.pathname.endsWith('.woff') ||
+        u.pathname.endsWith('.woff2') ||
+        u.pathname.endsWith('.ttf') ||
+        u.pathname.endsWith('.eot')
+    );
+}
+
+function isDynamicContent (request) {
+    const url = new URL(request.url);
+    
+    return (
+        url.pathname.includes('/api/') ||
+        url.pathname.includes('/projects/') ||
+        url.searchParams.has('project') ||
+        request.headers.get('accept')?.includes('application/json')
+    );
+}
+
 // Normalize URLs: handle routes with/without .html extension
-function normalizeURL(url) {
+function normalizeURL (url) {
     const urlObj = new URL(url);
     let pathname = urlObj.pathname;
     
@@ -65,7 +115,7 @@ function normalizeURL(url) {
     
     // If no extension and not a file, try .html
     if (!pathname.includes('.') && pathname !== '/') {
-        urlObj.pathname = pathname + '.html';
+        urlObj.pathname = `${pathname}.html`;
         return urlObj.toString();
     }
     
@@ -79,7 +129,7 @@ function normalizeURL(url) {
 }
 
 // Enhanced cache lookup that tries multiple URL variations
-async function getCachedResponse(request) {
+async function getCachedResponse (request) {
     const originalUrl = request.url;
     
     // Try exact match first
@@ -138,13 +188,15 @@ self.addEventListener('install', event => {
                     )
                 )
             );
-        }).then(() => {
-            console.log('[SW] Installation complete');
-            // Take control immediately
-            self.skipWaiting();
-        }).catch(error => {
-            console.error('[SW] Installation failed:', error);
         })
+            .then(() => {
+                console.log('[SW] Installation complete');
+                // Take control immediately
+                self.skipWaiting();
+            })
+            .catch(error => {
+                console.error('[SW] Installation failed:', error);
+            })
     );
 });
 
@@ -153,21 +205,21 @@ self.addEventListener('activate', event => {
     console.log('[SW] Activating service worker...');
     
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    // Delete old cache versions
-                    if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== CACHE_NAME) {
-                        console.log('[SW] Deleting old cache:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(() => {
-            console.log('[SW] Activation complete');
-            // Take control of all clients immediately
-            return self.clients.claim();
-        })
+        caches.keys().then(cacheNames => Promise.all(
+            cacheNames.map(cacheName => {
+                // Delete old cache versions
+                if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== CACHE_NAME) {
+                    console.log('[SW] Deleting old cache:', cacheName);
+                    return caches.delete(cacheName);
+                }
+                return Promise.resolve();
+            })
+        ))
+            .then(() => {
+                console.log('[SW] Activation complete');
+                // Take control of all clients immediately
+                return self.clients.claim();
+            })
     );
 });
 
@@ -191,7 +243,7 @@ self.addEventListener('fetch', event => {
         const p = url.pathname.replace(/\/+$/, '');
         if (p.endsWith('/songeditor') || p.endsWith('/songeditor.html') || p.endsWith('/static/songeditor')) {
             event.respondWith(
-                caches.match(CANONICAL_SONGEDITOR).then(hit => hit || fetch(CANONICAL_SONGEDITOR))
+                getCachedResponse(new Request(CANONICAL_SONGEDITOR)).then(hit => hit || fetch(CANONICAL_SONGEDITOR))
             );
             return;
         }
@@ -202,12 +254,12 @@ self.addEventListener('fetch', event => {
     );
 });
 
-async function handleRequest(request) {
+async function handleRequest (request) {
     const url = new URL(request.url);
     
     try {
         // In handleRequest() - add BEFORE the cache-first check:
-            if (url.endsWith('.js')) {
+        if (url.pathname.endsWith('.js')) {
             return networkFirst(request);
         }
         // Strategy 1: Cache-first for static assets
@@ -232,12 +284,12 @@ async function handleRequest(request) {
         console.error('[SW] Request failed:', error);
         
         // Return offline fallback if available
-        return await getOfflineFallback(request);
+        return getOfflineFallback(request);
     }
 }
 
 // Cache-first strategy: Check cache first, then network
-async function cacheFirst(request, cacheName) {
+async function cacheFirst (request, cacheName) {
     const cachedResponse = await getCachedResponse(request);
     
     if (cachedResponse) {
@@ -257,7 +309,7 @@ async function cacheFirst(request, cacheName) {
 }
 
 // Network-first strategy: Try network first, fallback to cache
-async function networkFirst(request, cacheName) {
+async function networkFirst (request, cacheName) {
     try {
         console.log('[SW] Trying network first:', request.url);
         const networkResponse = await fetch(request);
@@ -280,71 +332,16 @@ async function networkFirst(request, cacheName) {
     }
 }
 
-// Check if request is for a static asset
-function isStaticAsset(request) {
-    const u = new URL(request.url);
-    // compare normalized absolute string URLs
-    const requestURL = toURL(u.pathname);
-    
-    return (
-        STATIC_ASSETS.includes(requestURL) ||
-        u.pathname.includes('/static/') ||
-        u.pathname.endsWith('.js') ||
-        u.pathname.endsWith('.css') ||
-        u.pathname.endsWith('.png') ||
-        u.pathname.endsWith('.jpg') ||
-        u.pathname.endsWith('.jpeg') ||
-        u.pathname.endsWith('.gif') ||
-        u.pathname.endsWith('.svg') ||
-        u.pathname.endsWith('.ico') ||
-        u.pathname.endsWith('.woff') ||
-        u.pathname.endsWith('.woff2') ||
-        u.pathname.endsWith('.ttf') ||
-        u.pathname.endsWith('.eot') ||
-        u.pathname.includes('jquery') ||
-        u.pathname.includes('select2')
-    );
-}
-
-// Check if request is for an HTML page
-function isHTMLPage(request) {
-    const url = new URL(request.url);
-    const pathname = url.pathname;
-    
-    return (
-        request.headers.get('accept')?.includes('text/html') ||
-        pathname.endsWith('.html') ||
-        pathname === '/' ||
-        pathname.endsWith('/editor') ||
-        pathname.endsWith('/fullscreen') ||
-        pathname.endsWith('/embed')
-    );
-}
-
-// Check if request is for dynamic content
-function isDynamicContent(request) {
-    const url = new URL(request.url);
-    
-    return (
-        url.pathname.includes('/api/') ||
-        url.pathname.includes('/projects/') ||
-        url.searchParams.has('project') ||
-        request.headers.get('accept')?.includes('application/json')
-    );
-}
-
 // Get offline fallback for failed requests
-async function getOfflineFallback(request) {
-    const url = new URL(request.url);
-    
+async function getOfflineFallback (request) {
     // For HTML pages, try to serve a cached page or offline page
     if (isHTMLPage(request)) {
         // Try to serve the main editor page as fallback using enhanced cache lookup
-        const fallbackResponse = await getCachedResponse(new Request('/editor.html')) || 
-                                 await getCachedResponse(new Request('/editor')) ||
-                                 await getCachedResponse(new Request('/index.html')) ||
-                                 await getCachedResponse(new Request('/')) ||
-                                 await getCachedResponse(new Request('/offline.html'));
+        const fallbackResponse = await getCachedResponse(new Request(toURL('editor.html'))) ||
+                                 await getCachedResponse(new Request(toURL('editor'))) ||
+                                 await getCachedResponse(new Request(toURL('index.html'))) ||
+                                 await getCachedResponse(new Request(toURL('/'))) ||
+                                 await getCachedResponse(new Request(toURL('offline.html')));
         
         if (fallbackResponse) {
             return fallbackResponse;
@@ -418,8 +415,8 @@ async function getOfflineFallback(request) {
                 <h1>You're Offline</h1>
                 <p>Sorry! OmniBlocks doesn't seem to be working offline right now.</p>
                 <div class="images">
-                    <img src="/static/favicon.ico" alt="OmniBlocks Logo" class="logo">
-                    <img src="/static/images/boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
+                    <img src="static/favicon.ico" alt="OmniBlocks Logo" class="logo">
+                    <img src="static/Boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
                 </div>
                 <button onclick="location.href='/'">Go to Editor</button>
                 <button onclick="location.reload()">Try Again</button>
@@ -467,6 +464,6 @@ self.addEventListener('notificationclick', event => {
     event.notification.close();
     
     event.waitUntil(
-        clients.openWindow('/editor.html')
+        self.clients.openWindow('/editor.html')
     );
 });

@@ -87,9 +87,7 @@ function isStaticAsset (request) {
         u.pathname.endsWith('.woff') ||
         u.pathname.endsWith('.woff2') ||
         u.pathname.endsWith('.ttf') ||
-        u.pathname.endsWith('.eot') ||
-        u.pathname.includes('jquery') ||
-        u.pathname.includes('select2')
+        u.pathname.endsWith('.eot')
     );
 }
 
@@ -418,7 +416,7 @@ async function getOfflineFallback (request) {
                 <p>Sorry! OmniBlocks doesn't seem to be working offline right now.</p>
                 <div class="images">
                     <img src="static/favicon.ico" alt="OmniBlocks Logo" class="logo">
-                    <img src="static/images/boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
+                    <img src="static/Boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
                 </div>
                 <button onclick="location.href='/'">Go to Editor</button>
                 <button onclick="location.reload()">Try Again</button>

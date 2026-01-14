@@ -29,7 +29,7 @@ const defined = obj => typeof obj !== 'undefined' && obj !== null;
  */
 
 /**
- * @typedef {JSDelta|ImmutableJSDelta} ExternalDelta Delta object that might be JS or immutable.js.
+ * @typedef {JSDelta|ImmutableJSDelta|Map} ExternalDelta Delta object that might be JS object, immutable.js, or JS Map
  */
 
 /**
@@ -184,13 +184,17 @@ class MonitorRecord {
 }
 
 /**
- * For compatibility, converts an immutable.js delta received from consumer to a plain JS delta for internal use.
+ * For compatibility, converts delta received from consumer to a plain JS delta for internal use.
  * @param {ExternalDelta} obj
  * @returns {JSDelta}
  */
 MonitorRecord.externalDeltaToJS = obj => {
     if (typeof obj.toJS === 'function') {
         return obj.toJS();
+    }
+    // Nothing in Scratch would pass a JS map into this, but some weird extensions do.
+    if (obj instanceof Map) {
+        return Object.fromEntries(Array.from(obj.entries()));
     }
     return obj;
 };

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`2c5e19b74`](https://github.com/OmniBlocks/scratch-gui/commit/2c5e19b74a5d732e4ad2b9ed4e0c1fa3fbf1eec2) - 2026-01-15 11:13:39 -0600
+
+**Merge pull request #713 from OmniBlocks/graisonscrap**
+
+Add initial developer changelog file
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`d4f834a1e`](https://github.com/OmniBlocks/scratch-gui/commit/d4f834a1e9242ee83474a54a11d1e4862fb41e55) - 2026-01-13 19:35:55 +0000
 
 **Merge pull request #711 from OmniBlocks/cto-task-710**

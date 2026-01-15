@@ -1,6 +1,6 @@
 # OmniBlocks Developer Changelogs (Devlogs)
 
-# 1/15/26
+# January 15, 2026
 Welcome to the new OmniBlocks devlogs!</br>
 Here you can find developer-made versions of the [CHANGELOG.md file.](https://github.com/OmniBlocks/scratch-gui/blob/main/CHANGELOG.md)</br>
 ## Changes

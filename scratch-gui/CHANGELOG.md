@@ -4,6 +4,48 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`488168e20`](https://github.com/OmniBlocks/scratch-gui/commit/488168e20040b2be4bdfb2fa803f954e8b8143d6) - 2026-01-15 11:15:57 -0600
+
+**why did no one tell me that doing ### instead of ## makes a heading h3?**
+
+*Author: Graison P*
+
+---
+
+
+### Commit [`2c5e19b74`](https://github.com/OmniBlocks/scratch-gui/commit/2c5e19b74a5d732e4ad2b9ed4e0c1fa3fbf1eec2) - 2026-01-15 11:13:39 -0600
+
+**Merge pull request #713 from OmniBlocks/graisonscrap**
+
+Add initial developer changelog file
+
+*Author: Graison P*
+
+---
+
+
+### Commit [`d4f834a1e`](https://github.com/OmniBlocks/scratch-gui/commit/d4f834a1e9242ee83474a54a11d1e4862fb41e55) - 2026-01-13 19:35:55 +0000
+
+**Merge pull request #711 from OmniBlocks/cto-task-710**
+
+cto-task-710
+
+*Author: 8to16*
+
+---
+
+
+### Commit [`d52f4714a`](https://github.com/OmniBlocks/scratch-gui/commit/d52f4714a4b4796055b67508224178eb9b298c53) - 2026-01-12 21:24:12 -0500
+
+**Merge pull request #707 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-828467d**
+
+Bump scratch-vm from `fb00bb6` to `828467d`
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`a5072b7ad`](https://github.com/OmniBlocks/scratch-gui/commit/a5072b7ad89a27f2c2b68eea4441663c0b3c0bdd) - 2026-01-11 22:32:13 +0000
 
 **Create Home.md**

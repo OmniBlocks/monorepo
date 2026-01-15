@@ -722,16 +722,15 @@ class ExtensionManager {
             if (blockInfo.func && !blockInfo.opcode) {
                 blockInfo.opcode = blockInfo.func;
             }
-            const funcName = blockInfo.opcode;
-            const callBlockFunc = (...args) => dispatch.call(serviceName, funcName, ...args);
+           blockInfo.callFunc = () => {
+           dispatch.call(serviceName, blockInfo.func);
 
-            blockInfo.func = callBlockFunc;
             break;
         case BlockType.LABEL:
             break;
         default: {
-            if (!blockInfo.opcode) {
-                throw new Error('Missing opcode for block');
+               if (blockInfo.opcode) {
+                                log.warn(`Ignoring opcode "${blockInfo.opcode}" for button with text: ${blockInfo.text}`);
             }
 
             const funcName = blockInfo.func || blockInfo.opcode;

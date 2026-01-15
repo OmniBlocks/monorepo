@@ -724,7 +724,7 @@ class ExtensionManager {
             }
            blockInfo.callFunc = () => {
            dispatch.call(serviceName, blockInfo.func);
-
+            };
             break;
         case BlockType.LABEL:
             break;

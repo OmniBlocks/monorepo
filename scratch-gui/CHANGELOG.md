@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`25788310b`](https://github.com/OmniBlocks/scratch-gui/commit/25788310b9594c6ec9d44261606d435d60837b0e) - 2026-01-15 13:13:45 -0500
+
+**Merge pull request #716 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-1323847**
+
+Bump scratch-vm from `828467d` to `1323847`
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`488168e20`](https://github.com/OmniBlocks/scratch-gui/commit/488168e20040b2be4bdfb2fa803f954e8b8143d6) - 2026-01-15 11:15:57 -0600
 
 **why did no one tell me that doing ### instead of ## makes a heading h3?**

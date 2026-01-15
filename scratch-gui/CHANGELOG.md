@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`488168e20`](https://github.com/OmniBlocks/scratch-gui/commit/488168e20040b2be4bdfb2fa803f954e8b8143d6) - 2026-01-15 11:15:57 -0600
+
+**why did no one tell me that doing ### instead of ## makes a heading h3?**
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`2c5e19b74`](https://github.com/OmniBlocks/scratch-gui/commit/2c5e19b74a5d732e4ad2b9ed4e0c1fa3fbf1eec2) - 2026-01-15 11:13:39 -0600
 
 **Merge pull request #713 from OmniBlocks/graisonscrap**

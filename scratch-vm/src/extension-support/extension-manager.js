@@ -722,10 +722,8 @@ class ExtensionManager {
             // Prioritize opcode, fallback to func if opcode not present
             const funcName = blockInfo.opcode || blockInfo.func;
             
-            // Store funcName in func property for ID generation in runtime
-            if (!blockInfo.func) {
-                blockInfo.func = funcName;
-            }
+            // Normalize func property to the chosen callback name for ID generation and consistency
+            blockInfo.func = funcName;
             
             // Create the callback function
             blockInfo.callFunc = (...args) => dispatch.call(serviceName, funcName, ...args);

@@ -262,7 +262,10 @@ class SPjavascriptV2 {
           blockType: BlockType.COMMAND,
           hideFromPalette: isSafari || !isScratchBlocksReady,
           arguments: {
-            CODE: { fillIn: "codeInput" },
+            CODE: { 
+              type: ArgumentType.STRING,
+              fillIn: "codeInput"
+            },
             ARGS: {
               type: ArgumentType.STRING,
               defaultValue: `{ "FOO": "bar" }`,
@@ -278,7 +281,10 @@ class SPjavascriptV2 {
           allowDropAnywhere: true,
           hideFromPalette: isSafari || !isScratchBlocksReady,
           arguments: {
-            CODE: { fillIn: "codeInput" },
+            CODE: { 
+              type: ArgumentType.STRING,
+              fillIn: "codeInput"
+            },
             ARGS: {
               type: ArgumentType.STRING,
               defaultValue: `{ "STRING": "output: " }`,
@@ -293,7 +299,10 @@ class SPjavascriptV2 {
           disableMonitor: true,
           hideFromPalette: isSafari || !isScratchBlocksReady,
           arguments: {
-            CODE: { fillIn: "codeInput" },
+            CODE: { 
+              type: ArgumentType.STRING,
+              fillIn: "codeInput"
+            },
             ARGS: {
               type: ArgumentType.STRING,
               defaultValue: `{ "THRESHOLD": 0.5 }`,
@@ -311,7 +320,10 @@ class SPjavascriptV2 {
             NAME: {
               type: ArgumentType.STRING, defaultValue: "myFunction"
             },
-            CODE: { fillIn: "codeInput" }
+            CODE: { 
+              type: ArgumentType.STRING,
+              fillIn: "codeInput"
+            }
           }
         },
         {
@@ -321,7 +333,10 @@ class SPjavascriptV2 {
           hideFromPalette: true,
           arguments: {
             NAME: { type: ArgumentType.STRING },
-            CODE: { fillIn: "argumentReport" }
+            CODE: { 
+              type: ArgumentType.STRING,
+              fillIn: "argumentReport"
+            }
           }
         },
         {
@@ -478,7 +493,7 @@ class SPjavascriptV2 {
 
   // block funcs
   codeInput(args) {
-    return args.CODE;
+    return args.CODE || '';
   }
 
   async jsCommand(args) {

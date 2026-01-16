@@ -1657,7 +1657,7 @@ categoryInfo.blockText = extensionInfo.blockText;
         if (typeof callback === 'function') {
             callback();
         } else {
-            log.warn(`No callback found for button: ${buttonData}`);
+            log.warn(`No callback found for extension button with data: ${buttonData}`);
         }
     }
 

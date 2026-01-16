@@ -1752,6 +1752,12 @@ categoryInfo.blockText = extensionInfo.blockText;
                 shadowType = (argTypeInfo.shadow && argTypeInfo.shadow.type) || null;
                 fieldName = (argTypeInfo.shadow && argTypeInfo.shadow.fieldName) || null;
             }
+            // TODO: Allow fillIn to work with non-shadow.
+            if (argInfo.fillIn || argInfo.fillInGlobal/* && argInfo.fillInShadow*/) {
+                shadowType = argInfo.fillInGlobal || `${context.categoryInfo.id}_${argInfo.fillIn}`;
+            }/* else if (argInfo.fillIn) {
+                blockType = `${context.categoryInfo.id}_${argInfo.fillIn}`;
+            }*/
 
             // <value> is the ScratchBlocks name for a block input.
             if (valueName) {

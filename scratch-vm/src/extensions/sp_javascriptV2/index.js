@@ -478,7 +478,7 @@ class SPjavascriptV2 {
 
   // block funcs
   codeInput(args) {
-    return args.CODE;
+    return args.CODE || '';
   }
 
   async jsCommand(args) {

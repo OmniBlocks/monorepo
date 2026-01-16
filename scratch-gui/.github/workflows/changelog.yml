@@ -1,10 +1,6 @@
 name: Changelog Updater
 
 on:
-  push:
-    branches:
-      - master
-      - main
   release:
     types: [published]
 
@@ -27,70 +23,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Update Changelog for Commit
-        if: github.event_name == 'push'
-        run: |
-          # Get the latest commit info
-          COMMIT_SHA=$(git rev-parse HEAD)
-          COMMIT_SHORT=$(git rev-parse --short HEAD)
-          COMMIT_MSG=$(git log -1 --pretty=%s)
-          COMMIT_BODY=$(git log -1 --pretty=%b)
-          COMMIT_AUTHOR=$(git log -1 --pretty="%an")
-          COMMIT_DATE=$(git log -1 --pretty=%ci)
-          
-          # Skip if this is the changelog update commit itself
-          if [[ "$COMMIT_MSG" == *"update CHANGELOG.md"* ]] || [[ "$COMMIT_MSG" == *"[skip ci]"* ]]; then
-            echo "Skipping changelog update for changelog commit"
-            exit 0
-          fi
-          
-          # Ensure CHANGELOG.md exists with markers
-          if [ ! -f CHANGELOG.md ]; then
-            cat > CHANGELOG.md << 'HEADER'
-          # Changelog
-
-          This file is automatically updated by the Changelog Updater bot.
-
-          <!-- UNRELEASED_COMMITS_START -->
-          <!-- UNRELEASED_COMMITS_END -->
-
-          HEADER
-          fi
-          
-          # Check if markers exist, add them if they don't
-          if ! grep -q "UNRELEASED_COMMITS_START" CHANGELOG.md; then
-            sed -i '3 i <!-- UNRELEASED_COMMITS_START -->\n<!-- UNRELEASED_COMMITS_END -->\n' CHANGELOG.md
-          fi
-          
-          # Create the new commit entry
-          NEW_ENTRY="### Commit [\`${COMMIT_SHORT}\`](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA}) - ${COMMIT_DATE}
-
-          **${COMMIT_MSG}**
-          "
-          
-          # Add body if it exists and is not empty
-          if [ -n "$COMMIT_BODY" ] && [ "$COMMIT_BODY" != "" ]; then
-            NEW_ENTRY="${NEW_ENTRY}
-          ${COMMIT_BODY}
-          "
-          fi
-          
-          NEW_ENTRY="${NEW_ENTRY}
-          *Author: ${COMMIT_AUTHOR}*
-
-          ---
-          "
-          
-          # Insert the new entry after the START marker
-          awk -v entry="$NEW_ENTRY" '
-            /UNRELEASED_COMMITS_START/ { print; print ""; print entry; next }
-            { print }
-          ' CHANGELOG.md > CHANGELOG.md.tmp
-          
-          mv CHANGELOG.md.tmp CHANGELOG.md
-
       - name: Update Changelog for Release
-        if: github.event_name == 'release'
         run: |
           # Get release info
           RELEASE_TAG="${{ github.event.release.tag_name }}"

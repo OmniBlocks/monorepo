@@ -719,13 +719,16 @@ class ExtensionManager {
                 throw new Error(`Missing opcode or func for button: ${blockInfo.text}`);
             }
 
-            if (blockInfo.func && !blockInfo.opcode) {
-                blockInfo.opcode = blockInfo.func;
+            // Prioritize opcode, fallback to func if opcode not present
+            const funcName = blockInfo.opcode || blockInfo.func;
+            
+            // Store funcName in func property for ID generation in runtime
+            if (!blockInfo.func) {
+                blockInfo.func = funcName;
             }
-            const funcName = blockInfo.opcode;
-            const callBlockFunc = (...args) => dispatch.call(serviceName, funcName, ...args);
-
-            blockInfo.func = callBlockFunc;
+            
+            // Create the callback function
+            blockInfo.callFunc = (...args) => dispatch.call(serviceName, funcName, ...args);
             break;
         }
         case BlockType.LABEL:

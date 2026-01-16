@@ -623,7 +623,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
       this.procCode_ += input.fieldRow[0].getValue();
     } else if (input.type == Blockly.INPUT_VALUE) {
       // Inspect the argument editor.
-      var target = input.connection && input.connection.targetBlock();
+      var target = input.connection ? input.connection.targetBlock() : null;
       if (target) {
         this.displayNames_.push(target.getFieldValue('TEXT'));
         this.argumentIds_.push(input.name);
@@ -651,7 +651,7 @@ Blockly.ScratchBlocks.ProcedureUtils.focusLastEditor_ = function() {
       newInput.fieldRow[0].showEditor_();
     } else if (newInput.type == Blockly.INPUT_VALUE) {
       // Inspect the argument editor.
-      var target = newInput.connection && newInput.connection.targetBlock();
+      var target = newInput.connection ? newInput.connection.targetBlock() : null;
       if (target) {
         target.getField('TEXT').showEditor_();
       }

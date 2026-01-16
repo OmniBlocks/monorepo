@@ -152,7 +152,13 @@ class SecurityManager {
     canEmbed (documentURL) {
         return Promise.resolve(true);
     }
-
+    /**
+     * pm: Used to prompt the user if they would like to unsandbox a feature in the extension.
+     * @returns {Promise<boolean>|boolean} -
+     */
+    canUnsandbox() {
+        return Promise.resolve(false);
+    }
     /**
      * Determine whether an extension is allowed to download a URL with a given name.
      * @param {string} resourceURL The URL to download

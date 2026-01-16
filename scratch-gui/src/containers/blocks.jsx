@@ -157,6 +157,8 @@ class Blocks extends React.Component {
                 unregisterInput: () => {},
                 getRegisteredInputs: () => new Map()
             };
+            log.warn('ScratchBlocks.FieldCustom is not available; using stub implementation. ' +
+                'This usually means the Blockly → ScratchBlocks FieldCustom bridge is not configured correctly.');
         }
 
         const Msg = this.ScratchBlocks.Msg;

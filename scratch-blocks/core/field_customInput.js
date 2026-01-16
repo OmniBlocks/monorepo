@@ -160,6 +160,18 @@ Blockly.FieldCustom.prototype.getValue = function() {
 };
 
 /**
+ * Get the text from this field for display and XML serialization.
+ * Return empty string since the actual code is stored in value_ and
+ * should not be serialized as display text.
+ * @return {string} Empty string for display.
+ */
+Blockly.FieldCustom.prototype.getText = function() {
+  // Return empty string to avoid serializing code with special characters
+  // The actual value is handled separately via getValue/setValue
+  return '';
+};
+
+/**
  * do whatever the user desires on-edit
  * @private
  */

@@ -7,6 +7,9 @@ const Cast = require("../../util/cast");
 let isScratchBlocksReady = typeof ScratchBlocks === "object";
 const codeEditorHandlers = new Map();
 
+// Sentinel value to trigger default code initialization for custom code editor fields
+const CODE_EDITOR_INIT_SENTINEL = "needsInit-1@#4%^7*(0";
+
 // we cant have nice things
 const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
@@ -78,7 +81,7 @@ function initBlockTools() {
       input.replaceChild(iframe, input.firstChild);
       iframe.onload = () => {
         let value = field.getValue();
-        if (value === "needsInit-1@#4%^7*(0") {
+        if (value === CODE_EDITOR_INIT_SENTINEL) {
           const outerType = srcBlock.parentBlock_.type;
           if (outerType.endsWith("jsCommandBinded")) value = `alert(FOO);`;
           else if (outerType.endsWith("jsReporterBinded")) value = `return STRING + Math.random()`;
@@ -197,7 +200,7 @@ class SPjavascriptV2 {
             CODE: {
               type: ArgumentType.CUSTOM,
               id: "SPjavascriptV2-codeEditor",
-              defaultValue: "needsInit-1@#4%^7*(0"
+              defaultValue: CODE_EDITOR_INIT_SENTINEL
             }
           },
         },
@@ -266,7 +269,7 @@ class SPjavascriptV2 {
             CODE: { 
               type: ArgumentType.CUSTOM,
               id: "SPjavascriptV2-codeEditor",
-              defaultValue: "needsInit-1@#4%^7*(0"
+              defaultValue: CODE_EDITOR_INIT_SENTINEL
             },
             ARGS: {
               type: ArgumentType.STRING,
@@ -286,7 +289,7 @@ class SPjavascriptV2 {
             CODE: { 
               type: ArgumentType.CUSTOM,
               id: "SPjavascriptV2-codeEditor",
-              defaultValue: "needsInit-1@#4%^7*(0"
+              defaultValue: CODE_EDITOR_INIT_SENTINEL
             },
             ARGS: {
               type: ArgumentType.STRING,
@@ -305,7 +308,7 @@ class SPjavascriptV2 {
             CODE: { 
               type: ArgumentType.CUSTOM,
               id: "SPjavascriptV2-codeEditor",
-              defaultValue: "needsInit-1@#4%^7*(0"
+              defaultValue: CODE_EDITOR_INIT_SENTINEL
             },
             ARGS: {
               type: ArgumentType.STRING,

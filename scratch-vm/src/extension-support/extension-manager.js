@@ -715,22 +715,21 @@ class ExtensionManager {
             }
             break;
         case BlockType.BUTTON:
-            if (!blockInfo.opcode && !blockInfo.func) {
-                throw new Error(`Missing opcode or func for button: ${blockInfo.text}`);
+            if (blockInfo.opcode) {
+                log.warn(`Ignoring opcode "${blockInfo.opcode}" for button with text: ${blockInfo.text}`);
             }
-
-            if (blockInfo.func && !blockInfo.opcode) {
-                blockInfo.opcode = blockInfo.func;
-            }
-           blockInfo.callFunc = () => {
-           dispatch.call(serviceName, blockInfo.func);
+            blockInfo.callFunc = () => {
+                dispatch.call(serviceName, blockInfo.func);
             };
             break;
         case BlockType.LABEL:
+            if (blockInfo.opcode) {
+                log.warn(`Ignoring opcode "${blockInfo.opcode}" for label: ${blockInfo.text}`);
+            }
             break;
         default: {
-               if (blockInfo.opcode) {
-                                log.warn(`Ignoring opcode "${blockInfo.opcode}" for button with text: ${blockInfo.text}`);
+            if (!blockInfo.opcode) {
+                throw new Error('Missing opcode for block');
             }
 
             const funcName = blockInfo.func || blockInfo.opcode;

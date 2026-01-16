@@ -1654,7 +1654,11 @@ categoryInfo.blockText = extensionInfo.blockText;
 
     handleExtensionButtonPress (buttonData) {
         const callback = this.extensionButtons.get(buttonData);
-        callback();
+        if (typeof callback === 'function') {
+            callback();
+        } else {
+            log.warn(`No callback found for button: ${buttonData}`);
+        }
     }
 
     /**

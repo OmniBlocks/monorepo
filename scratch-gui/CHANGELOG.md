@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`b8297810e`](https://github.com/OmniBlocks/scratch-gui/commit/b8297810efd675092ac90c9bfd9b3525414d7993) - 2026-01-16 12:20:29 -0500
+
+**Merge pull request #722 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-dfa4f50**
+
+Bump scratch-vm from `450f549` to `dfa4f50`
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`fe1ebeccb`](https://github.com/OmniBlocks/scratch-gui/commit/fe1ebeccbaaf32a646e6ea397a809c5d3bcd1611) - 2026-01-16 10:35:47 -0500
 
 **Merge pull request #719 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-450f549**

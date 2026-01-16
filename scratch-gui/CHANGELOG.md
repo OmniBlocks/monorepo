@@ -4,6 +4,39 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`405ea7d3e`](https://github.com/OmniBlocks/scratch-gui/commit/405ea7d3eb224a865e2f2607dd0b3572ef3f1c4d) - 2026-01-16 15:39:12 -0500
+
+**Merge pull request #723 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-6326757**
+
+Bump scratch-blocks from `d67d6cf` to `6326757`
+
+*Author: supervoidcoder*
+
+---
+
+
+### Commit [`607dddb8b`](https://github.com/OmniBlocks/scratch-gui/commit/607dddb8bcfb208c8a25c614eccb312f078caf5c) - 2026-01-16 12:24:49 -0600
+
+**hehehe**
+
+added that joke dependency to the diagram ;)
+
+*Author: Graison P*
+
+---
+
+
+### Commit [`b8297810e`](https://github.com/OmniBlocks/scratch-gui/commit/b8297810efd675092ac90c9bfd9b3525414d7993) - 2026-01-16 12:20:29 -0500
+
+**Merge pull request #722 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-dfa4f50**
+
+Bump scratch-vm from `450f549` to `dfa4f50`
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`fe1ebeccb`](https://github.com/OmniBlocks/scratch-gui/commit/fe1ebeccbaaf32a646e6ea397a809c5d3bcd1611) - 2026-01-16 10:35:47 -0500
 
 **Merge pull request #719 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-450f549**

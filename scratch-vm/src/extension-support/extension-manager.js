@@ -714,14 +714,20 @@ class ExtensionManager {
                 log.warn(`Ignoring function "${blockInfo.func}" for event block ${blockInfo.opcode}`);
             }
             break;
-        case BlockType.BUTTON:
-            if (blockInfo.opcode) {
-                log.warn(`Ignoring opcode "${blockInfo.opcode}" for button with text: ${blockInfo.text}`);
+        case BlockType.BUTTON: {
+            if (!blockInfo.opcode && !blockInfo.func) {
+                throw new Error(`Missing opcode or func for button: ${blockInfo.text}`);
             }
-            blockInfo.callFunc = () => {
-                dispatch.call(serviceName, blockInfo.func);
-            };
+
+            if (blockInfo.func && !blockInfo.opcode) {
+                blockInfo.opcode = blockInfo.func;
+            }
+            const funcName = blockInfo.opcode;
+            const callBlockFunc = (...args) => dispatch.call(serviceName, funcName, ...args);
+
+            blockInfo.func = callBlockFunc;
             break;
+        }
         case BlockType.LABEL:
             if (blockInfo.opcode) {
                 log.warn(`Ignoring opcode "${blockInfo.opcode}" for label: ${blockInfo.text}`);

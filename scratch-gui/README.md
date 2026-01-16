@@ -121,6 +121,7 @@ graph TD
     C --> H["scratch-svg-renderer<br/>SVG Processor"]
     B --> I["scratch-parser<br/>Project Parser"]
     B --> J["scratch-translate<br/>i18n System"]
+    K["coffee"] --> L["caffine<br/>feeds the devs"] 
     
     style A fill:#4C97FF,color:#fff
     style B fill:#FF6680,color:#fff

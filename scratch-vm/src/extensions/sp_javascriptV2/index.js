@@ -195,8 +195,9 @@ class SPjavascriptV2 {
           hideFromPalette: true,
           arguments: {
             CODE: {
-              type: ArgumentType.STRING,
-              defaultValue: "alert(FOO)"
+              type: ArgumentType.CUSTOM,
+              id: "SPjavascriptV2-codeEditor",
+              defaultValue: "needsInit-1@#4%^7*(0"
             }
           },
         },
@@ -263,8 +264,9 @@ class SPjavascriptV2 {
           hideFromPalette: isSafari || !isScratchBlocksReady,
           arguments: {
             CODE: { 
-              type: ArgumentType.STRING,
-              fillIn: "codeInput"
+              type: ArgumentType.CUSTOM,
+              id: "SPjavascriptV2-codeEditor",
+              defaultValue: "needsInit-1@#4%^7*(0"
             },
             ARGS: {
               type: ArgumentType.STRING,
@@ -282,8 +284,9 @@ class SPjavascriptV2 {
           hideFromPalette: isSafari || !isScratchBlocksReady,
           arguments: {
             CODE: { 
-              type: ArgumentType.STRING,
-              fillIn: "codeInput"
+              type: ArgumentType.CUSTOM,
+              id: "SPjavascriptV2-codeEditor",
+              defaultValue: "needsInit-1@#4%^7*(0"
             },
             ARGS: {
               type: ArgumentType.STRING,
@@ -300,8 +303,9 @@ class SPjavascriptV2 {
           hideFromPalette: isSafari || !isScratchBlocksReady,
           arguments: {
             CODE: { 
-              type: ArgumentType.STRING,
-              fillIn: "codeInput"
+              type: ArgumentType.CUSTOM,
+              id: "SPjavascriptV2-codeEditor",
+              defaultValue: "needsInit-1@#4%^7*(0"
             },
             ARGS: {
               type: ArgumentType.STRING,

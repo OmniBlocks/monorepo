@@ -59,6 +59,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
+      - name: Clean working directory
+        run: |
+          # Reset any changes from the build
+          git reset --hard HEAD
+          git clean -fd
+      
       - name: Switch to develop-builds branch
         run: |
           git fetch origin develop-builds:develop-builds || git branch develop-builds

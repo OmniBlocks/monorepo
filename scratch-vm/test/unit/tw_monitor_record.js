@@ -52,5 +52,9 @@ test('externalDeltaToJS', t => {
         toJS: () => ({whatever: 'a'})
     }), {whatever: 'a'});
 
+    t.same(MonitorRecord.externalDeltaToJS(
+        new Map([['whatever', 'a']])
+    ), {whatever: 'a'});
+
     t.end();
 });

@@ -8,32 +8,32 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout develop branch
         uses: actions/checkout@v3
         with:
           ref: develop
-          fetch-depth: 0  # Need full history to switch branches
-      
+          fetch-depth: 0  # Need full history to manage branches
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-      
+          node-version: '22'
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.14'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Build compressed bundles
         run: |
           npm run prepublish
           echo "✅ Build completed"
-      
+
       - name: Verify FieldCustom is in bundle
         run: |
           if ! grep -q "FieldCustom" blockly_compressed_horizontal.js; then
@@ -45,7 +45,7 @@ jobs:
             exit 1
           fi
           echo "✅ FieldCustom verified in bundles"
-      
+
       - name: Check for merge conflict markers
         run: |
           if grep -r "<<<<<<< HEAD\|=======\|>>>>>>>" blockly_compressed*.js blocks_compressed*.js; then
@@ -53,47 +53,44 @@ jobs:
             exit 1
           fi
           echo "✅ No conflict markers found"
-      
+
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      
-      - name: Clean working directory
+
+      # IMPORTANT: do NOT reset away the build.
+      # Instead, move the built tree into the develop-builds branch.
+      - name: Create or update local develop-builds branch from built tree
         run: |
-          # Reset any changes from the build
-          git reset --hard HEAD
-          git clean -fd
-      
-      - name: Switch to develop-builds branch
-        run: |
-          git fetch origin develop-builds:develop-builds || git branch develop-builds
-          git checkout develop-builds
-      
-      - name: Replace with fresh builds from develop
-        run: |
-          DEVELOP_SHA=$(git rev-parse --short origin/develop)
-          
-          # Copy all compiled files from develop
-          git checkout origin/develop -- blockly_compressed*.js blocks_compressed*.js msg/
-          
-          # Also copy any other dist files if they exist
-          if git ls-tree -r origin/develop --name-only | grep -q "^dist/"; then
-            git checkout origin/develop -- dist/ || true
+          # Ensure we know about the remote develop-builds branch if it exists
+          git fetch origin develop-builds:develop-builds || true
+
+          # If the branch exists locally, reset it to current HEAD (built develop)
+          if git show-ref --verify --quiet refs/heads/develop-builds; then
+            git branch -f develop-builds
+          else
+            git branch develop-builds
           fi
-          
-          # Stage all changes
-          git add -A
-          
-          # Commit only if there are changes
+
+          # Switch to develop-builds (same working tree, with built artifacts)
+          git checkout develop-builds
+
+      - name: Commit and push compiled files
+        run: |
+          git status
+
+          # Stage compiled files and related dirs
+          git add blockly_compressed*.js blocks_compressed*.js msg/ dist/ 2>/dev/null || true
+
+          # Only commit if there are actual changes
           if git diff --staged --quiet; then
             echo "✅ No changes to commit"
-          else
-            git commit -m "Auto-build: Update compiled files from develop ($DEVELOP_SHA)"
-            echo "✅ Committed changes"
+            exit 0
           fi
-      
-      - name: Push to develop-builds
-        run: |
+
+          DEVELOP_SHA=$(git rev-parse --short origin/develop)
+          git commit -m "Auto-build: Update compiled files from develop (${DEVELOP_SHA})"
+
           git push origin develop-builds
           echo "✅ Successfully pushed to develop-builds"

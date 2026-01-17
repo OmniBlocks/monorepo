@@ -743,7 +743,7 @@ Blockly.BlockSvg.prototype.updateColour = function() {
     if (this.textColour) for (const field of input.fieldRow) {
       if (field.textElement_ && field instanceof Blockly.FieldLabel) {
         field.textElement_.style.fill = this.textColour;
-        field.textElement_.setAttribute('stroke', this.textColour);
+        field.textElement_.setAttribute('stoke', this.textColour);
       }
     }
   }
@@ -903,7 +903,6 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
  */
 Blockly.BlockSvg.prototype.renderFields_ = function(fieldList, cursorX,
     cursorY) {
-  if (this.edgeShapeWidth_ && this.inputList.find(v => v.type == Blockly.NEXT_STATEMENT)) cursorX += this.edgeShapeWidth_ + Blockly.BlockSvg.CORNER_RADIUS * 2;
   if (this.RTL) {
     cursorX = -cursorX;
   }
@@ -1101,27 +1100,6 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
       }
     }
     previousRow = row;
-  }
-
-  // fix incorrect width calculations for mega-chin blocks
-  // ie, C- or E- shaped blocks with labels and/or inputs on the end branch
-  if (hasStatement) {
-    // the mega-chin block issue only happens to blocks with images
-    const input = inputList[inputList.length - 1];
-    const field = input.fieldRow[0];
-    if (field instanceof Blockly.FieldImage) {
-      // check for inputs before the last branch
-      const measureables = [];
-      for (var i = inputList.length - 1; i--; ) {
-        if (inputList[i].type == Blockly.NEXT_STATEMENT) break;
-        measureables.push(inputList[i]);
-      }
-
-      if (measureables.length) {
-        const newWidth = measureables.reduce((w, input) => w + (input.fieldWidth), 0);
-        input.fieldWidth = newWidth * (Blockly.BlockSvg.BOX_FIELD_PADDING / 4);
-      }
-    }
   }
 
   // Compute padding for output blocks.
@@ -1407,7 +1385,7 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
     // Width of the curve/pointy-curve
     var shape = this.getOutputShape();
     if (shape != Blockly.OUTPUT_SHAPE_SQUARE) {
-      this.edgeShapeWidth_ = inputRows.bottomEdge / 2;
+      this.edgeShapeWidth_ = (inputRows.bottomEdge + Math.max(this.inputList.filter(v => v.type == Blockly.NEXT_STATEMENT).length-1, 0) * Blockly.BlockSvg.NOTCH_WIDTH) / 2;
       this.edgeShape_ = shape;
       this.squareTopLeftCorner_ = true;
     }
@@ -1559,6 +1537,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
     var connectionX, connectionY;
     for (var y = 0, row; row = inputRows[y]; y++) {
       cursorX = row.paddingStart;
+      if (this.edgeShape_ && this.inputList.find(v => v.type == Blockly.NEXT_STATEMENT)) cursorX += this.edgeShapeWidth_ + Blockly.BlockSvg.CORNER_RADIUS * 2
       if (y == 0) {
         cursorX += this.RTL ? -iconWidth : iconWidth;
       }
@@ -1593,6 +1572,9 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
             input.connection.setOffsetInBlock(connectionX, connectionY);
             this.renderInputShape_(input, cursorX, cursorY + connectionYOffset);
             cursorX += input.renderWidth + Blockly.BlockSvg.SEP_SPACE_X;
+            if (input.connection.targetConnection) {
+              cursorX += input.connection.targetConnection.sourceBlock_.outputLeftPadding_()
+            }
           }
         }
         // Remove final separator and replace it with right-padding.
@@ -1749,6 +1731,29 @@ Blockly.BlockSvg.prototype.renderDrawBottom_ = function(steps, cursorY) {
   }
 };
 
+Blockly.BlockSvg.prototype.outputLeftPadding_ = function() {
+  if (!this.outputConnection) return 0;
+  const shape = this.getOutputShape();
+
+  switch (shape) {
+    case Blockly.OUTPUT_SHAPE_PLUS: {
+      if (this.inputList.find(v => v.type == Blockly.NEXT_STATEMENT)) {
+        const paddingMultiplier = Blockly.BlockSvg.SEP_SPACE_Y / 2 / Blockly.BlockSvg.GRID_UNIT;
+        const unit = 6 * paddingMultiplier;
+        return -this.height / 2 + unit * 3;
+      }
+    }
+    default: {
+      const customShape = Blockly.BlockSvg.CUSTOM_SHAPES.get(this.edgeShape_);
+      if (customShape && customShape.outputLeftPadding) {
+        return customShape.outputLeftPadding(this)
+      }
+    }
+  }
+
+  return 0;
+}
+
 /**
  * Render the left edge of the block.
  * @param {!Array.<string>} steps Path of block outline.
@@ -1760,7 +1765,7 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ = function(steps, cursorY) {
 
   if (this.outputConnection) {
     // Scratch-style reporters have output connection y at half block height.
-    this.outputConnection.setOffsetInBlock(0, this.height / 2);
+    this.outputConnection.setOffsetInBlock(-this.outputLeftPadding_(), this.height / 2);
   }
   if (this.edgeShape_) {
     // Draw the left-side edge shape.
@@ -1788,8 +1793,9 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ = function(steps, cursorY) {
         const unit = 6 * paddingMultiplier;
         const remainingHeight = scale * 2 - 36 * paddingMultiplier;
         const remainingWidth = scale - 20 * paddingMultiplier;
+        const hasBranch = this.inputList.find(v => v.type == Blockly.NEXT_STATEMENT)
+        if (!hasBranch) steps.push(`l ${-remainingWidth} 0 `)
         steps.push(
-          `l ${-remainingWidth} 0 ` +
           `a ${unit} ${unit} 0 0 1 ${-unit} ${-unit} ` +
           `a ${unit} ${unit} 0 0 0 ${-unit} ${-unit} ` +
           `l -2 0 ` +
@@ -1798,9 +1804,9 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ = function(steps, cursorY) {
           `a ${unit} ${unit} 0 0 1 ${unit} ${-unit} ` +
           `l 2 0 ` +
           `a ${unit} ${unit} 0 0 0 ${unit} ${-unit} ` +
-          `a ${unit} ${unit} 0 0 1 ${unit} ${-unit} ` +
-          `l ${remainingWidth} 0`
+          `a ${unit} ${unit} 0 0 1 ${unit} ${-unit} `
         );
+        if (!hasBranch) steps.push(`l ${remainingWidth} 0 `)
         break;
       }
       default: {
@@ -1896,6 +1902,10 @@ Blockly.BlockSvg.prototype.positionNewBlock = function(newBlock, newConnection,
   if (newConnection.type == Blockly.NEXT_STATEMENT) {
     var dx = existingConnection.x_ - newConnection.x_;
     var dy = existingConnection.y_ - newConnection.y_;
+    if (newConnection.sourceBlock_.edgeShape_) {
+      var bounds = existingConnection.sourceBlock_.getBoundingRectangle();
+      dx += ((bounds.bottomRight.y - bounds.topLeft.y) / -2) + 6 * Blockly.BlockSvg.GRID_UNIT;
+    }
 
     newBlock.moveBy(dx, dy);
   }
@@ -2107,8 +2117,32 @@ Blockly.BlockSvg.getInputShapeInfo_ = function(shape) {
 Blockly.BlockSvg.getAlignedCursor_ = function(cursorX, input, rightEdge) {
   // Align inline field rows (left/right/centre).
   if (input.align === Blockly.ALIGN_RIGHT) {
-    cursorX += rightEdge - input.fieldWidth -
-      (2 * Blockly.BlockSvg.SEP_SPACE_X);
+    const SEP_SPACE = 2 * Blockly.BlockSvg.SEP_SPACE_X;
+    const offsetAmt = rightEdge - input.fieldWidth - SEP_SPACE;
+    cursorX += offsetAmt;
+
+    // fix incorrect width calculations for mega-chin blocks
+    // ie, branched blocks with labels and/or inputs on the end branch
+    const srcInputList = input.sourceBlock_.inputList;
+    const inputIndex = srcInputList.indexOf(input);
+    const lastBranchIndex = srcInputList.findLastIndex((i) => i.type === Blockly.NEXT_STATEMENT);
+    const subInputs = srcInputList.slice(lastBranchIndex + 1, inputIndex);
+
+    if (subInputs.length) {
+      // measure the widths of the fields in the block row and subtract it
+      // from cursorX. Without this, the row width will be doubled.
+      const backOffset = subInputs.reduce((acc, cur) => {
+        let amt = cur.fieldWidth;
+        if (cur.connection) {
+          const block = cur.connection.targetBlock();
+          if (block) amt += block.width + SEP_SPACE;
+          else amt += Blockly.BlockSvg.INPUT_AND_FIELD_MIN_X + SEP_SPACE;
+        }
+        return acc + amt;
+      }, 0);
+
+      cursorX -= Math.min(backOffset, offsetAmt);
+    }
   } else if (input.align === Blockly.ALIGN_CENTRE) {
     cursorX = Math.max(cursorX, rightEdge / 2 - input.fieldWidth / 2);
   }

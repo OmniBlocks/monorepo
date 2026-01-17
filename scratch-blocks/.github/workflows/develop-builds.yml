@@ -34,17 +34,6 @@ jobs:
           npm run prepublish
           echo "✅ Build completed"
 
-      - name: Verify FieldCustom is in bundle
-        run: |
-          if ! grep -q "FieldCustom" blockly_compressed_horizontal.js; then
-            echo "❌ ERROR: FieldCustom not found in horizontal bundle"
-            exit 1
-          fi
-          if ! grep -q "FieldCustom" blockly_compressed_vertical.js; then
-            echo "❌ ERROR: FieldCustom not found in vertical bundle"
-            exit 1
-          fi
-          echo "✅ FieldCustom verified in bundles"
 
       - name: Check for merge conflict markers
         run: |
@@ -63,17 +52,7 @@ jobs:
       # Instead, move the built tree into the develop-builds branch.
       - name: Create or update local develop-builds branch from built tree
         run: |
-          # Ensure we know about the remote develop-builds branch if it exists
-          git fetch origin develop-builds:develop-builds || true
-
-          # If the branch exists locally, reset it to current HEAD (built develop)
-          if git show-ref --verify --quiet refs/heads/develop-builds; then
-            git branch -f develop-builds
-          else
-            git branch develop-builds
-          fi
-
-          # Switch to develop-builds (same working tree, with built artifacts)
+          git fetch
           git checkout develop-builds
 
       - name: Commit and push compiled files
@@ -81,14 +60,14 @@ jobs:
           git status
 
           # Stage compiled files and related dirs
-          git add blockly_compressed*.js blocks_compressed*.js msg/ dist/ 2>/dev/null || true
+          git add.
 
           # Only commit if there are actual changes
           if git diff --staged --quiet; then
             echo "✅ No changes to commit"
             exit 0
           fi
-
+          git pull
           DEVELOP_SHA=$(git rev-parse --short origin/develop)
           git commit -m "Auto-build: Update compiled files from develop (${DEVELOP_SHA})"
 

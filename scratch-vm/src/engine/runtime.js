@@ -1731,8 +1731,9 @@ categoryInfo.blockText = extensionInfo.blockText;
             };
 
             const defaultValue =
-                xmlEscape.escapeAttribute(typeof argInfo.defaultValue === 'undefined' ? null :
-                    maybeFormatMessage(argInfo.defaultValue, this.makeMessageContextForTarget()).toString())
+                typeof argInfo.defaultValue === 'undefined' ? '' :
+                    xmlEscape.escapeAttribute(maybeFormatMessage(
+                        argInfo.defaultValue, this.makeMessageContextForTarget()).toString());
 
             if (argTypeInfo.check) {
                 // Right now the only type of 'check' we have specifies that the

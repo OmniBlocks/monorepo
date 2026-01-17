@@ -53,10 +53,12 @@ jobs:
       - name: Create or update local develop-builds branch from built tree
         run: |
           git fetch
+          git stash
           git checkout develop-builds
 
       - name: Commit and push compiled files
         run: |
+          git stash pop
           git status
 
           # Stage compiled files and related dirs

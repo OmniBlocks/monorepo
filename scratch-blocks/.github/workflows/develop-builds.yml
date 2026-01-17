@@ -62,7 +62,7 @@ jobs:
           git status
 
           # Stage compiled files and related dirs
-          git add.
+          git add .
 
           # Only commit if there are actual changes
           if git diff --staged --quiet; then

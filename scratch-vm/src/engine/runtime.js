@@ -17,7 +17,7 @@ const log = require('../util/log');
 const maybeFormatMessage = require('../util/maybe-format-message');
 const StageLayering = require('./stage-layering');
 const Variable = require('./variable');
-const xmlEscape.escapeAttribute = require('../util/xml-escape');
+const xmlEscape = require('../util/xml-escape');
 const ScratchLinkWebSocket = require('../util/scratch-link-websocket');
 const FontManager = require('./tw-font-manager');
 const fetchWithTimeout = require('../util/fetch-with-timeout');
@@ -1732,7 +1732,7 @@ categoryInfo.blockText = extensionInfo.blockText;
 
             const defaultValue =
                 xmlEscape.escapeAttribute(typeof argInfo.defaultValue === 'undefined' ? null :
-                    maybeFormatMessage(argInfo.defaultValue, this.makeMessageContextForTarget()).toString();)
+                    maybeFormatMessage(argInfo.defaultValue, this.makeMessageContextForTarget()).toString())
 
             if (argTypeInfo.check) {
                 // Right now the only type of 'check' we have specifies that the

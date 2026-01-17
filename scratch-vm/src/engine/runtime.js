@@ -17,7 +17,7 @@ const log = require('../util/log');
 const maybeFormatMessage = require('../util/maybe-format-message');
 const StageLayering = require('./stage-layering');
 const Variable = require('./variable');
-const xmlEscape = require('../util/xml-escape');
+const xmlEscape.escapeAttribute = require('../util/xml-escape');
 const ScratchLinkWebSocket = require('../util/scratch-link-websocket');
 const FontManager = require('./tw-font-manager');
 const fetchWithTimeout = require('../util/fetch-with-timeout');
@@ -1229,13 +1229,13 @@ categoryInfo.blockText = extensionInfo.blockText;
 
         if (extensionInfo.docsURI) {
             const xml = '<button ' +
-                `text="${xmlEscape(maybeFormatMessage({
+                `text="${xmlEscape.escapeAttribute(maybeFormatMessage({
                     id: 'tw.blocks.openDocs',
                     default: 'Open Documentation',
                     description: 'Button that opens site with more documentation about an extension'
                 }))}" ` +
                 'callbackKey="OPEN_EXTENSION_DOCS" ' +
-                `callbackData="${xmlEscape(extensionInfo.docsURI)}"></button>`;
+                `callbackData="${xmlEscape.escapeAttribute(extensionInfo.docsURI)}"></button>`;
             const block = {
                 info: {},
                 xml
@@ -1578,9 +1578,9 @@ categoryInfo.blockText = extensionInfo.blockText;
             ++outLineNum;
         }
 
-        const mutation = blockInfo.isDynamic ? `<mutation blockInfo="${xmlEscape(JSON.stringify(blockInfo))}"/>` : '';
+        const mutation = blockInfo.isDynamic ? `<mutation blockInfo="${xmlEscape.escapeAttribute(JSON.stringify(blockInfo))}"/>` : '';
         const inputs = context.inputList.join('');
-        const blockXML = `<block type="${xmlEscape(extendedOpcode)}">${mutation}${inputs}</block>`;
+        const blockXML = `<block type="${xmlEscape.escapeAttribute(extendedOpcode)}">${mutation}${inputs}</block>`;
 
         if (blockInfo.extensions) {
             for (const extension of blockInfo.extensions) {
@@ -1618,9 +1618,10 @@ categoryInfo.blockText = extensionInfo.blockText;
      * @private
      */
     _convertLabelForScratchBlocks (blockInfo) {
+        const text = xmlEscape.escapeAttribute(blockInfo.text)
         return {
             info: blockInfo,
-            xml: `<label text="${xmlEscape(blockInfo.text)}"></label>`
+            xml: `<label text="${text}"></label>`
         };
     }
     
@@ -1639,7 +1640,7 @@ categoryInfo.blockText = extensionInfo.blockText;
         if (nativeCallbackKeys.includes(buttonInfo.func)) {
             return {
                 info: buttonInfo,
-                xml: `<button text="${xmlEscape(buttonText)}" callbackKey="${xmlEscape(buttonInfo.func)}"></button>`
+                xml: `<button text="${xmlEscape.escapeAttribute(buttonText)}" callbackKey="${xmlEscape.escapeAttribute(buttonInfo.func)}"></button>`
             };
         }
         // Callbacks with data will be forwarded from GUI
@@ -1648,9 +1649,9 @@ categoryInfo.blockText = extensionInfo.blockText;
         this.extensionButtons.set(id, buttonInfo.callFunc);
         return {
             info: buttonInfo,
-            xml: `<button text="${xmlEscape(buttonText)}"` +
+            xml: `<button text="${xmlEscape.escapeAttribute(buttonText)}"` +
                 ' callbackKey="EXTENSION_CALLBACK"' +
-                ` callbackData="${xmlEscape(id)}"></button>`
+                ` callbackData="${xmlEscape.escapeAttribute(id)}"></button>`
         };
     }
 
@@ -1730,8 +1731,8 @@ categoryInfo.blockText = extensionInfo.blockText;
             };
 
             const defaultValue =
-                typeof argInfo.defaultValue === 'undefined' ? null :
-                    maybeFormatMessage(argInfo.defaultValue, this.makeMessageContextForTarget()).toString();
+                xmlEscape.escapeAttribute(typeof argInfo.defaultValue === 'undefined' ? null :
+                    maybeFormatMessage(argInfo.defaultValue, this.makeMessageContextForTarget()).toString();)
 
             if (argTypeInfo.check) {
                 // Right now the only type of 'check' we have specifies that the
@@ -1770,19 +1771,19 @@ categoryInfo.blockText = extensionInfo.blockText;
 
             // <value> is the ScratchBlocks name for a block input.
             if (valueName) {
-                context.inputList.push(`<value name="${xmlEscape(placeholder)}">`);
+                context.inputList.push(`<value name="${xmlEscape.escapeAttribute(placeholder)}">`);
             }
 
             // The <shadow> is a placeholder for a reporter and is visible when there's no reporter in this input.
             // Boolean inputs don't need to specify a shadow in the XML.
             if (shadowType) {
-                context.inputList.push(`<shadow type="${xmlEscape(shadowType)}">`);
+                context.inputList.push(`<shadow type="${xmlEscape.escapeAttribute(shadowType)}">`);
             }
 
             // A <field> displays a dynamic value: a user-editable text field, a drop-down menu, etc.
             // Leave out the field if defaultValue or fieldName are not specified
             if (defaultValue !== null && fieldName) {
-                context.inputList.push(`<field name="${xmlEscape(fieldName)}">${xmlEscape(defaultValue)}</field>`);
+                context.inputList.push(`<field name="${xmlEscape.escapeAttribute(fieldName)}">${xmlEscape.escapeAttribute(defaultValue)}</field>`);
             }
 
             if (shadowType) {
@@ -1827,7 +1828,7 @@ categoryInfo.blockText = extensionInfo.blockText;
                 return blockFilterIncludesTarget && !block.info.hideFromPalette;
             });
 
-            const colorXML = `colour="${xmlEscape(color1)}" secondaryColour="${xmlEscape(color2)}"`;
+            const colorXML = `colour="${xmlEscape.escapeAttribute(color1)}" secondaryColour="${xmlEscape.escapeAttribute(color2)}"`;
 
             // Use a menu icon if there is one. Otherwise, use the block icon. If there's no icon,
             // the category menu will show its default colored circle.
@@ -1838,15 +1839,15 @@ categoryInfo.blockText = extensionInfo.blockText;
                 menuIconURI = categoryInfo.blockIconURI;
             }
             const menuIconXML = menuIconURI ?
-                `iconURI="${xmlEscape(menuIconURI)}"` : '';
+                `iconURI="${xmlEscape.escapeAttribute(menuIconURI)}"` : '';
 
             let statusButtonXML = '';
             if (categoryInfo.showStatusButton) {
                 statusButtonXML = 'showStatusButton="true"';
             }
 
-            let xml = `<category name="${xmlEscape(name)}"`;
-            xml += ` id="${xmlEscape(categoryInfo.id)}"`;
+            let xml = `<category name="${xmlEscape.escapeAttribute(name)}"`;
+            xml += ` id="${xmlEscape.escapeAttribute(categoryInfo.id)}"`;
             xml += ` ${statusButtonXML}`;
             xml += ` ${colorXML}`;
             xml += ` ${menuIconXML}>`;
@@ -2904,11 +2905,11 @@ categoryInfo.blockText = extensionInfo.blockText;
                 info: {},
                 xml:
                    '<block type="procedures_call" gap="16"><mutation generateshadows="true" warp="false"' +
-                    ` proccode="${xmlEscape(procedureCode)}"` +
-                    ` argumentnames="${xmlEscape(JSON.stringify(names))}"` +
-                    ` argumentids="${xmlEscape(JSON.stringify(ids))}"` +
-                    ` argumentdefaults="${xmlEscape(JSON.stringify(defaults))}"` +
-                    `${options.return ? ` return="${xmlEscape(options.return.toString())}"` : ''}` +
+                    ` proccode="${xmlEscape.escapeAttribute(procedureCode)}"` +
+                    ` argumentnames="${xmlEscape.escapeAttribute(JSON.stringify(names))}"` +
+                    ` argumentids="${xmlEscape.escapeAttribute(JSON.stringify(ids))}"` +
+                    ` argumentdefaults="${xmlEscape.escapeAttribute(JSON.stringify(defaults))}"` +
+                    `${options.return ? ` return="${xmlEscape.escapeAttribute(options.return.toString())}"` : ''}` +
                     '></mutation></block>'
             });
         }

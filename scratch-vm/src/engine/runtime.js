@@ -114,6 +114,15 @@ const ArgumentTypeMap = (() => {
         // They are more analagous to the label on a block.
         fieldType: 'field_image'
     };
+    map[ArgumentType.POLYGON] = {
+        check: 'math_polygon',
+        shadow: {
+            type: 'polygon'
+        }
+    };
+        map[ArgumentType.CUSTOM] = {
+        fieldType: 'field_customInput'
+    };
     map[ArgumentType.COSTUME] = {
         shadow: {
             type: 'looks_costume',

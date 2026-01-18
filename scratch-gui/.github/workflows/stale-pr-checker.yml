@@ -108,38 +108,11 @@ jobs:
       fail-fast: false
     
     steps:
-      - name: Generate AI reminder for PR #${{ matrix.pr.number }}
-        id: ai-reminder
-        uses: actions/ai-inference@v1
-        with:
-          model: 'gpt-4o-mini'
-          prompt: |
-            You're a friendly, playful AI bot for OmniBlocks/scratch-gui (a Scratch editor fork).
-
-            Write a personalized stale PR reminder for:
-            * PR #${{ matrix.pr.number }} by @${{ matrix.pr.author }}
-            * Title: "${{ matrix.pr.title }}"
-            * Days since last update: ${{ matrix.pr.daysSinceUpdate }}
-            * ${{ matrix.pr.recentCommentContext }}
-            
-            ${{ matrix.pr.diffContext }}
-
-            Write a friendly 2-3 sentence reminder that:
-            * Acknowledges what the PR is trying to do
-            * Gently asks if they need help or if something is blocking progress
-            * Uses the playful OmniBlocks tone (emojis welcome! 🎨)
-            * Is encouraging, not pushy
-
-            Keep it under 200 words!
-      
-      - name: Post AI reminder comment
+      - name: Post reminder comment
         uses: actions/github-script@v7
-        env:
-          AI_MESSAGE: ${{ steps.ai-reminder.outputs.response }}
         with:
           script: |
-            const aiMessage = process.env.AI_MESSAGE || 
-              `Hey @${{ matrix.pr.author }}! 👋 This PR has been quiet for a while. Need any help getting it across the finish line? Feel free to ask! 🚀`;
+            const aiMessage = `Hey @${{ matrix.pr.author }}! 👋 This PR has been quiet for a while. Need any help getting it across the finish line? Feel free to ask! 🚀`;
             
             await github.rest.issues.createComment({
               owner: context.repo.owner,

@@ -1087,12 +1087,12 @@ class Runtime extends EventEmitter {
             const color1 = Color.hexToRgb(extensionInfo.color1);
             categoryInfo.color1 = extensionInfo.color1;
             categoryInfo.color2 = extensionInfo.color2;
-            if (!extensionInfo.color2) {
+            if (!extensionInfo.color2 && color1) {
                 const mixed = Color.mixRgb(color1, Color.RGB_BLACK, 0.1);
                 categoryInfo.color2 = Color.rgbToHex(mixed);
             }
             categoryInfo.color3 = extensionInfo.color3;
-            if (!extensionInfo.color3) {
+            if (!extensionInfo.color3 && color1) {
                 const mixed = Color.mixRgb(color1, Color.RGB_BLACK, 0.2);
                 categoryInfo.color3 = Color.rgbToHex(mixed);
             }

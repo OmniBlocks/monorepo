@@ -34,6 +34,7 @@ const MouseWheel = require('../io/mouseWheel');
 const UserData = require('../io/userData');
 const Video = require('../io/video');
 
+const Color = require('../util/color');
 const StringUtil = require('../util/string-util');
 const uid = require('../util/uid');
 
@@ -1083,15 +1084,24 @@ class Runtime extends EventEmitter {
         };
 
         if (extensionInfo.color1) {
+            const color1 = Color.hexToRgb(extensionInfo.color1);
             categoryInfo.color1 = extensionInfo.color1;
             categoryInfo.color2 = extensionInfo.color2;
+            if (!extensionInfo.color2) {
+                const mixed = Color.mixRgb(color1, Color.RGB_BLACK, 0.1);
+                categoryInfo.color2 = Color.rgbToHex(mixed);
+            }
             categoryInfo.color3 = extensionInfo.color3;
+            if (!extensionInfo.color3) {
+                const mixed = Color.mixRgb(color1, Color.RGB_BLACK, 0.2);
+                categoryInfo.color3 = Color.rgbToHex(mixed);
+            }
         } else {
             categoryInfo.color1 = defaultExtensionColors[0];
             categoryInfo.color2 = defaultExtensionColors[1];
             categoryInfo.color3 = defaultExtensionColors[2];
         }
-categoryInfo.blockText = extensionInfo.blockText;
+        categoryInfo.blockText = extensionInfo.blockText;
         this._blockInfo.push(categoryInfo);
 
         this._fillExtensionCategory(categoryInfo, extensionInfo);

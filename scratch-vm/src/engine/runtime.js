@@ -1829,7 +1829,7 @@ categoryInfo.blockText = extensionInfo.blockText;
                 return blockFilterIncludesTarget && !block.info.hideFromPalette;
             });
 
-            const colorXML = `colour="${xmlEscape.escapeAttribute(color1)}" secondaryColour="${xmlEscape.escapeAttribute(color2)}"`;
+            const colorXML = `colour="${xmlEscape(color1)}" secondaryColour="${xmlEscape(color2)}"`;
 
             // Use a menu icon if there is one. Otherwise, use the block icon. If there's no icon,
             // the category menu will show its default colored circle.
@@ -1840,7 +1840,7 @@ categoryInfo.blockText = extensionInfo.blockText;
                 menuIconURI = categoryInfo.blockIconURI;
             }
             const menuIconXML = menuIconURI ?
-                `iconURI="${xmlEscape.escapeAttribute(menuIconURI)}"` : '';
+                `iconURI="${xmlEscape(menuIconURI)}"` : '';
 
             let statusButtonXML = '';
             if (categoryInfo.showStatusButton) {

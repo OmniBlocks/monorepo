@@ -42,12 +42,6 @@ This repository contains the frontend interface of the Block-Based editor for Om
 If you want to fork this repo or contribute with PR's (or modify OmniBlocks as your own), you must follow the following rules from the AGPLv3 license, or you are in violation of it.
 * 1. Your fork/mod must be public and open-source.
 * 2. Your fork/mod can be paid, but must be licensed under the same AGPLv3 license.
-### Notice about rule 2
-While it does say your fork/mod can be paid, the <b>main software</b> cannot be paid. Here are acceptable uses for requiring payment:
-* 1. Premium features
-  2. Support services
-  3. Subscriptions.
-
 
 ## Try It Out
 Try out OmniBlocks: [https://omniblocks.github.io](https://omniblocks.github.io)

@@ -191,7 +191,7 @@ this is already part of the below -->
 
 This project is licensed under multiple agreements due to its forked nature.
 
-- **OmniBlocks & TurboWarp Modifications:** Licensed under the **GNU Affero General Public License v3.0**. See the `LICENSE` file or [gnu.org/licenses](https://www.gnu.org/licenses/) for details.
+- **OmniBlocks Modifications:** Licensed under the **GNU Affero General Public License v3.0**. See the `LICENSE` file or [gnu.org/licenses](https://www.gnu.org/licenses/) for details.
 
 - **Original TurboWarp Code (BSD License):** Copyright (c) TurboWarp contributors. The original license text is retained below as required.
 

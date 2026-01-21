@@ -144,8 +144,8 @@ graph TD
     click H "https://github.com/OmniBlocks/scratch-svg-renderer" "View scratch-svg-renderer repo"
     click I "https://github.com/OmniBlocks/scratch-parser" "View scratch-parser repo"
     click J "https://github.com/OmniBlocks/scratch-l10n" "View scratch-l10n repo"
-    
-    click K "https://github.com/OmniBlocks" "Visit OmniBlocks GitHub"
+    click K "https://github.com/OmniBlocks/" "Us. This is us :D"
+    click L "https://www.target.com/p/folgers-gourmet-supreme-ground-coffee/-/A-94500862?preselect=13376546#lnk=sametab" "Okay... why IS this here though... It was only a joke!"
 ```
 
 

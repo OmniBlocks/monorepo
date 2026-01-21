@@ -193,11 +193,11 @@ code_generation:
     path_instructions: []
 issue_enrichment:
   auto_enrich:
-    enabled: false
-  planning:
     enabled: true
+  planning:
+    enabled: false
     auto_planning:
-      enabled: true
+      enabled: false
       labels: []
   labeling:
     labeling_instructions: []

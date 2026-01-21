@@ -116,9 +116,11 @@ graph TD
     B --> G["scratch-storage<br/>Asset Manager"]
     C --> H["scratch-svg-renderer<br/>SVG Processor"]
     B --> I["scratch-parser<br/>Project Parser"]
-    B --> J["scratch-l10n<br/>i18n System"]
+    A --> G
+    A --> J["scratch-l10n<br/>i18n System"]
     K["Developers<br/>(Thats us!)"] --> L["scratch-caffeine-<br/>WAIT A MINUTE THIS WAS A<br/>JOKE!<br/>How did this get into here?!"]
     
+    %% Styles
     style A fill:#4C97FF,color:#fff
     style B fill:#FF6680,color:#fff
     style C fill:#FFAB19,color:#fff
@@ -129,6 +131,21 @@ graph TD
     style H fill:#FFAB19,color:#fff
     style I fill:#FF6680,color:#fff
     style J fill:#FF6680,color:#fff
+    style K fill:#FF6680,color:#fff,font:Comic Sans
+
+    %% Click Interactions
+    click A "https://github.com/OmniBlocks/scratch-gui" "View scratch-gui repo"
+    click B "https://github.com/OmniBlocks/scratch-vm" "View scratch-vm repo"
+    click C "https://github.com/OmniBlocks/scratch-render" "View scratch-render repo"
+    click D "https://github.com/OmniBlocks/scratch-paint" "View scratch-paint repo"
+    click E "https://github.com/OmniBlocks/scratch-blocks" "View scratch-blocks repo"
+    click F "https://github.com/OmniBlocks/scratch-audio" "View scratch-audio repo"
+    click G "https://github.com/OmniBlocks/scratch-storage" "View scratch-storage repo"
+    click H "https://github.com/OmniBlocks/scratch-svg-renderer" "View scratch-svg-renderer repo"
+    click I "https://github.com/OmniBlocks/scratch-parser" "View scratch-parser repo"
+    click J "https://github.com/OmniBlocks/scratch-l10n" "View scratch-l10n repo"
+    
+    click K "https://github.com/OmniBlocks" "Visit OmniBlocks GitHub"
 ```
 
 

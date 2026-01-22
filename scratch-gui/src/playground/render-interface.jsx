@@ -137,11 +137,11 @@ const Footer = () => (
             <div className={styles.footerText}>
                 <FormattedMessage
                     // eslint-disable-next-line max-len
-                    defaultMessage="Scratch is a project of the Scratch Foundation. It is available for free at {scratchDotOrg}."
+                    defaultMessage="Scratch is a project of the Scratch Foundation."
                     description="A disclaimer that Scratch requires when referring to Scratch. {scratchDotOrg} is a link with text 'https://scratch.org/'"
                     id="tw.footer.scratchDisclaimer"
                     values={{
-                        scratchDotOrg: (
+                        scratchSiteGone: (
                             <a
                                 href="https://scratch.org/"
                                 target="_blank"
@@ -217,7 +217,7 @@ const Footer = () => (
                     </a>
                 </div>
                 <div className={styles.footerSection}>
-                    <a href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments">
+                    <a href="https://github.com/OmniBlocks/scratch-gui/issues/new">
                         <FormattedMessage
                             defaultMessage="Feedback & Bugs"
                             description="Link to feedback/bugs page"

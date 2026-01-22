@@ -68,7 +68,7 @@ jobs:
       if: matrix.language == 'javascript-typescript'
       shell: bash
       run: |
-        npm ci
+        npm ci || npm i --legacy-peer-deps
         npm run build
 
     - name: Perform CodeQL Analysis

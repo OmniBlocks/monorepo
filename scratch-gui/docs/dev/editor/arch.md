@@ -5,4 +5,4 @@ The block pallete and the blocks stage is made from scratch-blocks, the stage fr
 
 Below is a diagram of the architecture.
 
-![OmniBlocks Architecture](https://github.com/OmniBlocks/scratch-gui/docs/dev/editor/images/blob/arch.png)
+![OmniBlocks Architecture](https://raw.githubusercontent.com/OmniBlocks/scratch-gui/refs/heads/main/docs/dev/editor/images/arch.png)

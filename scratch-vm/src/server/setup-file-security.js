@@ -19,7 +19,7 @@ const setupFileSecurity = (securityManager, permissions) => {
     };
 
     /* eslint-disable-next-line prefer-template */
-    const warn = (message, last) => process.stdout.write('\x1b[93m' + message + '\x1b[0m' + (last ? '' : '\n'));
+    const warn = (message, last) => process.stdout.write('\n\x1b[93m' + message + '\x1b[0m' + (last ? '' : '\n'));
 
     // FILE ACCESS
 

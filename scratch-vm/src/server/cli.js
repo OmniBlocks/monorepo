@@ -74,12 +74,16 @@
                 const server = new Server(!!argv.dev, argv.port);
                 setupFileSecurity(server.securityManager, permissions);
 
-                try {
-                    server.runProject(fs.readFileSync(resolvePath(argv.file)));
-                } catch {
+                const projectLoadError = () => {
                     console.log('Failed to load the project. :(');
                     server.halt();
                     process.exitCode = 2;
+                };
+
+                try {
+                    server.runProject(fs.readFileSync(resolvePath(argv.file))).catch(projectLoadError);
+                } catch {
+                    projectLoadError();
                     return;
                 }
             })

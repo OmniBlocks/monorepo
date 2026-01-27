@@ -24,7 +24,7 @@ const makePathResolver = (homeDir, workingDir) => {
         const normalizedPath = path.normalize(location);
 
         if (location.startsWith('~')) return path.join(homeDir(), normalizedPath.slice(1));
-        if (location.startsWith('/')) return normalizedPath;
+        if (path.isAbsolute(location)) return normalizedPath;
         return path.join(workingDir(), normalizedPath);
     };
 };

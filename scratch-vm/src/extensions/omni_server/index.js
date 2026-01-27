@@ -292,37 +292,6 @@ class Server {
                             defaultValue: 'apple'
                         }
                     }
-                },
-                '---',
-                {
-                    opcode: 'executeJS',
-                    text: formatMessage({
-                        id: 'omni_server.blocks.executeJS',
-                        default: 'execute JavaScript [JS]',
-                        description: 'Block that executes JavaScript'
-                    }),
-                    blockType: BlockType.COMMAND,
-                    arguments: {
-                        JS: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'alert("Hello!");'
-                        }
-                    }
-                },
-                {
-                    opcode: 'executeJSReporter',
-                    text: formatMessage({
-                        id: 'omni_server.blocks.executeJSReporter',
-                        default: 'execute JavaScript [JS]',
-                        description: 'Block that executes JavaScript'
-                    }),
-                    blockType: BlockType.UNIVERSAL,
-                    arguments: {
-                        JS: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'return true;'
-                        }
-                    }
                 }
             ],
             menus: {
@@ -429,17 +398,6 @@ class Server {
     data (args, util) {
         const thread = util.thread;
         return thread.serverRequest.data;
-    }
-
-    executeJS (args) {
-        if (this.runtime.isPackaged) {
-            new Function(args.JS)();
-        }
-    }
-    executeJSReporter (args) {
-        if (this.runtime.isPackaged) {
-            return new Function(args.JS)();
-        }
     }
 
     readFile ({PATH}) {

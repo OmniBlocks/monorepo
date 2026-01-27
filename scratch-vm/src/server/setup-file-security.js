@@ -1,6 +1,8 @@
 /* eslint-env node */
 /* eslint-disable no-console */
 
+const path = require('node:path');
+
 const awaitEvent = require('../util/await-event');
 const {resolvePath} = require('./resolve-path');
 
@@ -10,9 +12,11 @@ const setupFileSecurity = (securityManager, permissions) => {
         const location = resolvePath(fileLocation);
 
         for (let i = 0; i < permissions.fileScope.length; i++) {
-            const folder = permissions.fileScope[i];
-            const escapedFolder = folder.endsWith('/') ? folder : `${folder}/`;
-            if (location.startsWith(escapedFolder)) return true;
+            const folder = path.resolve(permissions.fileScope[i]);
+            const relative = path.relative(folder, location);
+            if (relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative))) {
+                return true;
+            }
         }
         
         return false;

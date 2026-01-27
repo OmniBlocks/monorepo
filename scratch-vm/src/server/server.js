@@ -63,7 +63,7 @@ class Server {
             } catch {
                 parsedJSON = {};
             }
-            res.writeHead(status, Object.create(null, {
+            res.writeHead(status, Object.assign(null, {
                 'Content-Type': mime,
                 ...parsedJSON
             }));
@@ -75,7 +75,7 @@ class Server {
         this.vm.securityManager.canFetch = () => Promise.resolve(false);
         this.vm.securityManager.canLoadExtensionFromProject = () => Promise.resolve(false);
 
-        // These are not possible in this enviroment.
+        // These are not possible in this environment.
         this.vm.securityManager.canOpenWindow = () => Promise.resolve(false);
         this.vm.securityManager.canRedirect = () => Promise.resolve(false);
 
@@ -123,16 +123,17 @@ class Server {
             const dataBuffer = Buffer.concat(dataRaw);
             const dataString = String(dataBuffer);
 
-            if (this.dev && req.url === '/_lk_devServer_updateLb') {
+            if (this.dev && req.url === '/_omni_devServer_updateProj') {
                 if (!('origin' in req.headers)) return res.end('denied');
                 
-                const isEditor = req.headers.origin === 'http://localhost:8601' ||
-                    req.headers.origin.endsWith('omniblocks.github.io');
+                const isEditor = req.headers.origin === 'http://localhost:8601' || 'https://omniblocks.github.io';
                 if (!isEditor) return res.end('denied');
                 
-                await this.runProject(dataBuffer).catch(err => {
-                    throw new Error(err);
-                });
+                try {
+                    await this.runProject(dataBuffer);
+                } catch {
+                    return res.end('corrupt');
+                }
                 
                 res.writeHead(200, {
                     'Content-Type': 'text/plain',

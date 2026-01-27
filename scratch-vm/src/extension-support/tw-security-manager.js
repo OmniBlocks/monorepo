@@ -171,6 +171,24 @@ class SecurityManager {
     shouldUseLocal(refrenceName) {
         return Promise.resolve(!confirm(`it seems that the extension ${refrenceName} has been updated, use the up-to-date code?`))
     }
+
+    /**
+     * omni: Determine whether a file can be read from a location. Meant for privileged environments.
+     * @param {string} path The file to read
+     * @returns {Promise<boolean>|boolean}
+     */
+    canReadFile (path) {
+        return Promise.resolve(false);
+    }
+
+    /**
+     * omni: Determine whether a file can be written to a location. Meant for privileged environments.
+     * @param {string} path The file to write
+     * @returns {Promise<boolean>|boolean}
+     */
+    canWriteFile (path) {
+        return Promise.resolve(false);
+    }
 }
 
 module.exports = SecurityManager;

@@ -178,14 +178,22 @@ const teardownUnsandboxedExtensionAPI = () => {
  * @returns {Promise<object[]>} Resolves with a list of extension objects if the extension was loaded successfully.
  */
 const loadUnsandboxedExtension = (extensionURL, vm) => new Promise((resolve, reject) => {
-    setupUnsandboxedExtensionAPI(vm).then(resolve);
-
-    const script = document.createElement('script');
-    script.onerror = () => {
-        reject(new Error(`Error in unsandboxed script ${extensionURL}. Check the console for more information.`));
-    };
-    script.src = extensionURL;
-    document.body.appendChild(script);
+    if (typeof process === 'undefined') {
+        const script = document.createElement('script');
+        script.onerror = () => {
+            reject(new Error(`Error in unsandboxed script ${extensionURL}. Check the console for more information.`));
+        };
+        script.src = extensionURL;
+        document.body.appendChild(script);
+    } else {
+        fetch(extensionURL).then(res => {
+            res.text().then(data => {
+                const extension = data;
+                const run = Function('Scratch', extension);
+                run(global.Scratch);
+            });
+        });
+    }
 }).then(objects => {
     teardownUnsandboxedExtensionAPI();
     return objects;

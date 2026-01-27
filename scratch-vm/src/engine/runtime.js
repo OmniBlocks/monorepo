@@ -504,6 +504,22 @@ class Runtime extends EventEmitter {
         this.isPackaged = false;
 
         /**
+         * omni: We support a "privileged" mode. This usually is set when the project is running as a server,
+         * but other privileged clients can use this too.
+         * This is mainly to indicate that system APIs (possibly mocked and/or with a permission system)
+         * can be accessed, as provided by the privileged client.
+         */
+        this.isPrivileged = false;
+
+        /**
+         * omni: Privileged utilities, so that the VM can communicate with a privileged client.
+         * This is usally filled in by the server client, but another client can fill this in too,
+         * as long as they are compatible and set isPrivileged to true.
+         * @type {Object<string, function>}
+         */
+        this.privilegedUtils = Object.create(null);
+
+        /**
          * Contains information about the external communication methods that the scripts inside the project
          * can use to send data from inside the project to an external server.
          * Do not update this directly. Use Runtime.setExternalCommunicationMethod() instead.
@@ -945,6 +961,20 @@ class Runtime extends EventEmitter {
      */
     static get PLATFORM_MISMATCH () {
         return 'PLATFORM_MISMATCH';
+    }
+
+    /**
+     * omni: Event name when a web request is forwarded to the VM.
+     */
+    static get SERVER_REQUEST () {
+        return 'SERVER_REQUEST';
+    }
+
+    /**
+     * omni: Event name when a response to a web request is forwarded to the web request handler.
+     */
+    static get SERVER_RESPONSE () {
+        return 'SERVER_RESPONSE';
     }
 
     /**

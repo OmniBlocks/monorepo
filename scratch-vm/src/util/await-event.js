@@ -7,8 +7,8 @@ const {EventEmitter} = require('events');
  * @returns {Promise<any[]>} The data transmitted over the listener.
  */
 const awaitEvent = (event, eventName) => new Promise((resolve, reject) => {
-    if (!(event instanceof EventEmitter)) reject(new TypeError('"event" must be an instance of EventEmitter.'));
-    if (typeof eventName !== 'string') reject(new TypeError('"eventName" must be a string.'));
+    if (!(event instanceof EventEmitter)) return reject(new TypeError('"event" must be an instance of EventEmitter.'));
+    if (typeof eventName !== 'string') return reject(new TypeError('"eventName" must be a string.'));
 
     const listener = (...data) => {
         event.removeListener(eventName, listener);

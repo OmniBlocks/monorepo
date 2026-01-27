@@ -57,10 +57,16 @@ class Server {
         this.vm.runtime.on(Runtime.SERVER_RESPONSE, (content, mime, status, extraHeaders, requestId) => {
             const res = this.resMap.get(requestId);
             if (typeof res === 'undefined') return;
-            res.writeHead(status, {
+            let parsedJSON;
+            try {
+                parsedJSON = JSON.parse(extraHeaders);
+            } catch {
+                parsedJSON = {};
+            }
+            res.writeHead(status, Object.create(null, {
                 'Content-Type': mime,
-                ...JSON.parse(extraHeaders)
-            });
+                ...parsedJSON
+            }));
             res.end(String(content));
             this.resMap.delete(requestId);
         });
@@ -118,11 +124,11 @@ class Server {
             const dataString = String(dataBuffer);
 
             if (this.dev && req.url === '/_lk_devServer_updateLb') {
-                if (!('origin' in req.headers)) return;
+                if (!('origin' in req.headers)) return res.end('denied');
                 
                 const isEditor = req.headers.origin === 'http://localhost:8601' ||
                     req.headers.origin.endsWith('omniblocks.github.io');
-                if (!isEditor) return;
+                if (!isEditor) return res.end('denied');
                 
                 await this.runProject(dataBuffer).catch(err => {
                     throw new Error(err);

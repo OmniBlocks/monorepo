@@ -74,7 +74,7 @@ const setupFileSecurity = (securityManager, permissions) => {
 
             if (String(key).toLowerCase() !== 'y') return false;
 
-            if (!permissions.fileReadAccess) permissions.fileWriteAccess = true;
+            if (!permissions.fileWriteAccess) permissions.fileWriteAccess = true;
         }
 
         if (!canAccessFolder(fileLocation)) {

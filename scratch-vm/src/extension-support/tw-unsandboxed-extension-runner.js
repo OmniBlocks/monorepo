@@ -178,6 +178,8 @@ const teardownUnsandboxedExtensionAPI = () => {
  * @returns {Promise<object[]>} Resolves with a list of extension objects if the extension was loaded successfully.
  */
 const loadUnsandboxedExtension = (extensionURL, vm) => new Promise((resolve, reject) => {
+    setupUnsandboxedExtensionAPI(vm).then(resolve);
+
     if (typeof process === 'undefined') {
         const script = document.createElement('script');
         script.onerror = () => {

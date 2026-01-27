@@ -35,8 +35,6 @@ class Server {
          */
         this.runtime = runtime;
 
-        this.renderer = this.runtime.renderer;
-
         this.runtime.on(Runtime.SERVER_REQUEST, (page, ip, method, headers, data, id) => {
             this.request = {
                 id,
@@ -93,7 +91,7 @@ class Server {
                     text: formatMessage({
                         id: 'omni_server.blocks.whenPageIsNotFound',
                         default: 'when page is not found',
-                        description: 'Hat that executes the the code under it when a certain page is not fouund.'
+                        description: 'Hat that executes the the code under it when a certain page is not found.'
                     }),
                     blockType: BlockType.HAT,
                     isEdgeActivated: false
@@ -299,7 +297,7 @@ class Server {
                 {
                     opcode: 'executeJS',
                     text: formatMessage({
-                        id: 'omni_appmaker.blocks.executeJS',
+                        id: 'omni_server.blocks.executeJS',
                         default: 'execute JavaScript [JS]',
                         description: 'Block that executes JavaScript'
                     }),
@@ -314,7 +312,7 @@ class Server {
                 {
                     opcode: 'executeJSReporter',
                     text: formatMessage({
-                        id: 'omni_appmaker.blocks.executeJSReporter',
+                        id: 'omni_server.blocks.executeJSReporter',
                         default: 'execute JavaScript [JS]',
                         description: 'Block that executes JavaScript'
                     }),
@@ -370,7 +368,6 @@ class Server {
     returnContent ({CONTENT, MIME, STATUS, EXTRA_HEADERS}, util) {
         const thread = util.thread;
         if (!thread.serverRequest) return;
-        console.log(CONTENT);
         this.runtime.emit(Runtime.SERVER_RESPONSE, CONTENT, MIME, STATUS, EXTRA_HEADERS, thread.serverRequest.id);
     }
 

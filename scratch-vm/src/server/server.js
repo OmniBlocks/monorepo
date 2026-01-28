@@ -126,7 +126,8 @@ class Server {
             if (this.dev && req.url === '/_omni_devServer_updateProj') {
                 if (!('origin' in req.headers)) return res.end('denied');
                 
-                const isEditor = req.headers.origin === 'http://localhost:8601' || 'https://omniblocks.github.io';
+                const isEditor = req.headers.origin === 'http://localhost:8601' ||
+                    req.headers.origin === 'https://omniblocks.github.io';
                 if (!isEditor) return res.end('denied');
                 
                 try {

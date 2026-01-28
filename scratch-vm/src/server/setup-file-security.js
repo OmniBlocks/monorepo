@@ -65,7 +65,7 @@ const setupFileSecurity = (securityManager, permissions) => {
             if (!process.stdin.isTTY || !process.stdout.isTTY) return false;
 
             /* eslint-disable max-len */
-            warn('This project wants write access to your filesystem. Allowing read access will mean the project will be able to write to and replace ANY file you can.');
+            warn('This project wants write access to your filesystem. Allowing write access will mean the project will be able to write to and replace ANY file you can.');
             warn('This includes personal documents and files, program settings, and more.');
             warn('If you don\'t trust this project, or you are not sure, you should not give permission.');
             warn('Are you sure you want to allow filesystem write access? (Y/N)', true);

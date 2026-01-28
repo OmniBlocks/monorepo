@@ -48,6 +48,7 @@ import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 
 import twIcon from './tw/tw.svg';
 import customExtensionIcon from './custom/custom.svg';
+import serverIcon from './server/server.svg';
 import returnIcon from './custom/return.svg';
 import galleryIcon from './gallery/gallery.svg';
 import {APP_NAME} from '../../brand';
@@ -161,6 +162,21 @@ export default [
         tags: ['scratch'],
         featured: true,
         internetConnectionRequired: true
+    },
+    {
+        name: 'Web Server',
+        extensionId: 'server',
+        collaborator: 'LibreKitten',
+        iconURL: serverIcon,
+        description: (
+            <FormattedMessage
+                defaultMessage="Build a web server that can host an API and simple websites."
+                description="Description for the 'Web Server' extension"
+                id="omni.extension.server.description"
+            />
+        ),
+        tags: ['ob'],
+        featured: true
     },
     {
         name: 'Makey Makey',

@@ -50,7 +50,7 @@ const setupFileSecurity = (securityManager, permissions) => {
 
         if (!canAccessFolder(fileLocation)) {
             /* eslint-disable max-len */
-            warn('The project attemped to read a file outside of the allowed file scope. The read has been prevented.');
+            warn('The project attempted to read a file outside of the allowed file scope. The read has been prevented.');
             warn('If the project needs to read a file outside the file scope, append "--file-scope /path/to/folder /add/more/folders/if/you/want --" to the command.');
             warn('You should not let the folder read outside of the home folder, unless it is absolutely necessary.');
             /* eslint-enable max-len */
@@ -83,7 +83,7 @@ const setupFileSecurity = (securityManager, permissions) => {
 
         if (!canAccessFolder(fileLocation)) {
             /* eslint-disable max-len */
-            warn('The project attemped to write to a file outside of the allowed file scope. The write has been prevented.');
+            warn('The project attempted to write to a file outside of the allowed file scope. The write has been prevented.');
             warn('If the project needs to write to a file outside the file scope, append "--file-scope /path/to/folder /add/more/folders/if/you/want --" to the command.');
             warn('You should not let the folder write outside of the home folder, unless it is absolutely necessary.');
             /* eslint-enable max-len */

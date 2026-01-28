@@ -48,6 +48,7 @@ import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 
 import twIcon from './tw/tw.svg';
 import customExtensionIcon from './custom/custom.svg';
+import serverIcon from './server/server.svg';
 import returnIcon from './custom/return.svg';
 import galleryIcon from './gallery/gallery.svg';
 import {APP_NAME} from '../../brand';
@@ -166,9 +167,7 @@ export default [
         name: 'Web Server',
         extensionId: 'server',
         collaborator: 'LibreKitten',
-        // TODO: This is a placeholder until someone designs a cover or Amp gives permission to use the he made one for
-        // LibreKitten.
-        iconURL: customExtensionIcon,
+        iconURL: serverIcon,
         description: (
             <FormattedMessage
                 defaultMessage="Build a web server that can host an API and simple websites."

@@ -351,6 +351,7 @@ class Server {
             Cast.toString(thread.serverResponse.headers),
             thread.serverRequest.id
         );
+        thread.stopThisScript();
     }
 
     setMime ({MIME}, util) {

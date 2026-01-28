@@ -57,6 +57,7 @@ class Server {
         this.vm.runtime.on(Runtime.SERVER_RESPONSE, (content, mime, status, extraHeaders, requestId) => {
             const res = this.resMap.get(requestId);
             if (typeof res === 'undefined') return;
+            if (res._omniTimeout) clearTimeout(res._omniTimeout);
             let parsedJSON;
             try {
                 parsedJSON = JSON.parse(extraHeaders);
@@ -145,6 +146,17 @@ class Server {
             
             const requestId = crypto.randomUUID();
             this.resMap.set(requestId, res);
+            
+            const timeout = setTimeout(() => {
+                if (this.resMap.has(requestId)) {
+                    this.resMap.delete(requestId);
+                    res.writeHead(504, {'Content-Type': 'text/plain'});
+                    res.end('Gateway Timeout');
+                }
+            }, 30000); // 30 second timeout
+            
+            // Store timeout with response for cleanup on successful response
+            res._omniTimeout = timeout;
             this.vm.runtime.emit(
                 Runtime.SERVER_REQUEST,
                 req.url,

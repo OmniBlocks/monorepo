@@ -163,6 +163,23 @@ export default [
         internetConnectionRequired: true
     },
     {
+        name: 'Web Server',
+        extensionId: 'server',
+        collaborator: 'LibreKitten',
+        // TODO: This is a placeholder until someone designs a cover or Amp gives permission to use the he made one for
+        // LibreKitten.
+        iconURL: customExtensionIcon,
+        description: (
+            <FormattedMessage
+                defaultMessage="Build a web server that can host an API and simple websites."
+                description="Description for the 'Web Server' extension"
+                id="omni.extension.server.description"
+            />
+        ),
+        tags: ['ob'],
+        featured: true
+    },
+    {
         name: 'Makey Makey',
         extensionId: 'makeymakey',
         collaborator: 'JoyLabz',

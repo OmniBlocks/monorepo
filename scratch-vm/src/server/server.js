@@ -64,7 +64,7 @@ class Server {
             } catch {
                 parsedJSON = {};
             }
-            res.writeHead(status, Object.assign(null, {
+            res.writeHead(status, Object.assign(Object.create(null), {
                 'Content-Type': mime,
                 ...parsedJSON
             }));

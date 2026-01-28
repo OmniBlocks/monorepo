@@ -75,7 +75,7 @@ class Server {
                     text: formatMessage({
                         id: 'omni_server.blocks.whenPageIsRequested',
                         default: 'when page [PAGE] is requested',
-                        description: 'Hat that executes the the code under it when a certain page is requested.'
+                        description: 'Hat that executes the code under it when a certain page is requested.'
                     }),
                     blockType: BlockType.HAT,
                     arguments: {
@@ -91,7 +91,7 @@ class Server {
                     text: formatMessage({
                         id: 'omni_server.blocks.whenPageIsNotFound',
                         default: 'when page is not found',
-                        description: 'Hat that executes the the code under it when a certain page is not found.'
+                        description: 'Hat that executes the code under it when a certain page is not found.'
                     }),
                     blockType: BlockType.HAT,
                     isEdgeActivated: false
@@ -103,7 +103,7 @@ class Server {
                         id: 'omni_server.blocks.returnContent',
                         // eslint-disable-next-line max-len
                         default: 'return content [CONTENT] as [MIME] with the status [STATUS] and headers [EXTRA_HEADERS]',
-                        description: 'Hat that executes the the code under it when a certain page is requested.'
+                        description: 'Hat that executes the code under it when a certain page is requested.'
                     }),
                     blockType: BlockType.COMMAND,
                     isTerminal: true,

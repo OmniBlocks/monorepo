@@ -15,7 +15,7 @@ function get_extension_switches(id, blocks) {
     // I have no idea what this is doing and why it is trying to monkeypatch Blockly via the DOM from
     // the VM; but, it is blocking server support, so I'm going to mock it for running in Node.js and
     // hope for the best. Contact @someCatInTheWorld if this mocking breaks something horribly.
-    if (typeof process !== 'undefined') return {
+    if (typeof process !== 'undefined' && process.versions?.node) return {
         opcode: 'un_supported',
         msg: 'unsupported',
 

@@ -70,27 +70,6 @@ class _StackFrame {
          * @type {object}
          */
         this.op = null;
-
-        /**
-         * omni: The object the web server stores a request in.
-         * @type {object}
-         */
-        this.serverRequest = {
-            ip: '',
-            method: '',
-            page: '',
-            headers: '{}',
-            data: ''
-        };
-        /**
-         * omni: The object the web server constructs the response in.
-         * @type {object}
-         */
-        this.serverResponse = {
-            mime: 'text/plain',
-            status: null, // Intialized by the request listener hat.
-            headers: '{}'
-        };
     }
 
     /**
@@ -255,7 +234,7 @@ class Thread {
          */
         this.serverResponse = {
             mime: 'text/plain',
-            status: null, // Intialized by the request listener hat.
+            status: null, // Initialized by the request listener hat.
             headers: '{}'
         };
     }

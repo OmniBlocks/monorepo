@@ -29,7 +29,7 @@ const setupFileSecurity = (securityManager, permissions) => {
 
     securityManager.canReadFile = async function (fileLocation) {
         if (!permissions.fileReadAccess) {
-            if (!process.stdout.isTTY) return false;
+            if (!process.stdin.isTTY || !process.stdout.isTTY) return false;
 
             /* eslint-disable max-len */
             warn('This project wants read access to your filesystem. Allowing read access will mean the project will be able to read ANY file you can.');
@@ -62,7 +62,7 @@ const setupFileSecurity = (securityManager, permissions) => {
 
     securityManager.canWriteFile = async function (fileLocation) {
         if (!permissions.fileWriteAccess) {
-            if (!process.stdout.isTTY) return false;
+            if (!process.stdin.isTTY || !process.stdout.isTTY) return false;
 
             /* eslint-disable max-len */
             warn('This project wants write access to your filesystem. Allowing read access will mean the project will be able to write to and replace ANY file you can.');
@@ -97,7 +97,7 @@ const setupFileSecurity = (securityManager, permissions) => {
 
     securityManager.canFetch = async function () {
         if (!permissions.networkAccess) {
-            if (!process.stdout.isTTY) return false;
+            if (!process.stdin.isTTY || !process.stdout.isTTY) return false;
 
             /* eslint-disable max-len */
             warn('This project wants network access. Allowing network access will mean the project will be able to access ANY website on the internet and ANY website on your local network.');

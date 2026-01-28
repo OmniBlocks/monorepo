@@ -338,6 +338,7 @@ class Server {
         const thread = util.thread;
         if (!thread.serverRequest) return;
         this.runtime.emit(Runtime.SERVER_RESPONSE, CONTENT, MIME, STATUS, EXTRA_HEADERS, thread.serverRequest.id);
+        thread.stopThisScript();
     }
 
     returnRequest ({CONTENT}, util) {

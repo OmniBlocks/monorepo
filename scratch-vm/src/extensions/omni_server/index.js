@@ -336,14 +336,20 @@ class Server {
 
     returnContent ({CONTENT, MIME, STATUS, EXTRA_HEADERS}, util) {
         const thread = util.thread;
-        if (!thread.serverRequest) return;
+        if (!thread.serverRequest) {
+            thread.stopThisScript();
+            return;
+        }
         this.runtime.emit(Runtime.SERVER_RESPONSE, CONTENT, MIME, STATUS, EXTRA_HEADERS, thread.serverRequest.id);
         thread.stopThisScript();
     }
 
     returnRequest ({CONTENT}, util) {
         const thread = util.thread;
-        if (!thread.serverRequest) return;
+        if (!thread.serverRequest) {
+            thread.stopThisScript();
+            return;
+        }
         this.runtime.emit(
             Runtime.SERVER_RESPONSE,
             Cast.toString(CONTENT),

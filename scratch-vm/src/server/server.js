@@ -96,8 +96,8 @@ class Server {
             try {
                 fs.writeFileSync(resolvedPath, String(content));
             } catch (err) {
-                // Empty on purpose.
-                // omni: TODO: Maybe add some form of error handling?
+               
+               console.error(`Failed to write to file: ${resolvedPath}`, err.message);
             }
         };
 

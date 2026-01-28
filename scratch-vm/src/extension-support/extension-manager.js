@@ -8,10 +8,12 @@ const Cast = require('../util/cast');
 
 const AddonSwitches = require('./extension-addon-switchers');
 
+/* Commenting out for the sake of server support.
+
 const urlParams = new URLSearchParams(location.search);
 
 const IsLocal = String(window.location.href).startsWith(`http://localhost:`);
-const IsLiveTests = urlParams.has('livetests');
+const IsLiveTests = urlParams.has('livetests'); */
 
 // thhank yoh random stack droverflwo person
 async function sha256(source) {
@@ -43,8 +45,9 @@ const defaultBuiltinExtensions = {
     gdxfor: () => require('../extensions/scratch3_gdx_for'),
     // tw: core extension
     tw: () => require('../extensions/tw'),
-    SPjavascriptV2: () => require("../extensions/sp_javascriptV2")
-    
+    SPjavascriptV2: () => require("../extensions/sp_javascriptV2"),
+    // omni: Web server blocks.
+    server: () => require('../extensions/omni_server'),
 };
 const CORE_EXTENSIONS = [
     'argument',

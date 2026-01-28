@@ -116,8 +116,18 @@ class Server {
      */
     httpServer (req, res) {
         const dataRaw = [];
+        let bodySize = 0;
+        // omni: TODO: Make this configurable.
+        const MAX_BODY_SIZE = 10 * 1024 * 1024; // 10 MB limit
 
         req.on('data', chunk => {
+            bodySize += chunk.length;
+            if (bodySize > MAX_BODY_SIZE) {
+                res.writeHead(413, {'Content-Type': 'text/plain'});
+                res.end('Request Entity Too Large');
+                req.destroy();
+                return;
+            }
             dataRaw.push(chunk);
         });
         req.on('end', async () => {

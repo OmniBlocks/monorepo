@@ -56,6 +56,8 @@ class Server {
             if (threadStatuses.every(status => (status === Thread.STATUS_DONE))) {
                 runtime.startHats('server_whenPageIsNotFound');
             }
+
+            this.request = null;
         });
     }
 
@@ -330,7 +332,6 @@ class Server {
         if (PAGE === this.request?.page) {
             thread.serverRequest = this.request;
             thread.serverResponse.status = 200;
-            this.request = null;
             return true;
         }
         return false;

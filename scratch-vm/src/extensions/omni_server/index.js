@@ -348,6 +348,10 @@ class Server {
             Cast.toString(CONTENT),
             Cast.toString(thread.serverResponse.mime),
             Cast.toNumber(thread.serverResponse.status),
+            Cast.toString(thread.serverResponse.headers),
+            thread.serverRequest.id
+        );
+    }
 
     setMime ({MIME}, util) {
         const thread = util.thread;

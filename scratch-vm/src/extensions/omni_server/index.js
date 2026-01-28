@@ -336,20 +336,14 @@ class Server {
 
     returnContent ({CONTENT, MIME, STATUS, EXTRA_HEADERS}, util) {
         const thread = util.thread;
-        if (!thread.serverRequest) {
-            thread.stopThisScript();
-            return;
-        }
+        if (!thread.serverRequest) return; // Do absolutely nothing in the browser.
         this.runtime.emit(Runtime.SERVER_RESPONSE, CONTENT, MIME, STATUS, EXTRA_HEADERS, thread.serverRequest.id);
-        thread.stopThisScript();
+        // No script stopping is intended behaviour for backwards compatibility.
     }
 
     returnRequest ({CONTENT}, util) {
         const thread = util.thread;
-        if (!thread.serverRequest) {
-            thread.stopThisScript();
-            return;
-        }
+        if (!thread.serverRequest) return; // Do absolutely nothing in the browser.
         this.runtime.emit(
             Runtime.SERVER_RESPONSE,
             Cast.toString(CONTENT),

@@ -35,6 +35,8 @@ class Server {
          */
         this.runtime = runtime;
 
+        this.fileAccessError = false;
+
         this.runtime.on(Runtime.SERVER_REQUEST, (page, ip, method, headers, data, id) => {
             this.request = {
                 id,
@@ -292,6 +294,15 @@ class Server {
                             defaultValue: 'apple'
                         }
                     }
+                },
+                {
+                    opcode: 'fileAccessStatus',
+                    text: formatMessage({
+                        id: 'omni_server.blocks.fileAccessStatus',
+                        default: 'failed to access file?',
+                        description: 'Block that checks if the was an error while accessing a file.'
+                    }),
+                    blockType: BlockType.BOOLEAN
                 }
             ],
             menus: {
@@ -401,16 +412,32 @@ class Server {
         return thread.serverRequest.data;
     }
 
-    readFile ({PATH}) {
+    async readFile ({PATH}) {
         // Bail out if not privileged.
         if (!this.runtime.isPrivileged) return '';
-        return this.runtime.privilegedUtils.readFile(PATH);
+        try {
+            const file = await this.runtime.privilegedUtils.readFile(PATH);
+            this.fileAccessError = false;
+            return file;
+        } catch {
+            this.fileAccessError = true;
+            return '';
+        }
     }
 
     async writeFile ({PATH, CONTENT}) {
         // Bail out if not privileged.
         if (!this.runtime.isPrivileged) return;
-        await this.runtime.privilegedUtils.writeFile(PATH, CONTENT);
+        try {
+            await this.runtime.privilegedUtils.writeFile(PATH, CONTENT);
+            this.fileAccessError = false;
+        } catch {
+            this.fileAccessError = true;
+        }
+    }
+
+    fileAccessStatus () {
+        return this.fileAccessError;
     }
 }
 

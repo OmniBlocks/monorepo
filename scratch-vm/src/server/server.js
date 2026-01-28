@@ -83,22 +83,13 @@ class Server {
         this.vm.runtime.privilegedUtils.readFile = async path => {
             const resolvedPath = resolvePath(path);
             if (!await this.securityManager.canReadFile(resolvedPath)) return '';
-            try {
-                return fs.readFileSync(resolvedPath, 'utf8');
-            } catch (err) {
-                return '';
-            }
+            return fs.readFileSync(resolvedPath, 'utf8');
         };
 
         this.vm.runtime.privilegedUtils.writeFile = async (path, content) => {
             const resolvedPath = resolvePath(path);
             if (!await this.securityManager.canWriteFile(resolvedPath)) return;
-            try {
-                fs.writeFileSync(resolvedPath, String(content));
-            } catch (err) {
-               
-               console.error(`Failed to write to file: ${resolvedPath}`, err.message);
-            }
+            fs.writeFileSync(resolvedPath, String(content));
         };
 
         this.vm.setCompatibilityMode(false);

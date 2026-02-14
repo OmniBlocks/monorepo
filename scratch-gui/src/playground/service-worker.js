@@ -2,8 +2,8 @@
 /* eslint-disable func-style, require-jsdoc, no-use-before-define */
 const CACHE_NAME = 'omniblocks-v1';
 // bump to clear old entries with bad paths
-const STATIC_CACHE = 'omniblocks-static-v4';
-const DYNAMIC_CACHE = 'omniblocks-dynamic-v2';
+const STATIC_CACHE = 'omniblocks-static-v5';
+const DYNAMIC_CACHE = 'omniblocks-dynamic-v3';
 
 // --- URL helpers: make all paths scope-relative so GH Pages subpaths work ---
 const toRel = p => p.replace(/^\//, ''); // drop leading slash
@@ -17,30 +17,30 @@ const STATIC_ASSETS = mapURLs([
     'index.html', 'editor.html', 'fullscreen.html', 'embed.html', 'offline.html',
     // song editor (actual file)
     'songeditor.html',
-    // data/sample bundles
-    'static/nintaribox_samples.js',
-    'static/mario_paintbox_samples.js',
-    'static/kirby_samples.js',
-    'static/drumsamples.js',
-    'static/samples.js', 'static/samples2.js', 'static/samples3.js',
-    'static/wario_samples.js',
-    'static/privacy.html',
-    // meta/icons
-    'static/manifest.webmanifest', 'static/favicon.ico',
-    'static/images/192.png', 'static/images/512.png',
-    'static/sb3-icon-256.png', 'static/sb3-icon-512.png',
-    // beepbox core
-    'static/beepbox_editor.min.js',
-    'static/beepbox_synth.min.js',
-    // correct player file path (was wrong before)
-    'static/player/beepbox_player.min.js',
-    // correct boxy-sad path (file exists at this location/case)
-    'static/Boxy-sad.svg',
+    // data/sample bundles (in root of build)
+    'nintaribox_samples.js',
+    'mario_paintbox_samples.js',
+    'kirby_samples.js',
+    'drumsamples.js',
+    'samples.js', 'samples2.js', 'samples3.js',
+    'wario_samples.js',
+    'privacy.html',
+    // meta/icons (in root of build)
+    'manifest.webmanifest', 'favicon.ico',
+    'images/192.png', 'images/512.png',
+    'sb3-icon-256.png', 'sb3-icon-512.png',
+    // beepbox core (in root of build)
+    'beepbox_editor.min.js',
+    'beepbox_synth.min.js',
+    // correct player file path
+    'player/beepbox_player.min.js',
+    // correct boxy-sad path (in root of build)
+    'Boxy-sad.svg',
     // player copies (embed/player view)
-    'static/player/samples.js', 'static/player/samples2.js', 'static/player/samples3.js',
-    'static/player/wario_samples.js', 'static/player/nintaribox_samples.js',
-    'static/player/kirby_samples.js', 'static/player/drumsamples.js',
-    'static/player/mario_paintbox_samples.js'
+    'player/samples.js', 'player/samples2.js', 'player/samples3.js',
+    'player/wario_samples.js', 'player/nintaribox_samples.js',
+    'player/kirby_samples.js', 'player/drumsamples.js',
+    'player/mario_paintbox_samples.js'
 ]);
 
 // canonical song editor URL for aliasing navigations
@@ -258,11 +258,7 @@ async function handleRequest (request) {
     const url = new URL(request.url);
     
     try {
-        // In handleRequest() - add BEFORE the cache-first check:
-        if (url.pathname.endsWith('.js')) {
-            return networkFirst(request);
-        }
-        // Strategy 1: Cache-first for static assets
+        // Strategy 1: Cache-first for static assets (including JS files)
         if (isStaticAsset(request)) {
             return await cacheFirst(request, STATIC_CACHE);
         }
@@ -415,8 +411,8 @@ async function getOfflineFallback (request) {
                 <h1>You're Offline</h1>
                 <p>Sorry! OmniBlocks doesn't seem to be working offline right now.</p>
                 <div class="images">
-                    <img src="static/favicon.ico" alt="OmniBlocks Logo" class="logo">
-                    <img src="static/Boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
+                    <img src="favicon.ico" alt="OmniBlocks Logo" class="logo">
+                    <img src="Boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
                 </div>
                 <button onclick="location.href='/'">Go to Editor</button>
                 <button onclick="location.reload()">Try Again</button>

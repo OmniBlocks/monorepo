@@ -255,8 +255,14 @@ self.addEventListener('fetch', event => {
 });
 
 async function handleRequest (request) {
+    const url = new URL(request.url);
+    
     try {
-        // Strategy 1: Cache-first for static assets (including JS files)
+        // Network-first for JS files to ensure updates are reflected immediately
+        if (url.pathname.endsWith('.js')) {
+            return networkFirst(request);
+        }
+        // Strategy 1: Cache-first for static assets
         if (isStaticAsset(request)) {
             return await cacheFirst(request, STATIC_CACHE);
         }

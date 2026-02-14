@@ -260,7 +260,7 @@ async function handleRequest (request) {
     try {
         // Network-first for JS files to ensure updates are reflected immediately
         if (url.pathname.endsWith('.js')) {
-            return networkFirst(request);
+            return networkFirst(request, STATIC_CACHE);
         }
         // Strategy 1: Cache-first for static assets
         if (isStaticAsset(request)) {

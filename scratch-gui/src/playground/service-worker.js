@@ -255,8 +255,6 @@ self.addEventListener('fetch', event => {
 });
 
 async function handleRequest (request) {
-    const url = new URL(request.url);
-    
     try {
         // Strategy 1: Cache-first for static assets (including JS files)
         if (isStaticAsset(request)) {

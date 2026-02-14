@@ -5,6 +5,7 @@ on:
   issue_comment:
     types: [created]
   workflow_dispatch:
+if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && github.event.action == 'opened') || (github.event_name == 'issue_comment' && (contains(github.event.comment.body, '@OmniBlocks/ai') || contains(github.event.comment.body, '@coderabbitai'))) }}
 
 permissions:
   contents: read

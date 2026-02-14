@@ -22,7 +22,7 @@
 # For more information: https://github.github.com/gh-aw/introduction/overview/
 #
 #
-# frontmatter-hash: 6bc32ffc1cd2d52c2b1bed5c79b7535e5f048694d12bc26baf7d5c0add7e29c1
+# frontmatter-hash: 5ca912e0f2d78fe3b8ee475e028b66f2aa76440a810f9efa6794ed4e4371eb14
 
 name: "issue-assistant-agentic"
 "on":
@@ -45,7 +45,10 @@ run-name: "issue-assistant-agentic"
 jobs:
   activation:
     needs: pre_activation
-    if: needs.pre_activation.outputs.activated == 'true'
+    if: >
+      (needs.pre_activation.outputs.activated == 'true') && (github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' &&
+      github.event.action == 'opened') || (github.event_name == 'issue_comment' && (contains(github.event.comment.body, '@OmniBlocks/ai') ||
+      contains(github.event.comment.body, '@coderabbitai'))))
     runs-on: ubuntu-slim
     permissions:
       contents: read
@@ -987,6 +990,9 @@ jobs:
           if-no-files-found: ignore
 
   pre_activation:
+    if: >
+      ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && github.event.action == 'opened') ||
+      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, '@OmniBlocks/ai') || contains(github.event.comment.body, '@coderabbitai'))) }}
     runs-on: ubuntu-slim
     outputs:
       activated: ${{ steps.check_membership.outputs.is_team_member == 'true' }}

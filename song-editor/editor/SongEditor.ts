@@ -7,13 +7,11 @@ import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
 import { ChannelSettingsPrompt } from "./ChannelSettingsPrompt";
 import { ColorConfig, ChannelColors } from "./ColorConfig";
-import { createKeys, createScales, createBreaks, createBreakNames } from "../synth/CreateScalesAndKeys";
 import { CustomChipPrompt } from "./CustomChipPrompt";
 import { CustomFilterPrompt } from "./CustomFilterPrompt";
 import { InstrumentExportPrompt } from "./InstrumentExportPrompt";
 import { InstrumentImportPrompt } from "./InstrumentImportPrompt";
 import { EditorConfig, isMobile, prettyNumber, Preset, PresetCategory } from "./EditorConfig";
-import { EdoPrompt } from "./EdoPrompt";
 import { EuclideanRhythmPrompt } from "./EuclidgenRhythmPrompt";
 import { ExportPrompt } from "./ExportPrompt";
 import "./Layout"; // Imported here for the sake of ensuring this code is transpiled early.
@@ -61,16 +59,6 @@ const { button, div, input, select, span, optgroup, option, canvas } = HTML;
 
 function buildOptions(menu: HTMLSelectElement, items: ReadonlyArray<string | number>): HTMLSelectElement {
     for (let index: number = 0; index < items.length; index++) {
-        menu.appendChild(option({ value: index }, items[index]));
-    }
-    return menu;
-}
-
-function buildScaleOptions(menu: HTMLSelectElement, items: ReadonlyArray<string | number>, breaks: Array<number>, breakNames: Array<string>): HTMLSelectElement {
-    for (let index: number = 0; index < items.length; index++) {
-        if (breaks.includes(index)) {
-            menu.appendChild(optgroup({ label: breakNames[breaks.indexOf(index)+1] }));
-        }
         menu.appendChild(option({ value: index }, items[index]));
     }
     return menu;
@@ -804,7 +792,6 @@ export class SongEditor {
         option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (" + EditorConfig.ctrlSymbol + "E)"),
         option({ value: "beatsPerBar" }, "Change Beats Per Bar... (⇧B)"),
         option({ value: "barCount" }, "Change Song Length... (L)"),
-        option({ value: "edo" }, "Change EDO... (EdoBox) (E)"),
         option({ value: "channelSettings" }, "Channel Settings... (Q)"),
         option({ value: "limiterSettings" }, "Limiter Settings... (⇧L)"),
         option({ value: "addExternal" }, "Add Custom Samples... (⇧Q)"),
@@ -844,8 +831,8 @@ export class SongEditor {
 	        option({ value: "customTheme" }, "Custom Theme..."),
         ),
     );
-    private readonly _scaleSelect: HTMLSelectElement = buildScaleOptions(select(), createScales(this.doc.song.edo).map(scale => scale.name), createBreaks(this.doc.song.edo), createBreakNames(this.doc.song.edo));
-    private readonly _keySelect: HTMLSelectElement = buildOptions(select(), createKeys(this.doc.song.edo).map(key => key.name).reverse());
+    private readonly _scaleSelect: HTMLSelectElement = buildOptions(select(), Config.scales.map(scale => scale.name));
+    private readonly _keySelect: HTMLSelectElement = buildOptions(select(), Config.keys.map(key => key.name).reverse());
     private readonly _octaveStepper: HTMLInputElement = input({ style: "width: 59.5%;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
     private readonly _tempoSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this.doc, (oldValue: number, newValue: number) => new ChangeTempo(this.doc, oldValue, newValue), false);
     private readonly _tempoStepper: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
@@ -2206,9 +2193,6 @@ export class SongEditor {
                 case "beatsPerBar":
                     this.prompt = new BeatsPerBarPrompt(this.doc);
                     break;
-                case "edo":
-                    this.prompt = new EdoPrompt(this.doc);
-                    break;
                 case "moveNotesSideways":
                     this.prompt = new MoveNotesSidewaysPrompt(this.doc);
                     break;
@@ -2481,8 +2465,8 @@ export class SongEditor {
         }
 
         setSelectedValue(this._scaleSelect, this.doc.song.scale);
-        this._scaleSelect.title = createScales(this.doc.song.edo)[this.doc.song.scale].realName;
-        setSelectedValue(this._keySelect, createKeys(this.doc.song.edo).length - 1 - this.doc.song.key);
+        this._scaleSelect.title = Config.scales[this.doc.song.scale].realName;
+        setSelectedValue(this._keySelect, Config.keys.length - 1 - this.doc.song.key);
         this._octaveStepper.value = Math.round(this.doc.song.octave).toString();
         this._tempoSlider.updateValue(Math.max(0, Math.round(this.doc.song.tempo)));
         this._tempoStepper.value = Math.round(this.doc.song.tempo).toString();
@@ -4395,7 +4379,7 @@ export class SongEditor {
                     event.preventDefault();
                     break;
                 } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    this._openPrompt("edo");;
+                    this._openPrompt("customSongEQFilterSettings");
                 }
                 break;
             case 70: // f
@@ -5178,7 +5162,7 @@ export class SongEditor {
             }
             this.doc.notifier.changed();
         } else {
-            this.doc.record(new ChangeKey(this.doc, createKeys(this.doc.song.edo).length - 1 - this._keySelect.selectedIndex));
+            this.doc.record(new ChangeKey(this.doc, Config.keys.length - 1 - this._keySelect.selectedIndex));
         }
     }
 
@@ -5552,9 +5536,6 @@ export class SongEditor {
                 break;
             case "beatsPerBar":
                 this._openPrompt("beatsPerBar");
-                break;
-            case "edo":
-                this._openPrompt("edo");
                 break;
             case "moveNotesSideways":
                 this._openPrompt("moveNotesSideways");

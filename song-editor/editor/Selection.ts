@@ -784,12 +784,12 @@ export class Selection {
         for (const channelIndex of this._eachSelectedChannel()) {
             if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex)) continue;
             for (const pattern of this._eachSelectedPattern(channelIndex)) {
-                unionOfUsedNotes(pattern, scaleFlags, this._doc.song.edo);
+                unionOfUsedNotes(pattern, scaleFlags);
             }
         }
 
-        const scaleMap: number[] = generateScaleMap(scaleFlags, this._doc.song.scale, this._doc.song.edo);
-        
+        const scaleMap: number[] = generateScaleMap(scaleFlags, this._doc.song.scale, this._doc.song.scaleCustom);
+
         for (const channelIndex of this._eachSelectedChannel()) {
             if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex)) continue;
             for (const pattern of this._eachSelectedPattern(channelIndex)) {

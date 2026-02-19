@@ -1668,6 +1668,57 @@ export class Config {
         }
         return wave;
     }
+
+    //acBox
+    public static generateAbsSineWave(): Float32Array {
+        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
+        for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+            wave[i] = Math.abs(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength));
+        }
+        return wave;
+    }
+
+    public static generateQuarterSineWave(): Float32Array {
+        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
+        for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+            let q = Math.floor((i*4)/Config.sineWaveLength);
+
+            if (q == 0 || q == 2) {
+                wave[i] = Math.abs(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength));
+            } else {
+                wave[i] = 0;
+            }
+                
+        }
+        return wave;
+    }
+
+    public static generateSquishedSineWave(): Float32Array {
+        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
+        for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+            if (i < Config.sineWaveLength / 2) {
+                wave[i] = Math.sin(2 * i * Math.PI * 2.0 / Config.sineWaveLength);
+            } else {
+                wave[i] = 0;
+            }
+                
+        }
+        return wave;
+    }
+
+    public static generateSquishedAbsSineWave(): Float32Array {
+        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
+        for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+            if (i < Config.sineWaveLength / 2) {
+                wave[i] = Math.abs(Math.sin(2 * i * Math.PI * 2.0 / Config.sineWaveLength));
+            } else {
+                wave[i] = 0;
+            }
+                
+        }
+        return wave;
+    }
+    
     
 
     public static readonly sineWave: Float32Array = Config.generateSineWave();
@@ -1817,7 +1868,11 @@ export class Config {
         { name: "quasi-sine", samples: Config.generateQuasiSineWave() },
         { name: "half-sine", samples: Config.generateSemisineWave() },
 		{ name: "white noise", samples: Config.generateWhiteNoiseFmWave() },
-		// { name: "1-bit white noise", samples: Config.generateOneBitWhiteNoiseFmWave() },
+		{ name: "absine", samples: Config.generateAbsSineWave() },
+        { name: "sharksine", samples: Config.generateQuarterSineWave() },
+        { name: "fastsine", samples: Config.generateSquishedSineWave() },
+        { name: "camelsine", samples: Config.generateSquishedAbsSineWave() },
+    	// { name: "1-bit white noise", samples: Config.generateOneBitWhiteNoiseFmWave() },
     ]);
     public static readonly pwmOperatorWaves: DictionaryArray<OperatorWave> = toNameMap([
         { name: "1%", samples: Config.generateSquareWave(0.01) },

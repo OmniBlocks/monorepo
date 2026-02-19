@@ -1,7 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Config } from "../synth/SynthConfig";
-import {createScales} from "../synth/CreateScalesAndKeys";
 import { Note, Pattern } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
 import { ChangeGroup } from "./Change";
@@ -391,8 +390,8 @@ export class SongPerformance {
                 this.clearAllPitches();
                 this._pitchesAreTemporary = false;
             }
-            if (this._doc.prefs.ignorePerformedNotesNotInScale && !createScales(this._doc.song.edo)[this._doc.song.scale].flags[pitch % this._doc.song.edo]) {
-			    return;
+            if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
+                return;
             }
             if (this._doc.synth.liveInputPitches.indexOf(pitch) == -1) {
                 this._doc.synth.liveInputPitches.push(pitch);
@@ -421,9 +420,9 @@ export class SongPerformance {
                 this.clearAllBassPitches();
                 this._bassPitchesAreTemporary = false;
             }
-            if (this._doc.prefs.ignorePerformedNotesNotInScale && !createScales(this._doc.song.edo)[this._doc.song.scale].flags[pitch % this._doc.song.edo]) {
-				return;
-			}
+            if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
+                return;
+            }
             if (this._doc.synth.liveBassInputPitches.indexOf(pitch) == -1) {
                 this._doc.synth.liveBassInputPitches.push(pitch);
                 this._bassPitchesChanged = true;

@@ -1,6 +1,6 @@
 // Copyright (C) 2020 John Nesky, distributed under the MIT license.
 
-//import { Config } from "../synth/SynthConfig";
+import { Config } from "../synth/SynthConfig";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { SongDocument } from "./SongDocument";
 import { Prompt } from "./Prompt";
@@ -22,7 +22,7 @@ export class CustomScalePrompt implements Prompt {
     constructor(private _doc: SongDocument) {
         this._flags = _doc.song.scaleCustom.slice();
         let scaleHolder: HTMLDivElement = div({});
-        for (var i = _doc.song.edo - 1; i > 0; i--) {
+        for (var i = Config.pitchesPerOctave - 1; i > 0; i--) {
             this._scaleFlags[i] = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;", "checked": this._flags[i], "value": i });
             this._scaleRows[i] = div({ style: "text-align: right; height: 2em;" },
                 "Note " + i + ":",

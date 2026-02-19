@@ -7,8 +7,6 @@ import { Deque } from "./Deque";
 import { events } from "../global/Events";
 import { FilterCoefficients, FrequencyResponse, DynamicBiquadFilter, warpInfinityToNyquist } from "./filtering";
 import { xxHash32 } from "js-xxhash";
-import { createKeys, createScales } from "./CreateScalesAndKeys";
-
 
 declare global {
     interface Window {
@@ -210,70 +208,70 @@ const enum CharCode {
 }
 
 const enum SongTagCode {
-    beatCount           = CharCode.a, // added in BeepBox URL version 2
-    bars                = CharCode.b, // added in BeepBox URL version 2
-    songEq              = CharCode.c, // added in BeepBox URL version 2 for vibrato, switched to song eq in Slarmoo's Box 1.3
-    fadeInOut           = CharCode.d, // added in BeepBox URL version 3 for transition, switched to fadeInOut in 9
-    loopEnd             = CharCode.e, // added in BeepBox URL version 2
-    eqFilter            = CharCode.f, // added in BeepBox URL version 3
-    barCount            = CharCode.g, // added in BeepBox URL version 3
-    unison              = CharCode.h, // added in BeepBox URL version 2
-    instrumentCount     = CharCode.i, // added in BeepBox URL version 3
-    patternCount        = CharCode.j, // added in BeepBox URL version 3
-    key                 = CharCode.k, // added in BeepBox URL version 2
-    loopStart           = CharCode.l, // added in BeepBox URL version 2
-    reverb              = CharCode.m, // added in BeepBox URL version 5, DEPRECATED
-    channelCount        = CharCode.n, // added in BeepBox URL version 6
-    channelOctave       = CharCode.o, // added in BeepBox URL version 3
-    patterns            = CharCode.p, // added in BeepBox URL version 2
-    effects             = CharCode.q, // added in BeepBox URL version 7
-    rhythm              = CharCode.r, // added in BeepBox URL version 2
-    scale               = CharCode.s, // added in BeepBox URL version 2
-    tempo               = CharCode.t, // added in BeepBox URL version 2
-    preset              = CharCode.u, // added in BeepBox URL version 7
-    volume              = CharCode.v, // added in BeepBox URL version 2
-    wave                = CharCode.w, // added in BeepBox URL version 2
-    supersaw            = CharCode.x, // added in BeepBox URL version 9 ([UB] was used for chip wave but is now DEPRECATED)
-    loopControls        = CharCode.y, // added in BeepBox URL version 7, DEPRECATED, [UB] repurposed for chip wave loop controls
-    drumsetEnvelopes    = CharCode.z, // added in BeepBox URL version 7 for filter envelopes, still used for drumset envelopes
-    algorithm           = CharCode.A, // added in BeepBox URL version 6
-    feedbackAmplitude   = CharCode.B, // added in BeepBox URL version 6
-    chord               = CharCode.C, // added in BeepBox URL version 7, DEPRECATED
-    detune              = CharCode.D, // added in JummBox URL version 3(?) for detune, DEPRECATED
-    envelopes           = CharCode.E, // added in BeepBox URL version 6 for FM operator envelopes, repurposed in 9 for general envelopes.
-    feedbackType        = CharCode.F, // added in BeepBox URL version 6
-    arpeggioSpeed       = CharCode.G, // added in JummBox URL version 3 for arpeggioSpeed, DEPRECATED
-    harmonics           = CharCode.H, // added in BeepBox URL version 7
-    stringSustain       = CharCode.I, // added in BeepBox URL version 9
-    edo                 = CharCode.J, // added in EdoBox
-    //	                = CharCode.K,
-    pan                 = CharCode.L, // added between 8 and 9, DEPRECATED
-    customChipWave      = CharCode.M, // added in JummBox URL version 1(?) for customChipWave
-    songTitle           = CharCode.N, // added in JummBox URL version 1(?) for songTitle
-    limiterSettings     = CharCode.O, // added in JummBox URL version 3(?) for limiterSettings
-    operatorAmplitudes  = CharCode.P, // added in BeepBox URL version 6
+    beatCount = CharCode.a, // added in BeepBox URL version 2
+    bars = CharCode.b, // added in BeepBox URL version 2
+    songEq = CharCode.c, // added in BeepBox URL version 2 for vibrato, switched to song eq in Slarmoo's Box 1.3
+    fadeInOut = CharCode.d, // added in BeepBox URL version 3 for transition, switched to fadeInOut in 9
+    loopEnd = CharCode.e, // added in BeepBox URL version 2
+    eqFilter = CharCode.f, // added in BeepBox URL version 3
+    barCount = CharCode.g, // added in BeepBox URL version 3
+    unison = CharCode.h, // added in BeepBox URL version 2
+    instrumentCount = CharCode.i, // added in BeepBox URL version 3
+    patternCount = CharCode.j, // added in BeepBox URL version 3
+    key = CharCode.k, // added in BeepBox URL version 2
+    loopStart = CharCode.l, // added in BeepBox URL version 2
+    reverb = CharCode.m, // added in BeepBox URL version 5, DEPRECATED
+    channelCount = CharCode.n, // added in BeepBox URL version 6
+    channelOctave = CharCode.o, // added in BeepBox URL version 3
+    patterns = CharCode.p, // added in BeepBox URL version 2
+    effects = CharCode.q, // added in BeepBox URL version 7
+    rhythm = CharCode.r, // added in BeepBox URL version 2
+    scale = CharCode.s, // added in BeepBox URL version 2
+    tempo = CharCode.t, // added in BeepBox URL version 2
+    preset = CharCode.u, // added in BeepBox URL version 7
+    volume = CharCode.v, // added in BeepBox URL version 2
+    wave = CharCode.w, // added in BeepBox URL version 2
+    supersaw = CharCode.x, // added in BeepBox URL version 9 ([UB] was used for chip wave but is now DEPRECATED)
+    loopControls = CharCode.y, // added in BeepBox URL version 7, DEPRECATED, [UB] repurposed for chip wave loop controls
+    drumsetEnvelopes = CharCode.z, // added in BeepBox URL version 7 for filter envelopes, still used for drumset envelopes
+    algorithm = CharCode.A, // added in BeepBox URL version 6
+    feedbackAmplitude = CharCode.B, // added in BeepBox URL version 6
+    chord = CharCode.C, // added in BeepBox URL version 7, DEPRECATED
+    detune = CharCode.D, // added in JummBox URL version 3(?) for detune, DEPRECATED
+    envelopes = CharCode.E, // added in BeepBox URL version 6 for FM operator envelopes, repurposed in 9 for general envelopes.
+    feedbackType = CharCode.F, // added in BeepBox URL version 6
+    arpeggioSpeed = CharCode.G, // added in JummBox URL version 3 for arpeggioSpeed, DEPRECATED
+    harmonics = CharCode.H, // added in BeepBox URL version 7
+    stringSustain = CharCode.I, // added in BeepBox URL version 9
+    //	                    = CharCode.J,
+    //	                    = CharCode.K,
+    pan = CharCode.L, // added between 8 and 9, DEPRECATED
+    customChipWave = CharCode.M, // added in JummBox URL version 1(?) for customChipWave
+    songTitle = CharCode.N, // added in JummBox URL version 1(?) for songTitle
+    limiterSettings = CharCode.O, // added in JummBox URL version 3(?) for limiterSettings
+    operatorAmplitudes = CharCode.P, // added in BeepBox URL version 6
     operatorFrequencies = CharCode.Q, // added in BeepBox URL version 6
-    operatorWaves       = CharCode.R, // added in JummBox URL version 4 for operatorWaves
-    spectrum            = CharCode.S, // added in BeepBox URL version 7
-    startInstrument     = CharCode.T, // added in BeepBox URL version 6
-    channelNames        = CharCode.U, // added in JummBox URL version 4(?) for channelNames
-    feedbackEnvelope    = CharCode.V, // added in BeepBox URL version 6, DEPRECATED
-    pulseWidth          = CharCode.W, // added in BeepBox URL version 7
-    aliases             = CharCode.X, // added in JummBox URL version 4 for aliases, DEPRECATED, [UB] repurposed for PWM decimal offset (DEPRECATED as well)
-    //                  = CharCode.Y, 
-    //	                = CharCode.Z,
-    //	                = CharCode.NUM_0,
-    //	                = CharCode.NUM_1,
-    //	                = CharCode.NUM_2,
-    //	                = CharCode.NUM_3,
-    //	                = CharCode.NUM_4,
-    //	                = CharCode.NUM_5,
-    //	                = CharCode.NUM_6,
-    //	                = CharCode.NUM_7,
-    //	                = CharCode.NUM_8,
-    //	                = CharCode.NUM_9,
-    //	                = CharCode.DASH,
-    //	                = CharCode.UNDERSCORE,
+    operatorWaves = CharCode.R, // added in JummBox URL version 4 for operatorWaves
+    spectrum = CharCode.S, // added in BeepBox URL version 7
+    startInstrument = CharCode.T, // added in BeepBox URL version 6
+    channelNames = CharCode.U, // added in JummBox URL version 4(?) for channelNames
+    feedbackEnvelope = CharCode.V, // added in BeepBox URL version 6, DEPRECATED
+    pulseWidth = CharCode.W, // added in BeepBox URL version 7
+    aliases = CharCode.X, // added in JummBox URL version 4 for aliases, DEPRECATED, [UB] repurposed for PWM decimal offset (DEPRECATED as well)
+    //                      = CharCode.Y, 
+    //	                    = CharCode.Z,
+    //	                    = CharCode.NUM_0,
+    //	                    = CharCode.NUM_1,
+    //	                    = CharCode.NUM_2,
+    //	                    = CharCode.NUM_3,
+    //	                    = CharCode.NUM_4,
+    //	                    = CharCode.NUM_5,
+    //	                    = CharCode.NUM_6,
+    //	                    = CharCode.NUM_7,
+    //	                    = CharCode.NUM_8,
+    //	                    = CharCode.NUM_9,
+    //	                    = CharCode.DASH,
+    //	                    = CharCode.UNDERSCORE,
 
 }
 
@@ -624,7 +622,7 @@ export class Pattern {
 
                 note.end = note.pins[note.pins.length - 1].time + note.start;
 
-                const maxPitch: number = isNoiseChannel ? Config.drumCount - 1 : song.edo * Config.maxPitch;
+                const maxPitch: number = isNoiseChannel ? Config.drumCount - 1 : Config.maxPitch;
                 let lowestPitch: number = maxPitch;
                 let highestPitch: number = 0;
                 for (let k: number = 0; k < note.pitches.length; k++) {
@@ -3094,8 +3092,8 @@ export class Instrument {
         return largest;
     }
 
-    public static frequencyFromPitch(pitch: number, edo: number): number {
-        return 440.0 * Math.pow(2.0, pitch / edo - 69 / 12);
+    public static frequencyFromPitch(pitch: number): number {
+        return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
     }
 
     public addEnvelope(target: number, index: number, envelope: number, newEnvelopes: boolean, start: number = 0, end: number = -1, inverse: boolean = false, perEnvelopeSpeed: number = -1, perEnvelopeLowerBound: number = 0, perEnvelopeUpperBound: number = 1, steps: number = 2, seed: number = 2, waveform: number = LFOEnvelopeTypes.sine, discrete: boolean = false): void {
@@ -3225,7 +3223,6 @@ export class Song {
     public scale: number;
     public scaleCustom: boolean[] = [];
     public key: number;
-    public edo: number;
     public octave: number;
     public tempo: number;
     public reverb: number;
@@ -3488,7 +3485,6 @@ export class Song {
         //this.scaleCustom = [true, false, true, true, false, false, false, true, true, false, true, true];
         //this.scaleCustom = [true, false, false, false, false, false, false, false, false, false, false, false];
         this.key = 0;
-        this.edo = 12;
         this.octave = 0;
         this.loopStart = 0;
         this.loopLength = 4;
@@ -3565,7 +3561,6 @@ export class Song {
             buffer.push(encodedSongTitle.charCodeAt(i));
         }
 
-        buffer.push(SongTagCode.edo, base64IntToCharCode[this.edo]);
         buffer.push(SongTagCode.channelCount, base64IntToCharCode[this.pitchChannelCount], base64IntToCharCode[this.noiseChannelCount], base64IntToCharCode[this.modChannelCount]);
         buffer.push(SongTagCode.scale, base64IntToCharCode[this.scale]);
         if (this.scale == Config.scales["dictionary"]["Custom"].index) {
@@ -4506,9 +4501,6 @@ export class Song {
                         for (let j: number = 0; j < Config.instrumentCountMin; j++) legacySettingsCache![i][j] = {};
                     }
                 }
-            } break;
-            case SongTagCode.edo: {
-                this.edo = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
             } break;
             case SongTagCode.scale: {
                 this.scale = clamp(0, Config.scales.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -7280,7 +7272,7 @@ export class Song {
                 "enigma": "strange",
             };
             const scaleName: string = (oldScaleNames[jsonObject["scale"]] != undefined) ? oldScaleNames[jsonObject["scale"]] : jsonObject["scale"];
-            const scale: number = createScales(this.edo).findIndex(scale => scale.name == scaleName);
+            const scale: number = Config.scales.findIndex(scale => scale.name == scaleName);
             if (scale != -1) this.scale = scale;
             if (this.scale == Config.scales["dictionary"]["Custom"].index) {
                 if (jsonObject["customScale"] != undefined) {
@@ -7709,7 +7701,7 @@ class PickedString {
         if (this.delayLine == null || this.delayLine.length <= minBufferLength) {
             // The delay line buffer will get reused for other tones so might as well
             // start off with a buffer size that is big enough for most notes.
-            const likelyMaximumLength: number = Math.ceil(2 * synth.samplesPerSecond / Instrument.frequencyFromPitch(((synth.song) ? synth.song.edo : 12)*2, ((synth.song) ? synth.song.edo : 12)));
+            const likelyMaximumLength: number = Math.ceil(2 * synth.samplesPerSecond / Instrument.frequencyFromPitch(12));
             const newDelayLine: Float32Array = new Float32Array(Synth.fittingPowerOfTwo(Math.max(likelyMaximumLength, minBufferLength)));
             if (!reinitializeImpulse && this.delayLine != null) {
                 // If the tone has already started but the buffer needs to be reallocated,
@@ -8853,7 +8845,7 @@ class InstrumentState {
         this.volumeScale = 1.0;
 
         const samplesPerSecond: number = synth.samplesPerSecond;
-        this.updateWaves(instrument, samplesPerSecond, ((synth.song) ? synth.song.edo : 12));
+        this.updateWaves(instrument, samplesPerSecond);
 
         const ticksIntoBar: number = synth.getTicksIntoBar();
         const tickTimeStart: number = ticksIntoBar;
@@ -9013,9 +9005,9 @@ class InstrumentState {
                 quantizationSettingEnd = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, true) * Math.sqrt(envelopeEnds[EnvelopeComputeIndex.bitcrusherQuantization]);
             }
 
-            const basePitch: number = synth.song ? createKeys(synth.song.edo)[synth.song!.key].basePitch : createKeys(12)[synth.song!.key].basePitch; // TODO: What if there's a key change mid-song?
-            const freqStart: number = Instrument.frequencyFromPitch(basePitch + (60*((synth.song) ? synth.song.edo : 12)/12), ((synth.song) ? synth.song.edo : 12)) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingStart) * Config.bitcrusherOctaveStep);
-            const freqEnd: number = Instrument.frequencyFromPitch(basePitch + (60*((synth.song) ? synth.song.edo : 12)/12), ((synth.song) ? synth.song.edo : 12)) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingEnd) * Config.bitcrusherOctaveStep);
+            const basePitch: number = Config.keys[synth.song!.key].basePitch + (Config.pitchesPerOctave * synth.song!.octave); // TODO: What if there's a key change mid-song?
+            const freqStart: number = Instrument.frequencyFromPitch(basePitch + 60) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingStart) * Config.bitcrusherOctaveStep);
+            const freqEnd: number = Instrument.frequencyFromPitch(basePitch + 60) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingEnd) * Config.bitcrusherOctaveStep);
             const phaseDeltaStart: number = Math.min(1.0, freqStart / samplesPerSecond);
             const phaseDeltaEnd: number = Math.min(1.0, freqEnd / samplesPerSecond);
             this.bitcrusherPhaseDelta = phaseDeltaStart;
@@ -9440,7 +9432,7 @@ class InstrumentState {
         this.envelopeComputer.clearEnvelopes();
     }
 
-    public updateWaves(instrument: Instrument, samplesPerSecond: number, edo: number): void {
+    public updateWaves(instrument: Instrument, samplesPerSecond: number): void {
         this.volumeScale = 1.0;
         if (instrument.type == InstrumentType.chip) {
             this.wave = (this.aliases) ? Config.rawChipWaves[instrument.chipWave].samples : Config.chipWaves[instrument.chipWave].samples;
@@ -9502,7 +9494,7 @@ class InstrumentState {
             this.unisonSign = instrument.unisonSign;
         } else if (instrument.type == InstrumentType.drumset) {
             for (let i: number = 0; i < Config.drumCount; i++) {
-                this.drumsetSpectrumWaves[i].getCustomWave(instrument.drumsetSpectrumWaves[i], InstrumentState._drumsetIndexToSpectrumOctave(i, 12));
+                this.drumsetSpectrumWaves[i].getCustomWave(instrument.drumsetSpectrumWaves[i], InstrumentState._drumsetIndexToSpectrumOctave(i));
             }
             this.wave = null;
             this.unisonVoices = instrument.unisonVoices;
@@ -9523,12 +9515,12 @@ class InstrumentState {
         }
     }
 
-    public static drumsetIndexReferenceDelta(index: number, edo: number): number {
-        return Instrument.frequencyFromPitch(Config.spectrumBasePitch + index * 6, edo) / 44100;
+    public static drumsetIndexReferenceDelta(index: number): number {
+        return Instrument.frequencyFromPitch(Config.spectrumBasePitch + index * 6) / 44100;
     }
 
-    private static _drumsetIndexToSpectrumOctave(index: number, edo: number): number {
-        return 15 + Math.log2(InstrumentState.drumsetIndexReferenceDelta(index, edo));
+    private static _drumsetIndexToSpectrumOctave(index: number): number {
+        return 15 + Math.log2(InstrumentState.drumsetIndexReferenceDelta(index));
     }
 }
 
@@ -9595,7 +9587,7 @@ export class Synth {
                     instrumentState.nextVibratoTime = 0;
                     for (let envelopeIndex: number = 0; envelopeIndex < Config.maxEnvelopeCount + 1; envelopeIndex++) instrumentState.envelopeTime[envelopeIndex] = 0;
                     instrumentState.arpTime = 0;
-                    instrumentState.updateWaves(instrument, this.samplesPerSecond, song.edo);
+                    instrumentState.updateWaves(instrument, this.samplesPerSecond);
                     instrumentState.allocateNecessaryBuffers(this, instrument, samplesPerTick);
                 }
 
@@ -11954,7 +11946,7 @@ export class Synth {
         let chordExpressionEnd: number = chordExpression;
 
         let expressionReferencePitch: number = 16; // A low "E" as a MIDI pitch.
-        let basePitch: number = createKeys(song.edo)[song.key].basePitch;
+        let basePitch: number = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
         let baseExpression: number = 1.0;
         let pitchDamping: number = 48;
         if (instrument.type == InstrumentType.spectrum) {
@@ -12236,9 +12228,8 @@ export class Synth {
                 modDetuneStart += 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, false);
                 modDetuneEnd += 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, true);
             }
-            intervalStart += Synth.detuneToCents(modDetuneStart) * envelopeStart * song.edo / (12.0 * 100.0);
-            intervalEnd += Synth.detuneToCents(modDetuneEnd) * envelopeEnd * song.edo / (12.0 * 100.0);
-            
+            intervalStart += Synth.detuneToCents(modDetuneStart) * envelopeStart * Config.pitchesPerOctave / (12.0 * 100.0);
+            intervalEnd += Synth.detuneToCents(modDetuneEnd) * envelopeEnd * Config.pitchesPerOctave / (12.0 * 100.0);
             // //envelopes should not affect song detune
             // if (this.isModActive(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex)) {
             //     modDetuneStart = 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, false);
@@ -12258,11 +12249,11 @@ export class Synth {
                 // Special case: if vibrato delay is max, NEVER vibrato.
                 if (instrument.vibratoDelay == Config.modulators.dictionary["vibrato delay"].maxRawVol)
                     delayTicks = Number.POSITIVE_INFINITY;
-                vibratoAmplitudeStart = instrument.vibratoDepth*song.edo/12;
+                vibratoAmplitudeStart = instrument.vibratoDepth;
                 vibratoAmplitudeEnd = vibratoAmplitudeStart;
             } else {
                 delayTicks = Config.vibratos[instrument.vibrato].delayTicks;
-                vibratoAmplitudeStart = Config.vibratos[instrument.vibrato].amplitude*song.edo/12;
+                vibratoAmplitudeStart = Config.vibratos[instrument.vibrato].amplitude;
                 vibratoAmplitudeEnd = vibratoAmplitudeStart;
             }
 
@@ -12274,8 +12265,8 @@ export class Synth {
             }
 
             if (this.isModActive(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex)) {
-                vibratoAmplitudeStart = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, false) / 25*song.edo/12;
-                vibratoAmplitudeEnd = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, true) / 25*song.edo/12;
+                vibratoAmplitudeStart = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, false) / 25;
+                vibratoAmplitudeEnd = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, true) / 25;
             }
 
 
@@ -12405,8 +12396,7 @@ export class Synth {
         }
 
         noteFilterExpression = Math.min(3.0, noteFilterExpression);
-        let edo_: number = isNoiseChannel ? 12 : song.edo; // For modifying volume based on pitch, treat noise channels as if they're 12edo
-        
+
         if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
             // phase modulation!
 
@@ -12431,8 +12421,8 @@ export class Synth {
                 const interval = Config.operatorCarrierInterval[associatedCarrierIndex] + arpeggioInterval;
                 const pitchStart: number = basePitch + (pitch + intervalStart) * intervalScale + interval;
                 const pitchEnd: number = basePitch + (pitch + intervalEnd) * intervalScale + interval;
-                const baseFreqStart: number = Instrument.frequencyFromPitch(pitchStart, song.edo);
-                const baseFreqEnd: number = Instrument.frequencyFromPitch(pitchEnd, song.edo);
+                const baseFreqStart: number = Instrument.frequencyFromPitch(pitchStart);
+                const baseFreqEnd: number = Instrument.frequencyFromPitch(pitchEnd);
                 const hzOffset: number = Config.operatorFrequencies[instrument.operators[i].frequency].hzOffset;
                 const targetFreqStart: number = freqMult * baseFreqStart + hzOffset;
                 const targetFreqEnd: number = freqMult * baseFreqEnd + hzOffset;
@@ -12549,7 +12539,7 @@ export class Synth {
 
 
         } else {
-            const freqEndRatio: number = Math.pow(2.0, (intervalEnd - intervalStart) * intervalScale / song.edo);
+            const freqEndRatio: number = Math.pow(2.0, (intervalEnd - intervalStart) * intervalScale / 12.0);
             const basePhaseDeltaScale: number = Math.pow(freqEndRatio, 1.0 / roundedSamplesPerTick);
             const isMono: boolean = chord.name == "monophonic";
 
@@ -12559,7 +12549,7 @@ export class Synth {
                 const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
                 if (chord.customInterval) {
                     const intervalOffset: number = tone.pitches[1 + getArpeggioPitchIndex(tone.pitchCount - 1, instrument.fastTwoNoteArp, arpeggio)] - tone.pitches[0];
-                    specialIntervalMult = Math.pow(2.0, intervalOffset / song.edo);
+                    specialIntervalMult = Math.pow(2.0, intervalOffset / 12.0);
                     tone.specialIntervalExpressionMult = Math.pow(2.0, -intervalOffset / pitchDamping);
                 } else if (chord.arpeggiates) {
                     pitch = tone.pitches[getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio)];
@@ -12631,7 +12621,7 @@ export class Synth {
 
             }
 
-            const startFreq: number = Instrument.frequencyFromPitch(startPitch, instrument.type == InstrumentType.drumset ? song.edo : edo_);
+            const startFreq: number = Instrument.frequencyFromPitch(startPitch);
             if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString || instrument.type == InstrumentType.spectrum || instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.noise || instrument.type == InstrumentType.drumset) {
                 const unisonVoices: number = instrument.unisonVoices;
                 const unisonSpread: number = instrument.unisonSpread;
@@ -12783,7 +12773,7 @@ export class Synth {
                 for (let i = 0; i < Config.supersawVoiceCount; i++) {
                     // Spread out the detunes around the center;
                     const offset: number = (i == 0) ? 0.0 : Math.pow((((i + 1) >> 1) - 0.5 + 0.025 * ((i & 2) - 1)) / (Config.supersawVoiceCount >> 1), 1.1) * ((i & 1) * 2 - 1);
-                    tone.supersawUnisonDetunes[i] = Math.pow(2.0, curvedSpread * offset / song.edo);
+                    tone.supersawUnisonDetunes[i] = Math.pow(2.0, curvedSpread * offset / 12.0);
                 }
 
                 const baseShape: number = instrument.supersawShape / Config.supersawShapeMax;
@@ -12836,8 +12826,8 @@ export class Synth {
                 if (tone.supersawDelayLine == null || tone.supersawDelayLine.length <= minBufferLength) {
                     // The delay line buffer will get reused for other tones so might as well
                     // start off with a buffer size that is big enough for most notes.
-                    const likelyMaximumLength: number = Math.ceil(0.5 * this.samplesPerSecond / Instrument.frequencyFromPitch(song.edo*2, song.edo));
-					const newDelayLine: Float32Array = new Float32Array(Synth.fittingPowerOfTwo(Math.max(likelyMaximumLength, minBufferLength)));
+                    const likelyMaximumLength: number = Math.ceil(0.5 * this.samplesPerSecond / Instrument.frequencyFromPitch(24));
+                    const newDelayLine: Float32Array = new Float32Array(Synth.fittingPowerOfTwo(Math.max(likelyMaximumLength, minBufferLength)));
                     if (!initializeSupersaw && tone.supersawDelayLine != null) {
                         // If the tone has already started but the buffer needs to be reallocated,
                         // transfer the old data to the new buffer.
@@ -15130,7 +15120,7 @@ export class Synth {
             drumSource += `
         const data = synth.tempMonoInstrumentSampleBuffer;
         let wave = instrumentState.getDrumsetWave(tone.drumsetPitch);
-        const referenceDelta: number = InstrumentState.drumsetIndexReferenceDelta(tone.drumsetPitch!, ((synth.song) ? synth.song.edo : 12));
+        const referenceDelta = InstrumentState.drumsetIndexReferenceDelta(tone.drumsetPitch);
         const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
         `
             for (let i: number = 0; i < voiceCount; i++) {

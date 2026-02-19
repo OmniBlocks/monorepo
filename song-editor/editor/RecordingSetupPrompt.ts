@@ -1,7 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { createKeys, createScales } from "../synth/CreateScalesAndKeys";
-// import { Config } from "../synth/SynthConfig";
+import { Config } from "../synth/SynthConfig";
 import { EditorConfig } from "./EditorConfig";
 import { SongDocument } from "./SongDocument";
 import { Prompt } from "./Prompt";
@@ -153,8 +152,8 @@ export class RecordingSetupPrompt implements Prompt {
             this._keyboardLayoutPreview.removeChild(this._keyboardLayoutPreview.firstChild);
         }
         const rowLengths: number[] = [12, 12, 11, 10];
-        const scale: ReadonlyArray<boolean> = createScales(this._doc.song.edo)[this._doc.song.scale].flags;
-		for (let rowIndex: number = 0; rowIndex < 4; rowIndex++) {
+        const scale: ReadonlyArray<boolean> = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+        for (let rowIndex: number = 0; rowIndex < 4; rowIndex++) {
             const row: HTMLDivElement = div({ style: "display: flex;" });
             this._keyboardLayoutPreview.appendChild(row);
             const spacer: HTMLDivElement = div({ style: "width: " + (rowIndex * 12) + "px; height: 20px; flex-shrink: 0;" });
@@ -184,9 +183,9 @@ export class RecordingSetupPrompt implements Prompt {
                         key.style.setProperty("filter", "");
                     }
 
-                	const pitchNameIndex: number = (scalePitch + createKeys(this._doc.song.edo)[this._doc.song.key].basePitch) % this._doc.song.edo;
-					key.textContent = Piano.getPitchName(pitchNameIndex, scalePitch, Math.floor(pitch / this._doc.song.edo), this._doc.song.edo);
-				}
+                    const pitchNameIndex: number = (scalePitch + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave;
+                    key.textContent = Piano.getPitchName(pitchNameIndex, scalePitch, Math.floor(pitch / 12));
+                }
             }
         }
     }

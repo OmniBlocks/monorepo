@@ -520,7 +520,7 @@ export class ExportPrompt implements Prompt {
                 });
                 const left: Float32Array = this.recordedSamplesL;
                 const right: Float32Array = this.recordedSamplesR;
-                const parts: Uint8Array<ArrayBuffer>[] = [];
+                const parts: Uint8Array[] = [];
                 let sampleIndex: number = 0;
                 for (; sampleIndex < left.length; sampleIndex += sampleBlockSize) {
                     const leftChunk: Float32Array = left.subarray(sampleIndex, sampleIndex + sampleBlockSize);
@@ -610,7 +610,7 @@ export class ExportPrompt implements Prompt {
                 encoderComplexity: 10,
                 resampleQuality: 3, // [0, 10], but we're not using this.
             }, OpusEncoderLib);
-            const parts: Uint8Array<ArrayBuffer>[] = [];
+            const parts: Uint8Array[] = [];
             const left: Float32Array = this.recordedSamplesL;
             const right: Float32Array = this.recordedSamplesR;
             oggEncoder.setBitrate(256_000); // bits per second

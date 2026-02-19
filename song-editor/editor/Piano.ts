@@ -5,7 +5,6 @@ import { SongDocument } from "./SongDocument";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { ColorConfig } from "./ColorConfig";
 import { Instrument } from "../synth/synth";
-import { createKeys, createScales } from "../synth/CreateScalesAndKeys";
 
 export class Piano {
     private readonly _pianoContainer: HTMLDivElement = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
@@ -50,7 +49,7 @@ export class Piano {
     // Bass cutoff pitch is roughly half of the viewed window and below, though on odd-numbered octave counts the lead has priority for the middle octave.
     public static getBassCutoffPitch(doc: SongDocument): number {
         const octaveOffset: number = doc.getBaseVisibleOctave(doc.channel);
-        return octaveOffset * doc.song.edo + Math.floor(doc.getVisiblePitchCount() / (doc.song.edo * 2)) * doc.song.edo;
+        return octaveOffset * Config.pitchesPerOctave + Math.floor(doc.getVisiblePitchCount() / (Config.pitchesPerOctave * 2)) * Config.pitchesPerOctave;
     }
 
     constructor(private _doc: SongDocument) {
@@ -117,25 +116,25 @@ export class Piano {
     }
 
     private _updateCursorPitch(): void {
-        const scale: ReadonlyArray<boolean> = createScales(this._doc.song.edo)[this._doc.song.scale].flags;
+        const scale: ReadonlyArray<boolean> = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
         const mousePitch: number = Math.max(0, Math.min(this._pitchCount - 1, this._pitchCount - (this._mouseY / this._pitchHeight)));
-        if (scale[Math.floor(mousePitch) % this._doc.song.edo] || this._doc.song.getChannelIsNoise(this._doc.channel)) {
+        if (scale[Math.floor(mousePitch) % Config.pitchesPerOctave] || this._doc.song.getChannelIsNoise(this._doc.channel)) {
             this._cursorPitch = Math.floor(mousePitch);
         } else {
             let topPitch: number = Math.floor(mousePitch) + 1;
             let bottomPitch: number = Math.floor(mousePitch) - 1;
-            while (!scale[topPitch % this._doc.song.edo]) {
+            while (!scale[topPitch % Config.pitchesPerOctave]) {
                 topPitch++;
             }
-            while (!scale[(bottomPitch) % this._doc.song.edo]) {
+            while (!scale[(bottomPitch) % Config.pitchesPerOctave]) {
                 bottomPitch--;
             }
             let topRange: number = topPitch;
             let bottomRange: number = bottomPitch + 1;
-            if (topPitch % this._doc.song.edo == 0 || topPitch % this._doc.song.edo == 7) {
+            if (topPitch % Config.pitchesPerOctave == 0 || topPitch % Config.pitchesPerOctave == 7) {
                 topRange -= 0.5;
             }
-            if (bottomPitch % this._doc.song.edo == 0 || bottomPitch % this._doc.song.edo == 7) {
+            if (bottomPitch % Config.pitchesPerOctave == 0 || bottomPitch % Config.pitchesPerOctave == 7) {
                 bottomRange += 0.5;
             }
             this._cursorPitch = mousePitch - bottomRange > topRange - mousePitch ? topPitch : bottomPitch;
@@ -143,7 +142,7 @@ export class Piano {
     }
 
     private _playLiveInput(): void {
-        const octaveOffset: number = this._doc.getBaseVisibleOctave(this._doc.channel) * this._doc.song.edo;
+        const octaveOffset: number = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
         const currentPitch: number = this._cursorPitch + octaveOffset;
         if (this._playedPitch == currentPitch) return;
         this._doc.performance.removePerformedPitch(this._playedPitch);
@@ -267,7 +266,7 @@ export class Piano {
             this._preview.style.height = pitchHeight + "px";
         }
 
-        const octaveOffset: number = this._doc.getBaseVisibleOctave(this._doc.channel) * this._doc.song.edo;
+        const octaveOffset: number = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
         const container: HTMLDivElement = this._doc.song.getChannelIsNoise(this._doc.channel) ? this._drumContainer : this._pianoContainer;
         const children: HTMLCollection = container.children;
         for (let i: number = 0; i < children.length; i++) {
@@ -318,20 +317,20 @@ export class Piano {
             }
 
             for (let j: number = 0; j < this._pitchCount; j++) {
-                const pitchNameIndex: number = (j + createKeys(this._doc.song.edo)[this._doc.song.key].basePitch) % this._doc.song.edo;
-				const isWhiteKey: boolean = createKeys(this._doc.song.edo)[pitchNameIndex].isWhiteKey;
-				this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
-                //let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-                if (!createScales(this._doc.song.edo)[this._doc.song.scale].flags[j % this._doc.song.edo]) {
-					this._pianoKeys[j].classList.add("disabled");
-					this._pianoLabels[j].style.display = "none";
-				} else {
+                const pitchNameIndex: number = (j + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave;
+                const isWhiteKey: boolean = Config.keys[pitchNameIndex].isWhiteKey;
+                this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
+                let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+                if (!scale[j % Config.pitchesPerOctave]) {
+                    this._pianoKeys[j].classList.add("disabled");
+                    this._pianoLabels[j].style.display = "none";
+                } else {
                     this._pianoKeys[j].classList.remove("disabled");
                     this._pianoLabels[j].style.display = "";
 
                     const label: HTMLDivElement = this._pianoLabels[j];
 
-                    if ((j % this._doc.song.edo) == 0) {
+                    if ((j % 12) == 0) {
                         label.style.transform = "translate(-5px, 0px)";
                     }
                     else {
@@ -348,9 +347,10 @@ export class Piano {
                     }
                     */
 
-                	label.style.color = createKeys(this._doc.song.edo)[pitchNameIndex].isWhiteKey ? "black" : "white";
-					label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel), this._doc.song.edo);
-				}
+                    label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? ColorConfig.whitePianoKeyText : ColorConfig.blackPianoKeyText;
+                    label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel) + this._doc.song.octave);
+
+                }
             }
         }
         else if (isMod) {
@@ -558,15 +558,29 @@ export class Piano {
         this._updatePreview();
     }
 
-    public static getPitchName(pitchNameIndex: number, scaleIndex: number, baseVisibleOctave: number, edo: number): string {
-		let text: string;
+    public static getPitchName(pitchNameIndex: number, scaleIndex: number, baseVisibleOctave: number): string {
+        let text: string;
 
-		text = createKeys(edo)[(pitchNameIndex + edo) % edo].name;
+        // May wanna adjust this a little bit so a key and both it's sharp/flat won't all 
+        // appear on the piano at once, which often happens when the song key is a sharp.
+        // E.g: Piano Labels: D♯ E F G♭ G "A♭ A A♯" B C "D♭ D D♯", Song Key: D♯
+        // "" = incorrect
+        if (Config.keys[pitchNameIndex].isWhiteKey) {
+            text = Config.keys[pitchNameIndex].name;
+        } else {
+            const shiftDir: number = Config.blackKeyNameParents[scaleIndex % Config.pitchesPerOctave];
+            text = Config.keys[(pitchNameIndex + Config.pitchesPerOctave + shiftDir) % Config.pitchesPerOctave].name;
+            if (shiftDir == 1) {
+                text += "♭";
+            } else if (shiftDir == -1) {
+                text += "♯";
+            }
+        }
 
-		if (scaleIndex % edo == 0) {
-			text += Math.floor(scaleIndex / edo) + baseVisibleOctave;
-		}
+        if (scaleIndex % 12 == 0) {
+            text += Math.floor(scaleIndex / 12) + baseVisibleOctave;
+        }
 
-		return text;
-	}
+        return text;
+    }
 }

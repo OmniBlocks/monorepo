@@ -481,7 +481,7 @@ export class SongDocument {
     }
 
     public getVisiblePitchCount(): number {
-        return this.getVisibleOctaveCount() * this.song.edo + 1;
+        return this.getVisibleOctaveCount() * Config.pitchesPerOctave + 1;
     }
 
     public getBaseVisibleOctave(channel: number): number {

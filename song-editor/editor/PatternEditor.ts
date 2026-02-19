@@ -1,7 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { getLocalStorageItem, Chord, Transition, Config } from "../synth/SynthConfig";
-import { createScales } from "../synth/CreateScalesAndKeys";
 import { NotePin, Note, makeNotePin, FilterSettings, Channel, Pattern, Instrument, FilterControlPoint } from "../synth/synth";
 import { ColorConfig } from "./ColorConfig";
 import { SongDocument } from "./SongDocument";
@@ -139,7 +138,7 @@ export class PatternEditor {
         );
         this.container = HTML.div({ style: "height: 100%; overflow:hidden; position: relative; flex-grow: 1;" }, this._svg, this.modDragValueLabel);
 
-        for (let i: number = 0; i < _doc.song.edo; i++) {
+        for (let i: number = 0; i < Config.pitchesPerOctave; i++) {
             const rectangle: SVGRectElement = SVG.rect();
             rectangle.setAttribute("x", "1");
             rectangle.setAttribute("fill", (i == 0) ? ColorConfig.tonic : ColorConfig.pitchBackground);
@@ -179,7 +178,7 @@ export class PatternEditor {
     }
 
     private _getMaxPitch(): number {
-        return this._doc.song.getChannelIsMod(this._doc.channel) ? Config.modCount - 1 : (this._doc.song.getChannelIsNoise(this._doc.channel) ? Config.drumCount - 1 : this._doc.song.edo * Config.maxPitch);
+        return this._doc.song.getChannelIsMod(this._doc.channel) ? Config.modCount - 1 : (this._doc.song.getChannelIsNoise(this._doc.channel) ? Config.drumCount - 1 : Config.maxPitch);
     }
 
     private _validateModDragLabelInput = (event: Event): void => {
@@ -539,18 +538,17 @@ export class PatternEditor {
     private _snapToPitch(guess: number, min: number, max: number): number {
         if (guess < min) guess = min;
         if (guess > max) guess = max;
-        //const scale: ReadonlyArray<boolean> = this._doc.prefs.notesOutsideScale ? Config.scales.dictionary["Free"].flags : this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-        const scale: ReadonlyArray<boolean> = this._doc.prefs.notesOutsideScale ? createScales(this._doc.song.edo).dictionary["Free"].flags : createScales(this._doc.song.edo)[this._doc.song.scale].flags;
-        if (scale[Math.floor(guess) % this._doc.song.edo] || this._doc.song.getChannelIsNoise(this._doc.channel) || this._doc.song.getChannelIsMod(this._doc.channel)) {
+        const scale: ReadonlyArray<boolean> = this._doc.prefs.notesOutsideScale ? Config.scales.dictionary["Free"].flags : this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+        if (scale[Math.floor(guess) % Config.pitchesPerOctave] || this._doc.song.getChannelIsNoise(this._doc.channel) || this._doc.song.getChannelIsMod(this._doc.channel)) {
 
             return Math.floor(guess);
         } else {
             let topPitch: number = Math.floor(guess) + 1;
             let bottomPitch: number = Math.floor(guess) - 1;
-            while (!scale[topPitch % this._doc.song.edo]) {
+            while (!scale[topPitch % Config.pitchesPerOctave]) {
                 topPitch++;
             }
-            while (!scale[(bottomPitch) % this._doc.song.edo]) {
+            while (!scale[(bottomPitch) % Config.pitchesPerOctave]) {
                 bottomPitch--;
             }
             if (topPitch > max) {
@@ -564,10 +562,10 @@ export class PatternEditor {
             }
             let topRange: number = topPitch;
             let bottomRange: number = bottomPitch + 1;
-            if (topPitch % this._doc.song.edo == 0 || topPitch % this._doc.song.edo == 7) {
+            if (topPitch % Config.pitchesPerOctave == 0 || topPitch % Config.pitchesPerOctave == 7) {
                 topRange -= 0.5;
             }
-            if (bottomPitch % this._doc.song.edo == 0 || bottomPitch % this._doc.song.edo == 7) {
+            if (bottomPitch % Config.pitchesPerOctave == 0 || bottomPitch % Config.pitchesPerOctave == 7) {
                 bottomRange += 0.5;
             }
             return guess - bottomRange > topRange - guess ? topPitch : bottomPitch;
@@ -1944,9 +1942,9 @@ export class PatternEditor {
                     this._dragChange = sequence;
                     this._doc.setProspectiveChange(this._dragChange);
 
-                    //let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-                    const notesInScale: number = createScales(this._doc.song.edo)[this._doc.song.scale].flags.filter(x => x).length;
-                    const pitchRatio: number = this._doc.song.getChannelIsNoise(this._doc.channel) ? 1 :this._doc.song.edo / notesInScale;
+                    let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+                    const notesInScale: number = scale.filter(x => x).length;
+                    const pitchRatio: number = this._doc.song.getChannelIsNoise(this._doc.channel) ? 1 : 12 / notesInScale;
                     const draggedParts: number = Math.round((this._mouseX - this._mouseXStart) / (this._partWidth * minDivision)) * minDivision;
                     const draggedTranspose: number = Math.round((this._mouseYStart - this._mouseY) / (this._pitchHeight * pitchRatio));
                     sequence.append(new ChangeDragSelectedNotes(this._doc, this._doc.channel, pattern, draggedParts, draggedTranspose));
@@ -2476,7 +2474,7 @@ export class PatternEditor {
         this._editorWidth = this.container.clientWidth;
         this._editorHeight = this.container.clientHeight;
         this._partWidth = this._editorWidth / (this._doc.song.beatsPerBar * Config.partsPerBeat);
-        this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.song.channels[this._doc.channel].octave * this._doc.song.edo;
+        this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.song.channels[this._doc.channel].octave * Config.pitchesPerOctave;
 
         if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
             this._pitchBorder = 0;
@@ -2512,7 +2510,7 @@ export class PatternEditor {
         }
 
         this._pitchHeight = this._editorHeight / this._pitchCount;
-        this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.getBaseVisibleOctave(this._doc.channel) * this._doc.song.edo;
+        this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
 
         if (this._renderedRhythm != this._doc.song.rhythm ||
             this._renderedPitchChannelCount != this._doc.song.pitchChannelCount ||
@@ -2542,7 +2540,7 @@ export class PatternEditor {
             this._renderedBeatWidth = beatWidth;
             this._renderedPitchHeight = this._pitchHeight;
             this._svgNoteBackground.setAttribute("width", "" + beatWidth);
-            this._svgNoteBackground.setAttribute("height", "" + (this._pitchHeight * this._doc.song.edo));
+            this._svgNoteBackground.setAttribute("height", "" + (this._pitchHeight * Config.pitchesPerOctave));
             this._svgDrumBackground.setAttribute("width", "" + beatWidth);
             this._svgDrumBackground.setAttribute("height", "" + this._pitchHeight);
             this._svgModBackground.setAttribute("width", "" + beatWidth);
@@ -2557,9 +2555,9 @@ export class PatternEditor {
 
 
 
-            for (let j: number = 0; j < this._doc.song.edo; j++) {
+            for (let j: number = 0; j < Config.pitchesPerOctave; j++) {
                 const rectangle: SVGRectElement = this._backgroundPitchRows[j];
-                const y: number = (this._doc.song.edo - j) % this._doc.song.edo;
+                const y: number = (Config.pitchesPerOctave - j) % Config.pitchesPerOctave;
                 rectangle.setAttribute("width", "" + (beatWidth - 2));
                 rectangle.setAttribute("y", "" + (y * this._pitchHeight + 1));
                 rectangle.setAttribute("height", "" + (this._pitchHeight - 2));
@@ -2570,17 +2568,17 @@ export class PatternEditor {
             if (!this._mouseDown) this._updateCursorStatus();
             this._updatePreview();
             this._updateSelection();
-        } 
+        }
 
         if (this._renderedFifths != this._doc.prefs.showFifth) {
             this._renderedFifths = this._doc.prefs.showFifth;
-            this._backgroundPitchRows[Math.round(this._doc.song.edo*Math.log2(3/2))].setAttribute("fill", this._doc.prefs.showFifth ? ColorConfig.fifthNote : ColorConfig.pitchBackground);
+            this._backgroundPitchRows[7].setAttribute("fill", this._doc.prefs.showFifth ? ColorConfig.fifthNote : ColorConfig.pitchBackground);
         }
 
-        for (let j: number = 0; j < this._doc.song.edo; j++) {
-            //let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+        for (let j: number = 0; j < Config.pitchesPerOctave; j++) {
+            let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
 
-            this._backgroundPitchRows[j].style.visibility = createScales(this._doc.song.edo)[this._doc.song.scale].flags[j] ? "visible" : "hidden";
+            this._backgroundPitchRows[j].style.visibility = scale[j] ? "visible" : "hidden";
         }
 
         if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
@@ -2620,7 +2618,7 @@ export class PatternEditor {
                     const pattern2: Pattern | null = this._doc.song.getPattern(channel, this._doc.bar + this._barOffset);
                     if (pattern2 == null) continue;
 
-                    const octaveOffset: number = this._doc.getBaseVisibleOctave(channel) * this._doc.song.edo;
+                    const octaveOffset: number = this._doc.getBaseVisibleOctave(channel) * Config.pitchesPerOctave;
                     for (const note of pattern2.notes) {
                         for (const pitch of note.pitches) {
                             let notePath: SVGPathElement = SVG.path();

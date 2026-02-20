@@ -1669,7 +1669,7 @@ export class Config {
         return wave;
     }
 
-    //acBox
+    //AcBox
     public static generateAbsSineWave(): Float32Array {
         const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
         for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {

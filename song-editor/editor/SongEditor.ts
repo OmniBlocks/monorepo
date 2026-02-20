@@ -102,8 +102,8 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
     // TODO - When you port over the Dogebox2 import/export buttons be sure to uncomment these
     const randomGroup: HTMLElement = optgroup({ label: "Randomize ▾" });
     // const randomGroup: HTMLElement = optgroup({ label: "▾ Randomize" });
-    randomGroup.appendChild(option({ value: "randomPreset" }, "Random Preset"));
-    randomGroup.appendChild(option({ value: "randomGenerated" }, "Random Generated"));
+    randomGroup.appendChild(option({ value: "randomPreset" }, "Random Preset (R)"));
+    randomGroup.appendChild(option({ value: "randomGenerated" }, "Random Generated (Shift + R)"));
     menu.appendChild(randomGroup);
 
     let firstCategoryGroup: HTMLElement | null = null;

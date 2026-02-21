@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="subpages.css">
+    <link rel='shortcut icon' type='image/x-icon' href='../favicon.ico' />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="theme-color" content="#ad7760"/>
+	<meta property="og:image" content="/icon_maskable_192.png" />
+	<meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
+	<link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+    <script>
+		function linkTo(update) {
+			window.history.replaceState(null, "", location.pathname + "#" + update);
+			navigator.clipboard.writeText(window.location).then(() => {
+				const popup = document.getElementById("popup");
+				popup.classList.add("show");
+				setTimeout(() => {
+					popup.classList.remove("show");
+				}, 2000);
+			});
+		}
+	</script>
+	<title>JukeBox Patch Notes</title>
+</head>
+
+<style>
+h2 {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.gold {
+	color: #fbea37;
+}
+
+.bonus {
+	color: #8bc1f3;
+}
+
+.return {
+	color: #6ef43d;
+}
+</style>
+
+<body>
+<nav class="navbar">
+  <a title="Click to go back to homepage" href="https://jukeebox.github.io">
+    <div class="logo-wrapper">
+      <img src="https://jukeebox.github.io/image_assets/JukeBoxLogo.png" alt="JukeBox" class="logo" height="64px">
+      <img src="https://jukeebox.github.io/image_assets/JukeBoxLogo.png" alt="" class="logo-glow" height="64px" aria-hidden="true">
+    </div>
+  </a>
+  <div class="navbartitle col"><h1>JukeBox - Patch Notes</h1></div>
+  	<div class="col">
+		<a class="navbarlinks" href="credits.html"><button>Credits</button></a>
+    	<a class="navbarlinks" href="resources.html"><button>Resources</button></a>
+		<a class="navbarlinks" href="features.html"><button>Features</button></a>
+		<a class="navbarlinks" href="patch_notes.html"><button>Patch Notes</button></a>
+		<a class="navbarlinks" href="instructions.html"><button>Instructions</button></a>
+	</div>
+</nav>
+<article id="1.X.0">
+	<h2>Version 1.X.0 | JukeBox × EdoBox<a class="link" onclick="linkTo('1.X.0')" title="Copy link">⎋</a></h2>
+	</ul><h3>Changeable Song Edo:</h3>
+	<ul>  
+		<li></li>
+	</ul>
+<article id="1.0.0">
+	<h2>Version 1.0.0 | JukeBox<a class="link" onclick="linkTo('1.0.0')" title="Copy link">⎋</a></h2>
+	</ul><h3>Instrument Tag System:</h3>
+	<ul>  
+		<li>You can now filter instruments by tags, making it easier to find kinds of instruments</li>
+	</ul>
+    <h3>Major Bug Fix:</h3>
+	<ul>
+		<li>Instrument names are now stored in the url, so future updates won't mess with the preset names of old songs</li>
+	</ul>
+	
+	<p class="date"> uhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh bbaoaboanbo not 11/25/2026</p>
+<article id="0.3.X">
+	<h2>Version 0.3.X | uhh idk yet<a class="link" onclick="linkTo('0.3.X')" title="Copy link">⎋</a></h2>
+	</ul><h3>New Features:</h3>
+	<ul>  
+		<li>FM instruments can now be made in noise channels (<span class=dogebox2>Dogebox2</span> port)</li>
+		<li>created a drumset for the "unmodified" category</li>
+	</ul>
+	<p class="date"> uhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh bbaoaboanbo not 11/25/2026</p>
+<article id="0.3.0">
+	<h2>Version 0.3.0 | EFFECTS GALORE<a class="link" onclick="linkTo('0.3.0')" title="Copy link">⎋</a></h2>
+	</ul><h3>New Effects:</h3>
+	<ul>  
+		<li>"Phaser" effect from <span class=choptop>AbyssBox</span></li>
+		<li>"Note Range" effect from <span class=dogebox2>Dogebox2</span></li>
+		<li>"Invert Wave" effect from <span class=dogebox2>Dogebox2</span></li>
+		<li>"Octave Shift" effect from <span class=studiobox>Studio Box</span></li>
+	</ul>
+	<p class="date"> uhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh bbaoaboanbo not 11/25/2026</p>
+
+</body>
+</html>

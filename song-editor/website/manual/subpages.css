@@ -353,7 +353,7 @@ details:hover {
 }
 
 .bulbbox {
-    color: #9757c5;
+    color: #b961f8;
 }
 
 .jukebox {
@@ -369,5 +369,9 @@ details:hover {
 }
 
 .studiobox {
-    color: #39e185;
+    color: #41e995;
+}
+
+.unbox {
+    color: #50b8be;
 }

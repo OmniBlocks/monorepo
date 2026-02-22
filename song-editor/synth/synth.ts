@@ -3213,7 +3213,7 @@ export class Song {
     private static readonly _oldestSlarmoosBoxVersion: number = 1;
     private static readonly _latestSlarmoosBoxVersion: number = 5;
     private static readonly _oldestJukeBoxVersion: number = 1;
-    private static readonly _latestJukeBoxVersion: number = 2;
+    private static readonly _latestJukeBoxVersion: number = 3;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
     //also "u" is ultrabox lol
     // private static readonly _variant = 0x73; //"S" - Slarmoo's Box
@@ -4159,7 +4159,7 @@ export class Song {
                             shapeBits.write(bitsPerNoteSize, note.pins[0].size); // volume
                         }
                         else {
-                            shapeBits.write(9, note.pins[0].size); // Modulator value. 9 bits for now = 512 max mod value?
+                            shapeBits.write(11, note.pins[0].size); // Modulator value. had to change from 9 to 11 for 2000 max tempo
                         }
 
                         let shapePart: number = 0;
@@ -4181,7 +4181,7 @@ export class Song {
                             if (!isModChannel) {
                                 shapeBits.write(bitsPerNoteSize, pin.size);
                             } else {
-                                shapeBits.write(9, pin.size);
+                                shapeBits.write(11, pin.size); // Modulator value. had to change from 9 to 11 for 2000 max tempo
                             }
                         }
 
@@ -6346,6 +6346,8 @@ export class Song {
                                         shape.initialSize = bits.read(2) * 2;
                                     } else if (!isModChannel) {
                                         shape.initialSize = bits.read(bitsPerNoteSize);
+                                    } else if (fromJukeBox && !beforeThree) {
+                                        shape.initialSize = bits.read(11); //mod channels use 11 bits for 2000 tempo now
                                     } else {
                                         shape.initialSize = bits.read(9);
                                     }
@@ -6365,8 +6367,9 @@ export class Song {
                                             pinObj.size = bits.read(2) * 2;
                                         } else if (!isModChannel) {
                                             pinObj.size = bits.read(bitsPerNoteSize);
-                                        }
-                                        else {
+                                        } else if (fromJukeBox && !beforeThree) {
+                                            pinObj.size = bits.read(11); //mod channels use 11 bits for 2000 tempo now
+                                        } else {
                                             pinObj.size = bits.read(9);
                                         }
                                         shape.pins.push(pinObj);

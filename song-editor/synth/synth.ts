@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, OperatorWave, LFOEnvelopeTypes, RandomEnvelopeTypes, GranularEnvelopeType, calculateRingModHertz } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, OperatorWave, LFOEnvelopeTypes, RandomEnvelopeTypes, GranularEnvelopeType, calculateRingModHertz, effectsIncludePhaser } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -5423,7 +5423,7 @@ export class Song {
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                 } else {
                     // BeepBox currently uses three base64 characters at 6 bits each for a bitfield representing all the enabled effects.
-                    if (EffectType.length > 15) throw new Error();
+                    if (EffectType.length > 16) throw new Error();
                     if (fromJukeBox || (fromSlarmoosBox && !beforeFive)) {
                         instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     } else {
@@ -9909,7 +9909,7 @@ export class Synth {
 
     private static readonly fmSynthFunctionCache: Dictionary<Function> = {};
     private static readonly fm6SynthFunctionCache: Dictionary<Function> = {};
-    private static readonly effectsFunctionCache: Function[] = Array(1 << 7).fill(undefined); // keep in sync with the number of post-process effects.
+    private static readonly effectsFunctionCache: Function[] = Array(1 << 8).fill(undefined); // keep in sync with the number of post-process effects.
     private static readonly pickedStringFunctionCache: Function[] = Array(3).fill(undefined); // keep in sync with the number of unison voices.
     private static readonly spectrumFunctionCache: Function[] = [];
     private static readonly noiseFunctionCache: Function[] = [];
@@ -13826,6 +13826,7 @@ export class Synth {
         const usesReverb: boolean = effectsIncludeReverb(instrumentState.effects);
         const usesGranular: boolean = effectsIncludeGranular(instrumentState.effects);
         const usesRingModulation: boolean = effectsIncludeRingModulation(instrumentState.effects);
+        const usesPhaser: boolean = effectsIncludePhaser(instrumentState.effects);
         let signature: number = 0; if (usesDistortion) signature = signature | 1;
         signature = signature << 1; if (usesBitcrusher) signature = signature | 1;
         signature = signature << 1; if (usesEqFilter) signature = signature | 1;
@@ -13835,6 +13836,7 @@ export class Synth {
         signature = signature << 1; if (usesReverb) signature = signature | 1;
         signature = signature << 1; if (usesGranular) signature = signature | 1;
         signature = signature << 1; if (usesRingModulation) signature = signature | 1;
+        signature = signature << 1; if (usesPhaser) signature = signature | 1;
 
         let effectsFunction: Function = Synth.effectsFunctionCache[signature];
         if (effectsFunction == undefined) {
@@ -13949,6 +13951,10 @@ export class Synth {
                 }
                 const waveformLength = waveform.length - 1;
                 `
+            }
+
+            if (usesPhaser) {
+                effectsSource += `/* Load per-tick effect state here. */`
             }
 
             if (usesEqFilter) {
@@ -14229,6 +14235,10 @@ export class Synth {
                 `
             }
 
+            if (usesPhaser) {
+                effectsSource += `/* Apply per-sample effect here. */`;
+            }
+
             if (usesEqFilter) {
                 effectsSource += `
 					
@@ -14444,7 +14454,6 @@ export class Synth {
 				instrumentState.bitcrusherPhaseDelta = bitcrusherPhaseDelta;
 				instrumentState.bitcrusherScale = bitcrusherScale;
 				instrumentState.bitcrusherFoldLevel = bitcrusherFoldLevel;`
-
             }
 
             if (usesRingModulation) {
@@ -14458,6 +14467,9 @@ export class Synth {
                 instrumentState.ringModPulseWidth = ringModPulseWidth;
                 instrumentState.ringModMixFade = ringModMixFade;
                  `
+            }
+            if (usesPhaser) {
+                effectsSource += `/* Apply per-sample effect here. */`;
             }
 
             if (usesEqFilter) {

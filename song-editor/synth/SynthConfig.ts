@@ -157,6 +157,11 @@ export const enum EnvelopeComputeIndex {
     echoDelay,
     //Add more here
 
+    phaserFreq,
+    phaserMix,
+    phaserFeedback,
+    phaserStages,
+    
     length,
 }
 
@@ -940,32 +945,39 @@ export class Config {
         //shitbox
     ]);
     public static readonly blackKeyNameParents: ReadonlyArray<number> = [-1, 1, -1, 1, -1, 1, -1, -1, 1, -1, 1, -1];
-    public static readonly tempoMin: number = 1;
-    public static readonly tempoMax: number = 2000; //slarmoo 500
-    public static readonly octaveMin: number = -8; //slarmoo -2
-    public static readonly octaveMax: number = 8; //slarmoo 2
-    public static readonly echoDelayRange: number = 24;
-    public static readonly echoDelayStepTicks: number = 4;
-    public static readonly echoSustainRange: number = 8;
-    public static readonly echoShelfHz: number = 4000.0; // The cutoff freq of the shelf filter that is used to decay echoes.
-    public static readonly echoShelfGain: number = Math.pow(2.0, -0.5);
-    public static readonly reverbShelfHz: number = 8000.0; // The cutoff freq of the shelf filter that is used to decay reverb.
-    public static readonly reverbShelfGain: number = Math.pow(2.0, -1.5);
-    public static readonly reverbRange: number = 32;
-    public static readonly reverbDelayBufferSize: number = 16384; // TODO: Compute a buffer size based on sample rate.
-    public static readonly reverbDelayBufferMask: number = Config.reverbDelayBufferSize - 1; // TODO: Compute a buffer size based on sample rate.
-    public static readonly beatsPerBarMin: number = 1;
-    public static readonly beatsPerBarMax: number = 64;
-    public static readonly barCountMin: number = 1;
-    public static readonly barCountMax: number = 4096; //slarmoo: 1024
-    public static readonly instrumentCountMin: number = 1;
-    public static readonly layeredInstrumentCountMax: number = 10;
-    public static readonly patternInstrumentCountMax: number = 10;
-	public static readonly partsPerBeat: number = 24;
-	public static readonly ticksPerPart: number = 2;
-	public static readonly ticksPerArpeggio: number = 3;
-	public static readonly arpeggioPatterns: ReadonlyArray<ReadonlyArray<number>> = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7] ];
-	public static readonly rhythms: DictionaryArray<Rhythm> = toNameMap([
+    public static readonly tempoMin:                    number = 1;
+    public static readonly tempoMax:                    number = 2000; //slarmoo 500
+    public static readonly octaveMin:                   number = -8; //slarmoo -2
+    public static readonly octaveMax:                   number = 8; //slarmoo 2
+    public static readonly echoDelayRange:              number = 24;
+    public static readonly echoDelayStepTicks:          number = 4;
+    public static readonly echoSustainRange:            number = 8;
+    public static readonly echoShelfHz:                 number = 4000.0; // The cutoff freq of the shelf filter that is used to decay echoes.
+    public static readonly echoShelfGain:               number = Math.pow(2.0, -0.5);
+    public static readonly reverbShelfHz:               number = 8000.0; // The cutoff freq of the shelf filter that is used to decay reverb.
+    public static readonly reverbShelfGain:             number = Math.pow(2.0, -1.5);
+    public static readonly reverbRange:                 number = 32;
+    public static readonly reverbDelayBufferSize:       number = 16384; // TODO: Compute a buffer size based on sample rate.
+    public static readonly reverbDelayBufferMask:       number = Config.reverbDelayBufferSize - 1; // TODO: Compute a buffer size based on sample rate.
+    public static readonly phaserMixRange:              number = 32; 
+    public static readonly phaserFeedbackRange:         number = 32; 
+    public static readonly phaserFreqRange:             number = 32; 
+    public static readonly phaserMinFreq:               number = 8.0; 
+    public static readonly phaserMaxFreq:               number = 20000.0; 
+    public static readonly phaserMinStages:             number = 0; 
+    public static readonly phaserMaxStages:             number = 32; 
+    public static readonly beatsPerBarMin:              number = 1;
+    public static readonly beatsPerBarMax:              number = 64;
+    public static readonly barCountMin:                 number = 1;
+    public static readonly barCountMax:                 number = 4096; //slarmoo: 1024
+    public static readonly instrumentCountMin:          number = 1;
+    public static readonly layeredInstrumentCountMax:   number = 10;
+    public static readonly patternInstrumentCountMax:   number = 10;
+	public static readonly partsPerBeat:                number = 24;
+	public static readonly ticksPerPart:                number = 2;
+	public static readonly ticksPerArpeggio:            number = 3;
+	public static readonly arpeggioPatterns:            ReadonlyArray<ReadonlyArray<number>> = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7] ];
+	public static readonly rhythms:                     DictionaryArray<Rhythm> = toNameMap([
 		// ÷1, ÷2, ÷16, and ÷48 are taken from DinoBox
         // { name: "÷1", stepsPerBeat: 1, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1]],*/ roundUpThresholds: null},
 		// { name: "÷2", stepsPerBeat: 2, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1]],*/ roundUpThresholds: null},

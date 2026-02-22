@@ -1672,6 +1672,11 @@ export class Instrument {
     public reverb: number = 0;
     public echoSustain: number = 0;
     public echoDelay: number = 0;
+    public phaserFreq: number = 0;
+    public phaserMix: number = Config.phaserMixRange - 1;
+    public phaserFeedback: number = 0;
+    public phaserStages: number = 2;
+
     public algorithm: number = 0;
     public feedbackType: number = 0;
     public algorithm6Op: number = 1;
@@ -1785,15 +1790,23 @@ export class Instrument {
         this.distortion = Math.floor((Config.distortionRange - 1) * 0.75);
         this.bitcrusherFreq = Math.floor((Config.bitcrusherFreqRange - 1) * 0.5)
         this.bitcrusherQuantization = Math.floor((Config.bitcrusherQuantizationRange - 1) * 0.5);
+
         this.ringModulation = Config.ringModRange >> 1;
         this.ringModulationHz = Config.ringModHzRange >> 1;
         this.ringModWaveformIndex = 0;
         this.ringModPulseWidth = Config.pwmOperatorWaves.length >> 1;
         this.ringModHzOffset = 200;
+
         this.granular = 4;
         this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
         this.grainAmounts = Config.grainAmountsMax;
         this.grainRange = 40;
+
+        this.phaserFreq	= 0;
+        this.phaserFeedback = 0;
+        this.phaserStages = 2;
+        this.phaserMix = Config.phaserMixRange - 1;
+
         this.pan = Config.panCenter;
         this.panDelay = 0;
         this.pitchShift = Config.pitchShiftCenter;
@@ -2118,6 +2131,12 @@ export class Instrument {
             instrumentObject["ringModWaveformIndex"] = this.ringModWaveformIndex;
             instrumentObject["ringModPulseWidth"] = Math.round(100 * this.ringModPulseWidth / (Config.pulseWidthRange - 1));
             instrumentObject["ringModHzOffset"] = Math.round(100 * this.ringModHzOffset / (Config.rmHzOffsetMax));
+        }
+        if (effectsIncludePhaser(this.effects)) {
+            instrumentObject["phaserMix"] =  Math.round(100 *this.phaserMix/(Config.phaserMixRange - 1));
+            instrumentObject["phaserFreq"] =  Math.round(100 *this.phaserFreq/(Config.phaserFreqRange - 1));
+            instrumentObject["phaserFeedback"] =  Math.round(100 *this.phaserFeedback/(Config.phaserFeedbackRange - 1));
+            instrumentObject["phaserStages"] =  Math.round(100 *this.phaserStages/(Config.phaserMaxStages - 1));
         }
         if (effectsIncludeDistortion(this.effects)) {
             instrumentObject["distortion"] = Math.round(100 * this.distortion / (Config.distortionRange - 1));
@@ -2578,6 +2597,21 @@ export class Instrument {
         if (instrumentObject["grainRange"] != undefined) {
             this.grainRange = clamp(0, Config.grainRangeMax / Config.grainSizeStep + 1, instrumentObject["grainRange"]);
         }
+
+        
+        if (instrumentObject["phaserMix"] != undefined) {
+            this.phaserMix = clamp(0, Config.phaserMixRange, Math.round((Config.phaserMixRange - 1) * (instrumentObject["phaserMix"] | 0) / 100));
+        }
+        if (instrumentObject["phaserFreq"] != undefined) {
+            this.phaserFreq = clamp(0, Config.phaserFreqRange, Math.round((Config.phaserFreqRange - 1) * (instrumentObject["phaserFreq"] | 0) / 100));
+        }
+        if (instrumentObject["phaserFeedback"] != undefined) {
+            this.phaserFeedback = clamp(0, Config.phaserFeedbackRange, Math.round((Config.phaserFeedbackRange - 1) * (instrumentObject["phaserFeedback"] | 0) / 100));
+        }
+        if (instrumentObject["phaserStages"] != undefined) {
+            this.phaserStages = clamp(0, Config.phaserMaxStages, Math.round((Config.phaserMaxStages - 1) * (instrumentObject["phaserStages"] | 0) / 100));
+        }
+
 
         if (instrumentObject["distortion"] != undefined) {
             this.distortion = clamp(0, Config.distortionRange, Math.round((Config.distortionRange - 1) * (instrumentObject["distortion"] | 0) / 100));
@@ -3799,6 +3833,13 @@ export class Song {
                     buffer.push(base64IntToCharCode[instrument.ringModWaveformIndex]);
                     buffer.push(base64IntToCharCode[(instrument.ringModPulseWidth)]);
                     buffer.push(base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) >> 6], base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) & 0x3F]);
+                }
+                
+                if (effectsIncludePhaser(instrument.effects)) {
+                    buffer.push(base64IntToCharCode[instrument.phaserFreq]);
+                    buffer.push(base64IntToCharCode[instrument.phaserFeedback]);
+                    buffer.push(base64IntToCharCode[instrument.phaserStages]);
+                    buffer.push(base64IntToCharCode[instrument.phaserMix]);
                 }
 
                 if (instrument.type != InstrumentType.drumset) {
@@ -5423,7 +5464,7 @@ export class Song {
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                 } else {
                     // BeepBox currently uses three base64 characters at 6 bits each for a bitfield representing all the enabled effects.
-                    if (EffectType.length > 16) throw new Error();
+                    if (EffectType.length > 18) throw new Error();
                     if (fromJukeBox || (fromSlarmoosBox && !beforeFive)) {
                         instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     } else {
@@ -5537,6 +5578,14 @@ export class Song {
                         instrument.bitcrusherFreq = clamp(0, Config.bitcrusherFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.bitcrusherQuantization = clamp(0, Config.bitcrusherQuantizationRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     }
+                    
+                    if (effectsIncludePhaser(instrument.effects)) {
+                        instrument.phaserFreq = clamp(0, Config.phaserFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        instrument.phaserFeedback = clamp(0, Config.phaserFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        instrument.phaserStages = clamp(0, Config.phaserMaxStages + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]); 
+                        instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
+
                     if (effectsIncludePanning(instrument.effects)) {
                         if (fromBeepBox) {
                             // Beepbox has a panMax of 8 (9 total positions), Jummbox has a panMax of 100 (101 total positions)
@@ -8672,6 +8721,17 @@ class InstrumentState {
     public reverbShelfPrevInput2: number = 0.0;
     public reverbShelfPrevInput3: number = 0.0;
 
+    public phaserSamples: Float32Array | null = null;
+    public phaserPrevInputs: Float32Array | null = null;
+    public phaserFeedbackMult: number = 0.0;
+    public phaserFeedbackMultDelta: number = 0.0;
+    public phaserMix: number = 0.0;
+    public phaserMixDelta: number = 0.0;
+    public phaserBreakCoef: number = 0.0;
+    public phaserBreakCoefDelta: number = 0.0;
+    public phaserStages: number = 0;
+    public phaserStagesDelta: number = 0;
+
     public readonly spectrumWave: SpectrumWaveState = new SpectrumWaveState();
     public readonly harmonicsWave: HarmonicsWaveState = new HarmonicsWaveState();
     public readonly drumsetSpectrumWaves: SpectrumWaveState[] = [];
@@ -8898,7 +8958,8 @@ class InstrumentState {
         const usesChorus: boolean = effectsIncludeChorus(this.effects);
         const usesEcho: boolean = effectsIncludeEcho(this.effects);
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
-
+        const usesPhaser: boolean = effectsIncludePhaser(this.effects);
+        
         let granularChance: number = 0;
         if (usesGranular) { //has to happen before buffer allocation
             granularChance = (instrument.grainAmounts + 1);
@@ -9321,6 +9382,74 @@ class InstrumentState {
         }
 
         let maxReverbMult = 0.0;
+
+        if (usesPhaser) {
+            const phaserMinFeedback: number = 0.0;
+            const phaserMaxFeedback: number = 0.95;
+            const phaserFeedbackMultSlider: number = instrument.phaserFeedback / Config.phaserFeedbackRange;
+            const phaserFeedbackMultEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.phaserFeedback];
+            const phaserFeedbackMultEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.phaserFeedback];
+            let phaserFeedbackMultRawStart: number = phaserFeedbackMultSlider * phaserFeedbackMultEnvelopeStart;
+            let phaserFeedbackMultRawEnd: number = phaserFeedbackMultSlider * phaserFeedbackMultEnvelopeEnd;
+            if (synth.isModActive(Config.modulators.dictionary["phaser feedback"].index, channelIndex, instrumentIndex)) {
+                phaserFeedbackMultRawStart = synth.getModValue(Config.modulators.dictionary["phaser feedback"].index, channelIndex, instrumentIndex, false) / (Config.phaserFeedbackRange);
+                phaserFeedbackMultRawEnd = synth.getModValue(Config.modulators.dictionary["phaser feedback"].index, channelIndex, instrumentIndex, true) / (Config.phaserFeedbackRange);
+            }
+            const phaserFeedbackMultStart: number = Math.max(phaserMinFeedback, Math.min(phaserMaxFeedback, phaserFeedbackMultRawStart));
+            const phaserFeedbackMultEnd: number = Math.max(phaserMinFeedback, Math.min(phaserMaxFeedback, phaserFeedbackMultRawEnd));
+            this.phaserFeedbackMult = phaserFeedbackMultStart;
+            this.phaserFeedbackMultDelta = (phaserFeedbackMultEnd - phaserFeedbackMultStart) / roundedSamplesPerTick;
+            const phaserMixSlider: number = instrument.phaserMix / (Config.phaserMixRange - 1);
+
+            const phaserMixEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.phaserMix];
+            const phaserMixEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.phaserMix];
+            let phaserMixStart: number = phaserMixSlider * phaserMixEnvelopeStart;
+            let phaserMixEnd: number = phaserMixSlider * phaserMixEnvelopeEnd;
+
+            if (synth.isModActive(Config.modulators.dictionary["phaser"].index, channelIndex, instrumentIndex)) {
+                phaserMixStart = Math.max(0, Math.min(Config.phaserMixRange - 1, synth.getModValue(Config.modulators.dictionary["phaser"].index, channelIndex, instrumentIndex, false))) / (Config.phaserMixRange - 1)
+                phaserMixEnd = Math.max(0, Math.min(Config.phaserMixRange - 1, synth.getModValue(Config.modulators.dictionary["phaser"].index, channelIndex, instrumentIndex, true))) / (Config.phaserMixRange - 1);
+            }
+            this.phaserMix = phaserMixStart;
+            this.phaserMixDelta = (phaserMixEnd - phaserMixStart) / roundedSamplesPerTick;
+
+            // @TODO: Use filtering.ts
+            const phaserBreakFreqSlider: number = instrument.phaserFreq / (Config.phaserFreqRange - 1);
+            let phaserBreakFreqEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.phaserFreq];
+            let phaserBreakFreqEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.phaserFreq];
+            let phaserBreakFreqRawStart: number = phaserBreakFreqSlider * phaserBreakFreqEnvelopeStart;
+            let phaserBreakFreqRawEnd: number = phaserBreakFreqSlider * phaserBreakFreqEnvelopeEnd;
+            if (synth.isModActive(Config.modulators.dictionary["phaser frequency"].index, channelIndex, instrumentIndex)) {
+                phaserBreakFreqRawStart = synth.getModValue(Config.modulators.dictionary["phaser frequency"].index, channelIndex, instrumentIndex, false) / (Config.phaserFreqRange);
+                phaserBreakFreqRawEnd = synth.getModValue(Config.modulators.dictionary["phaser frequency"].index, channelIndex, instrumentIndex, true) / (Config.phaserFreqRange);
+            }
+            const phaserBreakFreqRemappedStart: number = Config.phaserMinFreq * Math.pow(Config.phaserMaxFreq / Config.phaserMinFreq, phaserBreakFreqRawStart);
+            const phaserBreakFreqRemappedEnd: number = Config.phaserMinFreq * Math.pow(Config.phaserMaxFreq / Config.phaserMinFreq, phaserBreakFreqRawEnd);
+            const phaserBreakFreqStart: number = Math.max(Config.phaserMinFreq, Math.min(Config.phaserMaxFreq, phaserBreakFreqRemappedStart)); 
+            const phaserBreakFreqStartT: number = Math.tan(Math.PI * phaserBreakFreqStart / samplesPerSecond);
+            const phaserBreakCoefStart: number = (phaserBreakFreqStartT - 1) / (phaserBreakFreqStartT + 1);
+            const phaserBreakFreqEnd: number = Math.max(Config.phaserMinFreq, Math.min(Config.phaserMaxFreq, phaserBreakFreqRemappedEnd));
+            const phaserBreakFreqEndT: number = Math.tan(Math.PI * phaserBreakFreqEnd / samplesPerSecond);
+            const phaserBreakCoefEnd: number = (phaserBreakFreqEndT - 1) / (phaserBreakFreqEndT + 1);
+
+            this.phaserBreakCoef = phaserBreakCoefStart;
+            this.phaserBreakCoefDelta = (phaserBreakCoefEnd - phaserBreakCoefStart) / roundedSamplesPerTick;
+            const phaserStagesEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.phaserStages];
+            const phaserStagesEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.phaserStages];
+            const phaserStagesSlider: number = instrument.phaserStages;
+            
+            let phaserStagesStart = Math.max(Config.phaserMinStages, Math.min(Config.phaserMaxStages, phaserStagesSlider * phaserStagesEnvelopeStart));
+            let phaserStagesEnd = Math.max(Config.phaserMinStages, Math.min(Config.phaserMaxStages, phaserStagesSlider * phaserStagesEnvelopeEnd));
+
+            if (synth.isModActive(Config.modulators.dictionary["phaser stages"].index, channelIndex, instrumentIndex)) {
+                phaserStagesStart = Math.round(synth.getModValue(Config.modulators.dictionary["phaser stages"].index, channelIndex, instrumentIndex, false));
+                phaserStagesEnd = Math.round(synth.getModValue(Config.modulators.dictionary["phaser stages"].index, channelIndex, instrumentIndex, false))
+            }
+
+            this.phaserStages = phaserStagesStart;
+            this.phaserStagesDelta = (phaserStagesEnd - phaserStagesStart) / roundedSamplesPerTick;
+        }
+
         if (usesReverb) {
             const reverbEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.reverb];
             const reverbEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.reverb];
@@ -13954,7 +14083,20 @@ export class Synth {
             }
 
             if (usesPhaser) {
-                effectsSource += `/* Load per-tick effect state here. */`
+                effectsSource += `
+                
+                const phaserSamples = instrumentState.phaserSamples;
+                const phaserPrevInputs = instrumentState.phaserPrevInputs;
+                let phaserStages = instrumentState.phaserStages;
+                let phaserStagesInt = Math.floor(phaserStages);
+                const phaserStagesDelta = instrumentState.phaserStagesDelta;
+                const phaserFeedbackMultDelta = +instrumentState.phaserFeedbackMultDelta;
+                let phaserFeedbackMult = +instrumentState.phaserFeedbackMult;
+                const phaserMixDelta = +instrumentState.phaserMixDelta;
+                let phaserMix = +instrumentState.phaserMix;
+                const phaserBreakCoefDelta = +instrumentState.phaserBreakCoefDelta;
+                let phaserBreakCoef = +instrumentState.phaserBreakCoef;
+                `
             }
 
             if (usesEqFilter) {
@@ -14236,7 +14378,24 @@ export class Synth {
             }
 
             if (usesPhaser) {
-                effectsSource += `/* Apply per-sample effect here. */`;
+                effectsSource += `
+                        const phaserFeedback = phaserSamples[Math.max(0,phaserStagesInt - 1)] * phaserFeedbackMult;
+                        for (let stage = 0; stage < phaserStagesInt; stage++) {
+                            const phaserInput = stage === 0 ? sample + phaserFeedback : phaserSamples[stage - 1];
+                            const phaserPrevInput = phaserPrevInputs[stage];
+                            const phaserSample = phaserSamples[stage];
+                            const phaserNextOutput = phaserBreakCoef * phaserInput + phaserPrevInput - phaserBreakCoef * phaserSample;
+                            phaserPrevInputs[stage] = phaserInput;
+                            phaserSamples[stage] = phaserNextOutput;
+                        }
+                        const phaserOutput = phaserSamples[Math.max(0,phaserStagesInt - 1)];
+                        sample = sample + phaserOutput * phaserMix;
+                        phaserFeedbackMult += phaserFeedbackMultDelta;
+                        phaserBreakCoef += phaserBreakCoefDelta;
+                        phaserMix += phaserMixDelta;
+                        phaserStages += phaserStagesDelta;
+                        /*phaserStagesInt = Math.floor(phaserStages);*/
+                    `
             }
 
             if (usesEqFilter) {
@@ -14469,7 +14628,17 @@ export class Synth {
                  `
             }
             if (usesPhaser) {
-                effectsSource += `/* Apply per-sample effect here. */`;
+                effectsSource += `
+                
+                for (let stage = 0; stage < phaserStages; stage++) {
+                    if (!Number.isFinite(phaserPrevInputs[stage]) || Math.abs(phaserPrevInputs[stage]) < epsilon) phaserPrevInputs[stage] = 0.0;
+                    if (!Number.isFinite(phaserSamples[stage]) || Math.abs(phaserSamples[stage]) < epsilon) phaserSamples[stage] = 0.0;
+                }
+                
+                instrumentState.phaserMix = phaserMix;
+                instrumentState.phaserFeedbackMult = phaserFeedbackMult;
+                instrumentState.phaserBreakCoef = phaserBreakCoef;
+                `
             }
 
             if (usesEqFilter) {

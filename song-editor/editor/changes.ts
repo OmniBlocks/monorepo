@@ -1630,6 +1630,12 @@ export class ChangeRandomGeneratedInstrument extends Change {
                             { item: "ramp", weight: 3 },
                             { item: "trapezoid", weight: 4 },
 				            { item: "quasi-sine", weight: 2 },
+                            { item: "half-sine", weight: 3 },
+                            { item: "white noise", weight: 1 },
+                            { item: "absine", weight: 3 },
+                            { item: "sharksine", weight: 3 },
+                            { item: "fastsine", weight: 3 },
+                            { item: "camelsine", weight: 5 },
                         ])].index;
                         if (instrument.operators[i].waveform == 2/*"pulse width"*/) {
                             instrument.operators[i].pulseWidth = selectWeightedRandom([

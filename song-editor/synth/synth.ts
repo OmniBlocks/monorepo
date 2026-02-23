@@ -3729,7 +3729,12 @@ export class Song {
                 }
 
                 // The list of enabled effects is represented as a 14-bit bitfield using two six-bit characters.
-                buffer.push(SongTagCode.effects, base64IntToCharCode[(instrument.effects >> 12) & 63], base64IntToCharCode[(instrument.effects >> 6) & 63], base64IntToCharCode[instrument.effects & 63]);
+                buffer.push(
+                    SongTagCode.effects, 
+                    base64IntToCharCode[(instrument.effects >> 12) & 63], 
+                    base64IntToCharCode[(instrument.effects >> 6) & 63], 
+                    base64IntToCharCode[instrument.effects & 63]
+                );
                 if (effectsIncludeNoteFilter(instrument.effects)) {
                     buffer.push(base64IntToCharCode[+instrument.noteFilterType]);
                     if (instrument.noteFilterType) {
@@ -8775,6 +8780,12 @@ class InstrumentState {
                 this.reverbDelayLine = new Float32Array(Config.reverbDelayBufferSize);
             }
         }
+        if (effectsIncludePhaser(instrument.effects)) {
+            if (this.phaserSamples == null) {
+                this.phaserSamples = new Float32Array(Config.phaserMaxStages);
+                this.phaserPrevInputs = new Float32Array(Config.phaserMaxStages);
+            }
+        }
         if (effectsIncludeGranular(instrument.effects)) {
             const granularDelayLineSizeInMilliseconds: number = 2500;
             const granularDelayLineSizeInSeconds: number = granularDelayLineSizeInMilliseconds / 1000; // Maximum possible delay time
@@ -8854,6 +8865,8 @@ class InstrumentState {
         this.reverbShelfPrevInput1 = 0.0;
         this.reverbShelfPrevInput2 = 0.0;
         this.reverbShelfPrevInput3 = 0.0;
+        if (this.phaserSamples != null) for (let i: number = 0; i < this.phaserSamples.length; i++) this.phaserSamples[i] = 0.0;
+        if (this.phaserPrevInputs != null) for (let i: number = 0; i < this.phaserPrevInputs.length; i++) this.phaserPrevInputs[i] = 0.0;
 
         this.volumeScale = 1.0;
         this.aliases = false;

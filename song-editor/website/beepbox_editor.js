@@ -1111,10 +1111,10 @@ var beepbox = (() => {
       ]);
     }
     static {
-      this.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "phaser", "", ""];
+      this.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "phaser", "", "invert wave"];
     }
     static {
-      this.effectOrder = [2 /* panning */, 10 /* transition */, 11 /* chord */, 7 /* pitchShift */, 8 /* detune */, 9 /* vibrato */, 5 /* noteFilter */, 14 /* granular */, 3 /* distortion */, 4 /* bitcrusher */, 1 /* chorus */, 6 /* echo */, 0 /* reverb */, 13 /* ringModulation */, 15 /* phaser */];
+      this.effectOrder = [2 /* panning */, 10 /* transition */, 11 /* chord */, 7 /* pitchShift */, 8 /* detune */, 9 /* vibrato */, 5 /* noteFilter */, 14 /* granular */, 3 /* distortion */, 4 /* bitcrusher */, 1 /* chorus */, 6 /* echo */, 0 /* reverb */, 13 /* ringModulation */, 15 /* phaser */, 12 /* noteRange */, 17 /* invertWave */];
     }
     static {
       this.noteSizeMax = 6;
@@ -3312,6 +3312,10 @@ var beepbox = (() => {
     return (effects & 1 << 14 /* granular */) != 0;
   }
   __name(effectsIncludeGranular, "effectsIncludeGranular");
+  function effectsIncludeNoteRange(effects) {
+    return (effects & 1 << 12 /* noteRange */) != 0;
+  }
+  __name(effectsIncludeNoteRange, "effectsIncludeNoteRange");
   function calculateRingModHertz(sliderHz, sliderHzOffset = 0) {
     if (sliderHz == 0) return 0;
     if (sliderHz > 0) sliderHz -= 1 / Config.ringModHzRange;
@@ -3340,6 +3344,10 @@ var beepbox = (() => {
     return (effects & 1 << 15 /* phaser */) != 0;
   }
   __name(effectsIncludePhaser, "effectsIncludePhaser");
+  function effectsIncludeInvertWave(effects) {
+    return (effects & 1 << 12 /* noteRange */) != 0;
+  }
+  __name(effectsIncludeInvertWave, "effectsIncludeInvertWave");
 
   // editor/EditorConfig.ts
   var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent);
@@ -17209,6 +17217,7 @@ li.select2-results__option[role=group] > strong:hover {
       this.phaserMix = Config.phaserMixRange - 1;
       this.phaserFeedback = 0;
       this.phaserStages = 2;
+      this.invertWave = false;
       this.algorithm = 0;
       this.feedbackType = 0;
       this.algorithm6Op = 1;
@@ -17232,6 +17241,8 @@ li.select2-results__option[role=group] > strong:hover {
       this.modFilterTypes = [];
       this.modEnvelopeNumbers = [];
       this.invalidModulators = [];
+      this.upperNoteLimit = Config.maxPitch;
+      this.lowerNoteLimit = 0;
       //Literally just for pitch envelopes. 
       this.isNoiseInstrument = false;
       if (isModChannel) {
@@ -17308,6 +17319,7 @@ li.select2-results__option[role=group] > strong:hover {
       this.phaserFeedback = 0;
       this.phaserStages = 2;
       this.phaserMix = Config.phaserMixRange - 1;
+      this.invertWave = false;
       this.pan = Config.panCenter;
       this.panDelay = 0;
       this.pitchShift = Config.pitchShiftCenter;
@@ -17616,6 +17628,9 @@ li.select2-results__option[role=group] > strong:hover {
         instrumentObject["bitcrusherOctave"] = (Config.bitcrusherFreqRange - 1 - this.bitcrusherFreq) * Config.bitcrusherOctaveStep;
         instrumentObject["bitcrusherQuantization"] = Math.round(100 * this.bitcrusherQuantization / (Config.bitcrusherQuantizationRange - 1));
       }
+      if (effectsIncludeInvertWave(this.effects)) {
+        instrumentObject["invertWave"] = this.invertWave;
+      }
       if (effectsIncludePanning(this.effects)) {
         instrumentObject["pan"] = Math.round(100 * (this.pan - Config.panCenter) / Config.panCenter);
         instrumentObject["panDelay"] = this.panDelay;
@@ -17629,6 +17644,10 @@ li.select2-results__option[role=group] > strong:hover {
       }
       if (effectsIncludeReverb(this.effects)) {
         instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
+      }
+      if (effectsIncludeNoteRange(this.effects)) {
+        instrumentObject["upperNoteLimit"] = this.upperNoteLimit;
+        instrumentObject["lowerNoteLimit"] = this.lowerNoteLimit;
       }
       if (this.type != 4 /* drumset */) {
         instrumentObject["fadeInSeconds"] = Math.round(1e4 * Synth.fadeInSettingToSeconds(this.fadeIn)) / 1e4;
@@ -18044,6 +18063,15 @@ li.select2-results__option[role=group] > strong:hover {
         this.reverb = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverb"] | 0) / 100));
       } else {
         this.reverb = legacyGlobalReverb;
+      }
+      if (instrumentObject["invertWave"] != void 0) {
+        this.invertWave = instrumentObject["invertWave"];
+      }
+      if (instrumentObject["upperNoteLimit"] != void 0) {
+        this.upperNoteLimit = instrumentObject["upperNoteLimit"];
+      }
+      if (instrumentObject["lowerNoteLimit"] != void 0) {
+        this.lowerNoteLimit = instrumentObject["lowerNoteLimit"];
       }
       if (instrumentObject["pulseWidth"] != void 0) {
         this.pulseWidth = clamp(1, Config.pulseWidthRange + 1, Math.round(instrumentObject["pulseWidth"]));
@@ -18795,7 +18823,7 @@ li.select2-results__option[role=group] > strong:hover {
       this._oldestJukeBoxVersion = 1;
     }
     static {
-      this._latestJukeBoxVersion = 3;
+      this._latestJukeBoxVersion = 4;
     }
     static {
       // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
@@ -19103,6 +19131,13 @@ li.select2-results__option[role=group] > strong:hover {
             buffer.push(base64IntToCharCode[instrument.phaserFeedback]);
             buffer.push(base64IntToCharCode[instrument.phaserStages]);
             buffer.push(base64IntToCharCode[instrument.phaserMix]);
+          }
+          if (effectsIncludeInvertWave(instrument.effects)) {
+            buffer.push(base64IntToCharCode[+instrument.invertWave]);
+          }
+          if (effectsIncludeNoteRange(instrument.effects)) {
+            buffer.push(base64IntToCharCode[instrument.upperNoteLimit >> 6], base64IntToCharCode[instrument.upperNoteLimit & 63]);
+            buffer.push(base64IntToCharCode[instrument.lowerNoteLimit >> 6], base64IntToCharCode[instrument.lowerNoteLimit & 63]);
           }
           if (instrument.type != 4 /* drumset */) {
             buffer.push(100 /* fadeInOut */, base64IntToCharCode[instrument.fadeIn], base64IntToCharCode[instrument.fadeOut]);
@@ -20618,12 +20653,6 @@ li.select2-results__option[role=group] > strong:hover {
                 instrument.bitcrusherFreq = clamp(0, Config.bitcrusherFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 instrument.bitcrusherQuantization = clamp(0, Config.bitcrusherQuantizationRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
               }
-              if (effectsIncludePhaser(instrument.effects)) {
-                instrument.phaserFreq = clamp(0, Config.phaserFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                instrument.phaserFeedback = clamp(0, Config.phaserFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                instrument.phaserStages = clamp(0, Config.phaserMaxStages + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-              }
               if (effectsIncludePanning(instrument.effects)) {
                 if (fromBeepBox) {
                   instrument.pan = clamp(0, Config.panMax + 1, Math.round(base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * (Config.panMax / 8)));
@@ -20663,6 +20692,19 @@ li.select2-results__option[role=group] > strong:hover {
                 instrument.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 instrument.ringModPulseWidth = clamp(0, Config.pulseWidthRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 instrument.ringModHzOffset = clamp(Config.rmHzOffsetMin, Config.rmHzOffsetMax + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+              }
+              if (effectsIncludePhaser(instrument.effects)) {
+                instrument.phaserFreq = clamp(0, Config.phaserFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                instrument.phaserFeedback = clamp(0, Config.phaserFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                instrument.phaserStages = clamp(0, Config.phaserMaxStages + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+              }
+              if (effectsIncludeInvertWave(instrument.effects)) {
+                instrument.invertWave = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
+              }
+              if (effectsIncludeNoteRange(instrument.effects)) {
+                instrument.upperNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                instrument.lowerNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
               }
             }
             instrument.effects &= (1 << 18 /* length */) - 1;
@@ -23417,6 +23459,7 @@ li.select2-results__option[role=group] > strong:hover {
       this.reverbShelfPrevInput1 = 0;
       this.reverbShelfPrevInput2 = 0;
       this.reverbShelfPrevInput3 = 0;
+      this.invertWave = false;
       this.phaserSamples = null;
       this.phaserPrevInputs = null;
       this.phaserFeedbackMult = 0;
@@ -23587,6 +23630,14 @@ li.select2-results__option[role=group] > strong:hover {
       this.effects = instrument.effects;
       this.aliases = instrument.aliases;
       this.volumeScale = 1;
+      const usesInvertWave = effectsIncludeInvertWave(this.effects);
+      if (usesInvertWave) {
+        if (synth.isModActive(Config.modulators.dictionary["invert wave"].index, channelIndex, instrumentIndex)) {
+          this.invertWave = Boolean(Math.floor(synth.getModValue(Config.modulators.dictionary["invert wave"].index, channelIndex, instrumentIndex, false)));
+        }
+      }
+      this.volumeScale = 1;
+      this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
       const samplesPerSecond = synth.samplesPerSecond;
       this.updateWaves(instrument, samplesPerSecond);
       const ticksIntoBar = synth.getTicksIntoBar();
@@ -24580,7 +24631,7 @@ li.select2-results__option[role=group] > strong:hover {
       this.fm6SynthFunctionCache = {};
     }
     static {
-      this.effectsFunctionCache = Array(1 << 8).fill(void 0);
+      this.effectsFunctionCache = Array(1 << 7).fill(void 0);
     }
     static {
       // keep in sync with the number of post-process effects.
@@ -27768,6 +27819,7 @@ li.select2-results__option[role=group] > strong:hover {
       const usesGranular = effectsIncludeGranular(instrumentState.effects);
       const usesRingModulation = effectsIncludeRingModulation(instrumentState.effects);
       const usesPhaser = effectsIncludePhaser(instrumentState.effects);
+      const usesInvertWave = effectsIncludeInvertWave(instrumentState.effects) && instrumentState.invertWave;
       let signature = 0;
       if (usesDistortion) signature = signature | 1;
       signature = signature << 1;
@@ -27788,6 +27840,8 @@ li.select2-results__option[role=group] > strong:hover {
       if (usesRingModulation) signature = signature | 1;
       signature = signature << 1;
       if (usesPhaser) signature = signature | 1;
+      signature = signature << 1;
+      if (usesInvertWave) signature = signature | 1;
       let effectsFunction = _Synth.effectsFunctionCache[signature];
       if (effectsFunction == void 0) {
         let effectsSource = "return (synth, outputDataL, outputDataR, bufferIndex, runLength, instrumentState) => {";
@@ -27897,6 +27951,11 @@ li.select2-results__option[role=group] > strong:hover {
                 let phaserMix = +instrumentState.phaserMix;
                 const phaserBreakCoefDelta = +instrumentState.phaserBreakCoefDelta;
                 let phaserBreakCoef = +instrumentState.phaserBreakCoef;
+                `;
+        }
+        if (usesInvertWave) {
+          effectsSource += `
+                let isInverted = +instrumentState.invertWave;
                 `;
         }
         if (usesEqFilter) {
@@ -28017,6 +28076,11 @@ li.select2-results__option[role=group] > strong:hover {
 				let reverbShelfPrevInput1 = +instrumentState.reverbShelfPrevInput1;
 				let reverbShelfPrevInput2 = +instrumentState.reverbShelfPrevInput2;
 				let reverbShelfPrevInput3 = +instrumentState.reverbShelfPrevInput3;`;
+        }
+        if (usesInvertWave) {
+          effectsSource += `
+                    sample = sample*-1;
+                `;
         }
         effectsSource += `
 				
@@ -33019,6 +33083,22 @@ li.select2-results__option[role=group] > strong:hover {
       doc.notifier.changed();
       if (oldValue != newValue) {
         instrument.aliases = newValue;
+        instrument.preset = instrument.type;
+        this._didSomething();
+      }
+    }
+  };
+  var ChangeInvertWave = class extends Change {
+    static {
+      __name(this, "ChangeInvertWave");
+    }
+    constructor(doc, newValue) {
+      super();
+      const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+      const oldValue = instrument.invertWave;
+      doc.notifier.changed();
+      if (oldValue != newValue) {
+        instrument.invertWave = newValue;
         instrument.preset = instrument.type;
         this._didSomething();
       }
@@ -53775,6 +53855,8 @@ You should be redirected to the song at:<br /><br />
       this._twoNoteArpBox = input18({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
       this._twoNoteArpRow = div25({ class: "selectRow dropFader" }, span7({ class: "tip", style: "margin-left:4px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("twoNoteArpeggio"), "onclick") }, "\u2023 Fast Two-Note:"), this._twoNoteArpBox);
       this._chordDropdownGroup = div25({ class: "editor-controls", style: "display: none;" }, this._arpeggioSpeedRow, this._twoNoteArpRow);
+      this._invertWaveBox = input18({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
+      this._invertWaveRow = div25({ class: "selectRow" }, span7({ class: "tip", style: "margin-left:10px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("invertWave"), "onclick") }, "Invert Wave:"), this._invertWaveBox);
       this._vibratoSelect = buildOptions(select14(), Config.vibratos.map((vibrato) => vibrato.name));
       this._vibratoDropdown = button25({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name(() => this._toggleDropdownMenu(0 /* Vibrato */), "onclick") }, "\u25BC");
       this._vibratoSelectRow = div25({ class: "selectRow" }, span7({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("vibrato"), "onclick") }, "Vibrato:"), this._vibratoDropdown, div25({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoSelect));
@@ -53942,6 +54024,7 @@ You should be redirected to the song at:<br /><br />
         this._phaserFreqRow,
         this._phaserFeedbackRow,
         this._phaserStagesRow,
+        this._invertWaveRow,
         this._granularContainerRow,
         div25(
           { style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` },
@@ -54792,6 +54875,11 @@ You should be redirected to the song at:<br /><br />
             this._phaserFeedbackRow.style.display = "none";
             this._phaserStagesRow.style.display = "none";
           }
+          if (effectsIncludeInvertWave(instrument.effects)) {
+            this._invertWaveRow.style.display = "";
+          } else {
+            this._invertWaveRow.style.display = "none";
+          }
           if (effectsIncludeGranular(instrument.effects)) {
             this._granularContainerRow.style.display = "";
             this._granularSlider.updateValue(instrument.granular);
@@ -55423,6 +55511,7 @@ You should be redirected to the song at:<br /><br />
         this._twoNoteArpBox.checked = instrument.fastTwoNoteArp ? true : false;
         this._clicklessTransitionBox.checked = instrument.clicklessTransition ? true : false;
         this._aliasingBox.checked = instrument.aliases ? true : false;
+        this._invertWaveBox.checked = instrument.invertWave ? true : false;
         this._addEnvelopeButton.disabled = instrument.envelopeCount >= Config.maxEnvelopeCount;
         this._volumeSlider.updateValue(prefs.volume);
         if (wasActive && activeElement != null && activeElement.clientWidth == 0) {
@@ -57180,6 +57269,9 @@ You should be redirected to the song at:<br /><br />
       });
       this._aliasingBox.addEventListener("input", () => {
         this.doc.record(new ChangeAliasing(this.doc, this._aliasingBox.checked));
+      });
+      this._invertWaveBox.addEventListener("input", () => {
+        this.doc.record(new ChangeInvertWave(this.doc, this._invertWaveBox.checked));
       });
       this._promptContainer.addEventListener("click", (event) => {
         if (this.doc.prefs.closePromptByClickoff === true) {

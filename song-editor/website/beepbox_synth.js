@@ -1106,10 +1106,10 @@ var beepbox = (() => {
       ]);
     }
     static {
-      this.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "phaser", "", ""];
+      this.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "phaser", "", "invert wave"];
     }
     static {
-      this.effectOrder = [2 /* panning */, 10 /* transition */, 11 /* chord */, 7 /* pitchShift */, 8 /* detune */, 9 /* vibrato */, 5 /* noteFilter */, 14 /* granular */, 3 /* distortion */, 4 /* bitcrusher */, 1 /* chorus */, 6 /* echo */, 0 /* reverb */, 13 /* ringModulation */, 15 /* phaser */];
+      this.effectOrder = [2 /* panning */, 10 /* transition */, 11 /* chord */, 7 /* pitchShift */, 8 /* detune */, 9 /* vibrato */, 5 /* noteFilter */, 14 /* granular */, 3 /* distortion */, 4 /* bitcrusher */, 1 /* chorus */, 6 /* echo */, 0 /* reverb */, 13 /* ringModulation */, 15 /* phaser */, 12 /* noteRange */, 17 /* invertWave */];
     }
     static {
       this.noteSizeMax = 6;
@@ -3307,6 +3307,10 @@ var beepbox = (() => {
     return (effects & 1 << 14 /* granular */) != 0;
   }
   __name(effectsIncludeGranular, "effectsIncludeGranular");
+  function effectsIncludeNoteRange(effects) {
+    return (effects & 1 << 12 /* noteRange */) != 0;
+  }
+  __name(effectsIncludeNoteRange, "effectsIncludeNoteRange");
   function calculateRingModHertz(sliderHz, sliderHzOffset = 0) {
     if (sliderHz == 0) return 0;
     if (sliderHz > 0) sliderHz -= 1 / Config.ringModHzRange;
@@ -3335,6 +3339,10 @@ var beepbox = (() => {
     return (effects & 1 << 15 /* phaser */) != 0;
   }
   __name(effectsIncludePhaser, "effectsIncludePhaser");
+  function effectsIncludeInvertWave(effects) {
+    return (effects & 1 << 12 /* noteRange */) != 0;
+  }
+  __name(effectsIncludeInvertWave, "effectsIncludeInvertWave");
 
   // editor/EditorConfig.ts
   var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent);
@@ -7659,6 +7667,7 @@ var beepbox = (() => {
       this.phaserMix = Config.phaserMixRange - 1;
       this.phaserFeedback = 0;
       this.phaserStages = 2;
+      this.invertWave = false;
       this.algorithm = 0;
       this.feedbackType = 0;
       this.algorithm6Op = 1;
@@ -7682,6 +7691,8 @@ var beepbox = (() => {
       this.modFilterTypes = [];
       this.modEnvelopeNumbers = [];
       this.invalidModulators = [];
+      this.upperNoteLimit = Config.maxPitch;
+      this.lowerNoteLimit = 0;
       //Literally just for pitch envelopes. 
       this.isNoiseInstrument = false;
       if (isModChannel) {
@@ -7758,6 +7769,7 @@ var beepbox = (() => {
       this.phaserFeedback = 0;
       this.phaserStages = 2;
       this.phaserMix = Config.phaserMixRange - 1;
+      this.invertWave = false;
       this.pan = Config.panCenter;
       this.panDelay = 0;
       this.pitchShift = Config.pitchShiftCenter;
@@ -8066,6 +8078,9 @@ var beepbox = (() => {
         instrumentObject["bitcrusherOctave"] = (Config.bitcrusherFreqRange - 1 - this.bitcrusherFreq) * Config.bitcrusherOctaveStep;
         instrumentObject["bitcrusherQuantization"] = Math.round(100 * this.bitcrusherQuantization / (Config.bitcrusherQuantizationRange - 1));
       }
+      if (effectsIncludeInvertWave(this.effects)) {
+        instrumentObject["invertWave"] = this.invertWave;
+      }
       if (effectsIncludePanning(this.effects)) {
         instrumentObject["pan"] = Math.round(100 * (this.pan - Config.panCenter) / Config.panCenter);
         instrumentObject["panDelay"] = this.panDelay;
@@ -8079,6 +8094,10 @@ var beepbox = (() => {
       }
       if (effectsIncludeReverb(this.effects)) {
         instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
+      }
+      if (effectsIncludeNoteRange(this.effects)) {
+        instrumentObject["upperNoteLimit"] = this.upperNoteLimit;
+        instrumentObject["lowerNoteLimit"] = this.lowerNoteLimit;
       }
       if (this.type != 4 /* drumset */) {
         instrumentObject["fadeInSeconds"] = Math.round(1e4 * Synth.fadeInSettingToSeconds(this.fadeIn)) / 1e4;
@@ -8494,6 +8513,15 @@ var beepbox = (() => {
         this.reverb = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverb"] | 0) / 100));
       } else {
         this.reverb = legacyGlobalReverb;
+      }
+      if (instrumentObject["invertWave"] != void 0) {
+        this.invertWave = instrumentObject["invertWave"];
+      }
+      if (instrumentObject["upperNoteLimit"] != void 0) {
+        this.upperNoteLimit = instrumentObject["upperNoteLimit"];
+      }
+      if (instrumentObject["lowerNoteLimit"] != void 0) {
+        this.lowerNoteLimit = instrumentObject["lowerNoteLimit"];
       }
       if (instrumentObject["pulseWidth"] != void 0) {
         this.pulseWidth = clamp(1, Config.pulseWidthRange + 1, Math.round(instrumentObject["pulseWidth"]));
@@ -9245,7 +9273,7 @@ var beepbox = (() => {
       this._oldestJukeBoxVersion = 1;
     }
     static {
-      this._latestJukeBoxVersion = 3;
+      this._latestJukeBoxVersion = 4;
     }
     static {
       // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
@@ -9553,6 +9581,13 @@ var beepbox = (() => {
             buffer.push(base64IntToCharCode[instrument.phaserFeedback]);
             buffer.push(base64IntToCharCode[instrument.phaserStages]);
             buffer.push(base64IntToCharCode[instrument.phaserMix]);
+          }
+          if (effectsIncludeInvertWave(instrument.effects)) {
+            buffer.push(base64IntToCharCode[+instrument.invertWave]);
+          }
+          if (effectsIncludeNoteRange(instrument.effects)) {
+            buffer.push(base64IntToCharCode[instrument.upperNoteLimit >> 6], base64IntToCharCode[instrument.upperNoteLimit & 63]);
+            buffer.push(base64IntToCharCode[instrument.lowerNoteLimit >> 6], base64IntToCharCode[instrument.lowerNoteLimit & 63]);
           }
           if (instrument.type != 4 /* drumset */) {
             buffer.push(100 /* fadeInOut */, base64IntToCharCode[instrument.fadeIn], base64IntToCharCode[instrument.fadeOut]);
@@ -11068,12 +11103,6 @@ var beepbox = (() => {
                 instrument.bitcrusherFreq = clamp(0, Config.bitcrusherFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 instrument.bitcrusherQuantization = clamp(0, Config.bitcrusherQuantizationRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
               }
-              if (effectsIncludePhaser(instrument.effects)) {
-                instrument.phaserFreq = clamp(0, Config.phaserFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                instrument.phaserFeedback = clamp(0, Config.phaserFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                instrument.phaserStages = clamp(0, Config.phaserMaxStages + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-              }
               if (effectsIncludePanning(instrument.effects)) {
                 if (fromBeepBox) {
                   instrument.pan = clamp(0, Config.panMax + 1, Math.round(base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * (Config.panMax / 8)));
@@ -11113,6 +11142,19 @@ var beepbox = (() => {
                 instrument.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 instrument.ringModPulseWidth = clamp(0, Config.pulseWidthRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 instrument.ringModHzOffset = clamp(Config.rmHzOffsetMin, Config.rmHzOffsetMax + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+              }
+              if (effectsIncludePhaser(instrument.effects)) {
+                instrument.phaserFreq = clamp(0, Config.phaserFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                instrument.phaserFeedback = clamp(0, Config.phaserFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                instrument.phaserStages = clamp(0, Config.phaserMaxStages + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+              }
+              if (effectsIncludeInvertWave(instrument.effects)) {
+                instrument.invertWave = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
+              }
+              if (effectsIncludeNoteRange(instrument.effects)) {
+                instrument.upperNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                instrument.lowerNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
               }
             }
             instrument.effects &= (1 << 18 /* length */) - 1;
@@ -13867,6 +13909,7 @@ var beepbox = (() => {
       this.reverbShelfPrevInput1 = 0;
       this.reverbShelfPrevInput2 = 0;
       this.reverbShelfPrevInput3 = 0;
+      this.invertWave = false;
       this.phaserSamples = null;
       this.phaserPrevInputs = null;
       this.phaserFeedbackMult = 0;
@@ -14037,6 +14080,14 @@ var beepbox = (() => {
       this.effects = instrument.effects;
       this.aliases = instrument.aliases;
       this.volumeScale = 1;
+      const usesInvertWave = effectsIncludeInvertWave(this.effects);
+      if (usesInvertWave) {
+        if (synth.isModActive(Config.modulators.dictionary["invert wave"].index, channelIndex, instrumentIndex)) {
+          this.invertWave = Boolean(Math.floor(synth.getModValue(Config.modulators.dictionary["invert wave"].index, channelIndex, instrumentIndex, false)));
+        }
+      }
+      this.volumeScale = 1;
+      this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
       const samplesPerSecond = synth.samplesPerSecond;
       this.updateWaves(instrument, samplesPerSecond);
       const ticksIntoBar = synth.getTicksIntoBar();
@@ -15030,7 +15081,7 @@ var beepbox = (() => {
       this.fm6SynthFunctionCache = {};
     }
     static {
-      this.effectsFunctionCache = Array(1 << 8).fill(void 0);
+      this.effectsFunctionCache = Array(1 << 7).fill(void 0);
     }
     static {
       // keep in sync with the number of post-process effects.
@@ -18218,6 +18269,7 @@ var beepbox = (() => {
       const usesGranular = effectsIncludeGranular(instrumentState.effects);
       const usesRingModulation = effectsIncludeRingModulation(instrumentState.effects);
       const usesPhaser = effectsIncludePhaser(instrumentState.effects);
+      const usesInvertWave = effectsIncludeInvertWave(instrumentState.effects) && instrumentState.invertWave;
       let signature = 0;
       if (usesDistortion) signature = signature | 1;
       signature = signature << 1;
@@ -18238,6 +18290,8 @@ var beepbox = (() => {
       if (usesRingModulation) signature = signature | 1;
       signature = signature << 1;
       if (usesPhaser) signature = signature | 1;
+      signature = signature << 1;
+      if (usesInvertWave) signature = signature | 1;
       let effectsFunction = _Synth.effectsFunctionCache[signature];
       if (effectsFunction == void 0) {
         let effectsSource = "return (synth, outputDataL, outputDataR, bufferIndex, runLength, instrumentState) => {";
@@ -18347,6 +18401,11 @@ var beepbox = (() => {
                 let phaserMix = +instrumentState.phaserMix;
                 const phaserBreakCoefDelta = +instrumentState.phaserBreakCoefDelta;
                 let phaserBreakCoef = +instrumentState.phaserBreakCoef;
+                `;
+        }
+        if (usesInvertWave) {
+          effectsSource += `
+                let isInverted = +instrumentState.invertWave;
                 `;
         }
         if (usesEqFilter) {
@@ -18467,6 +18526,11 @@ var beepbox = (() => {
 				let reverbShelfPrevInput1 = +instrumentState.reverbShelfPrevInput1;
 				let reverbShelfPrevInput2 = +instrumentState.reverbShelfPrevInput2;
 				let reverbShelfPrevInput3 = +instrumentState.reverbShelfPrevInput3;`;
+        }
+        if (usesInvertWave) {
+          effectsSource += `
+                    sample = sample*-1;
+                `;
         }
         effectsSource += `
 				

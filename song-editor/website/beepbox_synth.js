@@ -2034,7 +2034,7 @@ var beepbox = (() => {
           effect: 9 /* vibrato */,
           compatibleInstruments: null
         },
-        //{ name: "vibratoSpeed", computeIndex: EnvelopeComputeIndex.vibratoSpeed, displayName: "vibrato speed", /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: 1, effect: EffectType.vibrato, compatibleInstruments: null },
+        //{ name: "vibratoSpeed",         computeIndex: EnvelopeComputeIndex.vibratoSpeed,              displayName: "vibrato speed",  /*perNote: true,*/ interleave: false, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: 1, effect: EffectType.vibrato, compatibleInstruments: null },
         {
           name: "noteFilterAllFreqs",
           computeIndex: 1 /* noteFilterAllFreqs */,
@@ -2209,7 +2209,11 @@ var beepbox = (() => {
         { name: "grainFreq", computeIndex: 52 /* grainAmount */, displayName: "grain freq", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 14 /* granular */, compatibleInstruments: null },
         { name: "grainSize", computeIndex: 53 /* grainSize */, displayName: "grain size", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 14 /* granular */, compatibleInstruments: null },
         { name: "grainRange", computeIndex: 54 /* grainRange */, displayName: "grain range", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 14 /* granular */, compatibleInstruments: null },
-        { name: "echoDelay", computeIndex: 55 /* echoDelay */, displayName: "echo delay", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 6 /* echo */, compatibleInstruments: null }
+        { name: "echoDelay", computeIndex: 55 /* echoDelay */, displayName: "echo delay", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 6 /* echo */, compatibleInstruments: null },
+        { name: "phaserFreq", computeIndex: 56 /* phaserFreq */, displayName: "phaser freq", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 15 /* phaser */, compatibleInstruments: null },
+        { name: "phaserMix", computeIndex: 57 /* phaserMix */, displayName: "phaser", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 15 /* phaser */, compatibleInstruments: null },
+        { name: "phaserFeedback", computeIndex: 58 /* phaserFeedback */, displayName: "phaser feedback", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 15 /* phaser */, compatibleInstruments: null },
+        { name: "phaserStages", computeIndex: 59 /* phaserStages */, displayName: "phaser stages", perNote: false, interleave: false, isFilter: false, maxCount: 1, effect: 15 /* phaser */, compatibleInstruments: null }
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
         //{name: "noteFilterGain",         computeIndex:       EnvelopeComputeIndex.noteFilterGain0,        displayName: "n. filter # vol",  /*perNote:  true,*/ interleave: false, isFilter:  true, range: Config.filterGainRange,             maxCount: Config.filterMaxPoints, effect: EffectType.noteFilter, compatibleInstruments: null},
         /*
@@ -2819,54 +2823,6 @@ var beepbox = (() => {
           promptDesc: ["This setting controls the supersaw shape of your instrument, just like the Saw\u2194Pulse slider.", "As the slider's name implies, this effect will give you a sawtooth wave at $LO, and a full pulse width wave at $HI. Values in between will be a blend of the two.", "[OVERWRITING] [$LO - $HI] [%]"]
         },
         {
-          name: "phaser",
-          pianoName: "Phaser",
-          maxRawVol: _Config.phaserMixRange,
-          newNoteVol: 0,
-          forSong: false,
-          convertRealFactor: 0,
-          associatedEffect: 15 /* phaser */,
-          maxIndex: 0,
-          promptName: "Instrument Phaser",
-          promptDesc: ["This setting controls the Phaser Mix of your insturment, just like the Phaser slider.", "At $LO, your instrument will have no phaser. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"]
-        },
-        {
-          name: "phaser frequency",
-          pianoName: "Phaser Frequency",
-          maxRawVol: _Config.phaserFreqRange,
-          newNoteVol: 0,
-          forSong: false,
-          convertRealFactor: 0,
-          associatedEffect: 15 /* phaser */,
-          maxIndex: 0,
-          promptName: "Phaser Frequency",
-          promptDesc: ["This setting controls the phaser frequency of your insturment, just like the phaser freq slider.", "At $LO, your instrument will have no phaser freq. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"]
-        },
-        {
-          name: "phaser feedback",
-          pianoName: "Phaser Feedback",
-          maxRawVol: _Config.phaserFeedbackRange,
-          newNoteVol: 0,
-          forSong: false,
-          convertRealFactor: 0,
-          associatedEffect: 15 /* phaser */,
-          maxIndex: 0,
-          promptName: "Phaser Feedback",
-          promptDesc: ["This setting controls the phaser feedback of your insturment, just like the phaser feedback slider.", "At $LO, your instrument will have no phaser feedback. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"]
-        },
-        {
-          name: "phaser stages",
-          pianoName: "Phaser Stages",
-          maxRawVol: _Config.phaserMaxStages,
-          newNoteVol: 0,
-          forSong: false,
-          convertRealFactor: 0,
-          associatedEffect: 15 /* phaser */,
-          maxIndex: 0,
-          promptName: "Phaser Stages",
-          promptDesc: ["This setting controls the number of phaser stages in your insturment, just like the phaser stages slider.", "At $LO, your instrument will have no phaser stages. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"]
-        },
-        {
           name: "individual envelope speed",
           pianoName: "IndvEnvSpd",
           maxRawVol: 63,
@@ -3014,6 +2970,54 @@ var beepbox = (() => {
           maxIndex: this.maxEnvelopeCount - 1,
           promptName: "Individual Envelope Upper Bound",
           promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound"]
+        },
+        {
+          name: "phaser",
+          pianoName: "Phaser",
+          maxRawVol: _Config.phaserMixRange,
+          newNoteVol: 0,
+          forSong: false,
+          convertRealFactor: 0,
+          associatedEffect: 15 /* phaser */,
+          maxIndex: 0,
+          promptName: "Instrument Phaser",
+          promptDesc: ["This setting controls the Phaser Mix of your insturment, just like the Phaser slider.", "At $LO, your instrument will have no phaser. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"]
+        },
+        {
+          name: "phaser frequency",
+          pianoName: "Phaser Frequency",
+          maxRawVol: _Config.phaserFreqRange,
+          newNoteVol: 0,
+          forSong: false,
+          convertRealFactor: 0,
+          associatedEffect: 15 /* phaser */,
+          maxIndex: 0,
+          promptName: "Phaser Frequency",
+          promptDesc: ["This setting controls the phaser frequency of your insturment, just like the phaser freq slider.", "At $LO, your instrument will have no phaser freq. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"]
+        },
+        {
+          name: "phaser feedback",
+          pianoName: "Phaser Feedback",
+          maxRawVol: _Config.phaserFeedbackRange,
+          newNoteVol: 0,
+          forSong: false,
+          convertRealFactor: 0,
+          associatedEffect: 15 /* phaser */,
+          maxIndex: 0,
+          promptName: "Phaser Feedback",
+          promptDesc: ["This setting controls the phaser feedback of your insturment, just like the phaser feedback slider.", "At $LO, your instrument will have no phaser feedback. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"]
+        },
+        {
+          name: "phaser stages",
+          pianoName: "Phaser Stages",
+          maxRawVol: _Config.phaserMaxStages,
+          newNoteVol: 0,
+          forSong: false,
+          convertRealFactor: 0,
+          associatedEffect: 15 /* phaser */,
+          maxIndex: 0,
+          promptName: "Phaser Stages",
+          promptDesc: ["This setting controls the number of phaser stages in your insturment, just like the phaser stages slider.", "At $LO, your instrument will have no phaser stages. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"]
         }
       ]);
     }
@@ -3909,9 +3913,7 @@ var beepbox = (() => {
           { name: "BulbBox Trumpet", midiProgram: 80, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters1": [], "effects": ["panning"], "pan": 0, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1\u2190(2\u20023\u20024)", "feedbackType": "1\u27F2\u20032\u27F2", "feedbackAmplitude": 6, "operators": [{ "frequency": "1\xD7", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 9, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "linear", "inverse": false, "perEnvelopeSpeed": 128, "perEnvelopeLowerBound": 0.8, "perEnvelopeUpperBound": 1.1, "index": 1 }, { "target": "operatorAmplitude", "envelope": "swell", "inverse": false, "perEnvelopeSpeed": 64, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1.1, "index": 1 }], "isDrum": false } },
           { name: "BulbBox Brass", midiProgram: 80, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters1": [], "effects": ["panning"], "pan": 0, "panDelay": 0, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1\u2190(2\u20023\u20024)", "feedbackType": "2\u27F2", "feedbackAmplitude": 3, "operators": [{ "frequency": "1\xD7", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "~1\xD7", "amplitude": 11, "waveform": "half-sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 6, "waveform": "triangle", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 0 }, { "target": "noteVolume", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0.8, "perEnvelopeUpperBound": 1.1 }], "isDrum": false } },
           { name: "BulbBox Synth Sax", midiProgram: 80, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "high-pass", "cutoffHz": 88.39, "linearGain": 0.0884 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "high-pass", "cutoffHz": 88.39, "linearGain": 0.0884 }], "eqSubFilters1": [], "effects": ["panning", "distortion", "bitcrusher"], "distortion": 29, "aliases": false, "bitcrusherOctave": 5.5, "bitcrusherQuantization": 29, "pan": 0, "panDelay": 0, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1\u2190(2\u20023\u20024)", "feedbackType": "1\u27F2\u20032\u27F2", "feedbackAmplitude": 2, "operators": [{ "frequency": "1\xD7", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "~1\xD7", "amplitude": 10, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5\xD7", "amplitude": 2, "waveform": "triangle", "pulseWidth": 5 }, { "frequency": "2\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "swell", "inverse": false, "perEnvelopeSpeed": 128, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 0 }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 1.5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1.5, "index": 0 }, { "target": "noteVolume", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0.4, "perEnvelopeUpperBound": 1 }], "isDrum": false } },
-          { name: "BulbBox Flute", midiProgram: 80, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters1": [], "effects": ["panning", "vibrato"], "vibrato": "custom", "vibratoDepth": 0.24, "vibratoDelay": 5, "vibratoSpeed": 5, "vibratoType": 0, "pan": 0, "panDelay": 0, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1\u2190(2\u20023\u20024)", "feedbackType": "1\u27F2", "feedbackAmplitude": 0, "operators": [{ "frequency": "1\xD7", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "~2\xD7", "amplitude": 3, "waveform": "half-sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 4.5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 1 }, { "target": "noteVolume", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "noteVolume", "envelope": "swell", "inverse": false, "perEnvelopeSpeed": 256, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }], "isDrum": false } },
-          // Other Presets
-          { name: "Clock Tower/Church Bell", midiProgram: 80, settings: { "type": "noise", "volume": 0, "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["panning", "phaser"], "phaserMix": 100, "phaserFreq": 81, "phaserFeedback": 100, "phaserStages": 103, "pan": 0, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": -1, "unison": "none", "wave": "white", "envelopes": [{ "target": "noteVolume", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 4, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }], "isDrum": false } }
+          { name: "BulbBox Flute", midiProgram: 80, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters1": [], "effects": ["panning", "vibrato"], "vibrato": "custom", "vibratoDepth": 0.24, "vibratoDelay": 5, "vibratoSpeed": 5, "vibratoType": 0, "pan": 0, "panDelay": 0, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1\u2190(2\u20023\u20024)", "feedbackType": "1\u27F2", "feedbackAmplitude": 0, "operators": [{ "frequency": "1\xD7", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "~2\xD7", "amplitude": 3, "waveform": "half-sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1\xD7", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 4.5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 1 }, { "target": "noteVolume", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "noteVolume", "envelope": "swell", "inverse": false, "perEnvelopeSpeed": 256, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }], "isDrum": false } }
         ]) },
         { name: "Misc Modded Presets", presets: toNameMap([
           // -------------JukeBox 0.0.1--------------
@@ -3965,7 +3967,8 @@ var beepbox = (() => {
           { name: "odd yet musical (DinoBox)", generalMidi: false, settings: { "type": "FM", "volume": 80, "eqFilter": [{ "type": "low-pass", "cutoffHz": 1414.21, "linearGain": 11.3137 }, { "type": "peak", "cutoffHz": 1189.21, "linearGain": 0.7071 }], "preset": 1090, "effects": ["note filter", "bit crusher", "reverb"], "noteFilter": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 5.6569 }], "bitcrusherOctave": 2.5, "bitcrusherQuantization": 71, "reverb": 33, "fadeInSeconds": 0.075, "fadeOutTicks": 12, "algorithm": "1\u2190(2\u20023\u21904)", "feedbackType": "2\u27F2", "feedbackAmplitude": 0, "operators": [{ "frequency": "~1\xD7", "amplitude": 11 }, { "frequency": "3\xD7", "amplitude": 0 }, { "frequency": "5\xD7", "amplitude": 7 }, { "frequency": "5\xD7", "amplitude": 5 }], "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "flare 2" }] } },
           { name: "scifi-uoh (Studio Box)", generalMidi: false, settings: { "type": "harmonics", "eqFilter": [{ "type": "peak", "cutoffHz": 594.6, "linearGain": 4 }, { "type": "peak", "cutoffHz": 2e3, "linearGain": 0.0884 }, { "type": "low-pass", "cutoffHz": 8e3, "linearGain": 0.0884 }, { "type": "high-pass", "cutoffHz": 250, "linearGain": 0.0884 }, { "type": "high-pass", "cutoffHz": 176.78, "linearGain": 11.3137 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": ["pitch shift", "note filter", "chorus", "echo", "reverb"], "pitchShiftSemitones": 7, "noteFilterType": true, "noteSimpleCut": 10, "noteSimplePeak": 5, "noteFilter": [{ "type": "low-pass", "cutoffHz": 7980.25, "linearGain": 4 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 8e3, "linearGain": 4 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 7980.25, "linearGain": 4 }], "panDelay": 0, "chorus": 100, "echoSustain": 71, "echoDelayBeats": 1.167, "reverb": 77, "reverbfeedback": 77, "fadeInSeconds": 0, "fadeOutTicks": 48, "harmonics": [0, 0, 0, 86, 29, 86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "unison": "none", "envelopes": [{ "target": "pitchShift", "envelope": "linear", "inverse": true, "perEnvelopeSpeed": 19, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "noteVolume", "envelope": "decay", "inverse": false, "perEnvelopeSpeed": 5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }] } },
           { name: "wind spectrum (Studio Box)", generalMidi: false, settings: { "type": "spectrum", "eqFilter": [{ "type": "low-pass", "cutoffHz": 9656.85, "linearGain": 0.5 }], "eqFilterType": true, "eqSimpleCut": 9, "eqSimplePeak": 1, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": ["granular", "bitcrusher", "echo", "reverb"], "granular": 4, "grainSize": 49, "grainAmounts": 10, "grainRange": 40, "bitcrusherOctave": 3.5, "bitcrusherQuantization": 43, "panDelay": 0, "echoSustain": 86, "echoDelayBeats": 0.5, "reverb": 6, "reverbfeedback": 77, "fadeInSeconds": 0, "fadeOutTicks": 96, "spectrum": [100, 100, 100, 100, 100, 100, 100, 0, 0, 100, 100, 100, 100, 100, 100, 100, 100, 0, 29, 14, 14, 29, 14, 14, 14, 14, 14, 14, 14, 14], "unison": "none", "envelopes": [] } },
-          { name: "aim sound (Studio Box)", generalMidi: false, settings: { "type": "harmonics", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [], "effects": ["note filter", "reverb"], "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }], "panDelay": 0, "reverb": 45, "reverbfeedback": 77, "fadeInSeconds": 0, "fadeOutTicks": 48, "harmonics": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 29, 0, 0, 0], "unison": "octave", "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "decay", "inverse": false, "perEnvelopeSpeed": 9.5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "unison", "envelope": "linear", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }] } }
+          { name: "aim sound (Studio Box)", generalMidi: false, settings: { "type": "harmonics", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [], "effects": ["note filter", "reverb"], "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }], "panDelay": 0, "reverb": 45, "reverbfeedback": 77, "fadeInSeconds": 0, "fadeOutTicks": 48, "harmonics": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 29, 0, 0, 0], "unison": "octave", "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "decay", "inverse": false, "perEnvelopeSpeed": 9.5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "unison", "envelope": "linear", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }] } },
+          { name: "BulbBox Church Bell", midiProgram: 80, settings: { "type": "noise", "volume": 0, "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["panning", "phaser"], "phaserMix": 100, "phaserFreq": 81, "phaserFeedback": 100, "phaserStages": 103, "pan": 0, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": -1, "unison": "none", "wave": "white", "envelopes": [{ "target": "noteVolume", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 4, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }], "isDrum": false } }
           // { name: "", generalMidi: false, settings: {} },    
           // { name: "", generalMidi: false, settings: {} },
         ]) },

@@ -3270,6 +3270,7 @@ export class SongEditor {
                             anyInstrumentReverbs: boolean = false,
                             anyInstrumentRingMods: boolean = false,
                             anyInstrumentGranulars: boolean = false,
+                            anyInstrumentPhasers: boolean = false,
                             anyInstrumentHasEnvelopes: boolean = false;
                         let allInstrumentPitchShifts: boolean = true,
                             allInstrumentNoteFilters: boolean = true,
@@ -3377,6 +3378,12 @@ export class SongEditor {
                             }
                             else {
                                 allInstrumentGranulars = false;
+                            }
+                            if (effectsIncludePhaser(channel.instruments[instrumentIndex].effects)) {
+                                anyInstrumentPhasers = true;
+                            }
+                            else {
+                                anyInstrumentPhasers = false;
                             }
                             if (channel.instruments[instrumentIndex].envelopes.length > 0) {
                                 anyInstrumentHasEnvelopes = true;
@@ -3518,6 +3525,13 @@ export class SongEditor {
                             unusedSettingList.push("+ grain freq");
                             unusedSettingList.push("+ grain size");
                             unusedSettingList.push("+ grain range");
+                        }
+
+                        if (anyInstrumentPhasers) {
+                            settingList.push("phaser");
+                            settingList.push("phaser frequency");
+                            settingList.push("phaser feedback");
+                            settingList.push("phaser stages");
                         }
 
                         if (anyInstrumentHasEnvelopes) {

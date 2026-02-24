@@ -1109,7 +1109,7 @@ var beepbox = (() => {
       this.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "phaser", "", "invert wave"];
     }
     static {
-      this.effectOrder = [2 /* panning */, 10 /* transition */, 11 /* chord */, 7 /* pitchShift */, 8 /* detune */, 9 /* vibrato */, 5 /* noteFilter */, 14 /* granular */, 3 /* distortion */, 4 /* bitcrusher */, 1 /* chorus */, 6 /* echo */, 0 /* reverb */, 13 /* ringModulation */, 15 /* phaser */, 12 /* noteRange */, 17 /* invertWave */];
+      this.effectOrder = [2 /* panning */, 10 /* transition */, 11 /* chord */, 7 /* pitchShift */, 8 /* detune */, 9 /* vibrato */, 5 /* noteFilter */, 14 /* granular */, 3 /* distortion */, 4 /* bitcrusher */, 1 /* chorus */, 6 /* echo */, 0 /* reverb */, 13 /* ringModulation */, 15 /* phaser */, 17 /* invertWave */, 12 /* noteRange */];
     }
     static {
       this.noteSizeMax = 6;
@@ -2972,6 +2972,18 @@ var beepbox = (() => {
           promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound"]
         },
         {
+          name: "invert wave",
+          pianoName: "Invert Wave",
+          maxRawVol: 1,
+          newNoteVol: 1,
+          forSong: false,
+          convertRealFactor: 0,
+          associatedEffect: 17 /* invertWave */,
+          maxIndex: 0,
+          promptName: "Invert Wave",
+          promptDesc: ["Allows you to toggle the Invert Wave effect on instruments. Value must be exactly 1 for this to take effect.", "[$LO - $HI]"]
+        },
+        {
           name: "phaser",
           pianoName: "Phaser",
           maxRawVol: _Config.phaserMixRange,
@@ -3340,7 +3352,7 @@ var beepbox = (() => {
   }
   __name(effectsIncludePhaser, "effectsIncludePhaser");
   function effectsIncludeInvertWave(effects) {
-    return (effects & 1 << 12 /* noteRange */) != 0;
+    return (effects & 1 << 17 /* invertWave */) != 0;
   }
   __name(effectsIncludeInvertWave, "effectsIncludeInvertWave");
 
@@ -13105,7 +13117,7 @@ var beepbox = (() => {
       this._modifiedEnvelopeIndices = [];
       this._modifiedEnvelopeCount = 0;
       this.lowpassCutoffDecayVolumeCompensation = 1;
-      const length = 60 /* length */;
+      const length = 61 /* length */;
       for (let i = 0; i < length; i++) {
         this.envelopeStarts[i] = 1;
         this.envelopeEnds[i] = 1;
@@ -14039,6 +14051,7 @@ var beepbox = (() => {
       if (this.phaserPrevInputs != null) for (let i = 0; i < this.phaserPrevInputs.length; i++) this.phaserPrevInputs[i] = 0;
       this.volumeScale = 1;
       this.aliases = false;
+      this.invertWave = false;
       this.awake = false;
       this.flushingDelayLines = false;
       this.deactivateAfterThisTick = false;
@@ -14079,7 +14092,7 @@ var beepbox = (() => {
       this.noisePitchFilterMult = Config.chipNoises[instrument.chipNoise].pitchFilterMult;
       this.effects = instrument.effects;
       this.aliases = instrument.aliases;
-      this.volumeScale = 1;
+      this.invertWave = instrument.invertWave;
       const usesInvertWave = effectsIncludeInvertWave(this.effects);
       if (usesInvertWave) {
         if (synth.isModActive(Config.modulators.dictionary["invert wave"].index, channelIndex, instrumentIndex)) {
@@ -16137,14 +16150,19 @@ var beepbox = (() => {
         const instrumentState = channelState.instruments[instrumentIndex];
         const toneList = instrumentState.liveInputTones;
         let toneCount = 0;
+        const instrument = channel.instruments[instrumentIndex];
+        let filteredPitches = pitches;
+        if (effectsIncludeNoteRange(instrument.effects)) filteredPitches = pitches.filter((pitch) => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+        let filteredBassPitches = bassPitches;
+        if (effectsIncludeNoteRange(instrument.effects)) filteredBassPitches = bassPitches.filter((pitch) => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
         if (this.liveInputDuration > 0 && channelIndex == this.liveInputChannel && pitches.length > 0 && this.liveInputInstruments.indexOf(instrumentIndex) != -1) {
-          const instrument = channel.instruments[instrumentIndex];
-          if (instrument.getChord().singleTone) {
+          const instrument2 = channel.instruments[instrumentIndex];
+          if (instrument2.getChord().singleTone) {
             let tone;
             if (toneList.count() <= toneCount) {
               tone = this.newTone();
               toneList.pushBack(tone);
-            } else if (!instrument.getTransition().isSeamless && this.liveInputStarted) {
+            } else if (!instrument2.getTransition().isSeamless && this.liveInputStarted) {
               this.releaseTone(instrumentState, toneList.get(toneCount));
               tone = this.newTone();
               toneList.set(toneCount, tone);
@@ -16152,10 +16170,10 @@ var beepbox = (() => {
               tone = toneList.get(toneCount);
             }
             toneCount++;
-            for (let i = 0; i < pitches.length; i++) {
-              tone.pitches[i] = pitches[i];
+            for (let i = 0; i < filteredPitches.length; i++) {
+              tone.pitches[i] = filteredPitches[i];
             }
-            tone.pitchCount = pitches.length;
+            tone.pitchCount = filteredPitches.length;
             tone.chordSize = 1;
             tone.instrumentIndex = instrumentIndex;
             tone.note = tone.prevNote = tone.nextNote = null;
@@ -16164,13 +16182,13 @@ var beepbox = (() => {
             tone.forceContinueAtEnd = false;
             this.computeTone(song, channelIndex, samplesPerTick, tone, false, false);
           } else {
-            this.moveTonesIntoOrderedTempMatchedList(toneList, pitches);
-            for (let i = 0; i < pitches.length; i++) {
+            this.moveTonesIntoOrderedTempMatchedList(toneList, filteredPitches);
+            for (let i = 0; i < filteredPitches.length; i++) {
               let tone;
               if (this.tempMatchedPitchTones[toneCount] != null) {
                 tone = this.tempMatchedPitchTones[toneCount];
                 this.tempMatchedPitchTones[toneCount] = null;
-                if (tone.pitchCount != 1 || tone.pitches[0] != pitches[i]) {
+                if (tone.pitchCount != 1 || tone.pitches[0] != filteredPitches[i]) {
                   this.releaseTone(instrumentState, tone);
                   tone = this.newTone();
                 }
@@ -16180,9 +16198,9 @@ var beepbox = (() => {
                 toneList.pushBack(tone);
               }
               toneCount++;
-              tone.pitches[0] = pitches[i];
+              tone.pitches[0] = filteredPitches[i];
               tone.pitchCount = 1;
-              tone.chordSize = pitches.length;
+              tone.chordSize = filteredPitches.length;
               tone.instrumentIndex = instrumentIndex;
               tone.note = tone.prevNote = tone.nextNote = null;
               tone.atNoteStart = this.liveInputStarted;
@@ -16192,14 +16210,14 @@ var beepbox = (() => {
             }
           }
         }
-        if (this.liveBassInputDuration > 0 && channelIndex == this.liveBassInputChannel && bassPitches.length > 0 && this.liveBassInputInstruments.indexOf(instrumentIndex) != -1) {
-          const instrument = channel.instruments[instrumentIndex];
-          if (instrument.getChord().singleTone) {
+        if (this.liveBassInputDuration > 0 && channelIndex == this.liveBassInputChannel && filteredBassPitches.length > 0 && this.liveBassInputInstruments.indexOf(instrumentIndex) != -1) {
+          const instrument2 = channel.instruments[instrumentIndex];
+          if (instrument2.getChord().singleTone) {
             let tone;
             if (toneList.count() <= toneCount) {
               tone = this.newTone();
               toneList.pushBack(tone);
-            } else if (!instrument.getTransition().isSeamless && this.liveInputStarted) {
+            } else if (!instrument2.getTransition().isSeamless && this.liveInputStarted) {
               this.releaseTone(instrumentState, toneList.get(toneCount));
               tone = this.newTone();
               toneList.set(toneCount, tone);
@@ -16207,10 +16225,10 @@ var beepbox = (() => {
               tone = toneList.get(toneCount);
             }
             toneCount++;
-            for (let i = 0; i < bassPitches.length; i++) {
-              tone.pitches[i] = bassPitches[i];
+            for (let i = 0; i < filteredBassPitches.length; i++) {
+              tone.pitches[i] = filteredBassPitches[i];
             }
-            tone.pitchCount = bassPitches.length;
+            tone.pitchCount = filteredBassPitches.length;
             tone.chordSize = 1;
             tone.instrumentIndex = instrumentIndex;
             tone.note = tone.prevNote = tone.nextNote = null;
@@ -16219,13 +16237,13 @@ var beepbox = (() => {
             tone.forceContinueAtEnd = false;
             this.computeTone(song, channelIndex, samplesPerTick, tone, false, false);
           } else {
-            this.moveTonesIntoOrderedTempMatchedList(toneList, bassPitches);
-            for (let i = 0; i < bassPitches.length; i++) {
+            this.moveTonesIntoOrderedTempMatchedList(toneList, filteredBassPitches);
+            for (let i = 0; i < filteredBassPitches.length; i++) {
               let tone;
               if (this.tempMatchedPitchTones[toneCount] != null) {
                 tone = this.tempMatchedPitchTones[toneCount];
                 this.tempMatchedPitchTones[toneCount] = null;
-                if (tone.pitchCount != 1 || tone.pitches[0] != bassPitches[i]) {
+                if (tone.pitchCount != 1 || tone.pitches[0] != filteredBassPitches[i]) {
                   this.releaseTone(instrumentState, tone);
                   tone = this.newTone();
                 }
@@ -16235,9 +16253,9 @@ var beepbox = (() => {
                 toneList.pushBack(tone);
               }
               toneCount++;
-              tone.pitches[0] = bassPitches[i];
+              tone.pitches[0] = filteredBassPitches[i];
               tone.pitchCount = 1;
-              tone.chordSize = bassPitches.length;
+              tone.chordSize = filteredBassPitches.length;
               tone.instrumentIndex = instrumentIndex;
               tone.note = tone.prevNote = tone.nextNote = null;
               tone.atNoteStart = this.liveBassInputStarted;
@@ -16489,7 +16507,9 @@ var beepbox = (() => {
             } else if (nextNoteForThisInstrument != null) {
               tonesInNextNote = chord.singleTone ? 1 : nextNoteForThisInstrument.pitches.length;
             }
-            if (chord.singleTone) {
+            let filteredPitches = note.pitches;
+            if (effectsIncludeNoteRange(instrument.effects)) filteredPitches = note.pitches.filter((pitch) => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+            if (chord.singleTone && !(filteredPitches.length <= 0)) {
               const atNoteStart = Config.ticksPerPart * note.start == currentTick;
               let tone;
               if (toneList.count() <= toneCount) {
@@ -16535,6 +16555,7 @@ var beepbox = (() => {
               for (let i = 0; i < note.pitches.length; i++) {
                 let prevNoteForThisTone = tonesInPrevNote > i ? prevNoteForThisInstrument : null;
                 let noteForThisTone = note;
+                let pitchesForThisTone = filteredPitches;
                 let nextNoteForThisTone = tonesInNextNote > i ? nextNoteForThisInstrument : null;
                 let noteStartPart = noteForThisTone.start + strumOffsetParts;
                 let passedEndOfNote = false;
@@ -16542,6 +16563,7 @@ var beepbox = (() => {
                   if (toneList.count() > i && (transition2.isSeamless || forceContinueAtStart) && prevNoteForThisTone != null) {
                     nextNoteForThisTone = noteForThisTone;
                     noteForThisTone = prevNoteForThisTone;
+                    if (effectsIncludeNoteRange(instrument.effects)) pitchesForThisTone = pitchesForThisTone.filter((pitch) => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
                     prevNoteForThisTone = null;
                     noteStartPart = noteForThisTone.start + strumOffsetParts;
                     passedEndOfNote = true;

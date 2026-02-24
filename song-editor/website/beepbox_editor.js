@@ -1114,7 +1114,7 @@ var beepbox = (() => {
       this.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "phaser", "", "invert wave"];
     }
     static {
-      this.effectOrder = [2 /* panning */, 10 /* transition */, 11 /* chord */, 7 /* pitchShift */, 8 /* detune */, 9 /* vibrato */, 5 /* noteFilter */, 14 /* granular */, 3 /* distortion */, 4 /* bitcrusher */, 1 /* chorus */, 6 /* echo */, 0 /* reverb */, 13 /* ringModulation */, 15 /* phaser */, 12 /* noteRange */, 17 /* invertWave */];
+      this.effectOrder = [2 /* panning */, 10 /* transition */, 11 /* chord */, 7 /* pitchShift */, 8 /* detune */, 9 /* vibrato */, 5 /* noteFilter */, 14 /* granular */, 3 /* distortion */, 4 /* bitcrusher */, 1 /* chorus */, 6 /* echo */, 0 /* reverb */, 13 /* ringModulation */, 15 /* phaser */, 17 /* invertWave */, 12 /* noteRange */];
     }
     static {
       this.noteSizeMax = 6;
@@ -2977,6 +2977,18 @@ var beepbox = (() => {
           promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound"]
         },
         {
+          name: "invert wave",
+          pianoName: "Invert Wave",
+          maxRawVol: 1,
+          newNoteVol: 1,
+          forSong: false,
+          convertRealFactor: 0,
+          associatedEffect: 17 /* invertWave */,
+          maxIndex: 0,
+          promptName: "Invert Wave",
+          promptDesc: ["Allows you to toggle the Invert Wave effect on instruments. Value must be exactly 1 for this to take effect.", "[$LO - $HI]"]
+        },
+        {
           name: "phaser",
           pianoName: "Phaser",
           maxRawVol: _Config.phaserMixRange,
@@ -3345,7 +3357,7 @@ var beepbox = (() => {
   }
   __name(effectsIncludePhaser, "effectsIncludePhaser");
   function effectsIncludeInvertWave(effects) {
-    return (effects & 1 << 12 /* noteRange */) != 0;
+    return (effects & 1 << 17 /* invertWave */) != 0;
   }
   __name(effectsIncludeInvertWave, "effectsIncludeInvertWave");
 
@@ -22655,7 +22667,7 @@ li.select2-results__option[role=group] > strong:hover {
       this._modifiedEnvelopeIndices = [];
       this._modifiedEnvelopeCount = 0;
       this.lowpassCutoffDecayVolumeCompensation = 1;
-      const length = 60 /* length */;
+      const length = 61 /* length */;
       for (let i = 0; i < length; i++) {
         this.envelopeStarts[i] = 1;
         this.envelopeEnds[i] = 1;
@@ -23589,6 +23601,7 @@ li.select2-results__option[role=group] > strong:hover {
       if (this.phaserPrevInputs != null) for (let i = 0; i < this.phaserPrevInputs.length; i++) this.phaserPrevInputs[i] = 0;
       this.volumeScale = 1;
       this.aliases = false;
+      this.invertWave = false;
       this.awake = false;
       this.flushingDelayLines = false;
       this.deactivateAfterThisTick = false;
@@ -23629,7 +23642,7 @@ li.select2-results__option[role=group] > strong:hover {
       this.noisePitchFilterMult = Config.chipNoises[instrument.chipNoise].pitchFilterMult;
       this.effects = instrument.effects;
       this.aliases = instrument.aliases;
-      this.volumeScale = 1;
+      this.invertWave = instrument.invertWave;
       const usesInvertWave = effectsIncludeInvertWave(this.effects);
       if (usesInvertWave) {
         if (synth.isModActive(Config.modulators.dictionary["invert wave"].index, channelIndex, instrumentIndex)) {
@@ -25687,14 +25700,19 @@ li.select2-results__option[role=group] > strong:hover {
         const instrumentState = channelState.instruments[instrumentIndex];
         const toneList = instrumentState.liveInputTones;
         let toneCount = 0;
+        const instrument = channel.instruments[instrumentIndex];
+        let filteredPitches = pitches;
+        if (effectsIncludeNoteRange(instrument.effects)) filteredPitches = pitches.filter((pitch) => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+        let filteredBassPitches = bassPitches;
+        if (effectsIncludeNoteRange(instrument.effects)) filteredBassPitches = bassPitches.filter((pitch) => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
         if (this.liveInputDuration > 0 && channelIndex == this.liveInputChannel && pitches.length > 0 && this.liveInputInstruments.indexOf(instrumentIndex) != -1) {
-          const instrument = channel.instruments[instrumentIndex];
-          if (instrument.getChord().singleTone) {
+          const instrument2 = channel.instruments[instrumentIndex];
+          if (instrument2.getChord().singleTone) {
             let tone;
             if (toneList.count() <= toneCount) {
               tone = this.newTone();
               toneList.pushBack(tone);
-            } else if (!instrument.getTransition().isSeamless && this.liveInputStarted) {
+            } else if (!instrument2.getTransition().isSeamless && this.liveInputStarted) {
               this.releaseTone(instrumentState, toneList.get(toneCount));
               tone = this.newTone();
               toneList.set(toneCount, tone);
@@ -25702,10 +25720,10 @@ li.select2-results__option[role=group] > strong:hover {
               tone = toneList.get(toneCount);
             }
             toneCount++;
-            for (let i = 0; i < pitches.length; i++) {
-              tone.pitches[i] = pitches[i];
+            for (let i = 0; i < filteredPitches.length; i++) {
+              tone.pitches[i] = filteredPitches[i];
             }
-            tone.pitchCount = pitches.length;
+            tone.pitchCount = filteredPitches.length;
             tone.chordSize = 1;
             tone.instrumentIndex = instrumentIndex;
             tone.note = tone.prevNote = tone.nextNote = null;
@@ -25714,13 +25732,13 @@ li.select2-results__option[role=group] > strong:hover {
             tone.forceContinueAtEnd = false;
             this.computeTone(song, channelIndex, samplesPerTick, tone, false, false);
           } else {
-            this.moveTonesIntoOrderedTempMatchedList(toneList, pitches);
-            for (let i = 0; i < pitches.length; i++) {
+            this.moveTonesIntoOrderedTempMatchedList(toneList, filteredPitches);
+            for (let i = 0; i < filteredPitches.length; i++) {
               let tone;
               if (this.tempMatchedPitchTones[toneCount] != null) {
                 tone = this.tempMatchedPitchTones[toneCount];
                 this.tempMatchedPitchTones[toneCount] = null;
-                if (tone.pitchCount != 1 || tone.pitches[0] != pitches[i]) {
+                if (tone.pitchCount != 1 || tone.pitches[0] != filteredPitches[i]) {
                   this.releaseTone(instrumentState, tone);
                   tone = this.newTone();
                 }
@@ -25730,9 +25748,9 @@ li.select2-results__option[role=group] > strong:hover {
                 toneList.pushBack(tone);
               }
               toneCount++;
-              tone.pitches[0] = pitches[i];
+              tone.pitches[0] = filteredPitches[i];
               tone.pitchCount = 1;
-              tone.chordSize = pitches.length;
+              tone.chordSize = filteredPitches.length;
               tone.instrumentIndex = instrumentIndex;
               tone.note = tone.prevNote = tone.nextNote = null;
               tone.atNoteStart = this.liveInputStarted;
@@ -25742,14 +25760,14 @@ li.select2-results__option[role=group] > strong:hover {
             }
           }
         }
-        if (this.liveBassInputDuration > 0 && channelIndex == this.liveBassInputChannel && bassPitches.length > 0 && this.liveBassInputInstruments.indexOf(instrumentIndex) != -1) {
-          const instrument = channel.instruments[instrumentIndex];
-          if (instrument.getChord().singleTone) {
+        if (this.liveBassInputDuration > 0 && channelIndex == this.liveBassInputChannel && filteredBassPitches.length > 0 && this.liveBassInputInstruments.indexOf(instrumentIndex) != -1) {
+          const instrument2 = channel.instruments[instrumentIndex];
+          if (instrument2.getChord().singleTone) {
             let tone;
             if (toneList.count() <= toneCount) {
               tone = this.newTone();
               toneList.pushBack(tone);
-            } else if (!instrument.getTransition().isSeamless && this.liveInputStarted) {
+            } else if (!instrument2.getTransition().isSeamless && this.liveInputStarted) {
               this.releaseTone(instrumentState, toneList.get(toneCount));
               tone = this.newTone();
               toneList.set(toneCount, tone);
@@ -25757,10 +25775,10 @@ li.select2-results__option[role=group] > strong:hover {
               tone = toneList.get(toneCount);
             }
             toneCount++;
-            for (let i = 0; i < bassPitches.length; i++) {
-              tone.pitches[i] = bassPitches[i];
+            for (let i = 0; i < filteredBassPitches.length; i++) {
+              tone.pitches[i] = filteredBassPitches[i];
             }
-            tone.pitchCount = bassPitches.length;
+            tone.pitchCount = filteredBassPitches.length;
             tone.chordSize = 1;
             tone.instrumentIndex = instrumentIndex;
             tone.note = tone.prevNote = tone.nextNote = null;
@@ -25769,13 +25787,13 @@ li.select2-results__option[role=group] > strong:hover {
             tone.forceContinueAtEnd = false;
             this.computeTone(song, channelIndex, samplesPerTick, tone, false, false);
           } else {
-            this.moveTonesIntoOrderedTempMatchedList(toneList, bassPitches);
-            for (let i = 0; i < bassPitches.length; i++) {
+            this.moveTonesIntoOrderedTempMatchedList(toneList, filteredBassPitches);
+            for (let i = 0; i < filteredBassPitches.length; i++) {
               let tone;
               if (this.tempMatchedPitchTones[toneCount] != null) {
                 tone = this.tempMatchedPitchTones[toneCount];
                 this.tempMatchedPitchTones[toneCount] = null;
-                if (tone.pitchCount != 1 || tone.pitches[0] != bassPitches[i]) {
+                if (tone.pitchCount != 1 || tone.pitches[0] != filteredBassPitches[i]) {
                   this.releaseTone(instrumentState, tone);
                   tone = this.newTone();
                 }
@@ -25785,9 +25803,9 @@ li.select2-results__option[role=group] > strong:hover {
                 toneList.pushBack(tone);
               }
               toneCount++;
-              tone.pitches[0] = bassPitches[i];
+              tone.pitches[0] = filteredBassPitches[i];
               tone.pitchCount = 1;
-              tone.chordSize = bassPitches.length;
+              tone.chordSize = filteredBassPitches.length;
               tone.instrumentIndex = instrumentIndex;
               tone.note = tone.prevNote = tone.nextNote = null;
               tone.atNoteStart = this.liveBassInputStarted;
@@ -26039,7 +26057,9 @@ li.select2-results__option[role=group] > strong:hover {
             } else if (nextNoteForThisInstrument != null) {
               tonesInNextNote = chord.singleTone ? 1 : nextNoteForThisInstrument.pitches.length;
             }
-            if (chord.singleTone) {
+            let filteredPitches = note.pitches;
+            if (effectsIncludeNoteRange(instrument.effects)) filteredPitches = note.pitches.filter((pitch) => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+            if (chord.singleTone && !(filteredPitches.length <= 0)) {
               const atNoteStart = Config.ticksPerPart * note.start == currentTick;
               let tone;
               if (toneList.count() <= toneCount) {
@@ -26085,6 +26105,7 @@ li.select2-results__option[role=group] > strong:hover {
               for (let i = 0; i < note.pitches.length; i++) {
                 let prevNoteForThisTone = tonesInPrevNote > i ? prevNoteForThisInstrument : null;
                 let noteForThisTone = note;
+                let pitchesForThisTone = filteredPitches;
                 let nextNoteForThisTone = tonesInNextNote > i ? nextNoteForThisInstrument : null;
                 let noteStartPart = noteForThisTone.start + strumOffsetParts;
                 let passedEndOfNote = false;
@@ -26092,6 +26113,7 @@ li.select2-results__option[role=group] > strong:hover {
                   if (toneList.count() > i && (transition2.isSeamless || forceContinueAtStart) && prevNoteForThisTone != null) {
                     nextNoteForThisTone = noteForThisTone;
                     noteForThisTone = prevNoteForThisTone;
+                    if (effectsIncludeNoteRange(instrument.effects)) pitchesForThisTone = pitchesForThisTone.filter((pitch) => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
                     prevNoteForThisTone = null;
                     noteStartPart = noteForThisTone.start + strumOffsetParts;
                     passedEndOfNote = true;
@@ -36609,6 +36631,22 @@ li.select2-results__option[role=group] > strong:hover {
       if (scaleIndex % 12 == 0) {
         text += Math.floor(scaleIndex / 12) + baseVisibleOctave;
       }
+      return text;
+    }
+    static getPitchNameAlwaysOctave(pitchNameIndex, scaleIndex, baseVisibleOctave) {
+      let text;
+      if (Config.keys[pitchNameIndex].isWhiteKey) {
+        text = Config.keys[pitchNameIndex].name;
+      } else {
+        const shiftDir = Config.blackKeyNameParents[scaleIndex % Config.pitchesPerOctave];
+        text = Config.keys[(pitchNameIndex + Config.pitchesPerOctave + shiftDir) % Config.pitchesPerOctave].name;
+        if (shiftDir == 1) {
+          text += "\u266D";
+        } else if (shiftDir == -1) {
+          text += "\u266F";
+        }
+      }
+      text += Math.floor(scaleIndex / 12) + baseVisibleOctave;
       return text;
     }
   };
@@ -50759,6 +50797,64 @@ You should be redirected to the song at:<br /><br />
             );
           }
           break;
+        case "phaserMix":
+          {
+            message = div20(
+              h220("Phaser Mix"),
+              p8(`This setting adds holes (aka notches) or peaks in the frequency spectrum to the waveform its given. The placement of these peaks and notches in the waveform can be changed by using envelopes and/or modulators.`)
+            );
+          }
+          break;
+        case "phaserFreq":
+          {
+            message = div20(
+              h220("Phaser Frequency"),
+              p8(`This setting controls the frequency of the the peaks and notches of the phaser.`)
+            );
+          }
+          break;
+        case "phaserFeedback":
+          {
+            message = div20(
+              h220("Phaser Feedback"),
+              p8(`This setting effects how pronounced the Feedback of the Phaser is, this is done by adding the Feedback of the Phaser back into itself.`)
+            );
+          }
+          break;
+        case "phaserStages":
+          {
+            message = div20(
+              h220("Phaser Stages"),
+              p8(`This slider changes how many all-passes there are in the phaser. An all-pass is created by splitting an audio signal into paths, every path after the first one that is created is called an all-pass.`),
+              p8(`The minimum value of this slider is 1, the reason being that 1 all-pass is the exact same as having no phaser at all, if there were 0 all-passes then the audio would cease to exist.`)
+            );
+          }
+          break;
+        case "upperNoteLimit":
+          {
+            message = div20(
+              h220("Upper Note Limit"),
+              p8("Defines the upper limit in which notes will play, useful for advanced instruments.")
+            );
+          }
+          break;
+        case "lowerNoteLimit":
+          {
+            message = div20(
+              h220("Lower Note Limit"),
+              p8("Defines the lower limit in which notes will play, useful for advanced instruments.")
+            );
+          }
+          break;
+        case "invertWave":
+          {
+            message = div20(
+              h220("Invert Wave"),
+              p8("Flips the wave output of the instrument."),
+              p8("This setting is best used with two very similar instruments, one with invert wave and the other without.")
+            );
+          }
+          break;
         default:
           if (type.indexOf("modSetInfo") >= 0) {
             let modNum = +type[type.length - 1];
@@ -53889,6 +53985,10 @@ You should be redirected to the song at:<br /><br />
       this._drumsetGroup = div25({ class: "editor-controls" });
       this._drumsetZoom = button25({ style: "margin-left:0em; padding-left:0.3em; margin-right:0.5em; height:1.5em; max-width: 16px;", onclick: /* @__PURE__ */ __name(() => this._openPrompt("drumsetSettings"), "onclick") }, "+");
       this._modulatorGroup = div25({ class: "editor-controls" });
+      this._upperNoteLimitInputBox = input18({ style: "width: 4em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+      this._upperNoteLimitRow = div25({ class: "selectRow" }, span7({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("upperNoteLimit"), "onclick") }, "Upper Note Limit:"), this._upperNoteLimitInputBox);
+      this._lowerNoteLimitInputBox = input18({ style: "width: 4em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+      this._lowerNoteLimitRow = div25({ class: "selectRow" }, span7({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("lowerNoteLimit"), "onclick") }, "Lower Note Limit:"), this._lowerNoteLimitInputBox);
       this._feedback6OpTypeSelect = buildOptions(select14(), Config.feedbacks6Op.map((feedback) => feedback.name));
       this._feedback6OpRow1 = div25({ class: "selectRow" }, span7({ class: "tip", onclick: /* @__PURE__ */ __name(() => this._openPrompt("feedbackType"), "onclick") }, "Feedback:"), div25({ class: "selectContainer" }, this._feedback6OpTypeSelect));
       this._algorithmCanvasSwitch = button25({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: /* @__PURE__ */ __name((e) => this._toggleAlgorithmCanvas(e), "onclick") }, "A");
@@ -54860,6 +54960,15 @@ You should be redirected to the song at:<br /><br />
           } else {
             this._ringModContainerRow.style.display = "none";
           }
+          if (effectsIncludeGranular(instrument.effects)) {
+            this._granularContainerRow.style.display = "";
+            this._granularSlider.updateValue(instrument.granular);
+            this._grainSizeSlider.updateValue(instrument.grainSize);
+            this._grainAmountsSlider.updateValue(instrument.grainAmounts);
+            this._grainRangeSlider.updateValue(instrument.grainRange);
+          } else {
+            this._granularContainerRow.style.display = "none";
+          }
           if (effectsIncludePhaser(instrument.effects)) {
             this._phaserMixRow.style.display = "";
             this._phaserMixSlider.updateValue(instrument.phaserMix);
@@ -54880,14 +54989,14 @@ You should be redirected to the song at:<br /><br />
           } else {
             this._invertWaveRow.style.display = "none";
           }
-          if (effectsIncludeGranular(instrument.effects)) {
-            this._granularContainerRow.style.display = "";
-            this._granularSlider.updateValue(instrument.granular);
-            this._grainSizeSlider.updateValue(instrument.grainSize);
-            this._grainAmountsSlider.updateValue(instrument.grainAmounts);
-            this._grainRangeSlider.updateValue(instrument.grainRange);
+          if (effectsIncludeNoteRange(instrument.effects)) {
+            this._upperNoteLimitRow.style.display = "";
+            this._lowerNoteLimitRow.style.display = "";
+            this._upperNoteLimitInputBox.value = String(instrument.upperNoteLimit);
+            this._lowerNoteLimitInputBox.value = String(instrument.lowerNoteLimit);
           } else {
-            this._granularContainerRow.style.display = "none";
+            this._upperNoteLimitRow.style.display = "none";
+            this._lowerNoteLimitRow.style.display = "none";
           }
           if (instrument.type == 0 /* chip */ || instrument.type == 9 /* customChipWave */ || instrument.type == 5 /* harmonics */ || instrument.type == 7 /* pickedString */ || instrument.type == 3 /* spectrum */ || instrument.type == 6 /* pwm */ || instrument.type == 2 /* noise */ || instrument.type == 4 /* drumset */) {
             this._unisonSelectRow.style.display = "";
@@ -54952,6 +55061,16 @@ You should be redirected to the song at:<br /><br />
           this._envelopeSpeedSlider.updateValue(instrument.envelopeSpeed);
           this._envelopeSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
           this._envelopeSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
+          this._upperNoteLimitRow.firstChild.textContent = "Upper Note Limit [" + Piano.getPitchNameAlwaysOctave(
+            (instrument.upperNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave,
+            instrument.upperNoteLimit,
+            this.doc.song.octave
+          ) + "]:";
+          this._lowerNoteLimitRow.firstChild.textContent = "Lower Note Limit [" + Piano.getPitchNameAlwaysOctave(
+            (instrument.lowerNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave,
+            instrument.lowerNoteLimit,
+            this.doc.song.octave
+          ) + "]:";
           if (instrument.type == 9 /* customChipWave */) {
             this._customWaveDrawCanvas.redrawCanvas();
             if (this.prompt instanceof CustomChipPrompt) {
@@ -55089,7 +55208,7 @@ You should be redirected to the song at:<br /><br />
                 settingList.push("mix volume");
                 let tgtInstrumentTypes = [];
                 let anyInstrumentAdvancedEQ = false, anyInstrumentSimpleEQ = false, anyInstrumentAdvancedNote = false, anyInstrumentSimpleNote = false, anyInstrumentArps = false, anyInstrumentPitchShifts = false, anyInstrumentDetunes = false, anyInstrumentVibratos = false, anyInstrumentNoteFilters = false, anyInstrumentDistorts = false, anyInstrumentBitcrushes = false, anyInstrumentPans = false, anyInstrumentChorus = false, anyInstrumentEchoes = false, anyInstrumentReverbs = false, anyInstrumentRingMods = false, anyInstrumentGranulars = false, anyInstrumentPhasers = false, anyInstrumentHasEnvelopes = false;
-                let allInstrumentPitchShifts = true, allInstrumentNoteFilters = true, allInstrumentDetunes = true, allInstrumentVibratos = true, allInstrumentDistorts = true, allInstrumentBitcrushes = true, allInstrumentPans = true, allInstrumentChorus = true, allInstrumentEchoes = true, allInstrumentReverbs = true, allInstrumentRingMods = true, allInstrumentGranulars = true;
+                let allInstrumentPitchShifts = true, allInstrumentNoteFilters = true, allInstrumentDetunes = true, allInstrumentVibratos = true, allInstrumentDistorts = true, allInstrumentBitcrushes = true, allInstrumentPans = true, allInstrumentChorus = true, allInstrumentEchoes = true, allInstrumentReverbs = true, allInstrumentRingMods = true, anyInstrumentInvertWave = true, allInstrumentGranulars = true;
                 let instrumentCandidates = [];
                 if (modInstrument >= channel2.instruments.length) {
                   for (let i = 0; i < channel2.instruments.length; i++) {
@@ -55177,6 +55296,11 @@ You should be redirected to the song at:<br /><br />
                     anyInstrumentPhasers = true;
                   } else {
                     anyInstrumentPhasers = false;
+                  }
+                  if (effectsIncludeInvertWave(channel2.instruments[instrumentIndex2].effects)) {
+                    anyInstrumentInvertWave = true;
+                  } else {
+                    anyInstrumentInvertWave = false;
                   }
                   if (channel2.instruments[instrumentIndex2].envelopes.length > 0) {
                     anyInstrumentHasEnvelopes = true;
@@ -55322,6 +55446,9 @@ You should be redirected to the song at:<br /><br />
                   settingList.push("phaser frequency");
                   settingList.push("phaser feedback");
                   settingList.push("phaser stages");
+                }
+                if (anyInstrumentInvertWave) {
+                  settingList.push("invert wave");
                 }
                 if (anyInstrumentHasEnvelopes) {
                   settingList.push("envelope speed");
@@ -55669,6 +55796,12 @@ You should be redirected to the song at:<br /><br />
           return;
         }
         if (document.activeElement == this._panSliderInputBox || document.activeElement == this._pwmSliderInputBox || document.activeElement == this._detuneSliderInputBox || document.activeElement == this._instrumentVolumeSliderInputBox || document.activeElement == this._chipWaveLoopStartStepper || document.activeElement == this._chipWaveLoopEndStepper || document.activeElement == this._chipWaveStartOffsetStepper || document.activeElement == this._octaveStepper || document.activeElement == this._unisonVoicesInputBox || document.activeElement == this._unisonSpreadInputBox || document.activeElement == this._unisonOffsetInputBox || document.activeElement == this._unisonExpressionInputBox || document.activeElement == this._unisonSignInputBox || document.activeElement == this._monophonicNoteInputBox || this.envelopeEditor.pitchStartBoxes.find((element) => element == document.activeElement) || this.envelopeEditor.pitchEndBoxes.find((element) => element == document.activeElement) || this.envelopeEditor.perEnvelopeLowerBoundBoxes.find((element) => element == document.activeElement) || this.envelopeEditor.perEnvelopeUpperBoundBoxes.find((element) => element == document.activeElement) || this.envelopeEditor.randomStepsBoxes.find((element) => element == document.activeElement) || this.envelopeEditor.randomStepsBoxes.find((element) => element == document.activeElement) || this.envelopeEditor.LFOStepsBoxes.find((element) => element == document.activeElement)) {
+          if (event.keyCode == 13 || event.keyCode == 27) {
+            this.mainLayer.focus();
+          }
+          return;
+        }
+        if (document.activeElement == this._upperNoteLimitInputBox || document.activeElement == this._lowerNoteLimitInputBox) {
           if (event.keyCode == 13 || event.keyCode == 27) {
             this.mainLayer.focus();
           }

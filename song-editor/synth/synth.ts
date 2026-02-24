@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, OperatorWave, LFOEnvelopeTypes, RandomEnvelopeTypes, GranularEnvelopeType, calculateRingModHertz, effectsIncludePhaser, effectsIncludeInvertWave, effectsIncludeNoteRange } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeNoteRange, effectsIncludeRingModulation, effectsIncludeGranular, OperatorWave, LFOEnvelopeTypes, RandomEnvelopeTypes, GranularEnvelopeType, calculateRingModHertz, effectsIncludePhaser, effectsIncludeInvertWave } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -3848,9 +3848,6 @@ export class Song {
                 if (effectsIncludeReverb(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.reverb]);
                 }
-                // if (effectsIncludeNoteRange(instrument.effects)) {
-                //     buffer.push(base64IntToCharCode[instrument.noteRange]);
-                // }
                 if (effectsIncludeGranular(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.granular]);
                     buffer.push(base64IntToCharCode[instrument.grainSize]);
@@ -3875,7 +3872,6 @@ export class Song {
                 if (effectsIncludeInvertWave(instrument.effects)) {
                     buffer.push(base64IntToCharCode[+instrument.invertWave]);
                 }
-
                 if (effectsIncludeNoteRange(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.upperNoteLimit >> 6], base64IntToCharCode[instrument.upperNoteLimit & 0x3f]);
                     buffer.push(base64IntToCharCode[instrument.lowerNoteLimit >> 6], base64IntToCharCode[instrument.lowerNoteLimit & 0x3f]);
@@ -8915,6 +8911,8 @@ class InstrumentState {
         this.volumeScale = 1.0;
         this.aliases = false;
 
+        this.invertWave = false;
+
         this.awake = false;
         this.flushingDelayLines = false;
         this.deactivateAfterThisTick = false;
@@ -8962,7 +8960,7 @@ class InstrumentState {
         this.effects = instrument.effects;
 
         this.aliases = instrument.aliases;
-        this.volumeScale = 1.0;
+        this.invertWave = instrument.invertWave;
         const usesInvertWave: boolean = effectsIncludeInvertWave(this.effects);
 
         if (usesInvertWave) {
@@ -11485,6 +11483,11 @@ export class Synth {
             const instrumentState: InstrumentState = channelState.instruments[instrumentIndex];
             const toneList: Deque<Tone> = instrumentState.liveInputTones;
             let toneCount: number = 0;
+            const instrument: Instrument = channel.instruments[instrumentIndex];
+            let filteredPitches = pitches;
+            if (effectsIncludeNoteRange(instrument.effects)) filteredPitches = pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+            let filteredBassPitches: number[] = bassPitches;
+            if (effectsIncludeNoteRange(instrument.effects)) filteredBassPitches = bassPitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
             if (this.liveInputDuration > 0 && (channelIndex == this.liveInputChannel) && pitches.length > 0 && this.liveInputInstruments.indexOf(instrumentIndex) != -1) {
                 const instrument: Instrument = channel.instruments[instrumentIndex];
 
@@ -11502,10 +11505,10 @@ export class Synth {
                     }
                     toneCount++;
 
-                    for (let i: number = 0; i < pitches.length; i++) {
-                        tone.pitches[i] = pitches[i];
+                    for (let i: number = 0; i < filteredPitches.length; i++) {
+                        tone.pitches[i] = filteredPitches[i];
                     }
-                    tone.pitchCount = pitches.length;
+                    tone.pitchCount = filteredPitches.length;
                     tone.chordSize = 1;
                     tone.instrumentIndex = instrumentIndex;
                     tone.note = tone.prevNote = tone.nextNote = null;
@@ -11516,16 +11519,16 @@ export class Synth {
                 } else {
                     //const transition: Transition = instrument.getTransition();
 
-                    this.moveTonesIntoOrderedTempMatchedList(toneList, pitches);
+                    this.moveTonesIntoOrderedTempMatchedList(toneList, filteredPitches);
 
-                    for (let i: number = 0; i < pitches.length; i++) {
+                    for (let i: number = 0; i < filteredPitches.length; i++) {
                         //const strumOffsetParts: number = i * instrument.getChord().strumParts;
 
                         let tone: Tone;
                         if (this.tempMatchedPitchTones[toneCount] != null) {
                             tone = this.tempMatchedPitchTones[toneCount]!;
                             this.tempMatchedPitchTones[toneCount] = null;
-                            if (tone.pitchCount != 1 || tone.pitches[0] != pitches[i]) {
+                            if (tone.pitchCount != 1 || tone.pitches[0] != filteredPitches[i]) {
                                 this.releaseTone(instrumentState, tone);
                                 tone = this.newTone();
                             }
@@ -11536,9 +11539,9 @@ export class Synth {
                         }
                         toneCount++;
 
-                        tone.pitches[0] = pitches[i];
+                        tone.pitches[0] = filteredPitches[i];
                         tone.pitchCount = 1;
-                        tone.chordSize = pitches.length;
+                        tone.chordSize = filteredPitches.length;
                         tone.instrumentIndex = instrumentIndex;
                         tone.note = tone.prevNote = tone.nextNote = null;
                         tone.atNoteStart = this.liveInputStarted;
@@ -11549,7 +11552,7 @@ export class Synth {
                 }
             }
 
-            if (this.liveBassInputDuration > 0 && (channelIndex == this.liveBassInputChannel) && bassPitches.length > 0 && this.liveBassInputInstruments.indexOf(instrumentIndex) != -1) {
+            if (this.liveBassInputDuration > 0 && (channelIndex == this.liveBassInputChannel) && filteredBassPitches.length > 0 && this.liveBassInputInstruments.indexOf(instrumentIndex) != -1) {
                 const instrument: Instrument = channel.instruments[instrumentIndex];
 
                 if (instrument.getChord().singleTone) {
@@ -11566,10 +11569,10 @@ export class Synth {
                     }
                     toneCount++;
 
-                    for (let i: number = 0; i < bassPitches.length; i++) {
-                        tone.pitches[i] = bassPitches[i];
+                    for (let i: number = 0; i < filteredBassPitches.length; i++) {
+                        tone.pitches[i] = filteredBassPitches[i];
                     }
-                    tone.pitchCount = bassPitches.length;
+                    tone.pitchCount = filteredBassPitches.length;
                     tone.chordSize = 1;
                     tone.instrumentIndex = instrumentIndex;
                     tone.note = tone.prevNote = tone.nextNote = null;
@@ -11580,16 +11583,16 @@ export class Synth {
                 } else {
                     //const transition: Transition = instrument.getTransition();
 
-                    this.moveTonesIntoOrderedTempMatchedList(toneList, bassPitches);
+                    this.moveTonesIntoOrderedTempMatchedList(toneList, filteredBassPitches);
 
-                    for (let i: number = 0; i < bassPitches.length; i++) {
+                    for (let i: number = 0; i < filteredBassPitches.length; i++) {
                         //const strumOffsetParts: number = i * instrument.getChord().strumParts;
 
                         let tone: Tone;
                         if (this.tempMatchedPitchTones[toneCount] != null) {
                             tone = this.tempMatchedPitchTones[toneCount]!;
                             this.tempMatchedPitchTones[toneCount] = null;
-                            if (tone.pitchCount != 1 || tone.pitches[0] != bassPitches[i]) {
+                            if (tone.pitchCount != 1 || tone.pitches[0] != filteredBassPitches[i]) {
                                 this.releaseTone(instrumentState, tone);
                                 tone = this.newTone();
                             }
@@ -11600,9 +11603,9 @@ export class Synth {
                         }
                         toneCount++;
 
-                        tone.pitches[0] = bassPitches[i];
+                        tone.pitches[0] = filteredBassPitches[i];
                         tone.pitchCount = 1;
-                        tone.chordSize = bassPitches.length;
+                        tone.chordSize = filteredBassPitches.length;
                         tone.instrumentIndex = instrumentIndex;
                         tone.note = tone.prevNote = tone.nextNote = null;
                         tone.atNoteStart = this.liveBassInputStarted;
@@ -11909,7 +11912,9 @@ export class Synth {
                         tonesInNextNote = chord.singleTone ? 1 : nextNoteForThisInstrument.pitches.length
                     }
 
-                    if (chord.singleTone) {
+                    let filteredPitches: number[] = note.pitches;
+                    if (effectsIncludeNoteRange(instrument.effects)) filteredPitches = note.pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
+                    if (chord.singleTone && !(filteredPitches.length <= 0)) {
                         const atNoteStart: boolean = (Config.ticksPerPart * note.start == currentTick);
                         let tone: Tone;
                         if (toneList.count() <= toneCount) {
@@ -11959,6 +11964,7 @@ export class Synth {
 
                             let prevNoteForThisTone: Note | null = (tonesInPrevNote > i) ? prevNoteForThisInstrument : null;
                             let noteForThisTone: Note = note;
+                            let pitchesForThisTone: number[] = filteredPitches;
                             let nextNoteForThisTone: Note | null = (tonesInNextNote > i) ? nextNoteForThisInstrument : null;
                             let noteStartPart: number = noteForThisTone.start + strumOffsetParts;
                             let passedEndOfNote: boolean = false;
@@ -11972,6 +11978,7 @@ export class Synth {
                                     // Continue the previous note's chord until the current one takes over.
                                     nextNoteForThisTone = noteForThisTone;
                                     noteForThisTone = prevNoteForThisTone;
+                                    if (effectsIncludeNoteRange(instrument.effects)) pitchesForThisTone = pitchesForThisTone.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit);
                                     prevNoteForThisTone = null;
                                     noteStartPart = noteForThisTone.start + strumOffsetParts;
                                     passedEndOfNote = true;

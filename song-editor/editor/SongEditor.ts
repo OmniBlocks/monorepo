@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 //import {Layout} from "./Layout";
-import { sampleLoadEvents, SampleLoadedEvent, InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludeGranular, DropdownID, calculateRingModHertz, effectsIncludePhaser, effectsIncludeInvertWave } from "../synth/SynthConfig";
+import { sampleLoadEvents, SampleLoadedEvent, InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludeGranular, DropdownID, calculateRingModHertz, effectsIncludePhaser, effectsIncludeInvertWave, effectsIncludeNoteRange } from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
@@ -1111,6 +1111,11 @@ export class SongEditor {
     private readonly _modEnvelopeRows: HTMLElement[];
     private readonly _modEnvelopeBoxes: HTMLSelectElement[];
     private readonly _modTargetIndicators: SVGElement[];
+
+    private readonly _upperNoteLimitInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+    private readonly _upperNoteLimitRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("upperNoteLimit") }, "Upper Note Limit:"), this._upperNoteLimitInputBox);
+    private readonly _lowerNoteLimitInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+    private readonly _lowerNoteLimitRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("lowerNoteLimit") }, "Lower Note Limit:"), this._lowerNoteLimitInputBox);
 
     private readonly _feedback6OpTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks6Op.map(feedback => feedback.name));
     private readonly _feedback6OpRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedback6OpTypeSelect));
@@ -2977,6 +2982,16 @@ export class SongEditor {
             } else {
                 this._ringModContainerRow.style.display = "none";
             }
+            
+            if (effectsIncludeGranular(instrument.effects)) {
+                this._granularContainerRow.style.display = "";
+                this._granularSlider.updateValue(instrument.granular);
+                this._grainSizeSlider.updateValue(instrument.grainSize);
+                this._grainAmountsSlider.updateValue(instrument.grainAmounts);
+                this._grainRangeSlider.updateValue(instrument.grainRange);
+            } else {
+                this._granularContainerRow.style.display = "none";
+            }
 
             if (effectsIncludePhaser(instrument.effects)) {
                 this._phaserMixRow.style.display = "";
@@ -2999,15 +3014,15 @@ export class SongEditor {
             } else {
                 this._invertWaveRow.style.display = "none";
             }
-            
-            if (effectsIncludeGranular(instrument.effects)) {
-                this._granularContainerRow.style.display = "";
-                this._granularSlider.updateValue(instrument.granular);
-                this._grainSizeSlider.updateValue(instrument.grainSize);
-                this._grainAmountsSlider.updateValue(instrument.grainAmounts);
-                this._grainRangeSlider.updateValue(instrument.grainRange);
+
+            if (effectsIncludeNoteRange(instrument.effects)) {
+                this._upperNoteLimitRow.style.display = "";
+                this._lowerNoteLimitRow.style.display = "";
+                this._upperNoteLimitInputBox.value = String(instrument.upperNoteLimit);
+                this._lowerNoteLimitInputBox.value = String(instrument.lowerNoteLimit);
             } else {
-                this._granularContainerRow.style.display = "none";
+                this._upperNoteLimitRow.style.display = "none";
+                this._lowerNoteLimitRow.style.display = "none";
             }
 
             if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString || instrument.type == InstrumentType.spectrum || instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.noise || instrument.type == InstrumentType.drumset) {
@@ -3079,6 +3094,16 @@ export class SongEditor {
             this._envelopeSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
             this._envelopeSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
 
+            this._upperNoteLimitRow.firstChild!.textContent = "Upper Note Limit [" + Piano.getPitchNameAlwaysOctave(
+                (instrument.upperNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave,
+                instrument.upperNoteLimit,
+                this.doc.song.octave)
+                + "]:"
+            this._lowerNoteLimitRow.firstChild!.textContent = "Lower Note Limit [" + Piano.getPitchNameAlwaysOctave(
+                (instrument.lowerNoteLimit + Config.keys[this.doc.song.key].basePitch) % Config.pitchesPerOctave,
+                instrument.lowerNoteLimit,
+                this.doc.song.octave)
+                 + "]:"
 
             if (instrument.type == InstrumentType.customChipWave) {
                 this._customWaveDrawCanvas.redrawCanvas();
@@ -3268,37 +3293,39 @@ export class SongEditor {
                         // Build a list of target instrument indices, types and other info. It will be a single type for a single instrument, but with "all" and "active" it could be more.
                         // All or active are included together. Active allows any to be set, just in case the user fiddles with which are active later.
                         let tgtInstrumentTypes: InstrumentType[] = [];
-                        let anyInstrumentAdvancedEQ: boolean = false,
-                            anyInstrumentSimpleEQ: boolean = false,
+                        let anyInstrumentAdvancedEQ:   boolean = false,
+                            anyInstrumentSimpleEQ:     boolean = false,
                             anyInstrumentAdvancedNote: boolean = false,
-                            anyInstrumentSimpleNote: boolean = false,
-                            anyInstrumentArps: boolean = false,
-                            anyInstrumentPitchShifts: boolean = false,
-                            anyInstrumentDetunes: boolean = false,
-                            anyInstrumentVibratos: boolean = false,
-                            anyInstrumentNoteFilters: boolean = false,
-                            anyInstrumentDistorts: boolean = false,
-                            anyInstrumentBitcrushes: boolean = false,
-                            anyInstrumentPans: boolean = false,
-                            anyInstrumentChorus: boolean = false,
-                            anyInstrumentEchoes: boolean = false,
-                            anyInstrumentReverbs: boolean = false,
-                            anyInstrumentRingMods: boolean = false,
-                            anyInstrumentGranulars: boolean = false,
-                            anyInstrumentPhasers: boolean = false,
+                            anyInstrumentSimpleNote:   boolean = false,
+                            anyInstrumentArps:         boolean = false,
+                            anyInstrumentPitchShifts:  boolean = false,
+                            anyInstrumentDetunes:      boolean = false,
+                            anyInstrumentVibratos:     boolean = false,
+                            anyInstrumentNoteFilters:  boolean = false,
+                            anyInstrumentDistorts:     boolean = false,
+                            anyInstrumentBitcrushes:   boolean = false,
+                            anyInstrumentPans:         boolean = false,
+                            anyInstrumentChorus:       boolean = false,
+                            anyInstrumentEchoes:       boolean = false,
+                            anyInstrumentReverbs:      boolean = false,
+                            anyInstrumentRingMods:     boolean = false,
+                            anyInstrumentGranulars:    boolean = false,
+                            anyInstrumentPhasers:      boolean = false,
                             anyInstrumentHasEnvelopes: boolean = false;
-                        let allInstrumentPitchShifts: boolean = true,
-                            allInstrumentNoteFilters: boolean = true,
-                            allInstrumentDetunes: boolean = true,
-                            allInstrumentVibratos: boolean = true,
-                            allInstrumentDistorts: boolean = true,
-                            allInstrumentBitcrushes: boolean = true,
-                            allInstrumentPans: boolean = true,
-                            allInstrumentChorus: boolean = true,
-                            allInstrumentEchoes: boolean = true,
-                            allInstrumentReverbs: boolean = true,
-                            allInstrumentRingMods: boolean = true,
-                            allInstrumentGranulars: boolean = true;
+                        let allInstrumentPitchShifts:  boolean = true,
+                            allInstrumentNoteFilters:  boolean = true,
+                            allInstrumentDetunes:      boolean = true,
+                            allInstrumentVibratos:     boolean = true,
+                            allInstrumentDistorts:     boolean = true,
+                            allInstrumentBitcrushes:   boolean = true,
+                            allInstrumentPans:         boolean = true,
+                            allInstrumentChorus:       boolean = true,
+                            allInstrumentEchoes:       boolean = true,
+                            allInstrumentReverbs:      boolean = true,
+                            allInstrumentRingMods:     boolean = true,
+                            anyInstrumentInvertWave:   boolean = true,
+                            allInstrumentGranulars:    boolean = true;
+                            
                         let instrumentCandidates: number[] = [];
                         if (modInstrument >= channel.instruments.length) {
                             for (let i: number = 0; i < channel.instruments.length; i++) {
@@ -3399,6 +3426,12 @@ export class SongEditor {
                             }
                             else {
                                 anyInstrumentPhasers = false;
+                            }
+                            if (effectsIncludeInvertWave(channel.instruments[instrumentIndex].effects)) {
+                                anyInstrumentInvertWave = true;
+                            }
+                            else {
+                                anyInstrumentInvertWave = false;
                             }
                             if (channel.instruments[instrumentIndex].envelopes.length > 0) {
                                 anyInstrumentHasEnvelopes = true;
@@ -3547,6 +3580,10 @@ export class SongEditor {
                             settingList.push("phaser frequency");
                             settingList.push("phaser feedback");
                             settingList.push("phaser stages");
+                        }
+
+                        if (anyInstrumentInvertWave) {
+                            settingList.push("invert wave");
                         }
 
                         if (anyInstrumentHasEnvelopes) {
@@ -4185,6 +4222,15 @@ export class SongEditor {
             return;
         }
 
+         // Defer to actively editing upper note limit
+         if (document.activeElement == this._upperNoteLimitInputBox || document.activeElement == this._lowerNoteLimitInputBox) {
+            // Enter/esc returns focus to form
+            if (event.keyCode == 13 || event.keyCode == 27) {
+                this.mainLayer.focus();
+            }
+
+            return;
+        }
         if (this.doc.synth.recording) {
             // The only valid keyboard interactions when recording are playing notes or pressing space OR P to stop.
             if (!event.ctrlKey && !event.metaKey) {

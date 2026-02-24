@@ -114,7 +114,7 @@ export const enum EffectType {
     transition,
     chord,
     // If you add more, you'll also have to extend the bitfield used in Base64 which currently uses three six-bit characters.
-    noteRange, //placeholder for ultrabox 2.3 update
+    noteRange, //no longer just a placeholder :3
     ringModulation,
     granular,
     phaser,
@@ -163,7 +163,8 @@ export const enum EnvelopeComputeIndex {
     phaserMix,
     phaserFeedback,
     phaserStages,
-    
+    invertWave,
+
     length,
 }
 
@@ -1254,7 +1255,7 @@ export class Config {
         //for modbox; voices = riffapp, spread = intervals, offset = offsets, expression = volume, and sign = signs
     ]);
     public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "ring mod", "granular", "phaser", "", "invert wave"];
-    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.granular, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.ringModulation, EffectType.phaser, EffectType.noteRange, EffectType.invertWave];
+    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.granular, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.ringModulation, EffectType.phaser, EffectType.invertWave, EffectType.noteRange];
     public static readonly noteSizeMax: number = 6;
     public static readonly volumeRange: number = 50;
     // Beepbox's old volume scale used factor -0.5 and was [0~7] had roughly value 6 = 0.125 power. This new value is chosen to have -21 be the same,
@@ -2192,6 +2193,11 @@ export class Config {
             maxRawVol: Config.perEnvelopeBoundMax * 10, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length, maxIndex: this.maxEnvelopeCount-1,
             promptName: "Individual Envelope Upper Bound", 
             promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
+        { name: "invert wave", 
+            pianoName: "Invert Wave", 
+            maxRawVol: 1, newNoteVol: 1, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.invertWave, maxIndex: 0,
+            promptName: "Invert Wave", 
+            promptDesc: [ "Allows you to toggle the Invert Wave effect on instruments. Value must be exactly 1 for this to take effect.", "[$LO - $HI]" ] },
         { name: "phaser", 
             pianoName: "Phaser", 
             maxRawVol: Config.phaserMixRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.phaser, maxIndex: 0,
@@ -2567,11 +2573,11 @@ export function rawChipToIntegrated(raw: DictionaryArray<ChipWave>): DictionaryA
     return result;
 }
 export function effectsIncludeOctaveShift(effects: number): boolean {
-    return (effects & (1 << EffectType.noteRange)) != 0;
+    return (effects & (1 << EffectType.octaveShift)) != 0;
 }
 export function effectsIncludePhaser(effects: number): boolean {
 	return (effects & (1 << EffectType.phaser)) != 0;
 }
 export function effectsIncludeInvertWave(effects: number): boolean {
-    return (effects & (1 << EffectType.noteRange)) != 0;
+    return (effects & (1 << EffectType.invertWave)) != 0;
 }

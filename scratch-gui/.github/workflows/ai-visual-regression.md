@@ -45,6 +45,8 @@ tools:
     - "echo *"
     - "kill *"
     - "curl *"
+    - "sleep *"
+    - "seq *"
   github:
     toolsets: [default, pull_requests]
   cache-memory:
@@ -55,6 +57,7 @@ safe-outputs:
   add-comment:
     max: 1
     hide-older-comments: true
+    discussions: false
 network:
   allowed:
     - localhost

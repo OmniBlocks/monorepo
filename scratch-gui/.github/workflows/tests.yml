@@ -90,7 +90,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci || npm i --legacy-peer-deps
           npm install --no-save @playwright/test
 
       - name: Detect new UI components

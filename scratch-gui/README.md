@@ -42,12 +42,6 @@ This repository contains the frontend interface of the Block-Based editor for Om
 If you want to fork this repo or contribute with PR's (or modify OmniBlocks as your own), you must follow the following rules from the AGPLv3 license, or you are in violation of it.
 * 1. Your fork/mod must be public and open-source.
 * 2. Your fork/mod can be paid, but must be licensed under the same AGPLv3 license.
-### Notice about rule 2
-While it does say your fork/mod can be paid, the <b>main software</b> cannot be paid. Here are acceptable uses for requiring payment:
-* 1. Premium features
-  2. Support services
-  3. Subscriptions.
-
 
 ## Try It Out
 Try out OmniBlocks: [https://omniblocks.github.io](https://omniblocks.github.io)
@@ -68,14 +62,16 @@ We are working on a desktop app for more native access and integration, but this
 
 ### Enhancements and Improvements
 *   **Plenty of Addons:** Dozens of community-built addons for custom blocks, UI tweaks, and new functionality. Many are inherited from TurboWarp and other mods from now, but we will implement some new ones soon.
-<!--*   **Themes:** Multiple color themes (Aqua, Blue, Rainbow, Red, Purple) to personalize your editor. The Aqua theme is the default, as it is the main brand color of OmniBlocks.
-note: this part of the readme got removed because we didn't really make the theme system, turbowarp did, and we just inherited it and added our Aqua theme-->
 *   **OmniBlocks IDE:** OmniBlocks plans to be a full-featured IDE extending beyond blocks. There will be editors for text languages like Python and C in the future!
 *   **Integrated Tools:** Includes a custom music editor and other quality-of-life improvements. Keep in mind that if you're seeing this, it means the music editor is currently not fully implemented. It works, you can go try it out, but it doesn't fully integrate with OmniBlocks just yet.
 *   **Quality of Life**: As said earlier, we add a bunch of subtle, but definitely cool or useful quality-of-life additions, even if they seem niche or workaroundable. Most of these stem from mild annoyances that we ourselves have had, and don't hesitate to report yours too in the issues tab!
 
 ### A great feature inherited from TurboWarp: 
 *   **High Performance:** This is a fork of TurboWarp, meaning it uses the compiler that TurboWarp uses, making projects run way faster than other projects. This isn't listed as an enhancement/feature since we didn't implement it; the team at TurboWarp did, and we don't claim to have written the TurboWarp compiler that makes OmniBlocks projects run so fast. 
+
+## Vibe Coding
+As you can tell by some of the slop in this codebase, I have, for the past month, been experimenting with different AI tools to aid in development of OmniBlocks. I can confirm that it sucks, and I apologize for polluting the codebase with slop. I am in progress of writing about this in an article about my stance on AI that I will show to everyone soon. I will also start to write more code by myself and my fellow human contributors, as it AI is detrimental to my own skills as well.
+If you are planning to contribute to OmniBlocks, please don't vibe code large features, or preferably, anything at all. From my experience, AI is best for repetitive, mild tasks, like updating things across files quickly or adding small features, but even these have to go through a review process that takes about 2 days for me. Please don't make PRs with features that are entirely AI-generated, especially if you didn't test the code or review it.
 
 ## Quick Start
 
@@ -106,7 +102,7 @@ Scratch is broken up into a bunch of different packages, each implementing one p
 * scratch-parser extracts and validates sb2 and sb3 files
 * scratch-storage is an abstraction around fetch() used for downloading (and theoretically uploading) files. It is the reason why you can add files to your workspace and they work without being uploaded to any cloud storage.
 * scratch-l10n contains translations and localizations. This provides accessibility to people who speak other languages but want to use OmniBlocks.
-* caffeine- wait- wha? how did this one get here?
+* scratch-caffeine /j
 
 Here's a diagram to help you understand how these are connected:
 
@@ -120,9 +116,11 @@ graph TD
     B --> G["scratch-storage<br/>Asset Manager"]
     C --> H["scratch-svg-renderer<br/>SVG Processor"]
     B --> I["scratch-parser<br/>Project Parser"]
-    B --> J["scratch-translate<br/>i18n System"]
-    K["coffee"] --> L["caffine<br/>feeds the devs"] 
+    A --> G
+    A --> J["scratch-l10n<br/>i18n System"]
+    K["Developers<br/>(Thats us!)"] --> L["scratch-caffeine-<br/>WAIT A MINUTE THIS WAS A<br/>JOKE!<br/>How did this get into here?!"]
     
+    %% Styles
     style A fill:#4C97FF,color:#fff
     style B fill:#FF6680,color:#fff
     style C fill:#FFAB19,color:#fff
@@ -133,6 +131,21 @@ graph TD
     style H fill:#FFAB19,color:#fff
     style I fill:#FF6680,color:#fff
     style J fill:#FF6680,color:#fff
+    style K fill:#FF6680,color:#fff,font:Comic Sans
+
+    %% Click Interactions
+    click A "https://github.com/OmniBlocks/scratch-gui" "View scratch-gui repo"
+    click B "https://github.com/OmniBlocks/scratch-vm" "View scratch-vm repo"
+    click C "https://github.com/OmniBlocks/scratch-render" "View scratch-render repo"
+    click D "https://github.com/OmniBlocks/scratch-paint" "View scratch-paint repo"
+    click E "https://github.com/OmniBlocks/scratch-blocks" "View scratch-blocks repo"
+    click F "https://github.com/OmniBlocks/scratch-audio" "View scratch-audio repo"
+    click G "https://github.com/OmniBlocks/scratch-storage" "View scratch-storage repo"
+    click H "https://github.com/OmniBlocks/scratch-svg-renderer" "View scratch-svg-renderer repo"
+    click I "https://github.com/OmniBlocks/scratch-parser" "View scratch-parser repo"
+    click J "https://github.com/OmniBlocks/scratch-l10n" "View scratch-l10n repo"
+    click K "https://github.com/OmniBlocks/" "Us. This is us :D"
+    click L "https://www.target.com/p/folgers-gourmet-supreme-ground-coffee/-/A-94500862?preselect=13376546#lnk=sametab" "Okay... why IS this here though... It was only a joke!"
 ```
 
 
@@ -162,7 +175,7 @@ To actually mod Scratch, you need to build the GUI, as it is the main package th
     ```bash
     npm run build
     ```
-    Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow to push to a website or something like that. If you go to our [site build repo,](https://github.com/OmniBlocks/omniblocks.github.io) you can use the `sh` script and `yml` workflow from there 😁
+    Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow or other CI to push to a website or something like that. If you go to our [site build repo,](https://github.com/OmniBlocks/omniblocks.github.io) you can use the `sh` script and `yml` workflow from there 😁
 
 
 ## Development Guide
@@ -170,40 +183,29 @@ To actually mod Scratch, you need to build the GUI, as it is the main package th
 This section is for developers looking to understand, modify, or contribute to the codebase.
 
 ### Data Flow & Structure
-- **State Management:** Uses Redux. Reducers are located in `src/reducers/`.
+<!--- **State Management:** Uses Redux. Reducers are located in `src/reducers/`.
+this is already part of the below -->
 - **Core GUI Logic:** Located in `src/`.
-- **Addons:** Managed in `src/addons/`. Synced and patched from upstream repositories using `pull.js`. If you try hard enough you can make your own by making all the files you need yourself, which is what we do here.
-- **Extensions:** Custom blocks and hardware integrations are in `src/lib/libraries/extensions/`. Extensions are in scratch-vm, an external dependency. You'll need to fork that separate repository with your changes there, and link the new forked repository to scratch-vm. This isn't very easy if you don't know much about NPM, so we're sorry about this, although we might move to the monorepo that doesn't require all these repos someday. You can still do it manually by editing the `package.json` file.
-- **Translations:** Located in `src/lib/tw-translations/`.
+- **Addons:** Managed in `src/addons/`. If you try hard enough you can make your own by making all the files you need yourself, which is what we do here.
 - **Theming:** Theme definitions (Aqua, Blue, etc.) are in `src/lib/themes/accent/<theme>.js`. Global color variables are set in `src/css/colors.css` and overridden in JS as needed.
 
 ### Key Workflows
-- **Adding a New Addon:** Create a new directory within `src/addons/` with all necessary files and ensure it's imported in `src/addons/entry.js`.
+- **Adding a New Addon:** Create a new directory within `src/addons/` with all necessary files and ensure it's imported in the `.js` files located in `src/addons/generated`.
 - **Modifying Themes:** Make a new file and title it "<color-name>.js". For example, if you want to make a new yellow theme, you can do "yellow.js". Then look for all the other JS files where the themes are imported, such as scratch-gui/src/lib/themes/index.js.
 - **Debugging:** For build issues, inspect the output in the `build/` directory or check the console output from `npm run build`.
 
 
 ### Integration Points
-- **Addon Entry Point:** `src/addons/entry.js`
-- **Extensions:** `src/lib/libraries/extensions/`
-- **Translations:** `src/lib/tw-translations/`
+- **Extension Gallery:** `src/lib/libraries/extensions/`
 - **Static Assets:**  `static/`.
-<!--
-### Component Documentation
-For detailed information about specific components and development tools:
-
-- **[Extension Development](src/examples/README.md)** - Create custom extensions and blocks
-- **[Development Playground](src/playground/README.md)** - Testing and debugging environment  
-- **[Music Player](static/player/README.md)** - BeepBox-based music creation tool
-- **[Testing Infrastructure](test/README.md)** - Comprehensive testing suite and guidelines
-- **[Addon System](src/addons/README.md)** - Addon management and development
--->
 
 ## Licensing
 
 This project is licensed under multiple agreements due to its forked nature.
 
-- **OmniBlocks & TurboWarp Modifications:** Licensed under the **GNU Affero General Public License v3.0**. See the `LICENSE` file or [gnu.org/licenses](https://www.gnu.org/licenses/) for details.
+- **OmniBlocks Modifications:** Licensed under the **GNU Affero General Public License v3.0**. See the `LICENSE` file or [gnu.org/licenses](https://www.gnu.org/licenses/) for details.
+
+- **Original TurboWarp Code (BSD License):** Copyright (c) TurboWarp contributors. The original license text is retained below as required.
 
 - **Original Scratch Code (BSD License):** Copyright (c) 2016, Massachusetts Institute of Technology. The original license text is retained below as required.
 
@@ -231,6 +233,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 </details>
 
+Original TurboWarp (GPL-3.0) License: https://github.com/TurboWarp/scratch-gui/blob/develop/LICENSE
+
 ## Contributing
 
 Contributions are welcome! We are especially interested in addons, bug fixes, and new features!
@@ -246,7 +250,7 @@ Contributions are welcome! We are especially interested in addons, bug fixes, an
 
 
 ## 📝 The Super Strict Style Guide of Doom 😈
-As you may know from the earlier parts of the readme, this is all made in React JS, a modular JavaScript framework. We're pretty laid back, so we don't have a super strict style guide or coding conventions, just know the following:
+As you may know from the earlier parts of the readme, this is all made in React JS, a modular JavaScript UI framework. We're pretty laid back, so we don't have a super strict style guide or coding conventions, just know the following:
 
 -  Go all out on your code! It doesn't matter if you don't use proper indentation, or other stuff like that, just make sure to add comments explaining it. After all, this is JavaScript, not Python we're talking about, so any valid syntax is valid syntax.
 -  Make sure your variables are readable. While everyone loves fun code, please make sure your variables are legible. For example, if you need a variable for a new multi-backpack feature you're planning to add (not quite sure what the feature would do, but it's just an example), we'd prefer "multibackpack" or even "backpackthing" over "qwnpvoitwegjk".
@@ -259,13 +263,16 @@ Other than that, Code On! We don't require much other than these rules. Have fun
 ### General Questions
 
 **Q: What is OmniBlocks?**  
-A: OmniBlocks is an enhanced fork of TurboWarp for faster project execution, adds quality-of-life features, and constant updates. We hope to become a full-fledged IDE one day
+A: OmniBlocks is an enhanced fork of TurboWarp for faster project execution, adds quality-of-life features, and constant updates. We hope to become a full-fledged IDE one day!
 
 **Q: How is OmniBlocks different from TurboWarp?**  
 A: While we use TurboWarp's excellent compiler and extra features, OmniBlocks focuses on providing a more advanced, mature IDE. We plan to be able to be used by kids and adults alike, adding new advanced features for already knowledgeable coders, as well as being able to be booted up by children and/or beginners to explore programming. We will also be exploring additional features like alternative language editors (Python/C) in the future.
 
 **Q: Is OmniBlocks free to use?**  
 A: Yes! OmniBlocks is open-source and free forever! Unless you count paying your internet provider as an indirect fee ;)
+
+**Q: I hate Ommiblocks**  
+A: 67
 
 ### Compatibility
 
@@ -335,7 +342,7 @@ Q: But aren't you busy?
 A: True. I, supervoidcoder, the lead maintainer and creator of OmniBlocks, am very busy as I have to do school and other things too. But I'm not one of those people who is "onLy HeRe foR SeRiOuS sTuFF" or "iM a VeRy ImpOrtanT person With PrioRities, not your FrienD". I genuinely care about anyone that wants to reach out to me.
 Most of the maintainers and contributors have our own personal Scratch Account too. Here are some:
 - @supervoidcoder: [scratchcode1_2_3](https://scratch.mit.edu/users/scratchcode1_2_3/)
-- @ampelectrecuted: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
+- @8to16: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
 - @Graison-P: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
 - @NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
 
@@ -373,9 +380,9 @@ Update: As of 11/12/2025, there is even better integration with the music editor
 
 <!-- thisi is not a six seeven joke !-->
 ---
-## Vibe Coding
-As you can tell by some of the slop in this codebase, I have, for the past month, been experimenting with different AI tools to aid in development of OmniBlocks. I can confirm that it sucks, and I apologize for polluting the codebase with slop. I am in progress of writing about this in an article about my stance on AI that I will show to everyone soon. I will also start to write more code by myself and my fellow human contributors, as it AI is detrimental to my own skills as well.
-If you are planning to contribute to OmniBlocks, please don't vibe code large features, or preferably, anything at all. From my experience, AI is best for repetitive, mild tasks, like updating things across files quickly or adding small features, but even these have to go through a review process that takes about 2 days for me. Please don't make PRs with features that are entirely AI-generated, especially if you didn't test the code or review it.
 
+**Note:** This is a fork designed specifically for OmniBlocks. If you want to make your own Scratch or TurboWarp mod, please refer to the [upstream scratch-gui repository](https://github.com/scratchfoundation/scratch-gui) or the [TurboWarp scratch-gui repository](https://github.com/TurboWarp/scratch-gui) instead.
 
-**Note:** This is a fork designed specifically for OmniBlocks. If you want to make your own Scratch or TurboWarp mod, please refer to the [upstream scratch-gui repository](https://github.com/LLK/scratch-gui) or the [TurboWarp scratch-gui repository](https://github.com/TurboWarp/scratch-gui) instead.
+<details><summary>NASA Secret Information</summary>
+:egg:
+</details>

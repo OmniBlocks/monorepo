@@ -32,20 +32,19 @@ steps:
       fetch-depth: 0
       persist-credentials: false
 tools:
-  playwright: {}
+  playwright:
+    args: ["--viewport-size", "1366x900"]
   bash:
     - "npm *"
     - "npx *"
     - "node *"
     - "mkdir *"
     - "cp *"
-    - "git *"
-    - "curl *"
     - "cat *"
     - "ls *"
     - "echo *"
     - "kill *"
-    - "sleep *"
+    - "curl *"
   github:
     toolsets: [default, pull_requests]
   cache-memory:
@@ -113,27 +112,28 @@ Confirm the server is responding at `http://localhost:8080/`.
 
 ## Step 4: Capture Screenshots with Playwright
 
-Use Playwright to navigate the OmniBlocks editor. The built app serves `editor.html` as its main entry point at `http://localhost:8080/editor.html`. Verify this file exists in `build/` before navigating; if the file is missing, check for `index.html` or `app.html` as alternatives.
+Use the **Playwright MCP tool** (not the CLI) to navigate the OmniBlocks editor. The built app serves `editor.html` at `http://localhost:8080/editor.html`. If that path returns a 404, try `http://localhost:8080/` or `http://localhost:8080/index.html` instead.
 
 Before taking any screenshot:
-1. Wait for `[class*="menu-bar"]` to be visible (signals the editor has fully loaded)
-2. Wait an additional 1–2 seconds for animations to settle
+1. Use the Playwright tool to navigate to the URL
+2. Wait for the selector `[class*="menu-bar"]` to be visible (signals the editor has fully loaded)
+3. Wait an additional 1–2 seconds for animations to settle
 
-Capture these views at minimum, saving to `/tmp/vrt-current/`:
+Use the Playwright tool to take screenshots. Playwright saves them automatically to `/tmp/gh-aw/mcp-logs/playwright/`. Capture at minimum:
 
-1. **Full editor initial load** — full-page screenshot (`editor-initial.png`)
-2. **Menu bar area** — the top navigation bar (`menu-bar.png`)
-3. **Blocks workspace** — the blocks palette and code area (`blocks-workspace.png`)
-4. **Stage and sprites panel** — the right-side stage + sprite list (`stage-sprites.png`)
+1. **Full editor initial load** — full-page screenshot, save as `editor-initial.png`
+2. **Menu bar area** — screenshot of the top navigation bar, save as `menu-bar.png`
+3. **Blocks workspace** — screenshot of the blocks palette and code area, save as `blocks-workspace.png`
+4. **Stage and sprites panel** — screenshot of the right-side stage + sprite list, save as `stage-sprites.png`
 
-Additionally, for each component specifically changed by this PR (identified in Step 1), navigate to and screenshot the relevant UI area with a descriptive filename.
+Additionally, for each component specifically changed by this PR (identified in Step 1), use Playwright to navigate to and screenshot the relevant UI area with a descriptive filename.
 
 ## Step 5: Compare Against Baselines
 
-Check if baseline screenshots exist in `/tmp/gh-aw/cache-memory/baselines/`.
+Playwright saves screenshots to `/tmp/gh-aw/mcp-logs/playwright/`. Check if baseline screenshots exist in `/tmp/gh-aw/cache-memory/baselines/`.
 
 **If no baselines exist (first run):**
-- Copy `/tmp/vrt-current/` to `/tmp/gh-aw/cache-memory/baselines/`
+- Copy screenshots from `/tmp/gh-aw/mcp-logs/playwright/` to `/tmp/gh-aw/cache-memory/baselines/`
 - Save a `manifest.json` in the baselines directory with the list of screenshots and a timestamp
 - Post a comment: "🎯 AI Visual Regression baselines initialized — N screenshots captured. Future PRs will be compared against this baseline."
 

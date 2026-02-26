@@ -23,7 +23,7 @@
 #
 # AI-powered visual regression testing for OmniBlocks UI changes. A vision-capable agent builds the app, intelligently navigates the UI using Playwright, captures screenshots, and compares them against cached baselines. Only runs on non-draft PRs from org members when UI-related files have changed.
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"0baae02ce6da99c610eace1dc6694c0fee5c395d94396c43c661f9eea63a1fba","compiler_version":"v0.50.4"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"4528b4436280eb4f47295b316d2bda1a5621dc3a0e21241654dfff07e2aadc13","compiler_version":"v0.50.4"}
 
 name: "AI Visual Regression Tester"
 "on":
@@ -647,7 +647,7 @@ jobs:
                 "type": "stdio",
                 "container": "mcr.microsoft.com/playwright/mcp",
                 "args": ["--init", "--network", "host", "--security-opt", "seccomp=unconfined", "--ipc=host"],
-                "entrypointArgs": ["--output-dir", "/tmp/gh-aw/mcp-logs/playwright", "--no-sandbox"],
+                "entrypointArgs": ["--output-dir", "/tmp/gh-aw/mcp-logs/playwright", "--no-sandbox", "--viewport-size", "1366x900"],
                 "mounts": ["/tmp/gh-aw/mcp-logs:/tmp/gh-aw/mcp-logs:rw"]
               },
               "safeoutputs": {
@@ -691,7 +691,6 @@ jobs:
         # --allow-tool shell(date)
         # --allow-tool shell(echo *)
         # --allow-tool shell(echo)
-        # --allow-tool shell(git *)
         # --allow-tool shell(grep)
         # --allow-tool shell(head)
         # --allow-tool shell(kill *)
@@ -702,7 +701,6 @@ jobs:
         # --allow-tool shell(npm *)
         # --allow-tool shell(npx *)
         # --allow-tool shell(pwd)
-        # --allow-tool shell(sleep *)
         # --allow-tool shell(sort)
         # --allow-tool shell(tail)
         # --allow-tool shell(uniq)
@@ -714,7 +712,7 @@ jobs:
           set -o pipefail
           # shellcheck disable=SC1003
           sudo -E awf --env-all --container-workdir "${GITHUB_WORKSPACE}" --allow-domains "*.jsr.io,127.0.0.1,api.business.githubcopilot.com,api.enterprise.githubcopilot.com,api.github.com,api.githubcopilot.com,api.individual.githubcopilot.com,api.npms.io,bun.sh,cdn.jsdelivr.net,cdn.playwright.dev,deb.nodesource.com,deno.land,esm.sh,get.pnpm.io,github.com,googleapis.deno.dev,googlechromelabs.github.io,host.docker.internal,jsr.io,localhost,nodejs.org,npm.pkg.github.com,npmjs.com,npmjs.org,playwright.download.prss.microsoft.com,raw.githubusercontent.com,registry.bower.io,registry.npmjs.com,registry.npmjs.org,registry.yarnpkg.com,repo.yarnpkg.com,skimdb.npmjs.com,storage.googleapis.com,telemetry.enterprise.githubcopilot.com,telemetry.vercel.com,www.npmjs.com,www.npmjs.org,yarnpkg.com" --log-level info --proxy-logs-dir /tmp/gh-aw/sandbox/firewall/logs --enable-host-access --image-tag 0.23.0 --skip-pull --enable-api-proxy \
-            -- /bin/bash -c '/usr/local/bin/copilot --add-dir /tmp/gh-aw/ --log-level all --log-dir /tmp/gh-aw/sandbox/agent/logs/ --add-dir "${GITHUB_WORKSPACE}" --disable-builtin-mcps --allow-tool github --allow-tool safeoutputs --allow-tool '\''shell(cat *)'\'' --allow-tool '\''shell(cat)'\'' --allow-tool '\''shell(cp *)'\'' --allow-tool '\''shell(curl *)'\'' --allow-tool '\''shell(date)'\'' --allow-tool '\''shell(echo *)'\'' --allow-tool '\''shell(echo)'\'' --allow-tool '\''shell(git *)'\'' --allow-tool '\''shell(grep)'\'' --allow-tool '\''shell(head)'\'' --allow-tool '\''shell(kill *)'\'' --allow-tool '\''shell(ls *)'\'' --allow-tool '\''shell(ls)'\'' --allow-tool '\''shell(mkdir *)'\'' --allow-tool '\''shell(node *)'\'' --allow-tool '\''shell(npm *)'\'' --allow-tool '\''shell(npx *)'\'' --allow-tool '\''shell(pwd)'\'' --allow-tool '\''shell(sleep *)'\'' --allow-tool '\''shell(sort)'\'' --allow-tool '\''shell(tail)'\'' --allow-tool '\''shell(uniq)'\'' --allow-tool '\''shell(wc)'\'' --allow-tool '\''shell(yq)'\'' --allow-tool write --add-dir /tmp/gh-aw/cache-memory/ --allow-all-paths --prompt "$(cat /tmp/gh-aw/aw-prompts/prompt.txt)"${GH_AW_MODEL_AGENT_COPILOT:+ --model "$GH_AW_MODEL_AGENT_COPILOT"}' 2>&1 | tee -a /tmp/gh-aw/agent-stdio.log
+            -- /bin/bash -c '/usr/local/bin/copilot --add-dir /tmp/gh-aw/ --log-level all --log-dir /tmp/gh-aw/sandbox/agent/logs/ --add-dir "${GITHUB_WORKSPACE}" --disable-builtin-mcps --allow-tool github --allow-tool safeoutputs --allow-tool '\''shell(cat *)'\'' --allow-tool '\''shell(cat)'\'' --allow-tool '\''shell(cp *)'\'' --allow-tool '\''shell(curl *)'\'' --allow-tool '\''shell(date)'\'' --allow-tool '\''shell(echo *)'\'' --allow-tool '\''shell(echo)'\'' --allow-tool '\''shell(grep)'\'' --allow-tool '\''shell(head)'\'' --allow-tool '\''shell(kill *)'\'' --allow-tool '\''shell(ls *)'\'' --allow-tool '\''shell(ls)'\'' --allow-tool '\''shell(mkdir *)'\'' --allow-tool '\''shell(node *)'\'' --allow-tool '\''shell(npm *)'\'' --allow-tool '\''shell(npx *)'\'' --allow-tool '\''shell(pwd)'\'' --allow-tool '\''shell(sort)'\'' --allow-tool '\''shell(tail)'\'' --allow-tool '\''shell(uniq)'\'' --allow-tool '\''shell(wc)'\'' --allow-tool '\''shell(yq)'\'' --allow-tool write --add-dir /tmp/gh-aw/cache-memory/ --allow-all-paths --prompt "$(cat /tmp/gh-aw/aw-prompts/prompt.txt)"${GH_AW_MODEL_AGENT_COPILOT:+ --model "$GH_AW_MODEL_AGENT_COPILOT"}' 2>&1 | tee -a /tmp/gh-aw/agent-stdio.log
         env:
           COPILOT_AGENT_RUNNER_TYPE: STANDALONE
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

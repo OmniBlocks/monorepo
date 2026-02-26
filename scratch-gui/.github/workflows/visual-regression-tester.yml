@@ -160,7 +160,7 @@ jobs:
       - name: Install and build base
         working-directory: base
         run: |
-          npm ci
+          npm ci || npm i --legacy-peer-deps
           npm install rimraf mkdirp
           
           # Add node_modules/.bin to PATH so rimraf/mkdirp can be found
@@ -201,7 +201,7 @@ jobs:
       - name: Install and build PR
         working-directory: pr
         run: |
-          npm ci
+          npm ci || npm i --legacy-peer-deps
           npm install rimraf mkdirp
           # Add node_modules/.bin to PATH so rimraf/mkdirp can be found
           export PATH="$PWD/node_modules/.bin:$PATH"

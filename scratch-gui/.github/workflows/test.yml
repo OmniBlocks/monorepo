@@ -52,8 +52,11 @@ jobs:
         run: |
           echo "install_status=success" >> $GITHUB_OUTPUT
           npm ci 2>&1 | tee install-output.txt || {
-            echo "install_status=failure" >> $GITHUB_OUTPUT
-            exit 1
+            echo "npm ci failed, falling back to npm i --legacy-peer-deps" | tee -a install-output.txt
+            npm i --legacy-peer-deps 2>&1 | tee -a install-output.txt || {
+              echo "install_status=failure" >> $GITHUB_OUTPUT
+              exit 1
+            }
           }
 
       - name: Build project

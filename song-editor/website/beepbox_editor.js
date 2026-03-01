@@ -17350,6 +17350,8 @@ li.select2-results__option[role=group] > strong:hover {
       this.fadeOut = Config.fadeOutNeutral;
       this.transition = Config.transitions.dictionary["normal"].index;
       this.envelopeCount = 0;
+      this.upperNoteLimit = Config.maxPitch;
+      this.lowerNoteLimit = 0;
       this.isNoiseInstrument = isNoiseChannel;
       switch (type) {
         case 0 /* chip */:
@@ -26032,13 +26034,15 @@ li.select2-results__option[role=group] > strong:hover {
                   const chordOfCompatibleInstrument = this.adjacentPatternHasCompatibleInstrumentTransition(song, channel, pattern, prevPattern, instrumentIndex, transition, chord, note, lastNote, patternForcesContinueAtStart);
                   if (chordOfCompatibleInstrument != null) {
                     prevNoteForThisInstrument = lastNote;
-                    tonesInPrevNote = chordOfCompatibleInstrument.singleTone ? 1 : prevNoteForThisInstrument.pitches.length;
+                    let prevPitchesForThisInstrument = prevNoteForThisInstrument.pitches;
+                    tonesInPrevNote = chordOfCompatibleInstrument.singleTone ? 1 : prevPitchesForThisInstrument.length;
                     forceContinueAtStart = patternForcesContinueAtStart;
                   }
                 }
               }
             } else if (prevNoteForThisInstrument != null) {
-              tonesInPrevNote = chord.singleTone ? 1 : prevNoteForThisInstrument.pitches.length;
+              let prevPitchesForThisInstrument = prevNoteForThisInstrument.pitches;
+              tonesInPrevNote = chord.singleTone ? 1 : prevPitchesForThisInstrument.length;
             }
             if (note.end == partsPerBar) {
               let nextPattern = this.nextBar == null ? null : song.getPattern(channelIndex, this.nextBar);
@@ -26078,10 +26082,10 @@ li.select2-results__option[role=group] > strong:hover {
                 tone = toneList.get(toneCount);
               }
               toneCount++;
-              for (let i = 0; i < note.pitches.length; i++) {
-                tone.pitches[i] = note.pitches[i];
+              for (let i = 0; i < filteredPitches.length; i++) {
+                tone.pitches[i] = filteredPitches[i];
               }
-              tone.pitchCount = note.pitches.length;
+              tone.pitchCount = filteredPitches.length;
               tone.chordSize = 1;
               tone.instrumentIndex = instrumentIndex;
               tone.note = note;
@@ -26099,10 +26103,10 @@ li.select2-results__option[role=group] > strong:hover {
             } else {
               const transition2 = instrument.getTransition();
               if ((transition2.isSeamless && !transition2.slides && chord.strumParts == 0 || forceContinueAtStart) && Config.ticksPerPart * note.start == currentTick && prevNoteForThisInstrument != null) {
-                this.moveTonesIntoOrderedTempMatchedList(toneList, note.pitches);
+                this.moveTonesIntoOrderedTempMatchedList(toneList, filteredPitches);
               }
               let strumOffsetParts = 0;
-              for (let i = 0; i < note.pitches.length; i++) {
+              for (let i = 0; i < filteredPitches.length; i++) {
                 let prevNoteForThisTone = tonesInPrevNote > i ? prevNoteForThisInstrument : null;
                 let noteForThisTone = note;
                 let pitchesForThisTone = filteredPitches;
@@ -28100,11 +28104,6 @@ li.select2-results__option[role=group] > strong:hover {
 				let reverbShelfPrevInput2 = +instrumentState.reverbShelfPrevInput2;
 				let reverbShelfPrevInput3 = +instrumentState.reverbShelfPrevInput3;`;
         }
-        if (usesInvertWave) {
-          effectsSource += `
-                    sample = sample*-1;
-                `;
-        }
         effectsSource += `
 				
 				const stopIndex = bufferIndex + runLength;
@@ -28187,6 +28186,11 @@ li.select2-results__option[role=group] > strong:hover {
         } else {
           effectsSource += `let sample = tempMonoInstrumentSampleBuffer[sampleIndex];
                 tempMonoInstrumentSampleBuffer[sampleIndex] = 0.0;`;
+        }
+        if (usesInvertWave) {
+          effectsSource += `
+                    sample = sample*-1;
+                `;
         }
         if (usesDistortion) {
           effectsSource += `
@@ -57937,6 +57941,14 @@ You should be redirected to the song at:<br /><br />
           return this._ringModSlider;
         case Config.modulators.dictionary["ring mod hertz"].index:
           return this._ringModHzSlider;
+        case Config.modulators.dictionary["phaser"].index:
+          return this._phaserMixSlider;
+        case Config.modulators.dictionary["phaser frequency"].index:
+          return this._phaserFreqSlider;
+        case Config.modulators.dictionary["phaser feedback"].index:
+          return this._phaserFeedbackSlider;
+        case Config.modulators.dictionary["phaser stages"].index:
+          return this._phaserStagesSlider;
         case Config.modulators.dictionary["granular"].index:
           return this._granularSlider;
         case Config.modulators.dictionary["grain freq"].index:

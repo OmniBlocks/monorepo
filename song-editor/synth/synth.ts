@@ -1831,6 +1831,8 @@ export class Instrument {
         this.fadeOut = Config.fadeOutNeutral;
         this.transition = Config.transitions.dictionary["normal"].index;
         this.envelopeCount = 0;
+        this.upperNoteLimit = Config.maxPitch;
+        this.lowerNoteLimit = 0;
         this.isNoiseInstrument = isNoiseChannel;
         switch (type) {
             case InstrumentType.chip:
@@ -8973,8 +8975,6 @@ class InstrumentState {
 
         this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
 
-
-
         const samplesPerSecond: number = synth.samplesPerSecond;
         this.updateWaves(instrument, samplesPerSecond);
 
@@ -11884,13 +11884,15 @@ export class Synth {
                                 const chordOfCompatibleInstrument: Chord | null = this.adjacentPatternHasCompatibleInstrumentTransition(song, channel, pattern!, prevPattern, instrumentIndex, transition, chord, note, lastNote, patternForcesContinueAtStart);
                                 if (chordOfCompatibleInstrument != null) {
                                     prevNoteForThisInstrument = lastNote;
-                                    tonesInPrevNote = chordOfCompatibleInstrument.singleTone ? 1 : prevNoteForThisInstrument.pitches.length
+                                    let prevPitchesForThisInstrument: number[] = prevNoteForThisInstrument.pitches;
+                                    tonesInPrevNote = chordOfCompatibleInstrument.singleTone ? 1 : prevPitchesForThisInstrument.length;
                                     forceContinueAtStart = patternForcesContinueAtStart;
                                 }
                             }
                         }
                     } else if (prevNoteForThisInstrument != null) {
-                        tonesInPrevNote = chord.singleTone ? 1 : prevNoteForThisInstrument.pitches.length
+                        let prevPitchesForThisInstrument: number[] = prevNoteForThisInstrument.pitches;
+                        tonesInPrevNote = chord.singleTone ? 1 : prevPitchesForThisInstrument.length
                     }
                     if (note.end == partsPerBar) {
                         // If the end of the note coincides with the end of the pattern, look for an
@@ -11934,10 +11936,10 @@ export class Synth {
                         }
                         toneCount++;
 
-                        for (let i: number = 0; i < note.pitches.length; i++) {
-                            tone.pitches[i] = note.pitches[i];
+                        for (let i: number = 0; i < filteredPitches.length; i++) {
+                            tone.pitches[i] = filteredPitches[i];
                         }
-                        tone.pitchCount = note.pitches.length;
+                        tone.pitchCount = filteredPitches.length;
                         tone.chordSize = 1;
                         tone.instrumentIndex = instrumentIndex;
                         tone.note = note;
@@ -11956,11 +11958,11 @@ export class Synth {
                         const transition: Transition = instrument.getTransition();
 
                         if (((transition.isSeamless && !transition.slides && chord.strumParts == 0) || forceContinueAtStart) && (Config.ticksPerPart * note.start == currentTick) && prevNoteForThisInstrument != null) {
-                            this.moveTonesIntoOrderedTempMatchedList(toneList, note.pitches);
+                            this.moveTonesIntoOrderedTempMatchedList(toneList, filteredPitches);
                         }
 
                         let strumOffsetParts: number = 0;
-                        for (let i: number = 0; i < note.pitches.length; i++) {
+                        for (let i: number = 0; i < filteredPitches.length; i++) {
 
                             let prevNoteForThisTone: Note | null = (tonesInPrevNote > i) ? prevNoteForThisInstrument : null;
                             let noteForThisTone: Note = note;
@@ -14311,17 +14313,16 @@ export class Synth {
 				let reverbShelfPrevInput3 = +instrumentState.reverbShelfPrevInput3;`
             }
 
-            if(usesInvertWave) {
-                effectsSource += `
-                    sample = sample*-1;
-                `
-            }
+            
 
             effectsSource += `
 				
 				const stopIndex = bufferIndex + runLength;
             for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
                     `
+
+            
+
             if (usesGranular) {
                 effectsSource += `
                 let sample = tempMonoInstrumentSampleBuffer[sampleIndex];
@@ -14403,6 +14404,11 @@ export class Synth {
                 tempMonoInstrumentSampleBuffer[sampleIndex] = 0.0;`
             }
 
+            if(usesInvertWave) {
+                effectsSource += `
+                    sample = sample*-1;
+                `
+            }
 
             if (usesDistortion) {
                 effectsSource += `

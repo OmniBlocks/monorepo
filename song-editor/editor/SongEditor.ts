@@ -2171,6 +2171,14 @@ export class SongEditor {
                 return this._ringModSlider;
             case Config.modulators.dictionary["ring mod hertz"].index:
                 return this._ringModHzSlider;
+            case Config.modulators.dictionary["phaser"].index:
+                return this._phaserMixSlider;
+            case Config.modulators.dictionary["phaser frequency"].index:
+                return this._phaserFreqSlider;
+            case Config.modulators.dictionary["phaser feedback"].index:
+                return this._phaserFeedbackSlider;    
+            case Config.modulators.dictionary["phaser stages"].index:
+                return this._phaserStagesSlider;      
             case Config.modulators.dictionary["granular"].index:
                 return this._granularSlider;
             case Config.modulators.dictionary["grain freq"].index:

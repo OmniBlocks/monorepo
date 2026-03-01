@@ -1397,6 +1397,8 @@ export class Config {
         //50 and 100 are from dogebox
         //128 and 256 from slarmoo's box
         { name: "128×", mult: 128.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        //256× was mistakenly 250×. 250× has been left for preservationof old songs
+        { name: "250×", mult: 250.0, hzOffset: 0.0, amplitudeSign: 1.0},
         { name: "256×", mult: 256.0, hzOffset: 0.0, amplitudeSign: 1.0},
     ]);
 

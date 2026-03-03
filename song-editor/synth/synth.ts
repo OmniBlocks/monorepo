@@ -1638,6 +1638,7 @@ export class Instrument {
     public unisonOffset: number = 0.0;
     public unisonExpression: number = 1.4;
     public unisonSign: number = 1.0;
+    public unisonInitialized: boolean = true;
     public effects: number = 0;
     public chord: number = 1;
     public volume: number = 0;
@@ -2270,6 +2271,13 @@ export class Instrument {
             instrumentObject["dynamism"] = Math.round(100 * this.supersawDynamism / Config.supersawDynamismMax);
             instrumentObject["spread"] = Math.round(100 * this.supersawSpread / Config.supersawSpreadMax);
             instrumentObject["shape"] = Math.round(100 * this.supersawShape / Config.supersawShapeMax);
+            if (this.unison == Config.unisons.length) {
+                instrumentObject["unisonVoices"] = this.unisonVoices;
+                instrumentObject["unisonSpread"] = this.unisonSpread;
+                instrumentObject["unisonOffset"] = this.unisonOffset;
+                instrumentObject["unisonExpression"] = this.unisonExpression;
+                instrumentObject["unisonSign"] = this.unisonSign;
+            }
         } else if (this.type == InstrumentType.pickedString) {
             instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
             if (this.unison == Config.unisons.length) {
@@ -4050,6 +4058,8 @@ export class Song {
                     buffer.push(SongTagCode.supersaw, base64IntToCharCode[instrument.supersawDynamism], base64IntToCharCode[instrument.supersawSpread], base64IntToCharCode[instrument.supersawShape]);
                     buffer.push(SongTagCode.pulseWidth, base64IntToCharCode[instrument.pulseWidth]);
                     buffer.push(base64IntToCharCode[instrument.decimalOffset >> 6], base64IntToCharCode[instrument.decimalOffset & 0x3f]);
+                    buffer.push(104, base64IntToCharCode[instrument.unison]);
+                    if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                 } else if (instrument.type == InstrumentType.pickedString) {
                     if (Config.stringSustainRange > 0x20 || SustainType.length > 2) {
                         throw new Error("Not enough bits to represent sustain value and type in same base64 character.");
@@ -8782,6 +8792,7 @@ class InstrumentState {
     public readonly spectrumWave: SpectrumWaveState = new SpectrumWaveState();
     public readonly harmonicsWave: HarmonicsWaveState = new HarmonicsWaveState();
     public readonly drumsetSpectrumWaves: SpectrumWaveState[] = [];
+    unisonInitialized: any;
 
     constructor() {
         for (let i: number = 0; i < Config.drumCount; i++) {
@@ -9697,6 +9708,12 @@ class InstrumentState {
                 this.drumsetSpectrumWaves[i].getCustomWave(instrument.drumsetSpectrumWaves[i], InstrumentState._drumsetIndexToSpectrumOctave(i));
             }
             this.wave = null;
+            this.unisonVoices = instrument.unisonVoices;
+            this.unisonSpread = instrument.unisonSpread;
+            this.unisonOffset = instrument.unisonOffset;
+            this.unisonExpression = instrument.unisonExpression;
+            this.unisonSign = instrument.unisonSign;
+        } else if (instrument.type == InstrumentType.supersaw) {
             this.unisonVoices = instrument.unisonVoices;
             this.unisonSpread = instrument.unisonSpread;
             this.unisonOffset = instrument.unisonOffset;
@@ -12866,6 +12883,25 @@ export class Synth {
                     }
                 }
 
+            } else if (instrument.type == InstrumentType.supersaw) {
+                const unisonVoices: number = instrument.unisonVoices;
+                const unisonSpread: number = instrument.unisonSpread;
+                const unisonOffset: number = instrument.unisonOffset;
+                const unisonEnvelopeStart = envelopeStarts[EnvelopeComputeIndex.unison];
+                const unisonEnvelopeEnd = envelopeEnds[EnvelopeComputeIndex.unison];
+
+                const unisonStartA: number = Math.pow(2.0, (unisonOffset + unisonSpread) * unisonEnvelopeStart / 12.0);
+                const unisonEndA: number = Math.pow(2.0, (unisonOffset + unisonSpread) * unisonEnvelopeEnd / 12.0);
+                tone.phaseDeltas[0] = startFreq * sampleTime * unisonStartA;
+                tone.phaseDeltaScales[0] = basePhaseDeltaScale * Math.pow(unisonEndA / unisonStartA, 1.0 / roundedSamplesPerTick);
+
+                const divisor = (unisonVoices == 1) ? 1 : (unisonVoices - 1);
+                for (let voice: number = 1; voice < unisonVoices; voice++) {
+                    const unisonStart: number = Math.pow(2.0, (unisonOffset + unisonSpread - (2 * voice * unisonSpread / divisor)) * unisonEnvelopeStart / 12.0) * (specialIntervalMult);
+                    const unisonEnd: number = Math.pow(2.0, (unisonOffset + unisonSpread - (2 * voice * unisonSpread / divisor)) * unisonEnvelopeEnd / 12.0) * (specialIntervalMult);
+                    tone.phaseDeltas[voice] = startFreq * sampleTime * unisonStart;
+                    tone.phaseDeltaScales[voice] = basePhaseDeltaScale * Math.pow(unisonEnd / unisonStart, 1.0 / roundedSamplesPerTick);
+                }
             } else {
                 tone.phaseDeltas[0] = startFreq * sampleTime;
                 tone.phaseDeltaScales[0] = basePhaseDeltaScale;
@@ -12876,6 +12912,8 @@ export class Synth {
             let supersawExpressionStart: number = 1.0;
             let supersawExpressionEnd: number = 1.0;
             if (instrument.type == InstrumentType.supersaw) {
+                supersawExpressionStart = instrument.unisonExpression * instrument.unisonVoices / 1.4;
+                supersawExpressionEnd = instrument.unisonExpression * instrument.unisonVoices / 1.4;
                 const minFirstVoiceAmplitude: number = 1.0 / Math.sqrt(Config.supersawVoiceCount);
 
                 // Dynamism mods
@@ -12897,7 +12935,7 @@ export class Synth {
                 tone.supersawDynamismDelta = (dynamismEnd - dynamismStart) / roundedSamplesPerTick;
 
                 const initializeSupersaw: boolean = (tone.supersawDelayIndex == -1);
-                if (initializeSupersaw) {
+                if (initializeSupersaw || !instrumentState.unisonInitialized) {
                     // Goal: generate sawtooth phases such that the combined initial amplitude
                     // cancel out to minimize pop. Algorithm: generate sorted phases, iterate over
                     // their sawtooth drop points to find a combined zero crossing, then offset the
@@ -12908,19 +12946,21 @@ export class Synth {
                     // events, the gaps sizes should be an "exponential distribution", which is
                     // just: -Math.log(Math.random()). At the end, normalize the phases to a 0-1
                     // range by dividing by the final value of the accumulator.
+                    const voiceCount: number = false ? Config.supersawVoiceCount * Config.unisonVoicesMax : Config.supersawVoiceCount;
+
                     let accumulator: number = 0.0;
-                    for (let i: number = 0; i < Config.supersawVoiceCount; i++) {
+                    for (let i: number = 0; i < voiceCount; i++) {
                         tone.phases[i] = accumulator;
                         accumulator += -Math.log(Math.random());
                     }
 
-                    const amplitudeSum: number = 1.0 + (Config.supersawVoiceCount - 1.0) * dynamismStart;
+                    const amplitudeSum: number = 1.0 + (voiceCount - 1.0) * dynamismStart;
                     const slope: number = amplitudeSum;
 
                     // Find the initial amplitude of the sum of sawtooths with the normalized
                     // set of phases.
                     let sample: number = 0.0;
-                    for (let i: number = 0; i < Config.supersawVoiceCount; i++) {
+                    for (let i: number = 0; i < voiceCount; i++) {
                         const amplitude: number = (i == 0) ? 1.0 : dynamismStart;
                         const normalizedPhase: number = tone.phases[i] / accumulator;
                         tone.phases[i] = normalizedPhase;
@@ -12935,7 +12975,7 @@ export class Synth {
                     // through the phases.
                     let zeroCrossingPhase: number = 1.0;
                     let prevDrop: number = 0.0;
-                    for (let i: number = Config.supersawVoiceCount - 1; i >= 0; i--) {
+                    for (let i: number = voiceCount - 1; i >= 0; i--) {
                         const nextDrop: number = 1.0 - tone.phases[i];
                         const phaseDelta: number = nextDrop - prevDrop;
                         if (sample < 0.0) {
@@ -12949,20 +12989,22 @@ export class Synth {
                         sample += phaseDelta * slope - amplitude;
                         prevDrop = nextDrop;
                     }
-                    for (let i: number = 0; i < Config.supersawVoiceCount; i++) {
+                    for (let i: number = 0; i < voiceCount; i++) {
                         tone.phases[i] += zeroCrossingPhase;
                     }
 
                     // Randomize the (initially sorted) order of the phases (aside from the
                     // first one) so that they don't correlate to the detunes that are also
                     // based on index.
-                    for (let i: number = 1; i < Config.supersawVoiceCount - 1; i++) {
-                        const swappedIndex: number = i + Math.floor(Math.random() * (Config.supersawVoiceCount - i));
+                    for (let i: number = 1; i < voiceCount - 1; i++) {
+                        const swappedIndex: number = i + Math.floor(Math.random() * (voiceCount - i));
                         const temp: number = tone.phases[i];
                         tone.phases[i] = tone.phases[swappedIndex];
                         tone.phases[swappedIndex] = temp;
                     }
+                    instrumentState.unisonInitialized = true;
                 }
+
 
                 const baseSpreadSlider: number = instrument.supersawSpread / Config.supersawSpreadMax;
                 // Spread mods

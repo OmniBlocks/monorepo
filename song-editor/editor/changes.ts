@@ -2213,6 +2213,7 @@ export class ChangeUnison extends Change {
             instrument.unisonExpression = Config.unisons[instrument.unison].expression;
             instrument.unisonSign = Config.unisons[instrument.unison].sign;
             instrument.preset = instrument.type;
+            
             doc.notifier.changed();
             this._didSomething();
         }

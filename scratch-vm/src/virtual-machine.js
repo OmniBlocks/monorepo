@@ -5,6 +5,7 @@ if (typeof TextEncoder === 'undefined') {
     _TextEncoder = TextEncoder;
 }
 const EventEmitter = require('events');
+
 const JSZip = require('@turbowarp/jszip');
 const ExtensionStorage = require('./util/deprecated-extension-storage.js');
 const Buffer = require('buffer').Buffer;

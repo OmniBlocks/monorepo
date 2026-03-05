@@ -1773,6 +1773,16 @@ class Runtime extends EventEmitter {
         // check if this is not one of those cases. E.g. an inline image on a block.
         if (argTypeInfo.fieldType === 'field_image') {
             argJSON = this._constructInlineImageJson(argInfo);
+        } else if (argTypeInfo.fieldType === 'field_customInput') {
+            // Custom input fields (e.g. the Ace code editor) are inline fields on the block,
+            // not connectable input slots. Pass through the id and default value so that
+            // scratch-blocks can hand them off to the registered FieldCustom handler.
+            argJSON = {
+                type: 'field_customInput',
+                name: placeholder,
+                id: argInfo.id,
+                value: argInfo.defaultValue
+            };
         } else {
             // Construct input value
 
@@ -1818,6 +1828,10 @@ class Runtime extends EventEmitter {
             // TODO: Allow fillIn to work with non-shadow.
             if (argInfo.fillIn || argInfo.fillInGlobal/* && argInfo.fillInShadow*/) {
                 shadowType = argInfo.fillInGlobal || `${context.categoryInfo.id}_${argInfo.fillIn}`;
+                // The fill-in block has its own fields; clear fieldName to avoid generating
+                // a <field> referencing a field name that may not exist in the fill-in block
+                // (e.g. trying to set field "TEXT" inside an SPjavascriptV2_codeInput shadow).
+                fieldName = null;
             }/* else if (argInfo.fillIn) {
                 blockType = `${context.categoryInfo.id}_${argInfo.fillIn}`;
             }*/

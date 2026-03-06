@@ -134,6 +134,7 @@ let allowedGeolocation = false;
 const SECURITY_MANAGER_METHODS = [
     'getSandboxMode',
     'canLoadExtensionFromProject',
+    'canUnsandbox',
     'canFetch',
     'canOpenWindow',
     'canRedirect',
@@ -280,6 +281,17 @@ class TWSecurityManagerComponent extends React.Component {
         return showModal(SecurityModals.LoadExtension, {
             url,
             unsandboxed: false
+        });
+    }
+
+    /**
+     * @param {string} extensionName The extension's display name
+     * @returns {Promise<boolean>} True if the extension can run without sandbox
+     */
+    async canUnsandbox (extensionName) {
+        const {showModal} = await this.acquireModalLock();
+        return showModal(SecurityModals.Unsandbox, {
+            extensionName
         });
     }
 

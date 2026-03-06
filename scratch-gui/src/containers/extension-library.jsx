@@ -8,7 +8,10 @@ import log from '../lib/log';
 import extensionLibraryContent, {
     galleryError,
     galleryLoading,
-    galleryMore
+    galleryMore,
+    galleryLoadingOB,
+    galleryMoreOB,
+    galleryErrorOB
 } from '../lib/libraries/extensions/index.jsx';
 import extensionTags from '../lib/libraries/tw-extension-tags';
 
@@ -39,9 +42,57 @@ const translateGalleryItem = (extension, locale) => ({
     description: extension.descriptionTranslations[locale] || extension.description
 });
 
-let cachedGallery = null;
+// Timeout constant for gallery loading
+const GALLERY_TIMEOUT_MS = 750;
 
-const fetchLibrary = async () => {
+// Common gallery fetcher function to reduce code duplication
+let cachedGalleryTW = null;
+let cachedGalleryOB = null;
+
+const fetchLibraryTW = async () => {
+    const res = await fetch('https://extensions.turbowarp.org/generated-metadata/extensions-v0.json');
+    if (!res.ok) {
+        throw new Error(`HTTP status ${res.status}`);
+    }
+    const data = await res.json();
+    return data.extensions.map(extension => ({
+        name: extension.name,
+        nameTranslations: extension.nameTranslations || {},
+        description: extension.description,
+        descriptionTranslations: extension.descriptionTranslations || {},
+        extensionId: extension.id,
+        extensionURL: `https://extensions.turbowarp.org/${extension.slug}.js`,
+        iconURL: `https://extensions.turbowarp.org/${extension.image || 'images/unknown.svg'}`,
+        tags: ['tw'],
+        credits: [
+            ...(extension.original || []),
+            ...(extension.by || [])
+        ].map(credit => {
+            if (credit.link) {
+                return (
+                    <a
+                        href={credit.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        key={credit.name}
+                    >
+                        {credit.name}
+                    </a>
+                );
+            }
+            return credit.name;
+        }),
+        docsURI: extension.docs ? `https://extensions.turbowarp.org/${extension.slug}` : null,
+        samples: extension.samples ? extension.samples.map(sample => ({
+            href: `${process.env.ROOT}editor?project_url=https://extensions.turbowarp.org/samples/${encodeURIComponent(sample)}.sb3`,
+            text: sample
+        })) : null,
+        incompatibleWithScratch: !extension.scratchCompatible,
+        featured: true
+    }));
+};
+
+const fetchLibraryOB = async () => {
     const res = await fetch('https://omniblocks.github.io/extensions/generated-metadata/extensions-v0.json');
     if (!res.ok) {
         throw new Error(`HTTP status ${res.status}`);
@@ -55,7 +106,7 @@ const fetchLibrary = async () => {
         extensionId: extension.id,
         extensionURL: `https://omniblocks.github.io/extensions/${extension.slug}.js`,
         iconURL: `https://omniblocks.github.io/extensions/${extension.image || 'images/unknown.svg'}`,
-        tags: ['tw'],
+        tags: ['ob'],
         credits: [
             ...(extension.original || []),
             ...(extension.by || [])
@@ -84,6 +135,30 @@ const fetchLibrary = async () => {
     }));
 };
 
+// Helper function to handle gallery loading with timeout
+const loadGalleryWithTimeout = (fetchFunction, timeoutCallback, successCallback, errorCallback) => {
+    let timeoutFired = false;
+    const timeout = setTimeout(() => {
+        timeoutFired = true;
+        timeoutCallback();
+    }, GALLERY_TIMEOUT_MS);
+
+    fetchFunction()
+        .then(gallery => {
+            if (!timeoutFired) {
+                successCallback(gallery);
+            }
+            clearTimeout(timeout);
+        })
+        .catch(error => {
+            if (!timeoutFired) {
+                log.error(error);
+                errorCallback(error);
+            }
+            clearTimeout(timeout);
+        });
+};
+
 class ExtensionLibrary extends React.PureComponent {
     constructor (props) {
         super(props);
@@ -91,34 +166,39 @@ class ExtensionLibrary extends React.PureComponent {
             'handleItemSelect'
         ]);
         this.state = {
-            gallery: cachedGallery,
-            galleryError: null,
-            galleryTimedOut: false
+            galleryTW: cachedGalleryTW,
+            galleryOB: cachedGalleryOB,
+            galleryTWError: null,
+            galleryOBError: null,
+            galleryTWTimedOut: false,
+            galleryOBTimedOut: false
         };
     }
     componentDidMount () {
-        if (!this.state.gallery) {
-            const timeout = setTimeout(() => {
-                this.setState({
-                    galleryTimedOut: true
-                });
-            }, 750);
+        // Fetch TurboWarp gallery if not cached
+        if (!this.state.galleryTW) {
+            loadGalleryWithTimeout(
+                fetchLibraryTW,
+                () => this.setState({galleryTWTimedOut: true}),
+                gallery => {
+                    cachedGalleryTW = gallery;
+                    this.setState({galleryTW: gallery});
+                },
+                error => this.setState({galleryTWError: error})
+            );
+        }
 
-            fetchLibrary()
-                .then(gallery => {
-                    cachedGallery = gallery;
-                    this.setState({
-                        gallery
-                    });
-                    clearTimeout(timeout);
-                })
-                .catch(error => {
-                    log.error(error);
-                    this.setState({
-                        galleryError: error
-                    });
-                    clearTimeout(timeout);
-                });
+        // Fetch OmniBlocks gallery if not cached
+        if (!this.state.galleryOB) {
+            loadGalleryWithTimeout(
+                fetchLibraryOB,
+                () => this.setState({galleryOBTimedOut: true}),
+                gallery => {
+                    cachedGalleryOB = gallery;
+                    this.setState({galleryOB: gallery});
+                },
+                error => this.setState({galleryOBError: error})
+            );
         }
     }
     handleItemSelect (item) {
@@ -157,23 +237,40 @@ class ExtensionLibrary extends React.PureComponent {
         }
     }
     render () {
-        let library = null;
-        if (this.state.gallery || this.state.galleryError || this.state.galleryTimedOut) {
-            library = extensionLibraryContent.map(toLibraryItem);
-            library.push('---');
-            if (this.state.gallery) {
-                library.push(toLibraryItem(galleryMore));
-                const locale = this.props.intl.locale;
-                library.push(
-                    ...this.state.gallery
-                        .map(i => translateGalleryItem(i, locale))
-                        .map(toLibraryItem)
-                );
-            } else if (this.state.galleryError) {
-                library.push(toLibraryItem(galleryError));
-            } else {
-                library.push(toLibraryItem(galleryLoading));
-            }
+        const library = extensionLibraryContent.map(toLibraryItem);
+        library.push('---');
+        
+        const locale = this.props.intl.locale;
+        
+        // Add TurboWarp gallery items
+        if (this.state.galleryTW) {
+            library.push(toLibraryItem(galleryMore));
+            library.push(
+                ...this.state.galleryTW
+                    .map(i => translateGalleryItem(i, locale))
+                    .map(toLibraryItem)
+            );
+        } else if (this.state.galleryTWError) {
+            library.push(toLibraryItem(galleryError));
+        } else if (this.state.galleryTWTimedOut) {
+            library.push(toLibraryItem(galleryLoading));
+        }
+        
+        // Add separator between galleries
+        library.push('---');
+        
+        // Add OmniBlocks gallery items
+        if (this.state.galleryOB) {
+            library.push(toLibraryItem(galleryMoreOB));
+            library.push(
+                ...this.state.galleryOB
+                    .map(i => translateGalleryItem(i, locale))
+                    .map(toLibraryItem)
+            );
+        } else if (this.state.galleryOBError) {
+            library.push(toLibraryItem(galleryErrorOB));
+        } else if (this.state.galleryOBTimedOut) {
+            library.push(toLibraryItem(galleryLoadingOB));
         }
 
         return (

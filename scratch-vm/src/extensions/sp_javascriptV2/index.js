@@ -4,120 +4,242 @@ const ArgumentType = require("../../extension-support/argument-type");
 const SandboxRunner = require("../../util/sandboxed-javascript-runner");
 const Cast = require("../../util/cast");
 
+/** GUI */
 let isScratchBlocksReady = typeof ScratchBlocks === "object";
-const codeEditorHandlers = new Map();
 
-// Sentinel value to trigger default code initialization for custom code editor fields
-const CODE_EDITOR_INIT_SENTINEL = "needsInit-1@#4%^7*(0";
+let updateEditorSchema = (globalFuncs) => { /* Overridden in 'initBlockTools' */ };
 
-// we cant have nice things
-const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-async function runCode(x) {
-  return await Object.getPrototypeOf(async function() {}).constructor(x)();
-}
+const SECRET_BLOCK_KEY = "needsInit-1@#4%^7*(0";
 
 function initBlockTools() {
-  window.addEventListener("message", (e) => {
-    if (e.data?.type === "code-change") {
-      const handler = codeEditorHandlers.get(e.data.id);
-      if (handler) handler(e.data.value);
+  // import the 'ace' code editor
+  const ACE_URL = "https://cdn.jsdelivr.net/npm/ace-builds@1.32.3/src-min-noconflict/";
+  const ACE_PACKAGES = [
+    "ace.js", "ext-language_tools.js",
+    "mode-javascript.js", "theme-monokai.js"
+  ];
+
+  let loadedPackages = 0;
+  const importAcePackages = () => {
+    for (const packageName of ACE_PACKAGES) {
+      const script = document.createElement("script");
+      script.src = ACE_URL + packageName;
+      script.async = false;
+      script.onload = () => loadedPackages++;
+      document.body.appendChild(script);
     }
-  });
+  };
+  importAcePackages();
 
+  const waitForAce = async function() {
+    return new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (loadedPackages === ACE_PACKAGES.length) {
+          clearInterval(checkInterval);
+          resolve(true);
+        }
+      }, 100);
+    });
+  }
+
+  // update the ace editor autocomplete with various custom items
+  let aceCompleteSchema = [];
+  updateEditorSchema = (globalFuncs) => {
+    aceCompleteSchema = [
+      "data", // variable used when passing an array into a js data input
+    ];
+
+    // add global functions into autocomplete
+    if (globalFuncs && globalFuncs.size > 0) {
+      const iterator = globalFuncs.keys();
+      let iteratorValue = iterator.next();
+      while (!iteratorValue.done) {
+        aceCompleteSchema.push(iteratorValue.value);
+        iteratorValue = iterator.next();
+      }
+    }
+  };
+
+  /*
+    Import autocompletion in our editors as well as add our
+    own custom completor to the editor so the user can directly
+    access Scratch internals such as the vm, blockly, and more.
+  */
+  let langToolsNeedsInit = true;
+  const importAceAutoComplete = () => {
+    // ace is fully loaded by the time this runs
+    if (langToolsNeedsInit) {
+      langToolsNeedsInit = false;
+      const langTools = ace.require("ace/ext/language_tools");
+
+      // custom autocomplete
+      const ScratchContextCompleter = {
+        getCompletions: function(editor, session, pos, prefix, callback) {
+          const line = session.getLine(pos.row).slice(0, pos.column - prefix.length);
+          const matches = line.match(/([a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*)\.$/);
+          const chain = matches ? matches[1].split(".") : [];
+
+          let current = window;
+          for (const segment of chain) {
+            if (current && current[segment]) current = current[segment];
+            else {
+              current = null;
+              break;
+            }
+          }
+
+          let list = [];
+          if (current && chain.length) {
+            list = [
+              ...Object.getOwnPropertyNames(current),
+              ...Object.getOwnPropertyNames(current.constructor.prototype)
+            ];
+          } else {
+            list.push(...aceCompleteSchema);
+            list.push("vm");
+            if (typeof Scratch === "object") list.push("Scratch");
+            if (typeof Blockly === "object") list.push("Blockly");
+            if (typeof ScratchBlocks === "object") list.push("ScratchBlocks");
+          }
+
+          callback(null, list.map(word => ({
+            caption: word,
+            value: word,
+            meta: chain.length ? "child of " + chain[chain.length - 1] : "root",
+            score: 1000
+          })));
+        }
+      };
+
+      ScratchContextCompleter.triggerCharacters = ["."];
+      langTools.addCompleter(ScratchContextCompleter);
+    }
+  };
+
+  // since our code inputs are shadows, we cant hardcode the value from
+  // the parent block use this to initialize a default value when unset.
+  const getDefaultValue = (field, parent) => {
+    const currentValue = field.getValue();
+    if (currentValue === SECRET_BLOCK_KEY) {
+      const outerType = parent.type;
+      const opcode = (outerType ?? "").split("_")[1];
+      switch (opcode) {
+        case "jsCommandBinded": return `alert(FOO);`;
+        case "jsReporterBinded": return `return STRING + Math.random()`;
+        case "jsBooleanBinded": return `return Math.random() > THRESHOLD`;
+        case "defineGlobalFunc": return `(param1) => {\nreturn btoa(param1);\n}`;
+        default: return `console.log("Hello!")`;
+      }
+    }
+
+    return currentValue;
+  };
+
+  // element reused by the custom input api
   const recyclableDiv = document.createElement("div");
-  recyclableDiv.setAttribute("style", `display: flex; justify-content: center; padding-top: 10px; width: 250px; height: 200px;`);
+  recyclableDiv.setAttribute("style", `display: flex; justify-content: center; padding-top: 10px; width: 250px; height: 100px;`);
 
-  const fakeDiv = document.createElement("div");
-  fakeDiv.setAttribute("style", "background: #272822; border-radius: 10px; border: none; width: 100%; height: calc(100% - 20px);");
-  recyclableDiv.appendChild(fakeDiv);
+  const unloadedEditor = document.createElement("div");
+  unloadedEditor.setAttribute("style", "background: #272822; border-radius: 10px; border: none; width: 100%; height: calc(100% - 20px);");
+  recyclableDiv.appendChild(unloadedEditor);
 
+  const resizeHandleCSS = "position: absolute; right: 5px; bottom: 15px; width: 12px; height: 12px; background: #ffffff40; cursor: se-resize; border-radius: 0px 0 50px 0; z-index: 999;";
+
+  // register our code input
   ScratchBlocks.FieldCustom.registerInput(
     "SPjavascriptV2-codeEditor",
     recyclableDiv,
-    (field) => {
+    async (field) => {
       /* on init */
       const inputObject = field.inputSource;
       const input = inputObject.firstChild;
       const srcBlock = field.sourceBlock_;
+      if (!srcBlock) return;
+
       const parent = srcBlock.parentBlock_;
-      const dragCheck = parent.isInFlyout || srcBlock.svgGroup_.classList.contains("blocklyDragging") ? "none" : "all";
+      const isDraggable = parent.isInFlyout || srcBlock.svgGroup_.classList.contains("blocklyDragging");
+      const editorId = "editor-" + srcBlock.id;
 
-      inputObject.setAttribute("pointer-events", "none");
-      input.style.height = "210px";
-      const iframe = document.createElement("iframe");
-      iframe.setAttribute("style", `pointer-events: ${dragCheck}; background: #272822; border-radius: 10px; border: none; ${isSafari ? "" : "width: 100%;"} height: calc(100% - 20px);`);
-      iframe.setAttribute("sandbox", "allow-scripts");
+      input.style.height = "110px";
+      input.firstChild.id = editorId;
 
-      const html = `
-<!DOCTYPE html>
-<html><head>
-  <style>html, body, #editor {background: #272822; margin: 0; padding: 0; height: 100%; width: 100%;}</style>
-</head>
-<body>
-  <div id="editor"></div>
-  <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.3/src-min-noconflict/ace.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.3/src-min-noconflict/mode-javascript.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.3/src-min-noconflict/theme-monokai.js"></script>
-  <script>
-    window.addEventListener("message", function(e) {
-      const editor = ace.edit("editor");
+      await waitForAce();
+
+      // initialize the ace editor
+      importAceAutoComplete();
+
+      const editor = ace.edit(editorId);
       editor.setOptions({
-        fontSize: "15px", showPrintMargin: false,
-        highlightActiveLine: true, useWorker: false
+        fontSize: "15px",
+        showPrintMargin: false,
+        highlightActiveLine: true,
+        useWorker: false,
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true
       });
 
       editor.session.setMode("ace/mode/javascript");
       editor.setTheme("ace/theme/monokai");
-      editor.setValue(e.data.value);
-      editor.session.on("change", () => parent.postMessage({
-        type: "code-change", id: "${srcBlock.id}", value: editor.getValue()
-      }, "*"));
-    }, { once: true });
-  </script>
-</body>
-</html>`;
-      iframe.src = URL.createObjectURL(new Blob([html], { type: "text/html" }));
-      input.replaceChild(iframe, input.firstChild);
-      iframe.onload = () => {
-        let value = field.getValue();
-        if (value === CODE_EDITOR_INIT_SENTINEL) {
-          const outerType = srcBlock.parentBlock_.type;
-          if (outerType.endsWith("jsCommandBinded")) value = `alert(FOO);`;
-          else if (outerType.endsWith("jsReporterBinded")) value = `return STRING + Math.random()`;
-          else if (outerType.endsWith("jsBooleanBinded")) value = `return Math.random() > THRESHOLD`;
-          else if (outerType.endsWith("defineGlobalFunc")) value = `(param1) => {\nreturn btoa(param1);\n}`;
-          field.setValue(value);
-        }
+      editor.setOption("hasCssTransforms", true);
+      editor.session.on("change", () => field.setValue(editor.getValue()));
 
-        iframe.contentWindow.postMessage({ value }, "*");
+      const defaultValue = getDefaultValue(field, parent);
+
+      field.setValue(defaultValue);
+      editor.setValue(defaultValue);
+      editor.clearSelection();
+
+      // blockly will prevent us from focusing on our textarea
+      // so we need to override it via outside events
+      const unfocusListener = (e) => {
+        if (String(e.toElement?.className).includes("ace")) return;
+
+        editor.blur();
+        ScratchBlocks.mainWorkspace.allowDragging = true;
+        parent.setMovable(true);
+
+        input.removeEventListener("mouseleave", unfocusListener);
       };
 
-      // listen for code updates
-      codeEditorHandlers.set(srcBlock.id, (value) => field.setValue(value));
+      ScratchBlocks.bindEventWithChecks_(input, "mousedown", field, (e) => {
+        e.stopPropagation();
+        ScratchBlocks.mainWorkspace.allowDragging = false;
+        parent.setMovable(false);
+        editor.focus();
 
+        input.addEventListener("mouseleave", unfocusListener);
+      });
+
+      // allow resizing the editor
       const resizeHandle = document.createElement("div");
-      resizeHandle.setAttribute("style", `pointer-events: ${dragCheck}; position: absolute; right: 5px; bottom: 15px; width: 12px; height: 12px; background: #ffffff40; cursor: se-resize; border-radius: 0px 0 50px 0;`);
+      resizeHandle.setAttribute("style", resizeHandleCSS + `pointer-events: ${isDraggable ? "none" : "all"}`);
       input.appendChild(resizeHandle);
 
       let isResizing = false;
       let startX, startY, startW, startH;
       resizeHandle.addEventListener("mousedown", (e) => {
         if (parent.isInFlyout) return;
+
         e.preventDefault();
+        editor.blur();
+        ScratchBlocks.mainWorkspace.allowDragging = false;
+        parent.setMovable(false);
+        input.removeEventListener("mouseleave", unfocusListener);
+
         isResizing = true;
         startX = e.clientX;
         startY = e.clientY;
         startW = input.offsetWidth;
         startH = input.offsetHeight;
-        ScratchBlocks.mainWorkspace.allowDragging = false;
-        parent.setMovable(false);
 
         function onMouseMove(ev) {
           if (!isResizing) return;
-          iframe.style.pointerEvents = "none";
+
           const newW = Math.max(150, startW + (ev.clientX - startX));
           const newH = Math.max(100, startH + (ev.clientY - startY));
+
+          input.style.pointerEvents = "none";
           input.style.width = `${newW}px`;
           input.style.height = `${newH}px`;
           resizeHandle.style.left = `${newW - 20}px`;
@@ -126,6 +248,7 @@ function initBlockTools() {
           inputObject.setAttribute("height", newH);
           field.size_.width = newW;
           field.size_.height = newH - 10;
+
           if (srcBlock?.render) srcBlock.render();
         }
 
@@ -141,16 +264,16 @@ function initBlockTools() {
         document.addEventListener("mouseup", onMouseUp);
       });
 
-      // monkey patch this function since MutationObservers will lag
+      // monkey patch this function since using MutationObservers will cause lag
       // this patch allows dragging blocks to not act weird with mouse touching
       const ogSetAtt = parent.svgGroup_.setAttribute;
       parent.svgGroup_.setAttribute = (...args) => {
         if (args[0] === "class") {
           if (parent.isInFlyout || args[1].includes("blocklyDragging")) {
-            iframe.style.pointerEvents = "none";
+            input.style.pointerEvents = "none";
             resizeHandle.style.pointerEvents = "none";
           } else {
-            iframe.style.pointerEvents = "all";
+            input.style.pointerEvents = "all";
             resizeHandle.style.pointerEvents = "all";
           }
         }
@@ -161,20 +284,26 @@ function initBlockTools() {
     () => { /* no work needs to be done here */ }
   );
 }
-if (isScratchBlocksReady) initBlockTools();
+if (isScratchBlocksReady) {
+  initBlockTools();
+  updateEditorSchema();
+}
 
 class SPjavascriptV2 {
   constructor(runtime) {
     this.runtime = runtime;
+    this.isInSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     this.isEditorUnsandboxed = false;
 
+    this.runtime.vm.on("EXTENSION_ADDED", () => updateEditorSchema(this.globalFuncs));
     this.runtime.vm.on("workspaceUpdate", () => {
-      codeEditorHandlers.clear();
       if (!isScratchBlocksReady) {
         isScratchBlocksReady = typeof ScratchBlocks === "object";
         if (isScratchBlocksReady) initBlockTools();
       }
     });
+
+    this.ASYNC_FUNC_PROTO = Object.getPrototypeOf(async function() {});
 
     this.globalFuncs = new Map();
   }
@@ -198,9 +327,8 @@ class SPjavascriptV2 {
           hideFromPalette: true,
           arguments: {
             CODE: {
-              type: ArgumentType.CUSTOM,
-              id: "SPjavascriptV2-codeEditor",
-              defaultValue: CODE_EDITOR_INIT_SENTINEL
+              type: ArgumentType.CUSTOM, id: "SPjavascriptV2-codeEditor",
+              defaultValue: SECRET_BLOCK_KEY
             }
           },
         },
@@ -222,12 +350,12 @@ class SPjavascriptV2 {
             DATA: { type: ArgumentType.STRING }
           },
         },
-        /* shown if ScratchBlocks is not availiable */
+        /* shown if ScratchBlocks is not available */
         {
           opcode: "jsCommand",
           text: "run [CODE]",
           blockType: BlockType.COMMAND,
-          hideFromPalette: isScratchBlocksReady && !isSafari,
+          hideFromPalette: isScratchBlocksReady && !this.isInSafari,
           arguments: {
             CODE: { type: ArgumentType.STRING, defaultValue: `alert("Hello!")` }
           }
@@ -238,7 +366,7 @@ class SPjavascriptV2 {
           blockType: BlockType.REPORTER,
           disableMonitor: true,
           allowDropAnywhere: true,
-          hideFromPalette: isScratchBlocksReady && !isSafari,
+          hideFromPalette: isScratchBlocksReady && !this.isInSafari,
           arguments: {
             CODE: {
               type: ArgumentType.STRING,
@@ -251,7 +379,7 @@ class SPjavascriptV2 {
           text: "run [CODE]",
           blockType: BlockType.BOOLEAN,
           disableMonitor: true,
-          hideFromPalette: isScratchBlocksReady && !isSafari,
+          hideFromPalette: isScratchBlocksReady && !this.isInSafari,
           arguments: {
             CODE: {
               type: ArgumentType.STRING,
@@ -259,18 +387,14 @@ class SPjavascriptV2 {
             }
           }
         },
-        /* shown if ScratchBlocks is availiable */
+        /* shown if ScratchBlocks is available */
         {
           opcode: "jsCommandBinded",
           text: "run [CODE] with data [ARGS]",
           blockType: BlockType.COMMAND,
-          hideFromPalette: isSafari || !isScratchBlocksReady,
+          hideFromPalette: this.isInSafari || !isScratchBlocksReady,
           arguments: {
-            CODE: { 
-              type: ArgumentType.CUSTOM,
-              id: "SPjavascriptV2-codeEditor",
-              defaultValue: CODE_EDITOR_INIT_SENTINEL
-            },
+            CODE: { fillIn: "codeInput" },
             ARGS: {
               type: ArgumentType.STRING,
               defaultValue: `{ "FOO": "bar" }`,
@@ -284,13 +408,9 @@ class SPjavascriptV2 {
           blockType: BlockType.REPORTER,
           disableMonitor: true,
           allowDropAnywhere: true,
-          hideFromPalette: isSafari || !isScratchBlocksReady,
+          hideFromPalette: this.isInSafari || !isScratchBlocksReady,
           arguments: {
-            CODE: { 
-              type: ArgumentType.CUSTOM,
-              id: "SPjavascriptV2-codeEditor",
-              defaultValue: CODE_EDITOR_INIT_SENTINEL
-            },
+            CODE: { fillIn: "codeInput" },
             ARGS: {
               type: ArgumentType.STRING,
               defaultValue: `{ "STRING": "output: " }`,
@@ -303,13 +423,9 @@ class SPjavascriptV2 {
           text: "run [CODE] with data [ARGS]",
           blockType: BlockType.BOOLEAN,
           disableMonitor: true,
-          hideFromPalette: isSafari || !isScratchBlocksReady,
+          hideFromPalette: this.isInSafari || !isScratchBlocksReady,
           arguments: {
-            CODE: { 
-              type: ArgumentType.CUSTOM,
-              id: "SPjavascriptV2-codeEditor",
-              defaultValue: CODE_EDITOR_INIT_SENTINEL
-            },
+            CODE: { fillIn: "codeInput" },
             ARGS: {
               type: ArgumentType.STRING,
               defaultValue: `{ "THRESHOLD": 0.5 }`,
@@ -322,15 +438,12 @@ class SPjavascriptV2 {
           opcode: "defineGlobalFunc",
           text: "create global function named [NAME] with code [CODE]",
           blockType: BlockType.COMMAND,
-          hideFromPalette: (isSafari || !isScratchBlocksReady) && !this.isEditorUnsandboxed,
+          hideFromPalette: (this.isInSafari || !isScratchBlocksReady) && !this.isEditorUnsandboxed,
           arguments: {
             NAME: {
               type: ArgumentType.STRING, defaultValue: "myFunction"
             },
-            CODE: { 
-              type: ArgumentType.STRING,
-              fillIn: "codeInput"
-            }
+            CODE: { fillIn: "codeInput" }
           }
         },
         {
@@ -340,10 +453,7 @@ class SPjavascriptV2 {
           hideFromPalette: true,
           arguments: {
             NAME: { type: ArgumentType.STRING },
-            CODE: { 
-              type: ArgumentType.STRING,
-              fillIn: "argumentReport"
-            }
+            CODE: { fillIn: "argumentReport" }
           }
         },
         {
@@ -402,22 +512,33 @@ class SPjavascriptV2 {
     ].join("\n"));
   }
 
-  parseArguments(argJSON) {
+  _parseArguments(arg) {
+    if (!arg) return [];
+
     try {
-      if (argJSON.constructor?.name === "Object") return argJSON;
-      else {
-        // this is a PM custom return api value
-        argJSON = argJSON.toString();
-        if (typeof argJSON === "object" && !Array.isArray(argJSON)) return argJSON;
-        else return JSON.parse(argJSON);
+      if (typeof arg === "object") {
+        const argType = arg.constructor?.name;
+        if (argType === "Object" || argType === "Array") {
+          // raw JSON was sent, no parsing needed
+          return arg;
+        } else {
+          // PM custom return api was sent, try calling toJSON
+          if (typeof arg.toJSON === "function") {
+            return arg.toJSON();
+          }
+
+          arg = arg.toString();
+        }
       }
-    } catch(err) {
-      console.warn(`Failed to parse Javascript Data JSON: ${err}`);
-      return {};
+
+      const parsed = JSON.parse(arg);
+      return typeof parsed === "object" ? parsed : [];
+    } catch {
+      return [];
     }
   }
 
-  isLegalFuncName(name) {
+  _isLegalFuncName(name) {
     try {
       new Function(`function ${name}(){}`);
       return true;
@@ -426,13 +547,15 @@ class SPjavascriptV2 {
     }
   }
 
-  async runCode(code, binds) {
+  async _compileCode(code, codeArgs = []) {
     let binders = "";
 
     /* inject global functions */
     if (this.globalFuncs.size > 0) {
-      const funcs = this.globalFuncs.entries().toArray();
-      for (const [name, funcData] of funcs) {
+      const entries = this.globalFuncs.entries();
+      let iteratorValue = entries.next();
+      while (!iteratorValue.done) {
+        const [name, funcData] = iteratorValue.value;
         if (funcData.isBlockCode) {
           binders += `const ${name} = async function(...args) {\n`;
           if (funcData.id) {
@@ -456,75 +579,92 @@ class SPjavascriptV2 {
         } else {
           binders += `const ${name} = ${funcData.code}\n`;
         }
+
+        iteratorValue = entries.next();
       }
     }
 
-    /* inject arguments */
-    if (binds !== undefined) {
-      for (let [name, value] of Object.entries(binds)) {
-        // normalize values
-        switch (typeof value) {
-          case "string":
-            value = `"${value}"`;
-            break;
-          case "object":
-            value = JSON.stringify(value);
-            break;
-          default: break;
-        }
-        binders += `const ${name} = ${value};\n`;
-      }
+    /* generate arguments */
+    const isArgArray = Array.isArray(codeArgs);
+    const argEntries = Object.entries(codeArgs);
+
+    let argNames = [];
+    if (codeArgs !== undefined) {
+      if (isArgArray) argNames.push("...data");
+      else argNames.push(...argEntries.map((a) => a[0]));
     }
 
-    /* 'extensionRuntimeOptions.javascriptUnsandboxed' is used for packager */
-    if (this.isEditorUnsandboxed || this.runtime.extensionRuntimeOptions.javascriptUnsandboxed === true) {
+    const newFunc = this.ASYNC_FUNC_PROTO.constructor(...argNames, binders + code);
+
+    /* 'extensionRuntimeOptions.javascriptUnsandboxed' is used by packager */
+    if (
+      this.isEditorUnsandboxed ||
+      this.runtime.extensionRuntimeOptions.javascriptUnsandboxed === true
+    ) {
+      // unsandboxed code
       let result;
       try {
-        // eslint-disable-next-line no-eval
-        result = await runCode(binders + code);
+        if (isArgArray) {
+          // eslint-disable-next-line no-eval
+          result = await newFunc(...codeArgs);
+        } else {
+          // eslint-disable-next-line no-eval
+          result = await newFunc(...argEntries.map((a) => a[1]));
+        }
       } catch (err) {
         throw err;
       }
+
       return result;
-    }
-    // we are sandboxed
-    const codeRunner = `Object.getPrototypeOf(async function() {}).constructor(\`${(binders + code).replaceAll("`", "\\`")}\`)()`;
-    return new Promise((resolve) => {
-      SandboxRunner.execute(codeRunner).then(result => {
-        // result is { value: any, success: boolean }
-        // in PM, we always ignore errors
-        return resolve(result.value);
+    } else {
+      // sandboxed code
+      let caller = "(";
+      if (!isArgArray) codeArgs = argEntries.map((a) => a[1]);
+
+      // unfortunately, this wont work on custom return types...
+      // nothing we can do in this case
+      caller += codeArgs.map(a => JSON.stringify(a)).join(",");
+      caller += ")";
+
+      const newFuncString = "(" + newFunc.toString() + ")" + caller;
+      return new Promise((resolve) => {
+        SandboxRunner.execute(newFuncString).then(result => {
+          // result is { value: any, success: boolean }
+          // in PM, we always ignore errors
+          return resolve(result.value);
+        });
       });
-    });
+    }
   }
 
   // block funcs
   codeInput(args) {
-    return args.CODE || '';
+    return args.CODE;
   }
 
   async jsCommand(args) {
-    await this.runCode(Cast.toString(args.CODE));
+    await this._compileCode(Cast.toString(args.CODE));
   }
   async jsCommandBinded(args) {
-    await this.runCode(
+    await this._compileCode(
       Cast.toString(args.CODE),
-      this.parseArguments(args.ARGS)
+      this._parseArguments(args.ARGS)
     );
   }
 
   async jsReporter(args) {
-    return await this.runCode(Cast.toString(args.CODE));
+    return await this._compileCode(Cast.toString(args.CODE));
   }
   async jsReporterBinded(args) {
-    return await this.runCode(
+    return await this._compileCode(
       Cast.toString(args.CODE),
-      this.parseArguments(args.ARGS)
+      this._parseArguments(args.ARGS)
     );
   }
 
   async jsBoolean(args) {
-    const possiblePromise = await this.runCode(Cast.toString(args.CODE));
+    const possiblePromise = await this._compileCode(Cast.toString(args.CODE));
+
     /* force output a boolean */
     if (possiblePromise && typeof possiblePromise.then === "function") {
       return (async () => {
@@ -532,13 +672,15 @@ class SPjavascriptV2 {
         return Cast.toBoolean(value);
       })();
     }
+
     return Cast.toBoolean(possiblePromise);
   }
   async jsBooleanBinded(args) {
-    const possiblePromise = await this.runCode(
+    const possiblePromise = await this._compileCode(
       Cast.toString(args.CODE),
-      this.parseArguments(args.ARGS)
+      this._parseArguments(args.ARGS)
     );
+
     /* force output a boolean */
     if (possiblePromise && typeof possiblePromise.then === "function") {
       return (async () => {
@@ -546,17 +688,20 @@ class SPjavascriptV2 {
         return Cast.toBoolean(value);
       })();
     }
+
     return Cast.toBoolean(possiblePromise);
   }
 
   defineGlobalFunc(args) {
     const funcName = Cast.toString(args.NAME);
-    if (this.isLegalFuncName(funcName)) {
+    if (this._isLegalFuncName(funcName)) {
       const funcRegex = /^function\s*\([^)]*\)\s*\{[\s\S]*\}$/;
       const lambRegex = /^\([^)]*\)\s*=>\s*(\{[\s\S]*\}|[^{}][^\n]*)$/;
       const code = Cast.toString(args.CODE).trim();
       if (funcRegex.test(code) || lambRegex.test(code)) this.globalFuncs.set(funcName, { code, isBlockCode: false });
       else throw new Error("Global Code must be 'function' or 'lambda'!");
+
+      updateEditorSchema(this.globalFuncs);
     } else {
       throw new Error("Illegal Function Name!");
     }
@@ -564,9 +709,10 @@ class SPjavascriptV2 {
 
   defineScratchCode(args, util) {
     const funcName = Cast.toString(args.NAME);
-    if (this.isLegalFuncName(funcName)) {
+    if (this._isLegalFuncName(funcName)) {
       const branch = util.thread.blockContainer.getBranch(util.thread.peekStack(), 1);
       this.globalFuncs.set(funcName, { id: branch, origin: util.target.id, isBlockCode: true });
+      updateEditorSchema(this.globalFuncs);
     } else {
       throw new Error("Illegal Function Name!");
     }
@@ -578,6 +724,7 @@ class SPjavascriptV2 {
 
   deleteGlobalFunc(args) {
     this.globalFuncs.delete(Cast.toString(args.NAME));
+    updateEditorSchema(this.globalFuncs);
   }
 
   returnData(args, util) {
@@ -589,6 +736,16 @@ class SPjavascriptV2 {
       util.yield();
     } else if (!util.stackTimerFinished()) util.yield();
     util.thread.stopThisScript();
+  }
+
+  // save state to storage
+  serialize() {
+    return {
+      isUnsandboxed: this.isEditorUnsandboxed
+    };
+  }
+  deserialize(data) {
+    if (data.isUnsandboxed) this.toggleSandbox();
   }
 }
 

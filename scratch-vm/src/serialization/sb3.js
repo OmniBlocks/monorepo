@@ -481,38 +481,6 @@ const serializeSound = function (sound) {
     return obj;
 };
 
-// Using some bugs, it can be possible to get values like undefined, null, or complex objects into
-// variables or lists. This will cause make the project unusable after exporting without JSON editing
-// as it will fail validation in scratch-parser.
-// To avoid this, we'll convert those objects to strings before saving them.
-const isVariableValueSafeForJSON = value => (
-    typeof value === 'number' ||
-    typeof value === 'string' ||
-    typeof value === 'boolean'
-);
-const makeSafeForJSON = value => {
-    if (Array.isArray(value)) {
-        let copy = null;
-        for (let i = 0; i < value.length; i++) {
-            if (!isVariableValueSafeForJSON(value[i])) {
-                if (!copy) {
-                    // Only copy the list when needed
-                    copy = value.slice();
-                }
-                copy[i] = `${copy[i]}`;
-            }
-        }
-        if (copy) {
-            return copy;
-        }
-        return value;
-    }
-    if (isVariableValueSafeForJSON(value)) {
-        return value;
-    }
-    return `${value}`;
-};
-
 /**
  * Serialize the given variables object.
  * @param {object} variables The variables to be serialized.
@@ -534,12 +502,12 @@ const serializeVariables = function (variables) {
             continue;
         }
         if (v.type === Variable.LIST_TYPE) {
-            obj.lists[varId] = [v.name, makeSafeForJSON(v.value)];
+            obj.lists[varId] = [v.name, v.value];
             continue;
         }
 
         // otherwise should be a scalar type
-        obj.variables[varId] = [v.name, makeSafeForJSON(v.value)];
+        obj.variables[varId] = [v.name, v.value];
         // only scalar vars have the potential to be cloud vars
         if (v.isCloud) obj.variables[varId].push(true);
     }

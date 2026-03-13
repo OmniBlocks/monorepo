@@ -807,6 +807,7 @@ export class SongEditor {
             option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"),
             option({ value: "enableChannelMuting" }, "Enable Channel Muting"),
             option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"),
+            option({ value: "enableTagSearch" }, "Enable Tag Search"),
             option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"),
             option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"),
             option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
@@ -1174,6 +1175,8 @@ export class SongEditor {
 
     private readonly _songTitleInputBox: InputBox = new InputBox(input({ style: "font-weight:bold; border:none; width: 98%; background-color:${ColorConfig.editorBackground}; color:${ColorConfig.primaryText}; text-align:center", maxlength: "30", type: "text", value: EditorConfig.versionDisplayName }), this.doc, (oldValue: string, newValue: string) => new ChangeSongTitle(this.doc, oldValue, newValue));
 
+    private readonly _presetTagsInputBox: HTMLInputElement = input({ style: "width: 60%; height: 1.5em; font-size: 80%; margin-left: 0.0em; vertical-align: middle;", id: "unisonVoicesInputBox", type: "text", value: "" });
+    
 
     private readonly _feedbackAmplitudeSlider: Slider = new Slider(input({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Feedback Amplitude" }), this.doc, (oldValue: number, newValue: number) => new ChangeFeedbackAmplitude(this.doc, oldValue, newValue), false);
     private readonly _feedbackRow2: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackVolume") }, "Fdback Vol:"), this._feedbackAmplitudeSlider.container);
@@ -1279,6 +1282,13 @@ export class SongEditor {
     private readonly _instrumentSettingsTextRow: HTMLDivElement = div({ id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` },
         "Instrument Settings"
     );
+
+
+    private readonly _instrumentTagRow: HTMLDivElement = div({ class: "selectRow" }, 
+        span({ class: "tip", onclick: () => this._openPrompt("instrumentTags") }, "Tags:"), 
+        this._presetTagsInputBox
+    );
+    
     private readonly _instrumentTypeSelectRow: HTMLDivElement = div({ class: "selectRow", id: "typeSelectRow" },
         span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"),
         div( 
@@ -1288,6 +1298,7 @@ export class SongEditor {
     );
     private readonly _instrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls" },
         this._instrumentSettingsTextRow,
+        this._instrumentTagRow,
         this._instrumentsButtonRow,
         // these could've been put into _instrumentSettingsGroup as well but I decided not to
         // this._instrumentCopyGroup,
@@ -2383,6 +2394,7 @@ export class SongEditor {
         this.doc.synth.oscEnabled = this.doc.prefs.showOscilloscope;
         this._sampleLoadingStatusContainer.style.display = this.doc.prefs.showSampleLoadingStatus ? "" : "none";
         this._instrumentCopyGroup.style.display = this.doc.prefs.instrumentCopyPaste ? "" : "none";
+        this._instrumentTagRow.style.display = this.doc.prefs.enableTagSearch ? "" : "none";
         this._instrumentExportGroup.style.display = this.doc.prefs.instrumentImportExport ? "" : "none";
         this._instrumentSettingsArea.style.scrollbarWidth = this.doc.prefs.showInstrumentScrollbars ? "" : "none";
         if (document.getElementById('text-content'))
@@ -2446,6 +2458,7 @@ export class SongEditor {
             (prefs.alwaysFineNoteVol ? textOnIcon : textOffIcon) + "Always Fine Note Volume",
             (prefs.enableChannelMuting ? textOnIcon : textOffIcon) + "Enable Channel Muting",
             (prefs.instrumentCopyPaste ? textOnIcon : textOffIcon) + "Enable Copy/Paste Buttons",
+            (prefs.enableTagSearch ? textOnIcon : textOffIcon) + "Enable Tag Search",
             (prefs.instrumentImportExport ? textOnIcon : textOffIcon) + "Enable Import/Export Buttons",
             (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL",
             (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
@@ -2543,6 +2556,7 @@ export class SongEditor {
             this._panSliderRow.style.display = "";
             this._panDropdownGroup.style.display = (this._openPanDropdown ? "" : "none");
             this._detuneSliderRow.style.display = "";
+            if (prefs.enableTagSearch) { this._instrumentTagRow.style.display = ""; }
             this._instrumentVolumeSliderRow.style.display = "";
             this._instrumentTypeSelectRow.style.setProperty("display", "");
             if (prefs.instrumentButtonsAtTop) {
@@ -3814,6 +3828,7 @@ export class SongEditor {
             this._customInstrumentSettingsGroup.style.display = "none";
             this._panSliderRow.style.display = "none";
             this._panDropdownGroup.style.display = "none";
+            this._instrumentTagRow.style.display = "none";
             this._instrumentVolumeSliderRow.style.display = "none";
             this._instrumentTypeSelectRow.style.setProperty("display", "none");
 
@@ -4206,6 +4221,7 @@ export class SongEditor {
             || document.activeElement == this._pwmSliderInputBox
             || document.activeElement == this._detuneSliderInputBox
             || document.activeElement == this._instrumentVolumeSliderInputBox
+            || document.activeElement == this._presetTagsInputBox
             // advloop addition
             || document.activeElement == this._chipWaveLoopStartStepper
             || document.activeElement == this._chipWaveLoopEndStepper
@@ -4225,7 +4241,6 @@ export class SongEditor {
             || this.envelopeEditor.randomStepsBoxes.find((element) => element == document.activeElement)
             || this.envelopeEditor.randomStepsBoxes.find((element) => element == document.activeElement)
             || this.envelopeEditor.LFOStepsBoxes.find((element) => element == document.activeElement)
-
         ) {
             // Enter/esc returns focus to form
             if (event.keyCode == 13 || event.keyCode == 27) {
@@ -4586,6 +4601,7 @@ export class SongEditor {
                     this.doc.prefs.visibleOctaves = 5;
                     this.doc.prefs.colorTheme = "jummbox classic";
                     this.doc.prefs.rollNoveltyPresets = false;
+                    this.doc.prefs.enableTagSearch = false;
                     this.doc.prefs.save();
                     event.preventDefault();
                     location.reload();
@@ -4724,6 +4740,7 @@ export class SongEditor {
                     this.doc.prefs.notesFlashWhenPlayed = true;
                     this.doc.prefs.showOscilloscope = true;
                     this.doc.prefs.rollNoveltyPresets = false;
+                    this.doc.prefs.enableTagSearch = false;
                     this.doc.prefs.save();
                     event.preventDefault();
                     location.reload();
@@ -4833,6 +4850,7 @@ export class SongEditor {
                     this.doc.prefs.notesFlashWhenPlayed = true;
                     this.doc.prefs.showOscilloscope = true;
                     this.doc.prefs.rollNoveltyPresets = true;
+                    this.doc.prefs.enableTagSearch = true;
                     this.doc.prefs.save();
                     event.preventDefault();
                     location.reload();
@@ -5760,6 +5778,11 @@ export class SongEditor {
             case "rollNoveltyPresets":
                 this.doc.prefs.rollNoveltyPresets = !this.doc.prefs.rollNoveltyPresets;
                 break;
+            case "enableTagSearch":
+                this.doc.prefs.enableTagSearch = !this.doc.prefs.enableTagSearch;
+                this._presetTagsInputBox.value = "";
+                break;
+            
         }
         this._optionsMenu.selectedIndex = 0;
         this.doc.notifier.changed();

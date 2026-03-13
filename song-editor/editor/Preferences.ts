@@ -44,8 +44,9 @@ export class Preferences {
 	public showInstrumentScrollbars: boolean;
 	public closePromptByClickoff: boolean;
 	public frostedGlassBackground: boolean;
-
+	//jukebox
 	public rollNoveltyPresets: boolean;
+	public enableTagSearch: boolean;
 
 	constructor() {
 		this.reload();
@@ -88,9 +89,10 @@ export class Preferences {
 		this.customTheme = window.localStorage.getItem("customTheme");
         this.customTheme2 = window.localStorage.getItem("customTheme2");
 		this.visibleOctaves = ((<any>window.localStorage.getItem("visibleOctaves")) >>> 0) || Preferences.defaultVisibleOctaves;
-		
+		//jukebox
 		this.rollNoveltyPresets = window.localStorage.getItem("rollNoveltyPresets") == "true";
-
+		this.enableTagSearch = window.localStorage.getItem("enableTagSearch") != "false";
+		
 		const defaultScale: Scale | undefined = Config.scales.dictionary[window.localStorage.getItem("defaultScale")!];
 		this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
 		
@@ -144,7 +146,8 @@ export class Preferences {
 		window.localStorage.setItem("customTheme2", this.customTheme2!);
 		window.localStorage.setItem("volume", String(this.volume));
 		window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
-		
+		//jukebox
 		window.localStorage.setItem("rollNoveltyPresets", this.rollNoveltyPresets ? "true" : "false");
+		window.localStorage.setItem("enableTagSearch", this.enableTagSearch ? "true" : "false");
 	}
 }

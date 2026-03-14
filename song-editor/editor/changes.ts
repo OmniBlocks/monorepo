@@ -2,7 +2,7 @@
 
 import { Algorithm, Dictionary, FilterType, SustainType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion, LFOEnvelopeTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
 import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, Instrument, Channel, Song, Synth, clamp } from "../synth/synth";
-import { Preset, PresetCategory, EditorConfig } from "./EditorConfig";
+import { Preset, PresetCategory, EditorConfig, fullTagList } from "./EditorConfig";
 import { Change, ChangeGroup, ChangeSequence, UndoableChange } from "./Change";
 import { SongDocument } from "./SongDocument";
 import { ColorConfig } from "./ColorConfig";
@@ -4373,17 +4373,95 @@ export class ChangeDetectKey extends ChangeGroup {
 
 export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boolean): number {
     const eligiblePresetValues: number[] = [];
+    const _presetTagsInputBox = document.getElementById("presetTagsInputBox") as HTMLInputElement;
+    
+    let tagList: any = _presetTagsInputBox.value.toLowerCase().split(/\s+/);
+    console.log(tagList);
+
+    //checking for valid tags
+    if (!(tagList == "") && !(tagList.every((tag: any) => (fullTagList.includes(tag)) || (tag.startsWith("!") && fullTagList.includes(tag.slice(1)))))) {
+        console.log("invalid tag");
+        return -2;
+    }
+
     for (let categoryIndex: number = 0; categoryIndex < EditorConfig.presetCategories.length; categoryIndex++) {
         const category: PresetCategory = EditorConfig.presetCategories[categoryIndex];
         if ((category.name.includes("Novelty") && rollNoveltyPresets == false) || category.name == "Unmodified") continue;
         for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
             const preset: Preset = category.presets[presetIndex];
-            if (preset.settings != undefined && (preset.isNoise == true) == isNoise ) {
+            if ((preset.settings != undefined && (preset.isNoise == true) == isNoise) && ((tagList == "") || (
+                
+                tagList.every((tag: any) => 
+                (tag.startsWith("!") && !preset.tags.includes(tag.slice(1))) || 
+                (!tag.startsWith("!") && preset.tags.includes(tag))
+
+            )))) {    
                 eligiblePresetValues.push((categoryIndex << 12) + presetIndex);
             }
         }
     }
-    return eligiblePresetValues[(Math.random() * eligiblePresetValues.length) | 0];
+    if (eligiblePresetValues.length > 0) {
+        return eligiblePresetValues[(Math.random() * eligiblePresetValues.length) | 0];
+    } else {
+        return -1; //no results
+    }
+    
+}
+
+export function pickNextPresetValue(isNoise: boolean,rollNoveltyPresets: boolean): number {
+    const eligiblePresetValues: number[] = [];
+    const _presetTagsInputBox = document.getElementById("presetTagsInputBox") as HTMLInputElement;
+    const _pitchedPresetSelect = document.getElementById("pitchPresetSelect") as HTMLInputElement;
+    const _drumPresetSelect = document.getElementById("drumPresetSelect") as HTMLInputElement;
+    
+    let currentPresetValue: any = 0;
+    let nextPresetIndex: any = 0;
+
+    if (isNoise) {
+        currentPresetValue = _drumPresetSelect.value;
+    } else {
+        currentPresetValue = _pitchedPresetSelect.value;
+    }  
+    
+
+    console.log(currentPresetValue)
+
+    let tagList: any = _presetTagsInputBox.value.toLowerCase().split(/\s+/);
+
+    //checking for valid tags
+    if (!(tagList == "") && !(tagList.every((tag: any) => (fullTagList.includes(tag)) || (tag.startsWith("!") && fullTagList.includes(tag.slice(1)))))) {
+        console.log("invalid tag");
+        return -2;
+    }
+
+    for (let categoryIndex: number = 0; categoryIndex < EditorConfig.presetCategories.length; categoryIndex++) {
+        const category: PresetCategory = EditorConfig.presetCategories[categoryIndex];
+        if ((category.name.includes("Novelty") && rollNoveltyPresets == false) || category.name == "Unmodified") continue;
+        for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
+            const preset: Preset = category.presets[presetIndex];
+            
+            if ((preset.settings != undefined && (preset.isNoise == true) == isNoise) && ((tagList == "") || (
+                
+                tagList.every((tag: any) => 
+                (tag.startsWith("!") && !preset.tags.includes(tag.slice(1))) || 
+                (!tag.startsWith("!") && preset.tags.includes(tag))
+
+            )))) {    
+                eligiblePresetValues.push((categoryIndex << 12) + presetIndex);
+                if ((categoryIndex << 12) + presetIndex == currentPresetValue) {
+                    nextPresetIndex = eligiblePresetValues.length
+                }
+            }
+        }
+    }
+
+    if (eligiblePresetValues.length > 0) {
+        if (eligiblePresetValues[nextPresetIndex] == undefined) { nextPresetIndex = 0; } //wraparound behavior
+        return eligiblePresetValues[nextPresetIndex];
+    } else {
+        return -1; //no results
+    }
+    
 }
 
 export function setDefaultInstruments(song: Song): void {

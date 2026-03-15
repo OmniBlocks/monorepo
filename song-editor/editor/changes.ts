@@ -4376,11 +4376,9 @@ export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boole
     const _presetTagsInputBox = document.getElementById("presetTagsInputBox") as HTMLInputElement;
     
     let tagList: any = _presetTagsInputBox.value.toLowerCase().split(/\s+/);
-    console.log(tagList);
 
     //checking for valid tags
     if (!(tagList == "") && !(tagList.every((tag: any) => (fullTagList.includes(tag)) || (tag.startsWith("!") && fullTagList.includes(tag.slice(1)))))) {
-        console.log("invalid tag");
         return -2;
     }
 
@@ -4417,20 +4415,13 @@ export function pickNextPresetValue(isNoise: boolean,rollNoveltyPresets: boolean
     let currentPresetValue: any = 0;
     let nextPresetIndex: any = 0;
 
-    if (isNoise) {
-        currentPresetValue = _drumPresetSelect.value;
-    } else {
-        currentPresetValue = _pitchedPresetSelect.value;
-    }  
-    
-
-    console.log(currentPresetValue)
+    if (isNoise) { currentPresetValue = _drumPresetSelect.value; } 
+    else { currentPresetValue = _pitchedPresetSelect.value; }  
 
     let tagList: any = _presetTagsInputBox.value.toLowerCase().split(/\s+/);
 
     //checking for valid tags
     if (!(tagList == "") && !(tagList.every((tag: any) => (fullTagList.includes(tag)) || (tag.startsWith("!") && fullTagList.includes(tag.slice(1)))))) {
-        console.log("invalid tag");
         return -2;
     }
 

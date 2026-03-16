@@ -50,6 +50,7 @@
     "mediarecorder/format": "Formátum",
     "mediarecorder/converting": "Konvertálás...", 
     "mediarecorder/exporting": "Videó exportálása...",
+    "mediarecorder/starting-export": "Videó exportálásának indítása...",
     "mediarecorder/conversion-failed": "Nem sikerült a videót MP4 formátumba konvertálni",
     "debugger/block-breakpoint": "töréspont",
     "debugger/block-error": "hibajelentés %s-vel",

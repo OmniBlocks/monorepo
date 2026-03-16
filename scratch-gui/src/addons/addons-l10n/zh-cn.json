@@ -54,6 +54,7 @@
     "mediarecorder/format": "格式",
     "mediarecorder/converting": "正在转换...",
     "mediarecorder/exporting": "正在导出视频...",
+    "mediarecorder/starting-export": "开始导出视频...",
     "mediarecorder/conversion-failed": "无法将视频转换为MP4格式",
     "debugger/block-breakpoint": "断点",
     "debugger/block-error": "错误 %s",

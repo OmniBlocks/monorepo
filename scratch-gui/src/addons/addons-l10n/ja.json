@@ -54,6 +54,7 @@
     "mediarecorder/format": "フォーマット",
     "mediarecorder/converting": "変換中...",
     "mediarecorder/exporting": "ビデオをエクスポート中...",
+    "mediarecorder/starting-export": "動画のエクスポートを開始します...",
     "mediarecorder/conversion-failed": "動画をMP4形式に変換できませんでした",
     "debugger/block-breakpoint": "ブレークポイント",
     "debugger/block-error": "エラー%sを記録",

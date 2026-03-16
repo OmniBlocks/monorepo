@@ -327,27 +327,27 @@ const detectFrameRate = async (ffmpeg, inputName) => {
 };
 
 const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
+  const ffmpeg = await loadFFmpeg();
+  const inputName = `input.${inputExt}`;
+  const outputName = `output.${outputExt}`;
+
   try {
     console.log(`=== Starting conversion from ${inputExt} to ${outputExt} ===`);
     console.log('Input size:', inputBlob.size, 'bytes');
-    
-    const ffmpeg = await loadFFmpeg();
-    const inputName = `input.${inputExt}`;
-    const outputName = `output.${outputExt}`;
-    
+
     // Write input file using v0.12 API
     const arrayBuffer = await inputBlob.arrayBuffer();
     await ffmpeg.writeFile(inputName, new Uint8Array(arrayBuffer));
     console.log('Input file written');
-    
+
     // Determine FPS and duration if we have to re-encode
     let fps = 30;
     let duration = 0;
-    
+
     // Wire up a custom log interceptor to extract frame count on the fly
     let totalFramesKnown = false;
     let estimatedTotalFrames = 30 * 10; // Fallback: Assume ~10 second clip initially
-    
+
     const initialLogHandler = ({ message }) => {
       const durationMatch = message.match(/Duration:\s*(\d{2}):(\d{2}):(\d{2}\.\d{2})/);
       if (durationMatch) {
@@ -360,12 +360,12 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
       }
     };
     ffmpeg.on('log', initialLogHandler);
-    
+
     if (inputExt !== outputExt) {
       const detectedFps = await detectFrameRate(ffmpeg, inputName);
       fps = detectedFps || 30;
       console.log(`Using ${fps} fps`);
-      
+
       // Fast initial pass to count frames
       if (onProgress) onProgress(0.05); // Give short bump
       console.log('Counting total frames prior to encode...');
@@ -390,8 +390,8 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
         }
       } catch (countErr) {
          console.warn("Frame count pre-pass failed.", countErr);
-      }  
-    } else { 
+      }
+    } else {
       duration = 1;
     }
     console.log('Starting ffmpeg encoding...');
@@ -399,7 +399,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
       '-err_detect', 'ignore_err',
       '-i', inputName
     ];
-    
+
     if (inputExt === outputExt) {
       // Re-mux to fix duration metadata (vital for MediaRecorder output)
       args.push('-c', 'copy');
@@ -470,15 +470,11 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
       if (onProgress) onProgress(1.0); // Force 100% at end
     }
     console.log('Encoding complete');
-    
+
     // Read output using v0.12 API
     const data = await ffmpeg.readFile(outputName);
     console.log('Output size:', data.length, 'bytes');
-    
-    // Clean up
-    await ffmpeg.deleteFile(inputName);
-    await ffmpeg.deleteFile(outputName);
-    
+
     const outputMime = outputExt === 'mp4' ? 'video/mp4' : 'video/webm';
     const outputBlob = new Blob([data.buffer], { type: outputMime });
     console.log('=== Conversion successful ===');
@@ -487,6 +483,18 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
     console.error('=== Conversion FAILED ===');
     console.error(error);
     throw error;
+  } finally {
+    // Clean up MEMFS files regardless of success or failure
+    try {
+      await ffmpeg.deleteFile(inputName);
+    } catch (e) {
+      // Ignore cleanup errors
+    }
+    try {
+      await ffmpeg.deleteFile(outputName);
+    } catch (e) {
+      // Ignore cleanup errors
+    }
   }
 };
     const stopRecording = async (force) => {

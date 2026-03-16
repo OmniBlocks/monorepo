@@ -51,6 +51,7 @@
     "mediarecorder/stop": "Ustavi snemanje",
     "mediarecorder/format": "Format",
     "mediarecorder/converting": "Pretvarjanje...",
+    "mediarecorder/exporting": "Izvoz videa...",
     "mediarecorder/conversion-failed": "Pretvorba videa v MP4 format ni uspela",
     "debugger/block-error": "napaka %s",
     "debugger/block-log": "zapiši %s",

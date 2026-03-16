@@ -45,6 +45,7 @@
     "mediarecorder/stop": "Остановить запись",
     "mediarecorder/format": "Формат",
     "mediarecorder/converting": "Конвертация...",
+    "mediarecorder/exporting": "Экспорт видео...",
     "mediarecorder/conversion-failed": "Не удалось конвертировать видео в формат MP4",
     "debugger/block-breakpoint": "приостановить",
     "debugger/block-error": "ошибка %s",

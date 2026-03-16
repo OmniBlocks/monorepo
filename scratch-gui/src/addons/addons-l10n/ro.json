@@ -25,6 +25,7 @@
     "mediarecorder/stop": "Oprește Înregistrarea",
     "mediarecorder/format": "Format",
     "mediarecorder/converting": "Conversie...",
+    "mediarecorder/exporting": "Exportare video...",
     "mediarecorder/conversion-failed": "Conversia videoclipului în format MP4 a eșuat",
     "pause/pause": "Întrerupe",
     "clones/clones": "clone: {cloneCount}",

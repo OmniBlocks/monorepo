@@ -435,10 +435,14 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
       // If progress exists and is > 0, we can use that float easily
       let pOut = 0;
       if (totalFramesKnown) {
-         const currentSecs = time / 1000000;
-         const currentFrameNum = currentSecs * fps;
-         let calc = currentFrameNum / estimatedTotalFrames;
-         pOut = Math.min(0.99, Math.max(0, calc));
+        // Validate time is a finite number and estimatedTotalFrames > 0 to prevent NaN
+        if (typeof time === 'number' && isFinite(time) && estimatedTotalFrames > 0) {
+          const currentSecs = time / 1000000;
+          const currentFrameNum = currentSecs * fps;
+          let calc = currentFrameNum / estimatedTotalFrames;
+          pOut = Math.min(0.99, Math.max(0, calc));
+        }
+        // else: skip frame-based calc, pOut remains 0 as safe fallback
       } else {
         if (time && duration > 0) {
           // Use actual duration for accurate time-based progress

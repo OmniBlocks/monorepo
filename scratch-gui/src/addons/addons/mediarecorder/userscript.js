@@ -441,6 +441,8 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
           const currentFrameNum = currentSecs * fps;
           let calc = currentFrameNum / estimatedTotalFrames;
           pOut = Math.min(0.99, Math.max(0, calc));
+          } else if (typeof progress === "number" && progress >= 0 && progress <= 1) {
+          pOut = progress;
         }
         // else: skip frame-based calc, pOut remains 0 as safe fallback
       } else {

@@ -266,12 +266,16 @@ async function handleRequest (request) {
         // deployment will serve the old HTML that references stale content-hashed
         // JS filenames → those files 404 and the page hangs forever spinning.
         if (isHTMLPage(request)) {
-            return await networkFirst(request, DYNAMIC_CACHE);
+            return await networkFirst(request, DYNAMIC_CACHE, {
+                fallbackToCacheOnNonOK: true
+            });
         }
 
         // Strategy 2: Network-first for JS files to ensure updates are reflected immediately
         if (url.pathname.endsWith('.js')) {
-            return networkFirst(request, STATIC_CACHE);
+            return await networkFirst(request, STATIC_CACHE, {
+                fallbackToCacheOnNonOK: true
+            });
         }
 
         // Strategy 3: Cache-first for other static assets (images, CSS, fonts, …)
@@ -316,7 +320,11 @@ async function cacheFirst (request, cacheName) {
 }
 
 // Network-first strategy: Try network first, fallback to cache
-async function networkFirst (request, cacheName) {
+async function networkFirst (request, cacheName, options = {}) {
+    const {
+        fallbackToCacheOnNonOK = false
+    } = options;
+
     try {
         console.log('[SW] Trying network first:', request.url);
         const networkResponse = await fetch(request);
@@ -327,12 +335,15 @@ async function networkFirst (request, cacheName) {
             return networkResponse;
         }
 
-        // Network returned a non-ok status (e.g. 404).  Try the cache before
-        // surfacing the error response so the app can still work offline.
-        console.log('[SW] Network returned non-ok status, trying cache:', request.url, networkResponse.status);
-        const cachedResponse = await getCachedResponse(request);
-        if (cachedResponse) {
-            return cachedResponse;
+        if (fallbackToCacheOnNonOK) {
+            // Network returned a non-ok status (e.g. 404). For requests that are
+            // safe to serve stale (HTML/hashed static assets), try the cache
+            // before surfacing the error response.
+            console.log('[SW] Network returned non-ok status, trying cache:', request.url, networkResponse.status);
+            const cachedResponse = await getCachedResponse(request);
+            if (cachedResponse) {
+                return cachedResponse;
+            }
         }
 
         return networkResponse;

@@ -386,3 +386,7 @@ Update: As of 11/12/2025, there is even better integration with the music editor
 <details><summary>NASA Secret Information</summary>
 :egg:
 </details>
+
+### Legal
+
+Python is a registered trademark of the Python Software Foundation. Scratch is a registered trademark of the Scratch Foundation. TurboWarp is a community project and is not affiliated with the Scratch Foundation. OmniBlocks and the OmniBlocks team are not affiliated with the Python Software Foundation, the Scratch Foundation, or TurboWarp.

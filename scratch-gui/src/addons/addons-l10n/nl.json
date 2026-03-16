@@ -51,6 +51,7 @@
     "mediarecorder/format": "Formaat",
     "mediarecorder/converting": "Converteren...",
     "mediarecorder/exporting": "Video exporteren...",
+    "mediarecorder/starting-export": "Video-export starten...",
     "mediarecorder/conversion-failed": "Kon video niet converteren naar MP4-formaat",
     "debugger/block-breakpoint": "onderbreking",
     "debugger/block-warn": "waarschuw %s",

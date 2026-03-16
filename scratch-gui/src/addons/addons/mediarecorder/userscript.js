@@ -530,7 +530,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
               if (progressModal.backdrop) progressModal.backdrop.style.pointerEvents = "none"; // block clicks outside
               
               const progressText = Object.assign(document.createElement("p"), {
-                textContent: "Starting video export...",
+                textContent: typeof msg === 'function' && msg("starting-export") ? msg("starting-export") : "Starting video export...",
                 className: "recordOptionDescription"
               });
               Object.assign(progressText.style, {
@@ -582,9 +582,8 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
               finalExtension = persistedSelectedFormat;
             } catch (e) {
               console.error(`Conversion to ${persistedSelectedFormat} failed`, e);
-              // Fall back to original format
-              finalExtension = recorder.mimeType.split(";")[0].split("/")[1];
-              if (finalExtension.includes("x-matroska")) finalExtension = "webm";
+              disposeRecorder();
+              return;
             } finally {
               if (progressModal) {
                  progressModal.remove();

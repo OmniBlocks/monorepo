@@ -48,7 +48,7 @@
     "mediarecorder/starting-in": "{secs} 후에 시작합니다... ",
     "mediarecorder/stop": "녹화 종료",
     "mediarecorder/format": "형식",
-    "mediarecorder/converting": "변환 중...",    "mediarecorder/exporting": "비디오 파일 내보내는 중...",    "mediarecorder/conversion-failed": "비디오를 MP4 형식으로 변환하지 못했습니다",
+    "mediarecorder/converting": "변환 중...",    "mediarecorder/exporting": "비디오 파일 내보내는 중...",    "mediarecorder/starting-export": "동영상 내보내기 시작 중...",    "mediarecorder/conversion-failed": "비디오를 MP4 형식으로 변환하지 못했습니다",
     "debugger/block-breakpoint": "중단점",
     "debugger/block-error": "오류 %s",
     "debugger/block-log": "기록 %s",

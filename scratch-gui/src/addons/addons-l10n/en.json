@@ -54,6 +54,7 @@
     "mediarecorder/format": "Format",
     "mediarecorder/converting": "Converting...",
     "mediarecorder/exporting": "Exporting Video...",
+    "mediarecorder/starting-export": "Starting video export...",
     "mediarecorder/conversion-failed": "Failed to convert video to MP4 format",
     "debugger/block-breakpoint": "breakpoint",
     "debugger/block-error": "error %s", 

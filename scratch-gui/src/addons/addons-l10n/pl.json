@@ -43,6 +43,8 @@
     "mediarecorder/stop": "Przestań Nagrywać",
     "mediarecorder/format": "Format",
     "mediarecorder/converting": "Konwertowanie...",
+    "mediarecorder/exporting": "Eksportowanie wideo...",
+    "mediarecorder/starting-export": "Rozpoczynanie eksportu wideo...",
     "mediarecorder/conversion-failed": "Nie udało się przekonwertować wideo do formatu MP4",
     "debugger/block-breakpoint": "punkt przerwania ",
     "debugger/block-error": "zgłoś błąd %s",

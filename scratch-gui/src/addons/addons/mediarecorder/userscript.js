@@ -13,6 +13,7 @@ export default async ({ addon, console, msg }) => {
   let recorder;
   let timeout;
   let ffmpeg = null;
+  let persistedSelectedFormat = null;
 
   // Determine supported formats
   const supportedMimeTypes = [
@@ -307,12 +308,7 @@ const detectFrameRate = async (ffmpeg, inputName) => {
     
     ffmpeg.off('log', logHandler);
     
-    // Attempt to parse out duration to calculate total frames if possible
-    let durationSeconds = 0;
-    const timeMatch = probeOutput.match(/time=\s*(\d+):(\d+):(\d+(?:\.\d+)?)/i);
-    // Note: Since this is raw stream data, duration parsing usually fails here since we know the file is broken initially. 
-    // However, we will find the time from later logs if it exists.
-    
+   
     // Parse fps
     let fps = null;
     const fpsMatch = probeOutput.match(/(\d+(?:\.\d+)?)\s*fps/i);
@@ -377,11 +373,12 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
         let frameCountOutput = '';
         const countHandler = ({ message }) => { frameCountOutput += message + '\n'; };
         ffmpeg.on('log', countHandler);
-        
-        await ffmpeg.exec(['-err_detect', 'ignore_err', '-i', inputName, '-f', 'null', '-c', 'copy', '-']);
-        
-        ffmpeg.off('log', countHandler);
-        
+        try {
+          await ffmpeg.exec(['-err_detect', 'ignore_err', '-i', inputName, '-f', 'null', '-c', 'copy', '-']);
+        } finally {
+          ffmpeg.off('log', countHandler);
+        }
+
         const frameMatches = [...frameCountOutput.matchAll(/frame=\s*(\d+)/g)];
         if (frameMatches && frameMatches.length > 0) {
           const highestFrame = parseInt(frameMatches[frameMatches.length - 1][1]);
@@ -393,12 +390,10 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
         }
       } catch (countErr) {
          console.warn("Frame count pre-pass failed.", countErr);
-      }
-    } else {
-      duration = 1; 
+      }  
+    } else { 
+      duration = 1;
     }
-    
-    // Convert with appropriate encoding
     console.log('Starting ffmpeg encoding...');
     let args = [
       '-err_detect', 'ignore_err',
@@ -435,7 +430,6 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
     // Wire up progress event
     // The ffmpeg 0.12 progress payload sometimes reports 'time' (microseconds) instead of a stable 'progress' float
     // if duration metadata is missing. We will use the 'time' object if available and scale it.
-    let durationSec = duration; // fallback
     const progressHandler = ({ progress, time }) => {
       // If we only have time (in microseconds), we track it purely visually without max bound if duration isn't perfectly known
       // If progress exists and is > 0, we can use that float easily
@@ -446,12 +440,14 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
          let calc = currentFrameNum / estimatedTotalFrames;
          pOut = Math.min(0.99, Math.max(0, calc));
       } else {
-        if (progress && progress > 0 && progress <= 1) {
+        if (time && duration > 0) {
+          // Use actual duration for accurate time-based progress
+          pOut = Math.min(0.95, (time / 1000000) / duration);
+        } else if (progress && progress > 0 && progress <= 1) {
           pOut = progress;
         } else if (time && time > 0) {
-          // Fallback: visual heartbeat update if tracking isn't locked to 1.0 properly 
+          // Fallback: visual heartbeat update if tracking isn't locked to 1.0 properly
           // Emulate progress up to ~95% dynamically based on processing time
-          if (durationSec === 0) durationSec = 10000000; // Fake large number to prevent divide by 0
           pOut = Math.min(0.95, (time / 1000000) / (time / 1000000 + 5)); // Asymptotic progress calculation based on time passed
         }
       }
@@ -489,7 +485,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
     throw error;
   }
 };
-    const stopRecording = async (force, selectedFormat) => {
+    const stopRecording = async (force) => {
       if (isWaitingForFlag) {
         addon.tab.traps.vm.runtime.off("PROJECT_START", waitingForFlagFunc);
         isWaitingForFlag = false;
@@ -518,7 +514,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
           
           let progressModal = null;
           // Convert to target format if not matching, OR remux to fix metadata duration
-          if (selectedFormat !== finalExtension || finalExtension === "webm" || finalExtension === "mp4") {
+          if (persistedSelectedFormat !== finalExtension || finalExtension === "webm" || finalExtension === "mp4") {
             try {
               progressModal = addon.tab.createModal(typeof msg === 'function' ? msg("exporting") || "Exporting Video..." : "Exporting Video...", {
                 isOpen: true,
@@ -578,10 +574,10 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
                  progressText.textContent = `${exportingLoc} ${pct}%`;
               };
               
-              blob = await convertVideo(blob, finalExtension, selectedFormat, onProgress);
-              finalExtension = selectedFormat;
+              blob = await convertVideo(blob, finalExtension, persistedSelectedFormat, onProgress);
+              finalExtension = persistedSelectedFormat;
             } catch (e) {
-              console.error(`Conversion to ${selectedFormat} failed`, e);
+              console.error(`Conversion to ${persistedSelectedFormat} failed`, e);
               // Fall back to original format
               finalExtension = recorder.mimeType.split(";")[0].split("/")[1];
               if (finalExtension.includes("x-matroska")) finalExtension = "webm";
@@ -686,9 +682,12 @@ if (selectedFormat === "mp4") {
         console.warn("Recorder error:", e.error);
         stopRecording(true);
       };
-      timeout = setTimeout(() => stopRecording(false, selectedFormat), secs * 1000);
+      // Persist the user's chosen format for use during stop/timeout handlers
+      persistedSelectedFormat = selectedFormat;
+      
+      timeout = setTimeout(() => stopRecording(false), secs * 1000);
       if (opts.useStopSign) {
-        stopSignFunc = () => stopRecording(false, selectedFormat);
+        stopSignFunc = () => stopRecording(false);
         vm.runtime.once("PROJECT_STOP_ALL", stopSignFunc);
       }
 
@@ -723,10 +722,8 @@ if (selectedFormat === "mp4") {
       recordElem.appendChild(recordTextSpan);
       recordElem.addEventListener("click", async () => {
         if (isRecording) {
-          // Get selected format from options if available
-          const formatInput = document.getElementById("recordOptionFormatInput");
-          const selectedFormat = formatInput ? formatInput.value : defaultFileExtension;
-          stopRecording(false, selectedFormat);
+          // Use the persisted format from when recording started
+          stopRecording(false);
         } else {
           const opts = await getOptions();
           if (!opts) {

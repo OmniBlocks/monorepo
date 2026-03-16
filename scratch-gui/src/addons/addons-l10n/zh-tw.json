@@ -42,6 +42,8 @@
     "mediarecorder/stop": "停止錄影",
     "mediarecorder/format": "格式",
     "mediarecorder/converting": "正在轉換...",
+    "mediarecorder/exporting": "匯出影片中...",
+    "mediarecorder/starting-export": "開始匯出影片...",
     "mediarecorder/conversion-failed": "無法將視頻轉換為MP4格式",
     "debugger/block-breakpoint": "中斷點",
     "debugger/block-error": "錯誤 %s",

@@ -2,7 +2,7 @@
 /* eslint-disable func-style, require-jsdoc, no-use-before-define */
 const CACHE_NAME = 'omniblocks-v1';
 // bump to clear old entries with bad paths
-const STATIC_CACHE = 'omniblocks-static-v5';
+const STATIC_CACHE = 'omniblocks-static-v6';
 const DYNAMIC_CACHE = 'omniblocks-dynamic-v3';
 
 // --- URL helpers: make all paths scope-relative so GH Pages subpaths work ---
@@ -258,26 +258,37 @@ async function handleRequest (request) {
     const url = new URL(request.url);
     
     try {
-        // Network-first for JS files to ensure updates are reflected immediately
-        if (url.pathname.endsWith('.js')) {
-            return networkFirst(request, STATIC_CACHE);
+        // Strategy 1: Network-first for HTML pages.
+        // IMPORTANT: this must come BEFORE isStaticAsset() because HTML entry
+        // points (editor.html, index.html, …) are listed in STATIC_ASSETS for
+        // pre-caching, which makes isStaticAsset() return true for them.  If we
+        // hit the cache-first branch for HTML files, a normal reload after a new
+        // deployment will serve the old HTML that references stale content-hashed
+        // JS filenames → those files 404 and the page hangs forever spinning.
+        if (isHTMLPage(request)) {
+            return await networkFirst(request, DYNAMIC_CACHE, {
+                fallbackToCacheOnNonOK: true
+            });
         }
-        // Strategy 1: Cache-first for static assets
+
+        // Strategy 2: Network-first for JS files to ensure updates are reflected immediately
+        if (url.pathname.endsWith('.js')) {
+            return await networkFirst(request, STATIC_CACHE, {
+                fallbackToCacheOnNonOK: true
+            });
+        }
+
+        // Strategy 3: Cache-first for other static assets (images, CSS, fonts, …)
         if (isStaticAsset(request)) {
             return await cacheFirst(request, STATIC_CACHE);
         }
         
-        // Strategy 2: Network-first for HTML pages
-        if (isHTMLPage(request)) {
-            return await networkFirst(request, DYNAMIC_CACHE);
-        }
-        
-        // Strategy 3: Network-first with cache fallback for API calls and dynamic content
+        // Strategy 4: Network-first with cache fallback for API calls and dynamic content
         if (isDynamicContent(request)) {
             return await networkFirst(request, DYNAMIC_CACHE);
         }
         
-        // Strategy 4: Network-first for everything else
+        // Strategy 5: Network-first for everything else
         return await networkFirst(request, DYNAMIC_CACHE);
         
     } catch (error) {
@@ -309,7 +320,11 @@ async function cacheFirst (request, cacheName) {
 }
 
 // Network-first strategy: Try network first, fallback to cache
-async function networkFirst (request, cacheName) {
+async function networkFirst (request, cacheName, options = {}) {
+    const {
+        fallbackToCacheOnNonOK = false
+    } = options;
+
     try {
         console.log('[SW] Trying network first:', request.url);
         const networkResponse = await fetch(request);
@@ -317,8 +332,20 @@ async function networkFirst (request, cacheName) {
         if (networkResponse.ok) {
             const cache = await caches.open(cacheName);
             cache.put(request, networkResponse.clone());
+            return networkResponse;
         }
-        
+
+        if (fallbackToCacheOnNonOK) {
+            // Network returned a non-ok status (e.g. 404). For requests that are
+            // safe to serve stale (HTML/hashed static assets), try the cache
+            // before surfacing the error response.
+            console.log('[SW] Network returned non-ok status, trying cache:', request.url, networkResponse.status);
+            const cachedResponse = await getCachedResponse(request);
+            if (cachedResponse) {
+                return cachedResponse;
+            }
+        }
+
         return networkResponse;
     } catch (error) {
         console.log('[SW] Network failed, trying cache:', request.url);

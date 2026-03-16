@@ -25,29 +25,22 @@ export default async ({ addon, console, msg }) => {
   const defaultFileExtension = defaultMimeType.split(";")[0].split("/")[1];
   
   // Available formats for dropdown
-  const availableFormats = [];
-  if (supportedMimeTypes.some(m => m.startsWith("video/webm"))) {
-    availableFormats.push("webm");
-  }
-  if (supportedMimeTypes.some(m => m.startsWith("video/mp4"))) {
-    availableFormats.push("mp4");
-  }
+  const availableFormats = ["webm", "mp4"];
 
   // Load FFmpeg.wasm only when needed
   // Load FFmpeg.wasm v0.12.x (matches package.json)
-// Load FFmpeg.wasm v0.12.x (matches package.json)
+// Load FFmpeg.wasm v0.12.x from static bundled files
 const loadFFmpeg = async () => {
   if (ffmpeg) return ffmpeg;
   
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    // Use v0.12.10 which has stable libx264 support
-    script.src = "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.min.js";
+    script.src = "/ffmpeg/ffmpeg.min.js";
     script.onload = async () => {
       try {
-        const { FFmpeg } = window.FFmpeg || {};
+        const { FFmpeg } = window.FFmpegWASM || window.FFmpeg || {};
         if (!FFmpeg) {
-          throw new Error("FFmpeg UMD bundle not found on window.FFmpeg");
+          throw new Error("FFmpeg UMD bundle not found on window");
         }
         ffmpeg = new FFmpeg();
         
@@ -56,14 +49,17 @@ const loadFFmpeg = async () => {
           console.log('FFmpeg:', message);
         });
         
-        // Load with multi-threaded core
+        // Auto detect whether we can use multithreading
+        const useMt = window.crossOriginIsolated;
+        const coreType = useMt ? 'core-mt' : 'core';
+        
         await ffmpeg.load({
-          coreURL: "https://cdn.jsdelivr.net/npm/@ffmpeg/core-mt@0.12.6/dist/esm/ffmpeg-core.js",
-          wasmURL: "https://cdn.jsdelivr.net/npm/@ffmpeg/core-mt@0.12.6/dist/esm/ffmpeg-core.wasm",
-          workerURL: "https://cdn.jsdelivr.net/npm/@ffmpeg/core-mt@0.12.6/dist/esm/ffmpeg-core.worker.js"
+          coreURL: `/ffmpeg/${coreType}/ffmpeg-core.js`,
+          wasmURL: `/ffmpeg/${coreType}/ffmpeg-core.wasm`,
+          workerURL: useMt ? `/ffmpeg/${coreType}/ffmpeg-core.worker.js` : undefined
         });
         
-        console.log('FFmpeg v0.12 loaded successfully');
+        console.log('FFmpeg loaded successfully. Multithreading:', useMt);
         resolve(ffmpeg);
       } catch (error) {
         console.error('FFmpeg load error:', error);
@@ -311,59 +307,168 @@ const detectFrameRate = async (ffmpeg, inputName) => {
     
     ffmpeg.off('log', logHandler);
     
+    // Attempt to parse out duration to calculate total frames if possible
+    let durationSeconds = 0;
+    const timeMatch = probeOutput.match(/time=\s*(\d+):(\d+):(\d+(?:\.\d+)?)/i);
+    // Note: Since this is raw stream data, duration parsing usually fails here since we know the file is broken initially. 
+    // However, we will find the time from later logs if it exists.
+    
     // Parse fps
+    let fps = null;
     const fpsMatch = probeOutput.match(/(\d+(?:\.\d+)?)\s*fps/i);
     if (fpsMatch) {
-      const fps = parseFloat(fpsMatch[1]);
-      console.log(`Detected frame rate: ${fps} fps`);
-      return fps;
+      fps = parseFloat(fpsMatch[1]);
+    } else {
+      const rateMatch = probeOutput.match(/(\d+)\/(\d+)\s*fps/);
+      if (rateMatch) fps = parseInt(rateMatch[1]) / parseInt(rateMatch[2]);
     }
-    
-    const rateMatch = probeOutput.match(/(\d+)\/(\d+)\s*fps/);
-    if (rateMatch) {
-      const fps = parseInt(rateMatch[1]) / parseInt(rateMatch[2]);
-      console.log(`Detected frame rate: ${fps} fps`);
-      return fps;
-    }
+    if (fps) console.log(`Detected frame rate: ${fps} fps`);
+    return fps;
   } catch (error) {
     console.warn('FPS detection failed:', error);
   }
   return null;
 };
 
-const convertWebmToMp4 = async (webmBlob) => {
+const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
   try {
-    console.log('=== Starting conversion ===');
-    console.log('Input size:', webmBlob.size, 'bytes');
+    console.log(`=== Starting conversion from ${inputExt} to ${outputExt} ===`);
+    console.log('Input size:', inputBlob.size, 'bytes');
     
     const ffmpeg = await loadFFmpeg();
-    const inputName = 'input.webm';
-    const outputName = 'output.mp4';
+    const inputName = `input.${inputExt}`;
+    const outputName = `output.${outputExt}`;
     
     // Write input file using v0.12 API
-    const arrayBuffer = await webmBlob.arrayBuffer();
+    const arrayBuffer = await inputBlob.arrayBuffer();
     await ffmpeg.writeFile(inputName, new Uint8Array(arrayBuffer));
     console.log('Input file written');
     
-    // Detect FPS
-    const detectedFps = await detectFrameRate(ffmpeg, inputName);
-    const fps = detectedFps || 30;
-    console.log(`Using ${fps} fps`);
+    // Determine FPS and duration if we have to re-encode
+    let fps = 30;
+    let duration = 0;
     
-    // Convert with H.264 encoding
+    // Wire up a custom log interceptor to extract frame count on the fly
+    let totalFramesKnown = false;
+    let estimatedTotalFrames = 30 * 10; // Fallback: Assume ~10 second clip initially
+    
+    const initialLogHandler = ({ message }) => {
+      const durationMatch = message.match(/Duration:\s*(\d{2}):(\d{2}):(\d{2}\.\d{2})/);
+      if (durationMatch) {
+         let hrs = parseFloat(durationMatch[1]);
+         let mins = parseFloat(durationMatch[2]);
+         let secs = parseFloat(durationMatch[3]);
+         let totalSecs = hrs*3600 + mins*60 + secs;
+         estimatedTotalFrames = Math.max(1, Math.floor(totalSecs * fps));
+         totalFramesKnown = true;
+      }
+    };
+    ffmpeg.on('log', initialLogHandler);
+    
+    if (inputExt !== outputExt) {
+      const detectedFps = await detectFrameRate(ffmpeg, inputName);
+      fps = detectedFps || 30;
+      console.log(`Using ${fps} fps`);
+      
+      // Fast initial pass to count frames
+      if (onProgress) onProgress(0.05); // Give short bump
+      console.log('Counting total frames prior to encode...');
+      try {
+        let frameCountOutput = '';
+        const countHandler = ({ message }) => { frameCountOutput += message + '\n'; };
+        ffmpeg.on('log', countHandler);
+        
+        await ffmpeg.exec(['-err_detect', 'ignore_err', '-i', inputName, '-f', 'null', '-c', 'copy', '-']);
+        
+        ffmpeg.off('log', countHandler);
+        
+        const frameMatches = [...frameCountOutput.matchAll(/frame=\s*(\d+)/g)];
+        if (frameMatches && frameMatches.length > 0) {
+          const highestFrame = parseInt(frameMatches[frameMatches.length - 1][1]);
+          if (highestFrame > 0) {
+            estimatedTotalFrames = highestFrame;
+            totalFramesKnown = true;
+            console.log(`Pre-counted exactly ${estimatedTotalFrames} frames!`);
+          }
+        }
+      } catch (countErr) {
+         console.warn("Frame count pre-pass failed.", countErr);
+      }
+    } else {
+      duration = 1; 
+    }
+    
+    // Convert with appropriate encoding
     console.log('Starting ffmpeg encoding...');
-    await ffmpeg.exec([
-      '-i', inputName,
-      '-c:v', 'libx264',
-      '-preset', 'ultrafast',
-      '-crf', '23',
-      '-pix_fmt', 'yuv420p',
-      '-r', fps.toString(),
-      '-g', '30',
-      '-movflags', '+faststart',
-      '-c:a', 'aac', '-b:a', '128k',
-      outputName
-    ]);
+    let args = [
+      '-err_detect', 'ignore_err',
+      '-i', inputName
+    ];
+    
+    if (inputExt === outputExt) {
+      // Re-mux to fix duration metadata (vital for MediaRecorder output)
+      args.push('-c', 'copy');
+    } else {
+      if (outputExt === 'mp4') {
+        args.push(
+          '-c:v', 'libx264',
+          '-preset', 'ultrafast',
+          '-crf', '23',
+          '-pix_fmt', 'yuv420p',
+          '-r', fps.toString(),
+          '-g', fps.toString(),
+          '-movflags', '+faststart',
+          '-c:a', 'aac', '-b:a', '128k'
+        );
+      } else if (outputExt === 'webm') {
+        args.push(
+          '-c:v', 'libvpx-vp9',
+          '-crf', '30',
+          '-b:v', '0',
+          '-r', fps.toString(),
+          '-c:a', 'libopus'
+        );
+      }
+    }
+    args.push(outputName);
+
+    // Wire up progress event
+    // The ffmpeg 0.12 progress payload sometimes reports 'time' (microseconds) instead of a stable 'progress' float
+    // if duration metadata is missing. We will use the 'time' object if available and scale it.
+    let durationSec = duration; // fallback
+    const progressHandler = ({ progress, time }) => {
+      // If we only have time (in microseconds), we track it purely visually without max bound if duration isn't perfectly known
+      // If progress exists and is > 0, we can use that float easily
+      let pOut = 0;
+      if (totalFramesKnown) {
+         const currentSecs = time / 1000000;
+         const currentFrameNum = currentSecs * fps;
+         let calc = currentFrameNum / estimatedTotalFrames;
+         pOut = Math.min(0.99, Math.max(0, calc));
+      } else {
+        if (progress && progress > 0 && progress <= 1) {
+          pOut = progress;
+        } else if (time && time > 0) {
+          // Fallback: visual heartbeat update if tracking isn't locked to 1.0 properly 
+          // Emulate progress up to ~95% dynamically based on processing time
+          if (durationSec === 0) durationSec = 10000000; // Fake large number to prevent divide by 0
+          pOut = Math.min(0.95, (time / 1000000) / (time / 1000000 + 5)); // Asymptotic progress calculation based on time passed
+        }
+      }
+      if (onProgress) onProgress(pOut);
+    };
+    ffmpeg.on('progress', progressHandler);
+
+    // Catch execution errors safely
+    try {
+      await ffmpeg.exec(args);
+    } catch(err) {
+      console.warn("FFmpeg execution warned/errored, but checking output output anyway...", err);
+    } finally {
+      ffmpeg.off('log', initialLogHandler);
+      ffmpeg.off('progress', progressHandler);
+      if (onProgress) onProgress(1.0); // Force 100% at end
+    }
     console.log('Encoding complete');
     
     // Read output using v0.12 API
@@ -374,7 +479,8 @@ const convertWebmToMp4 = async (webmBlob) => {
     await ffmpeg.deleteFile(inputName);
     await ffmpeg.deleteFile(outputName);
     
-    const outputBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    const outputMime = outputExt === 'mp4' ? 'video/mp4' : 'video/webm';
+    const outputBlob = new Blob([data.buffer], { type: outputMime });
     console.log('=== Conversion successful ===');
     return outputBlob;
   } catch (error) {
@@ -399,20 +505,90 @@ const convertWebmToMp4 = async (webmBlob) => {
         disposeRecorder();
       } else {
         recorder.onstop = async () => {
+          // Verify we have recorded data
+          if (recordBuffer.length === 0) {
+            console.error("No data recorded");
+            disposeRecorder();
+            return;
+          }
+
           let blob = new Blob(recordBuffer, { type: recorder.mimeType });
           let finalExtension = recorder.mimeType.split(";")[0].split("/")[1];
+          if (finalExtension.includes("x-matroska")) finalExtension = "webm";
           
-          // Convert to MP4 if requested and not native
-          if (selectedFormat === "mp4" && !recorder.mimeType.includes("mp4")) {
+          let progressModal = null;
+          // Convert to target format if not matching, OR remux to fix metadata duration
+          if (selectedFormat !== finalExtension || finalExtension === "webm" || finalExtension === "mp4") {
             try {
-              recordTextSpan.textContent = msg("converting");
-              blob = await convertWebmToMp4(blob);
-              finalExtension = "mp4";
+              progressModal = addon.tab.createModal(typeof msg === 'function' ? msg("exporting") || "Exporting Video..." : "Exporting Video...", {
+                isOpen: true,
+                useEditorClasses: true,
+              });
+              progressModal.container.classList.add("mediaRecorderPopup");
+              progressModal.content.classList.add("mediaRecorderPopupContent");
+              if (progressModal.closeButton) progressModal.closeButton.style.display = "none";
+              if (progressModal.backdrop) progressModal.backdrop.style.pointerEvents = "none"; // block clicks outside
+              
+              const progressText = Object.assign(document.createElement("p"), {
+                textContent: "Starting video export...",
+                className: "recordOptionDescription"
+              });
+              Object.assign(progressText.style, {
+                textAlign: "center",
+                fontWeight: "bold",
+                marginBottom: "15px"
+              });
+              progressModal.content.appendChild(progressText);
+              
+              const progressBarContainer = document.createElement("div");
+              Object.assign(progressBarContainer.style, {
+                width: "100%",
+                height: "20px",
+                backgroundColor: "rgba(0, 0, 0, 0.15)",
+                borderRadius: "10px",
+                overflow: "hidden"
+              });
+              
+              const progressBar = document.createElement("div");
+              Object.assign(progressBar.style, {
+                width: "0%",
+                height: "100%",
+                backgroundColor: "#4c97ff",
+                transition: "width 0.2s"
+              });
+              
+              progressBarContainer.appendChild(progressBar);
+              progressModal.content.appendChild(progressBarContainer);
+
+              // Wait a little bit for UI to catch up
+              recordTextSpan.textContent = typeof msg === 'function' ? msg("exporting") || "Exporting Video..." : "Exporting Video...";
+              
+              // Verify blob size is valid (>0) to avoid FFmpeg crashing on empty files
+              if (blob.size === 0) {
+                 throw new Error("Cannot convert empty recording buffer.");
+              }
+              
+              // Progress hook
+              const onProgress = (p) => {
+                 let pct = Math.round(p * 100);
+                 if (pct < 0) pct = 0;
+                 if (pct > 100) pct = 100;
+                 progressBar.style.width = `${pct}%`;
+                 const exportingLoc = typeof msg === 'function' && msg("exporting") ? msg("exporting") : "Exporting Video...";
+                 progressText.textContent = `${exportingLoc} ${pct}%`;
+              };
+              
+              blob = await convertVideo(blob, finalExtension, selectedFormat, onProgress);
+              finalExtension = selectedFormat;
             } catch (e) {
-              console.error("WebM to MP4 conversion failed", e);
-              alert(msg("conversion-failed"));
+              console.error(`Conversion to ${selectedFormat} failed`, e);
               // Fall back to original format
               finalExtension = recorder.mimeType.split(";")[0].split("/")[1];
+              if (finalExtension.includes("x-matroska")) finalExtension = "webm";
+            } finally {
+              if (progressModal) {
+                 progressModal.remove();
+              }
             }
           }
           

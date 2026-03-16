@@ -53,6 +53,7 @@
     "mediarecorder/stop": "Lopeta nauhoitus",
     "mediarecorder/format": "Muoto",
     "mediarecorder/converting": "Muunnetaan...",
+    "mediarecorder/exporting": "Viedään videota...",
     "mediarecorder/conversion-failed": "Videon muuntaminen MP4-muotoon epäonnistui",
     "debugger/block-breakpoint": "keskeytyskohta",
     "debugger/block-error": "kirjaa virhe %s",

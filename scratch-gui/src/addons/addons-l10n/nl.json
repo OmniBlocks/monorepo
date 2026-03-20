@@ -41,6 +41,8 @@
     "mediarecorder/record-audio": "Projectgeluiden opnemen",
     "mediarecorder/record-audio-description": "Dit neemt Tekst-naar-Spraak niet op.",
     "mediarecorder/record-description": "Neem het speelveld op als een {extension}-bestand. Je kunt het opslaan op je computer nadat de opname klaar is.\nOpmerking: monitoren van variabelen en lijsten zijn niet zichtbaar.",
+    "mediarecorder/gif-size": "GIF-grootte (px)",
+    "mediarecorder/gif-fps": "GIF-FPS",
     "mediarecorder/record-duration": "Opnamelengte (in seconden)",
     "mediarecorder/record-mic": "Microfoon opnemen",
     "mediarecorder/record-until-stop": "Stop met opnemen nadat het project is gestopt",

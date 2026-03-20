@@ -41,6 +41,8 @@
     "mediarecorder/record-audio": "Includi suoni del progetto",
     "mediarecorder/record-audio-description": "Questo non include l'estensione Da Testo A Voce",
     "mediarecorder/record-description": "Registra lo stage come file {extension}. Quando la registrazione termina puoi salvarla sul tuo computer.\nNota: i monitor delle variabili e delle liste non saranno visibili.",
+    "mediarecorder/gif-size": "Dimensione GIF (px)",
+    "mediarecorder/gif-fps": "FPS GIF",
     "mediarecorder/record-duration": "Durata Registrazione (in secondi)",
     "mediarecorder/record-mic": "Includi i suoni del microfono",
     "mediarecorder/record-until-stop": "Arresta la registrazione quando il progetto viene fermato",

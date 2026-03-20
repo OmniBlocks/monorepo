@@ -135,7 +135,7 @@ const loadFFmpeg = async () => {
           defaultValue: 480,
           id: "gifOptionWidthInput",
           className: addon.tab.scratchClass("prompt_variable-name-text-input"),
-          style: "width: 5em; margin-right: 5px; padding: 0 4px;"
+          style: "width: 5em; margin-left: 4px; margin-right: 5px; padding: 0 4px;"
         });
         const gifOptionCross = document.createElement("span");
         gifOptionCross.textContent = " x ";
@@ -145,7 +145,7 @@ const loadFFmpeg = async () => {
           defaultValue: 360,
           id: "gifOptionHeightInput",
           className: addon.tab.scratchClass("prompt_variable-name-text-input"),
-          style: "width: 5em; margin-left: 5px; padding: 0 4px;"
+          style: "width: 5em; margin-left: 15px; padding: 0 4px;"
         });
         const gifOptionSizeLabel = Object.assign(document.createElement("label"), {
           htmlFor: "gifOptionWidthInput",

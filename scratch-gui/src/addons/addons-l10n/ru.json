@@ -35,6 +35,8 @@
     "mediarecorder/record-audio": "Включить звуки проекта",
     "mediarecorder/record-audio-description": "Это не включает Text-to-Speech.",
     "mediarecorder/record-description": "Записать проект в файл типа {extension}. Его можно скачать на ваш ПК после завершения записи.\n(Примечание: переменные и списки не будут видны на записи.)",
+    "mediarecorder/gif-size": "Размер GIF (px)",
+    "mediarecorder/gif-fps": "FPS GIF",
     "mediarecorder/record-duration": "Продолжительность записи (в секундах)",
     "mediarecorder/record-mic": "Включить звуки из микрофона",
     "mediarecorder/record-until-stop": "Остановить запись после остановки проекта",

@@ -14,6 +14,7 @@ export default async ({ addon, console, msg }) => {
   let timeout;
   let ffmpeg = null;
   let persistedSelectedFormat = null;
+  let persistedOpts = null;
 
   // Determine supported formats
   const supportedMimeTypes = [
@@ -26,7 +27,7 @@ export default async ({ addon, console, msg }) => {
   const defaultFileExtension = defaultMimeType.split(";")[0].split("/")[1];
   
   // Available formats for dropdown
-  const availableFormats = ["webm", "mp4"];
+  const availableFormats = ["webm", "mp4", "mkv", "gif" ,"mp3", "wav", "ogg"];
 
   // Load FFmpeg.wasm only when needed
   // Load FFmpeg.wasm v0.12.x (matches package.json)
@@ -97,13 +98,14 @@ const loadFFmpeg = async () => {
       );
 
       // Format selection dropdown
+      let recordOptionFormatInput, gifOptionWidthInput, gifOptionHeightInput, gifOptionFpsInput;
       if (availableFormats.length > 1) {
         const recordOptionFormat = document.createElement("p");
         const recordOptionFormatLabel = Object.assign(document.createElement("label"), {
           htmlFor: "recordOptionFormatInput",
-          textContent: msg("format"),
+          textContent: msg("format") || "Format",
         });
-        const recordOptionFormatInput = Object.assign(document.createElement("select"), {
+        recordOptionFormatInput = Object.assign(document.createElement("select"), {
           id: "recordOptionFormatInput",
         });
         availableFormats.forEach(format => {
@@ -116,6 +118,65 @@ const loadFFmpeg = async () => {
         recordOptionFormat.appendChild(recordOptionFormatLabel);
         recordOptionFormat.appendChild(recordOptionFormatInput);
         content.appendChild(recordOptionFormat);
+
+        // GIF specific options
+        const gifOptionsContainer = document.createElement("div");
+        gifOptionsContainer.style.display = recordOptionFormatInput.value === "gif" ? "block" : "none";
+        
+        recordOptionFormatInput.addEventListener("change", (e) => {
+          gifOptionsContainer.style.display = e.target.value === "gif" ? "block" : "none";
+        });
+
+        // GIF Size
+        const gifOptionSize = document.createElement("p");
+        gifOptionWidthInput = Object.assign(document.createElement("input"), {
+          type: "number",
+          min: 1,
+          defaultValue: 480,
+          id: "gifOptionWidthInput",
+          className: addon.tab.scratchClass("prompt_variable-name-text-input"),
+          style: "width: 5em; margin-right: 5px; padding: 0 4px;"
+        });
+        const gifOptionCross = document.createElement("span");
+        gifOptionCross.textContent = " x ";
+        gifOptionHeightInput = Object.assign(document.createElement("input"), {
+          type: "number",
+          min: 1,
+          defaultValue: 360,
+          id: "gifOptionHeightInput",
+          className: addon.tab.scratchClass("prompt_variable-name-text-input"),
+          style: "width: 5em; margin-left: 5px; padding: 0 4px;"
+        });
+        const gifOptionSizeLabel = Object.assign(document.createElement("label"), {
+          htmlFor: "gifOptionWidthInput",
+          textContent: typeof msg === "function" && msg("gif-size") ? msg("gif-size") : "GIF Size (px): ",
+        });
+        gifOptionSize.appendChild(gifOptionSizeLabel);
+        gifOptionSize.appendChild(gifOptionWidthInput);
+        gifOptionSize.appendChild(gifOptionCross);
+        gifOptionSize.appendChild(gifOptionHeightInput);
+        gifOptionsContainer.appendChild(gifOptionSize);
+
+        // GIF FPS
+        const gifOptionFps = document.createElement("p");
+        gifOptionFpsInput = Object.assign(document.createElement("input"), {
+          type: "number",
+          min: 1,
+          max: 60,
+          defaultValue: 15,
+          id: "gifOptionFpsInput",
+          className: addon.tab.scratchClass("prompt_variable-name-text-input"),
+          style: "width: 5em; padding: 0 4px;"
+        });
+        const gifOptionFpsLabel = Object.assign(document.createElement("label"), {
+          htmlFor: "gifOptionFpsInput",
+          textContent: typeof msg === "function" && msg("gif-fps") ? msg("gif-fps") : "GIF FPS: ",
+        });
+        gifOptionFps.appendChild(gifOptionFpsLabel);
+        gifOptionFps.appendChild(gifOptionFpsInput);
+        gifOptionsContainer.appendChild(gifOptionFps);
+
+        content.appendChild(gifOptionsContainer);
       }
 
       // Seconds
@@ -268,6 +329,9 @@ const loadFFmpeg = async () => {
             waitUntilFlag: recordOptionFlagInput.checked,
             useStopSign: !recordOptionStopInput.disabled && recordOptionStopInput.checked,
             format: availableFormats.length > 1 ? recordOptionFormatInput.value : defaultFileExtension,
+            gifWidth: gifOptionWidthInput ? Number(gifOptionWidthInput.value) : 480,
+            gifHeight: gifOptionHeightInput ? Number(gifOptionHeightInput.value) : 360,
+            gifFps: gifOptionFpsInput ? Number(gifOptionFpsInput.value) : 15,
           }),
         { once: true }
       );
@@ -326,7 +390,7 @@ const detectFrameRate = async (ffmpeg, inputName) => {
   return null;
 };
 
-const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
+const convertVideo = async (inputBlob, inputExt, outputExt, onProgress, opts) => {
   const ffmpeg = await loadFFmpeg();
   const inputName = `input.${inputExt}`;
   const outputName = `output.${outputExt}`;
@@ -404,7 +468,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
       // Re-mux to fix duration metadata (vital for MediaRecorder output)
       args.push('-c', 'copy');
     } else {
-      if (outputExt === 'mp4') {
+      if (outputExt === 'mp4' || outputExt === 'mkv') {
         args.push(
           '-c:v', 'libx264',
           '-preset', 'ultrafast',
@@ -412,9 +476,9 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
           '-pix_fmt', 'yuv420p',
           '-r', fps.toString(),
           '-g', fps.toString(),
-          '-movflags', '+faststart',
           '-c:a', 'aac', '-b:a', '128k'
         );
+        if (outputExt === 'mp4') args.push('-movflags', '+faststart');
       } else if (outputExt === 'webm') {
         args.push(
           '-c:v', 'libvpx-vp9',
@@ -423,6 +487,21 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
           '-r', fps.toString(),
           '-c:a', 'libopus'
         );
+      } else if (outputExt === 'gif') {
+        const gifFps = opts?.gifFps || fps;
+        const gifWidth = opts?.gifWidth ? Math.floor(opts.gifWidth) : -1;
+        const gifHeight = opts?.gifHeight ? Math.floor(opts.gifHeight) : -1;
+        args.push(
+          '-an',
+          '-vf', `fps=${gifFps},scale=${gifWidth}:${gifHeight},setsar=1/1,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
+          '-c:v', 'gif'
+        );
+      } else if (outputExt === 'mp3') {
+        args.push('-vn', '-c:a', 'libmp3lame', '-q:a', '2');
+      } else if (outputExt === 'wav') {
+        args.push('-vn', '-c:a', 'pcm_s16le');
+      } else if (outputExt === 'ogg') {
+        args.push('-vn', '-c:a', 'libvorbis', '-q:a', '4');
       }
     }
     args.push(outputName);
@@ -450,7 +529,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
           // Use actual duration for accurate time-based progress
           pOut = Math.min(0.95, (time / 1000000) / duration);
         } else if (progress && progress > 0 && progress <= 1) {
-          pOut = progress;
+          pOut = progress;  
         } else if (time && time > 0) {
           // Fallback: visual heartbeat update if tracking isn't locked to 1.0 properly
           // Emulate progress up to ~95% dynamically based on processing time
@@ -477,7 +556,14 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
     const data = await ffmpeg.readFile(outputName);
     console.log('Output size:', data.length, 'bytes');
 
-    const outputMime = outputExt === 'mp4' ? 'video/mp4' : 'video/webm';
+    let outputMime = 'video/mp4';
+    if (outputExt === 'webm') outputMime = 'video/webm';
+    else if (outputExt === 'mkv') outputMime = 'video/x-matroska';
+    else if (outputExt === 'gif') outputMime = 'image/gif';
+    else if (outputExt === 'mp3') outputMime = 'audio/mpeg';
+    else if (outputExt === 'wav') outputMime = 'audio/wav';
+    else if (outputExt === 'ogg') outputMime = 'audio/ogg';
+
     const outputBlob = new Blob([data.buffer], { type: outputMime });
     console.log('=== Conversion successful ===');
     return outputBlob;
@@ -588,7 +674,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress) => {
                  progressText.textContent = `${exportingLoc} ${pct}%`;
               };
               
-              blob = await convertVideo(blob, finalExtension, persistedSelectedFormat, onProgress);
+              blob = await convertVideo(blob, finalExtension, persistedSelectedFormat, onProgress, persistedOpts);
               finalExtension = persistedSelectedFormat;
             } catch (e) {
               console.error(`Conversion to ${persistedSelectedFormat} failed`, e);
@@ -697,6 +783,8 @@ if (selectedFormat === "mp4") {
       };
       // Persist the user's chosen format for use during stop/timeout handlers
       persistedSelectedFormat = selectedFormat;
+      persistedOpts = opts; // Quick persist for conversion
+
       
       timeout = setTimeout(() => stopRecording(false), secs * 1000);
       if (opts.useStopSign) {

@@ -97,3 +97,41 @@ p.mediaRecorderPopupOption {
   background-position: right 1em center;
   background-size: 1em;
 }
+
+.mediaRecorderProgressContainer {
+  width: 100%;
+  height: 18px;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.07));
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), inset 0 2px 5px rgba(0,0,0,0.12);
+}
+
+.mediaRecorderProgressBar {
+  height: 100%;
+  width: 0%;
+  border-radius: 9px 0 0 9px;
+  background: linear-gradient(90deg, #4c97ff 0%, #72bbff 40%, #4c97ff 100%);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+  transition: width 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mediaRecorderProgressBar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(255,255,255,0.2) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.2) 75%);
+  transform: translateX(-50%);
+  animation: mediaRecorderProgressShimmer 2s linear infinite;
+}
+
+@keyframes mediaRecorderProgressShimmer {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0%); }
+}

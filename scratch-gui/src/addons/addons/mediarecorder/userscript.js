@@ -637,22 +637,11 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress, opts) =>
               progressModal.content.appendChild(progressText);
               
               const progressBarContainer = document.createElement("div");
-              Object.assign(progressBarContainer.style, {
-                width: "100%",
-                height: "20px",
-                backgroundColor: "rgba(0, 0, 0, 0.15)",
-                borderRadius: "10px",
-                overflow: "hidden"
-              });
+              progressBarContainer.className = "mediaRecorderProgressContainer";
               
               const progressBar = document.createElement("div");
-              Object.assign(progressBar.style, {
-                width: "0%",
-                height: "100%",
-                backgroundColor: "#4c97ff",
-                transition: "width 0.2s"
-              });
-              
+              progressBar.className = "mediaRecorderProgressBar";
+              progressBar.style.width = "0%";
               progressBarContainer.appendChild(progressBar);
               progressModal.content.appendChild(progressBarContainer);
 

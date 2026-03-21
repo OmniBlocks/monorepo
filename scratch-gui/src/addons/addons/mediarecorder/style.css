@@ -64,39 +64,7 @@ p.mediaRecorderPopupOption {
   color: black;
 }
 
-/* Custom style for format dropdown */
-#recordOptionFormatInput {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: #fff;
-  border: 1.5px solid #bbb;
-  border-radius: 0.4em;
-  padding: 0.5em 2.5em 0.5em 1em;
-  font-size: 1rem;
-  color: #222;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: border-color 0.2s, box-shadow 0.2s;
-  outline: none;
-  margin-left: 1rem;
-}
 
-#recordOptionFormatInput:focus {
-  
-  box-shadow: 0 0 0 2px rgba(74,144,226,0.15);
-}
-
-#recordOptionFormatInput option {
-  border-radius: 1em;
-}
-
-/* Add a dropdown arrow using a background SVG */
-#recordOptionFormatInput {
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 1em center;
-  background-size: 1em;
-}
 
 .mediaRecorderProgressContainer {
   width: 100%;

@@ -47,7 +47,6 @@ import { CustomThemePrompt } from "./CustomThemePrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
 import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeRingModPulseWidth, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone, ChangePhaserMix, ChangePhaserFreq, ChangePhaserFeedback, ChangePhaserStages, ChangeInvertWave, ChangeUpperLimit, ChangeLowerLimit, pickNextPresetValue } from "./changes";
-import { OctaveCountPrompt } from "./OctaveCountPrompt";
 
 import { TrackEditor } from "./TrackEditor";
 import { oscilloscopeCanvas } from "../global/Oscilloscope";
@@ -793,7 +792,6 @@ export class SongEditor {
         option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (" + EditorConfig.ctrlSymbol + "E)"),
         option({ value: "beatsPerBar" }, "Change Beats Per Bar... (⇧B)"),
         option({ value: "barCount" }, "Change Song Length... (L)"),
-        option({ value: "octaves" }, "Change Octave Count..."),
         option({ value: "channelSettings" }, "Channel Settings... (Q)"),
         option({ value: "limiterSettings" }, "Limiter Settings... (⇧L)"),
         option({ value: "addExternal" }, "Add Custom Samples... (⇧Q)"),
@@ -2245,9 +2243,6 @@ export class SongEditor {
                     break;
                 case "beatsPerBar":
                     this.prompt = new BeatsPerBarPrompt(this.doc);
-                    break;
-                case "octaves":
-                    this.prompt = new OctaveCountPrompt(this.doc);
                     break;
                 case "moveNotesSideways":
                     this.prompt = new MoveNotesSidewaysPrompt(this.doc);
@@ -5599,7 +5594,7 @@ export class SongEditor {
     }
 
     private _zoomOut = (): void => {
-        this.doc.prefs.visibleOctaves = Math.min(this.doc.song.octaveCount, this.doc.prefs.visibleOctaves + 1);
+        this.doc.prefs.visibleOctaves = Math.min(Config.pitchOctaves, this.doc.prefs.visibleOctaves + 1);
         this.doc.prefs.save();
         this.doc.notifier.changed();
         this.refocusStage();
@@ -5702,9 +5697,6 @@ export class SongEditor {
                 break;
             case "beatsPerBar":
                 this._openPrompt("beatsPerBar");
-                break;
-            case "octaves":
-                this._openPrompt("octaves");
                 break;
             case "moveNotesSideways":
                 this._openPrompt("moveNotesSideways");

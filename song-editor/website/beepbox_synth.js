@@ -9466,7 +9466,6 @@ var beepbox = (() => {
       this.scale = 0;
       this.scaleCustom = [true, false, false, false, false, false, false, false, false, false, false, false];
       this.key = 0;
-      this.octaveCount = 8;
       this.octave = 0;
       this.loopStart = 0;
       this.loopLength = 4;
@@ -9531,7 +9530,6 @@ var beepbox = (() => {
       for (let i2 = 0; i2 < encodedSongTitle.length; i2++) {
         buffer.push(encodedSongTitle.charCodeAt(i2));
       }
-      buffer.push(75 /* octaveCount */, base64IntToCharCode[this.octaveCount]);
       buffer.push(110 /* channelCount */, base64IntToCharCode[this.pitchChannelCount], base64IntToCharCode[this.noiseChannelCount], base64IntToCharCode[this.modChannelCount]);
       buffer.push(115 /* scale */, base64IntToCharCode[this.scale]);
       if (this.scale == Config.scales["dictionary"]["Custom"].index) {
@@ -10320,11 +10318,6 @@ var beepbox = (() => {
             }
           }
           break;
-        case 75 /* octaveCount */:
-          {
-            this.octaveCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-          }
-          break;
         case 115 /* scale */:
           {
             this.scale = clamp(0, Config.scales.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -10505,16 +10498,16 @@ var beepbox = (() => {
           {
             if (beforeThree && fromBeepBox) {
               const channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-              this.channels[channelIndex].octave = clamp(0, this.octaveCount, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
+              this.channels[channelIndex].octave = clamp(0, Config.pitchOctaves, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
               if (channelIndex >= this.pitchChannelCount) this.channels[channelIndex].octave = 0;
             } else if (beforeNine && fromBeepBox || (fromJummBox && beforeFive || beforeFour && fromGoldBox)) {
               for (let channelIndex = 0; channelIndex < this.getChannelCount(); channelIndex++) {
-                this.channels[channelIndex].octave = clamp(0, this.octaveCount, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
+                this.channels[channelIndex].octave = clamp(0, Config.pitchOctaves, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
                 if (channelIndex >= this.pitchChannelCount) this.channels[channelIndex].octave = 0;
               }
             } else {
               for (let channelIndex = 0; channelIndex < this.pitchChannelCount; channelIndex++) {
-                this.channels[channelIndex].octave = clamp(0, this.octaveCount, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                this.channels[channelIndex].octave = clamp(0, Config.pitchOctaves, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
               }
               for (let channelIndex = this.pitchChannelCount; channelIndex < this.getChannelCount(); channelIndex++) {
                 this.channels[channelIndex].octave = 0;
@@ -12984,7 +12977,7 @@ var beepbox = (() => {
             newPitchChannels.push(channel);
           }
           if (channelObject["octaveScrollBar"] != void 0) {
-            channel.octave = clamp(0, this.octaveCount, (channelObject["octaveScrollBar"] | 0) + 1);
+            channel.octave = clamp(0, Config.pitchOctaves, (channelObject["octaveScrollBar"] | 0) + 1);
             if (isNoiseChannel) channel.octave = 0;
           }
           if (channelObject["name"] != void 0) {

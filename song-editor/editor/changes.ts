@@ -5710,14 +5710,3 @@ export class ChangeSetEnvelopeWaveform extends Change {
         }
     }
 }
-
-export class ChangeOctaveCount extends Change {
-	constructor(doc: SongDocument, newValue: number) {
-		super();
-		if (doc.song.octaveCount != newValue) {
-			doc.song.octaveCount = newValue;
-			doc.notifier.changed();
-			this._didSomething();
-		}
-	}
-}

@@ -486,6 +486,6 @@ export class SongDocument {
 
     public getBaseVisibleOctave(channel: number): number {
         const visibleOctaveCount: number = this.getVisibleOctaveCount();
-        return Math.max(0, Math.min(this.song.octaveCount - visibleOctaveCount, Math.ceil(this.song.channels[channel].octave - visibleOctaveCount * 0.5)));
+        return Math.max(0, Math.min(Config.pitchOctaves - visibleOctaveCount, Math.ceil(this.song.channels[channel].octave - visibleOctaveCount * 0.5)));
     }
 }

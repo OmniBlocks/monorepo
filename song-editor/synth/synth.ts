@@ -208,70 +208,70 @@ const enum CharCode {
 }
 
 const enum SongTagCode {
-    beatCount           = CharCode.a, // added in BeepBox URL version 2
-    bars                = CharCode.b, // added in BeepBox URL version 2
-    songEq              = CharCode.c, // added in BeepBox URL version 2 for vibrato, switched to song eq in Slarmoo's Box 1.3
-    fadeInOut           = CharCode.d, // added in BeepBox URL version 3 for transition, switched to fadeInOut in 9
-    loopEnd             = CharCode.e, // added in BeepBox URL version 2
-    eqFilter            = CharCode.f, // added in BeepBox URL version 3
-    barCount            = CharCode.g, // added in BeepBox URL version 3
-    unison              = CharCode.h, // added in BeepBox URL version 2
-    instrumentCount     = CharCode.i, // added in BeepBox URL version 3
-    patternCount        = CharCode.j, // added in BeepBox URL version 3
-    key                 = CharCode.k, // added in BeepBox URL version 2
-    loopStart           = CharCode.l, // added in BeepBox URL version 2
-    reverb              = CharCode.m, // added in BeepBox URL version 5, DEPRECATED
-    channelCount        = CharCode.n, // added in BeepBox URL version 6
-    channelOctave       = CharCode.o, // added in BeepBox URL version 3
-    patterns            = CharCode.p, // added in BeepBox URL version 2
-    effects             = CharCode.q, // added in BeepBox URL version 7
-    rhythm              = CharCode.r, // added in BeepBox URL version 2
-    scale               = CharCode.s, // added in BeepBox URL version 2
-    tempo               = CharCode.t, // added in BeepBox URL version 2
-    preset              = CharCode.u, // added in BeepBox URL version 7
-    volume              = CharCode.v, // added in BeepBox URL version 2
-    wave                = CharCode.w, // added in BeepBox URL version 2
-    supersaw            = CharCode.x, // added in BeepBox URL version 9 ([UB] was used for chip wave but is now DEPRECATED)
-    loopControls        = CharCode.y, // added in BeepBox URL version 7, DEPRECATED, [UB] repurposed for chip wave loop controls
-    drumsetEnvelopes    = CharCode.z, // added in BeepBox URL version 7 for filter envelopes, still used for drumset envelopes
-    algorithm           = CharCode.A, // added in BeepBox URL version 6
-    feedbackAmplitude   = CharCode.B, // added in BeepBox URL version 6
-    chord               = CharCode.C, // added in BeepBox URL version 7, DEPRECATED
-    detune              = CharCode.D, // added in JummBox URL version 3(?) for detune, DEPRECATED
-    envelopes           = CharCode.E, // added in BeepBox URL version 6 for FM operator envelopes, repurposed in 9 for general envelopes.
-    feedbackType        = CharCode.F, // added in BeepBox URL version 6
-    arpeggioSpeed       = CharCode.G, // added in JummBox URL version 3 for arpeggioSpeed, DEPRECATED
-    harmonics           = CharCode.H, // added in BeepBox URL version 7
-    stringSustain       = CharCode.I, // added in BeepBox URL version 9
-    edo                 = CharCode.J, // added in EdoBox
-    octaveCount        = CharCode.K, // added in JukeBox
-    pan                 = CharCode.L, // added between 8 and 9, DEPRECATED
-    customChipWave      = CharCode.M, // added in JummBox URL version 1(?) for customChipWave
-    songTitle           = CharCode.N, // added in JummBox URL version 1(?) for songTitle
-    limiterSettings     = CharCode.O, // added in JummBox URL version 3(?) for limiterSettings
-    operatorAmplitudes  = CharCode.P, // added in BeepBox URL version 6
+    beatCount = CharCode.a, // added in BeepBox URL version 2
+    bars = CharCode.b, // added in BeepBox URL version 2
+    songEq = CharCode.c, // added in BeepBox URL version 2 for vibrato, switched to song eq in Slarmoo's Box 1.3
+    fadeInOut = CharCode.d, // added in BeepBox URL version 3 for transition, switched to fadeInOut in 9
+    loopEnd = CharCode.e, // added in BeepBox URL version 2
+    eqFilter = CharCode.f, // added in BeepBox URL version 3
+    barCount = CharCode.g, // added in BeepBox URL version 3
+    unison = CharCode.h, // added in BeepBox URL version 2
+    instrumentCount = CharCode.i, // added in BeepBox URL version 3
+    patternCount = CharCode.j, // added in BeepBox URL version 3
+    key = CharCode.k, // added in BeepBox URL version 2
+    loopStart = CharCode.l, // added in BeepBox URL version 2
+    reverb = CharCode.m, // added in BeepBox URL version 5, DEPRECATED
+    channelCount = CharCode.n, // added in BeepBox URL version 6
+    channelOctave = CharCode.o, // added in BeepBox URL version 3
+    patterns = CharCode.p, // added in BeepBox URL version 2
+    effects = CharCode.q, // added in BeepBox URL version 7
+    rhythm = CharCode.r, // added in BeepBox URL version 2
+    scale = CharCode.s, // added in BeepBox URL version 2
+    tempo = CharCode.t, // added in BeepBox URL version 2
+    preset = CharCode.u, // added in BeepBox URL version 7
+    volume = CharCode.v, // added in BeepBox URL version 2
+    wave = CharCode.w, // added in BeepBox URL version 2
+    supersaw = CharCode.x, // added in BeepBox URL version 9 ([UB] was used for chip wave but is now DEPRECATED)
+    loopControls = CharCode.y, // added in BeepBox URL version 7, DEPRECATED, [UB] repurposed for chip wave loop controls
+    drumsetEnvelopes = CharCode.z, // added in BeepBox URL version 7 for filter envelopes, still used for drumset envelopes
+    algorithm = CharCode.A, // added in BeepBox URL version 6
+    feedbackAmplitude = CharCode.B, // added in BeepBox URL version 6
+    chord = CharCode.C, // added in BeepBox URL version 7, DEPRECATED
+    detune = CharCode.D, // added in JummBox URL version 3(?) for detune, DEPRECATED
+    envelopes = CharCode.E, // added in BeepBox URL version 6 for FM operator envelopes, repurposed in 9 for general envelopes.
+    feedbackType = CharCode.F, // added in BeepBox URL version 6
+    arpeggioSpeed = CharCode.G, // added in JummBox URL version 3 for arpeggioSpeed, DEPRECATED
+    harmonics = CharCode.H, // added in BeepBox URL version 7
+    stringSustain = CharCode.I, // added in BeepBox URL version 9
+    //	                    = CharCode.J,
+    //	                    = CharCode.K,
+    pan = CharCode.L, // added between 8 and 9, DEPRECATED
+    customChipWave = CharCode.M, // added in JummBox URL version 1(?) for customChipWave
+    songTitle = CharCode.N, // added in JummBox URL version 1(?) for songTitle
+    limiterSettings = CharCode.O, // added in JummBox URL version 3(?) for limiterSettings
+    operatorAmplitudes = CharCode.P, // added in BeepBox URL version 6
     operatorFrequencies = CharCode.Q, // added in BeepBox URL version 6
-    operatorWaves       = CharCode.R, // added in JummBox URL version 4 for operatorWaves
-    spectrum            = CharCode.S, // added in BeepBox URL version 7
-    startInstrument     = CharCode.T, // added in BeepBox URL version 6
-    channelNames        = CharCode.U, // added in JummBox URL version 4(?) for channelNames
-    feedbackEnvelope    = CharCode.V, // added in BeepBox URL version 6, DEPRECATED
-    pulseWidth          = CharCode.W, // added in BeepBox URL version 7
-    aliases             = CharCode.X, // added in JummBox URL version 4 for aliases, DEPRECATED, [UB] repurposed for PWM decimal offset (DEPRECATED as well)
-    //                  = CharCode.Y, 
-    //	                = CharCode.Z,
-    //	                = CharCode.NUM_0,
-    //	                = CharCode.NUM_1,
-    //	                = CharCode.NUM_2,
-    //	                = CharCode.NUM_3,
-    //	                = CharCode.NUM_4,
-    //	                = CharCode.NUM_5,
-    //	                = CharCode.NUM_6,
-    //	                = CharCode.NUM_7,
-    //	                = CharCode.NUM_8,
-    //	                = CharCode.NUM_9,
-    //	                = CharCode.DASH,
-    //	                = CharCode.UNDERSCORE,
+    operatorWaves = CharCode.R, // added in JummBox URL version 4 for operatorWaves
+    spectrum = CharCode.S, // added in BeepBox URL version 7
+    startInstrument = CharCode.T, // added in BeepBox URL version 6
+    channelNames = CharCode.U, // added in JummBox URL version 4(?) for channelNames
+    feedbackEnvelope = CharCode.V, // added in BeepBox URL version 6, DEPRECATED
+    pulseWidth = CharCode.W, // added in BeepBox URL version 7
+    aliases = CharCode.X, // added in JummBox URL version 4 for aliases, DEPRECATED, [UB] repurposed for PWM decimal offset (DEPRECATED as well)
+    //                      = CharCode.Y, 
+    //	                    = CharCode.Z,
+    //	                    = CharCode.NUM_0,
+    //	                    = CharCode.NUM_1,
+    //	                    = CharCode.NUM_2,
+    //	                    = CharCode.NUM_3,
+    //	                    = CharCode.NUM_4,
+    //	                    = CharCode.NUM_5,
+    //	                    = CharCode.NUM_6,
+    //	                    = CharCode.NUM_7,
+    //	                    = CharCode.NUM_8,
+    //	                    = CharCode.NUM_9,
+    //	                    = CharCode.DASH,
+    //	                    = CharCode.UNDERSCORE,
 
 }
 
@@ -3292,7 +3292,6 @@ export class Song {
     public scale: number;
     public scaleCustom: boolean[] = [];
     public key: number;
-    public octaveCount: number;
     public octave: number;
     public tempo: number;
     public reverb: number;
@@ -3555,7 +3554,6 @@ export class Song {
         //this.scaleCustom = [true, false, true, true, false, false, false, true, true, false, true, true];
         //this.scaleCustom = [true, false, false, false, false, false, false, false, false, false, false, false];
         this.key = 0;
-        this.octaveCount = 8;
         this.octave = 0;
         this.loopStart = 0;
         this.loopLength = 4;
@@ -3632,7 +3630,6 @@ export class Song {
             buffer.push(encodedSongTitle.charCodeAt(i));
         }
 
-        buffer.push(SongTagCode.octaveCount, base64IntToCharCode[this.octaveCount]);
         buffer.push(SongTagCode.channelCount, base64IntToCharCode[this.pitchChannelCount], base64IntToCharCode[this.noiseChannelCount], base64IntToCharCode[this.modChannelCount]);
         buffer.push(SongTagCode.scale, base64IntToCharCode[this.scale]);
         if (this.scale == Config.scales["dictionary"]["Custom"].index) {
@@ -4593,9 +4590,6 @@ export class Song {
                     }
                 }
             } break;
-            case SongTagCode.octaveCount: {
-                this.octaveCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-            } break;
             case SongTagCode.scale: {
                 this.scale = clamp(0, Config.scales.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 // All the scales were jumbled around by Jummbox. Just convert to free.
@@ -4767,16 +4761,16 @@ export class Song {
             case SongTagCode.channelOctave: {
                 if (beforeThree && fromBeepBox) {
                     const channelIndex: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                    this.channels[channelIndex].octave = clamp(0, this.octaveCount, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
+                    this.channels[channelIndex].octave = clamp(0, Config.pitchOctaves, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
                     if (channelIndex >= this.pitchChannelCount) this.channels[channelIndex].octave = 0;
                 } else if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                     for (let channelIndex: number = 0; channelIndex < this.getChannelCount(); channelIndex++) {
-                        this.channels[channelIndex].octave = clamp(0, this.octaveCount, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
+                        this.channels[channelIndex].octave = clamp(0, Config.pitchOctaves, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
                         if (channelIndex >= this.pitchChannelCount) this.channels[channelIndex].octave = 0;
                     }
                 } else {
                     for (let channelIndex: number = 0; channelIndex < this.pitchChannelCount; channelIndex++) {
-                        this.channels[channelIndex].octave = clamp(0, this.octaveCount, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        this.channels[channelIndex].octave = clamp(0, Config.pitchOctaves, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     }
                     for (let channelIndex: number = this.pitchChannelCount; channelIndex < this.getChannelCount(); channelIndex++) {
                         this.channels[channelIndex].octave = 0;
@@ -7575,7 +7569,7 @@ export class Song {
                 }
 
                 if (channelObject["octaveScrollBar"] != undefined) {
-                    channel.octave = clamp(0, this.octaveCount, (channelObject["octaveScrollBar"] | 0) + 1);
+                    channel.octave = clamp(0, Config.pitchOctaves, (channelObject["octaveScrollBar"] | 0) + 1);
                     if (isNoiseChannel) channel.octave = 0;
                 }
 
@@ -9754,6 +9748,7 @@ class ChannelState {
 }
 
 export class Synth {
+
     private syncSongState(): void {
         const channelCount: number = this.song!.getChannelCount();
         for (let i: number = this.channels.length; i < channelCount; i++) {

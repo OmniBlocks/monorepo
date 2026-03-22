@@ -55,45 +55,72 @@ p.mediaRecorderPopupOption {
 }
 
 .sa-record-icon {
-  width: 2em; /* adjust the size as needed */
-  height: 2em; /* adjust the size as needed */
-  margin-right: 0.5em; /* adjust the spacing as needed */
+  width: 2em; 
+  height: 2em;  
+  margin-right: 0.5em;  
 }
 
 .mediaRecorderPopupButtons button:nth-of-type(1) {
   color: black;
 }
 
-/* Custom style for format dropdown */
-#recordOptionFormatInput {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: #fff;
-  border: 1.5px solid #bbb;
-  border-radius: 0.4em;
-  padding: 0.5em 2.5em 0.5em 1em;
-  font-size: 1rem;
-  color: #222;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: border-color 0.2s, box-shadow 0.2s;
-  outline: none;
-  margin-left: 1rem;
+
+
+.mediaRecorderProgressContainer {
+  width: 100%;
+  height: 18px;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.07));
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), inset 0 2px 5px rgba(0,0,0,0.12);
 }
 
-#recordOptionFormatInput:focus {
+.mediaRecorderProgressBar {
+  height: 100%;
+  width: 0%;
+  border-radius: 9px;  
+  --mediaRecorderAccent: var(--motion-primary, var(--loop-accent, var(--editorDarkMode-accent, var(--looks-secondary, #4c97ff))));
+ 
+  background: var(--mediaRecorderAccent);
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(0, 0, 0, 0.05) 51%,
+    rgba(0, 0, 0, 0) 100%
+  );
   
-  box-shadow: 0 0 0 2px rgba(74,144,226,0.15);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: width 0.25s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-#recordOptionFormatInput option {
-  border-radius: 1em;
+.mediaRecorderProgressBar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+ 
+  width: 150px; 
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    rgba(255, 255, 255, 0) 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    rgba(255, 255, 255, 0) 100%
+  );
+ 
+  transform: skewX(-25deg) translateX(-150%);
+  animation: win7Shimmer 2s infinite linear;
 }
 
-/* Add a dropdown arrow using a background SVG */
-#recordOptionFormatInput {
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 1em center;
-  background-size: 1em;
+@keyframes win7Shimmer {
+  0% {
+    left: -150px;
+  }
+  100% { 
+    left: 100%;
+  }
 }

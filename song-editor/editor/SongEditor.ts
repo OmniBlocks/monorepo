@@ -762,15 +762,14 @@ export class SongEditor {
     private readonly _fileMenu: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ selected: true, disabled: true, hidden: false }, "File"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
         option({ value: "new" }, "+ New Blank Song (⇧`)"),
-        option({ value: "import" }, "↑ Import Song... (" + EditorConfig.ctrlSymbol + "O)"),
-        option({ value: "export" }, "↓ Export Song... (" + EditorConfig.ctrlSymbol + "S)"),
-        option({ value: "copyUrl" }, "⎘ Copy Song URL"),
-        option({ value: "shareUrl" }, "⤳ Share Song URL"),
+        option({ value: "import" }, "↑ Import Song... (" + EditorConfig.ctrlSymbol + "O)"), 
+        option({ value: "export" }, "↓ Export Song... (" + EditorConfig.ctrlSymbol + "S)"), /*comment for testing
+        option({ value: "copyUrl" }, "⎘ Copy Song URL"), 
         option({ value: "configureShortener" }, "🛠 Customize Url Shortener..."),
         option({ value: "shortenUrl" }, "… Shorten Song URL (⇧U)"),
         option({ value: "viewPlayer" }, "▶ View in Song Player (⇧P)"),
         option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"),
-        option({ value: "songRecovery" }, "⚠ Recover Recent Song... (`)"),
+        option({ value: "songRecovery" }, "⚠ Recover Recent Song... (`)"), // */
     );
     private readonly _editMenu: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ selected: true, disabled: true, hidden: false }, "Edit"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
@@ -2461,7 +2460,7 @@ export class SongEditor {
             (prefs.instrumentCopyPaste ? textOnIcon : textOffIcon) + "Enable Copy/Paste Buttons",
             (prefs.enableTagSearch ? textOnIcon : textOffIcon) + "Enable Tag Search",
             (prefs.instrumentImportExport ? textOnIcon : textOffIcon) + "Enable Import/Export Buttons",
-            (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL",
+            //(prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL", //comment for testing
             (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
             (prefs.rollNoveltyPresets ? textOnIcon : textOffIcon) + "Can Randomly Select Novelty Presets",
             textSpacingIcon + "Note Recording...",
@@ -4330,8 +4329,9 @@ export class SongEditor {
                     event.preventDefault();
                 }
                 break;
+            /*comment for testing
             case 85: // u
-                if (event.shiftKey) {
+                if (event.shiftKey) { 
                     let shortenerStrategy: string = "https://tinyurl.com/api-create.php?url=";
                     const localShortenerStrategy: string | null = window.localStorage.getItem("shortenerStrategySelect");
 
@@ -4339,8 +4339,9 @@ export class SongEditor {
                     if (localShortenerStrategy == "isgd") shortenerStrategy = "https://is.gd/create.php?format=simple&url=";
 
                     window.open(shortenerStrategy + encodeURIComponent(new URL("#" + this.doc.song.toBase64String(), location.href).href));
-                }
+                } 
                 break;
+            // */
             case 192: // `/~
                 if (canPlayNotes) break;
                 if (event.shiftKey) {
@@ -4351,11 +4352,13 @@ export class SongEditor {
                         channel.name = "";
                     }
                     this.doc.record(new ChangeSong(this.doc, ""), false, true);
-                } else {
+                } 
+                /*comment for testing
+                else {
                     if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                         this._openPrompt("songRecovery");
                     }
-                }
+                } // */
                 event.preventDefault();
                 break;
             case 90: // z
@@ -4596,7 +4599,7 @@ export class SongEditor {
                     this.doc.prefs.showScrollBar = true;
                     this.doc.prefs.alwaysFineNoteVol = false;
                     this.doc.prefs.enableChannelMuting = true;
-                    this.doc.prefs.displayBrowserUrl = true;
+                    //this.doc.prefs.displayBrowserUrl = true;
                     this.doc.prefs.displayVolumeBar = true;
                     this.doc.prefs.layout = "wide";
                     this.doc.prefs.visibleOctaves = 5;
@@ -4728,7 +4731,7 @@ export class SongEditor {
                     this.doc.prefs.showScrollBar = true;
                     this.doc.prefs.alwaysFineNoteVol = false;
                     this.doc.prefs.enableChannelMuting = true;
-                    this.doc.prefs.displayBrowserUrl = true;
+                    //this.doc.prefs.displayBrowserUrl = true;
                     this.doc.prefs.displayVolumeBar = true;
                     this.doc.prefs.layout = "tall";
                     this.doc.prefs.visibleOctaves = 5;
@@ -4748,7 +4751,8 @@ export class SongEditor {
                 } else if (event.ctrlKey || event.metaKey) {
                     this._openPrompt("export");
                     event.preventDefault();
-                } else if (event.altKey) {
+                }
+                else if (event.altKey) {
                     this._openPrompt("exportInstrument");
                 } else if (this.doc.prefs.enableChannelMuting) {
                     // JummBox deviation: I like shift+s as just another mute toggle personally.
@@ -4838,7 +4842,7 @@ export class SongEditor {
                     this.doc.prefs.showScrollBar = true;
                     this.doc.prefs.alwaysFineNoteVol = true;
                     this.doc.prefs.enableChannelMuting = true;
-                    this.doc.prefs.displayBrowserUrl = true;
+                    //this.doc.prefs.displayBrowserUrl = true;
                     this.doc.prefs.displayVolumeBar = true;
                     this.doc.prefs.layout = "long";
                     this.doc.prefs.visibleOctaves = 4;

@@ -808,7 +808,7 @@ export class SongEditor {
             option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"),
             option({ value: "enableTagSearch" }, "Enable Tag Search"),
             option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"),
-            option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"),
+            //option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), //comment for testing
             option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
             option({ value: "rollNoveltyPresets" }, "Can Randomly Select Novelty Presets"),
             option({ value: "recordingSetup" }, "Note Recording..."),

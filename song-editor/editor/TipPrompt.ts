@@ -124,11 +124,10 @@ export class TipPrompt implements Prompt {
 					p("JukeBox's instrument tags allow for filtering out specific instrument types, authors, and more!"),
 					p("Applied tags will filter search results from the instrument type search box, as well has presets rolled with random selection."),
 					p("Examples of how to use instrument tags:"),
-					p("Basic: #chip"),
-					p("Multiple: #chip #pad"),
-					p("Exclude: !!fm "),
-					p("Try checking the #featured tag for the best presets!"),
-					p("You can find the full list of tags here"),
+					p("Basic: chip"),
+					p("Multiple: ashiiware chip"),
+					p("Exclude: !fm"),
+					p("Try checking the \"featured\" tag for the best presets!"),
 				);
 			} break;
 			case "instrumentType": {

@@ -1,6 +1,6 @@
-# TurboWarp Extension Gallery
+# OmniBlocks Extension Gallery
 
-User-contributed unsandboxed extension gallery for TurboWarp.
+User-contributed unsandboxed extension gallery for OmniBlocks, a fork of TurboWarp.
 
 https://extensions.turbowarp.org/
 

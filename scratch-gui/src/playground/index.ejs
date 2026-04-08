@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google" value="notranslate">
+    <meta name="description" content="<%= htmlWebpackPlugin.options.APP_NAME %> is a beta Multi-Language IDE for creating projects with code, paint, sound, and music editing capabilities. Based on Scratch 3 with enhanced features." />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#59C0C0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.APP_NAME %>">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="<%= htmlWebpackPlugin.options.APP_NAME %>">
+    
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    
+    <!-- Icons and Manifest -->
+    <link rel="apple-touch-icon" href="<%= htmlWebpackPlugin.options.root %>images/apple-touch-icon.png">
+  <link rel="icon" type="image/x-icon" sizes="32x32" href="<%= htmlWebpackPlugin.options.root %>favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="<%= htmlWebpackPlugin.options.root %>images/192.png">
+    <link rel="manifest" href="<%= htmlWebpackPlugin.options.root %>manifest.webmanifest">
+    <style>
+      /* CSS Variables for theme consistency */
+      :root {
+        --offline-ui-bg: var(--menu-bar-background, #333);
+        --offline-text: var(--text-primary, #fff);
+        --offline-accent: var(--looks-secondary, #59C0C0);
+        --offline-accent-dark: var(--motion-tertiary, #389499);
+        --status-offline: #ff6b6b;
+        --status-online: #51cf66;
+        --status-info: #4c97ff;
+      }
+      
+      .splash-screen {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+      .splash-screen[hidden] {
+        display: none;
+      }
+      .splash-screen[data-theme="dark"] {
+        background-color: var(--offline-ui-bg);
+        color: var(--offline-text);
+      }
+      .splash-screen > * {
+        max-width: 80%;
+      }
+      .splash-spinner:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 6px solid;
+        border-color: currentColor transparent currentColor transparent;
+        animation: splash-spinner 1.2s linear infinite;
+      }
+      @keyframes splash-spinner {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .splash-error-title {
+        font-weight: bold;
+      }
+      .splash-error-title a {
+        color: inherit;
+      }
+      .splash-errors {
+        font-family: monospace;
+      }
+      .splash-error-list {
+        white-space: pre-wrap;
+      }
+      .splash-reset {
+        color: inherit;
+        background: none;
+        padding: 0;
+        margin: 0;
+        border: none;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      .splash-reset:disabled {
+        opacity: 0.8;
+      }
+      
+      /* Offline indicator styles */
+      .offline-indicator {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: var(--status-offline);
+        color: var(--offline-text);
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        z-index: 10000;
+        display: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+      .offline-indicator.online {
+        background: var(--status-online);
+      }
+      .offline-indicator.show {
+        display: block;
+      }
+      
+      /* Update notification styles */
+      .update-notification {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--status-info);
+        color: var(--offline-text);
+        border-radius: 8px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        z-index: 10000;
+        display: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        max-width: 90%;
+        text-align: center;
+      }
+      .update-notification.show {
+        display: block;
+      }
+      .update-notification button {
+        background: white;
+        color: var(--status-info);
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        margin-left: 10px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Offline/Online Indicator -->
+    <div id="offline-indicator" class="offline-indicator">
+      <span id="offline-text">Offline</span>
+    </div>
+    
+    <!-- Update Notification -->
+    <div id="update-notification" class="update-notification">
+      <span>A new version is available!</span>
+      <button onclick="window.location.reload()">Update</button>
+    </div>
+    
+    <noscript>
+      <div class="splash-screen">
+        <div>
+          <h1><%= htmlWebpackPlugin.options.APP_NAME %> requires JavaScript</h1>
+          <p>Consider using <a href="https://desktop.turbowarp.org/">TurboWarp Desktop</a> if you are afraid of remote JavaScript.</p>
+        </div>
+      </div>
+    </noscript>
+
+    <div class="splash-screen spash-waiting-for-js" hidden>
+      <div class="splash-spinner"></div>
+
+      <div class="splash-error-title" hidden>Something went wrong. <a href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments" target="_blank" rel="noreferrer">Please report</a> with the information below.</div>
+      <div class="splash-errors" hidden></div>
+      <button class="splash-reset" hidden>Click here to reset caches (can fix some errors)</button>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var theme = '';
+        var accent = '#59C0C0';
+
+        try {
+          var themeSetting = localStorage.getItem('tw:theme');
+        } catch (e) {
+          // ignore
+        }
+        if (themeSetting === 'light') {
+          theme = 'light';
+        } else if (themeSetting === 'dark') {
+          theme = 'dark';
+        } else if (themeSetting) {
+          try {
+            var parsed = JSON.parse(themeSetting);
+            if (parsed.accent === 'purple') {
+              accent = '#855cd6';
+            } else if (parsed.accent === 'blue') {
+              accent = '#4c97ff';
+            }
+            if (parsed.gui === 'dark' || parsed.gui === 'light') {
+              theme = parsed.gui;
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        var splash = document.querySelector('.spash-waiting-for-js');
+        splash.setAttribute('data-theme', theme);
+        if (theme !== 'dark') {
+          <% if (htmlWebpackPlugin.options.isEditor) { %>
+            splash.style.backgroundColor = accent;
+            splash.style.color = 'white';
+          <% } else { %>
+            splash.style.color = accent;
+          <% } %>
+        }
+        splash.hidden = false;
+
+        var splashErrorTitle = document.querySelector('.splash-error-title');
+        var splashError = document.querySelector('.splash-errors');
+        var splashReset = document.querySelector('.splash-reset');
+
+        var totalErrors = 0;
+        window.onerror = function (event, source, line, col, err) {
+          if (++totalErrors > 5) return; // dont bother logging more
+          splashErrorTitle.hidden = splashError.hidden = splashReset.hidden = false;
+          var el = document.createElement('div');
+          el.textContent = 'Error (splash) in ' + source + ' (' + line + ':' + col + '): ' + err;
+          splashError.appendChild(el);
+        };
+
+        splashReset.onclick = function () {
+          splashReset.disabled = true;
+          function hardRefresh() {
+            var search = location.search.replace(/[?&]nocache=\d+/, '');
+            location.replace(location.pathname + search + (search ? '&' : '?') + 'nocache=' + Math.floor(Math.random() * 100000));
+          }
+          if ('serviceWorker' in navigator) {
+            setTimeout(hardRefresh, 5000);
+            navigator.serviceWorker.getRegistration(<%= JSON.stringify(htmlWebpackPlugin.options.root) %>)
+              .then(function(registration) {
+                if (registration) {
+                  return registration.unregister();
+                }
+              })
+              .then(hardRefresh)
+              .catch(hardRefresh);
+          } else {
+            hardRefresh();
+          }
+        };
+
+        window.SplashEnd = () => {
+          splash.hidden = true;
+          window.onerror = null;
+        };
+        
+        var offlineIndicatorTimer = null;
+        window.showOfflineIndicator = function(isOffline) {
+          var indicator = document.getElementById('offline-indicator');
+          var text = document.getElementById('offline-text');
+          
+          if (offlineIndicatorTimer) {
+            clearTimeout(offlineIndicatorTimer);
+            offlineIndicatorTimer = null;
+          }
+          if (isOffline) {
+            indicator.className = 'offline-indicator show';
+            text.textContent = 'Offline';
+          } else {
+            indicator.className = 'offline-indicator online show';
+            text.textContent = 'Online';
+            // Hide online indicator after 3 seconds
+            offlineIndicatorTimer = setTimeout(function() {
+              indicator.className = 'offline-indicator online';
+              offlineIndicatorTimer = null;
+            }, 3000);
+          }
+        };
+        
+        // Update notification functionality
+        window.showUpdateNotification = function() {
+          var notification = document.getElementById('update-notification');
+          notification.className = 'update-notification show';
+        };
+        
+        // Check initial offline state
+        if (!navigator.onLine) {
+          window.showOfflineIndicator(true);
+        }
+      })();
+    </script>
+
+    <div id="app"></div>
+  </body>
+</html>

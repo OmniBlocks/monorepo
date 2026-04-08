@@ -1,0 +1,268 @@
+@import "../../css/units.css";
+@import "../../css/colors.css";
+@import "../../css/z-index.css";
+
+.alert {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    justify-content: flex-start;
+    border-radius: $space;
+    padding-top: .875rem;
+    padding-bottom: .875rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-bottom: 7px;
+    min-height: 1.5rem;
+    pointer-events: all;
+}
+
+.alert.warn {
+    background: #FFF0DF;
+    border: 1px solid #FF8C1A;
+    box-shadow: 0px 0px 0px 2px rgba(255, 140, 26, 0.25);
+}
+
+.alert.success {
+    background: $extensions-light;
+    border: 1px solid $extensions-tertiary;
+    box-shadow: 0px 0px 0px 2px $extensions-light;
+}
+
+.alert-spinner {
+    self-align: center;
+}
+
+.icon-section {
+    min-width: 1.25rem;
+    min-height: 1.25rem;
+    display: flex;
+    padding-right: 1rem;
+}
+
+.alert-icon {
+    vertical-align: middle;
+}
+
+.alert-message {
+    color: #555;
+    font-weight: bold;
+    font-size: .8125rem;
+    line-height: .875rem;
+    display: flex;
+    align-items: center;
+    padding-right: .5rem;
+}
+
+.alert-buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+.alert-close-button {
+    outline-style:none;
+}
+
+.alert-close-button-container {
+    outline-style: none;
+    width: 30px;
+    height: 30px;
+    align-self: center;
+}
+
+.alert-connection-button {
+    min-height: 2rem;
+    width: 6.5rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 0.35rem;
+    background: #FF8C1A;
+    color: white;
+    font-weight: 700;
+    font-size: 0.77rem;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    outline-style:none;
+}
+
+[dir="ltr"] .alert-connection-button {
+    margin-right: 13px;
+}
+
+[dir="rtl"] .alert-connection-button {
+    margin-left: 13px;
+}
+
+/* prevent last button in list from too much margin to edge of alert */
+.alert-buttons > :last-child {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* ============================================
+   ALERT ANIMATIONS
+   ============================================ */
+
+/* Slide in from top */
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Fade in */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Bounce effect */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Shake for errors/warnings */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Pulse glow effect */
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0px 0px 0px 2px rgba(255, 140, 26, 0.25);
+    }
+    50% {
+        box-shadow: 0px 0px 0px 4px rgba(255, 140, 26, 0.5);
+    }
+    100% {
+        box-shadow: 0px 0px 0px 2px rgba(255, 140, 26, 0.25);
+    }
+}
+
+/* Slide in with bounce */
+@keyframes slideInBounce {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(10px);
+        opacity: 1;
+    }
+    80% {
+        transform: translateY(-5px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Scale in (grow) */
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Fade out for dismiss */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* ============================================
+   ANIMATION CLASSES
+   ============================================ */
+
+/* Apply slide-in animation to all alerts by default */
+.alert {
+    animation: slideInFromTop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Alternative: Slide in with bounce */
+.alert.slide-bounce {
+    animation: slideInBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Fade in animation */
+.alert.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Scale in animation */
+.alert.scale-in {
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Shake animation for warnings - can be triggered on specific events */
+.alert.warn.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Add pulse glow to warn alerts */
+.alert.warn {
+    animation: slideInFromTop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+               pulseGlow 2s ease-in-out infinite;
+}
+
+/* Success alerts get a gentle fade */
+.alert.success {
+    animation: slideInFromTop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Bounce when alert appears */
+.alert.bounce-entrance {
+    animation: slideInFromTop 0.3s ease-out, 
+               bounce 0.8s ease-out 0.3s;
+}
+
+/* Fade out animation when closing */
+.alert.closing {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+/* Hover effect - slight lift */
+.alert:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+}

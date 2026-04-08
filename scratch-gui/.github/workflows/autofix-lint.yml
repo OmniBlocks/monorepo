@@ -1,0 +1,365 @@
+name: ESLint Autofix
+
+on:
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  autofix-lint:
+    # 👇 REVISED LOGIC: Triggers are now mutually exclusive and role-based.
+    # 1. A Human User runs the "/fix lint" slash command.
+    # 2. The github-actions[bot] runs because its comment (containing a checkbox) was edited.
+    if: >-
+      github.event_name == 'issue_comment' && 
+      github.event.issue.pull_request &&
+      (
+        (github.event.sender.type == 'User' && contains(github.event.comment.body, '/fix lint')) ||
+        (github.event.comment.user.login == 'github-actions[bot]' && (contains(github.event.comment.body, '[x] 🎨 Auto-fix ESLint issues') || contains(github.event.comment.body, '[X] 🎨 Auto-fix ESLint issues')))
+      )
+    runs-on: ubuntu-latest
+
+    steps:
+      # 👇 SIMPLIFIED: This step now just sets the method for future comments.
+      - name: Detect trigger method
+        id: trigger
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const isCheckbox = context.payload.comment.user.login === 'github-actions[bot]';
+            console.log(`Triggered by: ${isCheckbox ? 'checkbox (bot)' : 'slash command (user)'}`);
+            core.setOutput('method', isCheckbox ? 'checkbox' : 'command');
+
+      - name: Check user permissions (only for slash commands)
+        # This will now only run for users, never for the bot
+        if: steps.trigger.outputs.method == 'command'
+        id: permission_check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const permission = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.payload.comment.user.login
+            });
+            
+            const allowedRoles = ['admin', 'maintain', 'write'];
+            const hasPermission = allowedRoles.includes(permission.data.permission);
+            
+            console.log(`User: ${context.payload.comment.user.login}`);
+            console.log(`Permission: ${permission.data.permission}`);
+            console.log(`Has permission: ${hasPermission}`);
+            
+            if (!hasPermission) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `❌ Sorry @${context.payload.comment.user.login}, only collaborators can trigger autofixes for security reasons! 🔒\n\n` +
+                      `You need write access to this repository to use the \`/fix lint\` command.`
+              });
+              core.setFailed('User does not have permission');
+            }
+            
+            return hasPermission;
+
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            const isFork = pr.data.head.repo.full_name !== pr.data.base.repo.full_name;
+            
+            console.log(`PR #${pr.data.number}`);
+            console.log(`Head: ${pr.data.head.ref} (${pr.data.head.repo.full_name})`);
+            console.log(`Base: ${pr.data.base.ref} (${pr.data.base.repo.full_name})`);
+            console.log(`Is fork: ${isFork}`);
+            
+            return {
+              number: pr.data.number,
+              isFork,
+              headRef: pr.data.head.ref,
+              headSha: pr.data.head.sha,
+              headRepo: pr.data.head.repo.full_name
+            };
+
+      - name: Post starting comment
+        id: status_comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const triggerMethod = '${{ steps.trigger.outputs.method }}';
+            const triggerText = triggerMethod === 'checkbox' 
+              ? 'checkbox selection' 
+              : '`/fix lint` command';
+            
+            const comment = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `🎨 **ESLint Autofix Started!**\n\n` +
+                    `Triggered via ${triggerText}\n\n` +
+                    `🔄 Running ESLint with \`--fix\` on changed files...`
+            });
+            
+            return comment.data.id;
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.pr.outputs.result).headRef }}
+          repository: ${{ fromJSON(steps.pr.outputs.result).headRepo }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci || npm i --legacy-peer-deps
+      
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Get changed JS/JSX files
+        id: changed_files
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              per_page: 100
+            });
+            
+            const jsFiles = files
+              .filter(f => f.status !== 'removed')
+              .filter(f => /\.(js|jsx)$/.test(f.filename))
+              .map(f => f.filename)
+              .join(' ');
+            
+            console.log(`Found ${jsFiles.split(' ').filter(Boolean).length} JS/JSX files`);
+            console.log(`Files: ${jsFiles}`);
+            
+            return jsFiles;
+          result-encoding: string
+          
+      - name: Run ESLint --fix and capture output
+        id: autofix
+        run: |
+          FILES="${{ steps.changed_files.outputs.result }}"
+          
+          if [ -z "$FILES" ]; then
+            echo "No JS/JSX files to fix!"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "no_files=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          REPORT_FILE="eslint-report.json"
+
+          echo "🔎 Scanning for fixable ESLint issues..."
+          # Pass 1: Get a report of all fixable issues BEFORE fixing them
+          npx eslint $FILES --format=json > $REPORT_FILE
+
+          # Parse the report to get the rules that are fixable
+          POTENTIAL_FIXES=""
+          if [ -f "$REPORT_FILE" ] && [ -s "$REPORT_FILE" ]; then
+            POTENTIAL_FIXES=$(jq -r '.[] | .messages[] | select(.fix != null) | .ruleId' "$REPORT_FILE" | sort | uniq -c || echo "")
+          fi
+
+          echo "🔧 Applying fixes..."
+          # Pass 2: Now actually apply the fixes
+          # We redirect output to /dev/null because we only care about the file changes, not the final report
+          npx eslint $FILES --fix > /dev/null 2>&1 || true 
+
+          # Check if fixes were ACTUALLY made by looking at git status
+          if [[ -z $(git status --porcelain) ]]; then
+            echo "✨ No changes were made by ESLint."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "no_files=false" >> $GITHUB_OUTPUT
+            
+            # Even if we found potential fixes, if git status is clean, nothing was actually changed.
+            FIXED_RULES=""
+          else
+            echo "🎉 Files were fixed!"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            
+            # Since files WERE changed, we can safely report the rules we found earlier.
+            FIXED_RULES="$POTENTIAL_FIXES"
+          fi
+
+          # Set the final output for subsequent steps (commit message, PR comment)
+          echo "fixed_rules<<EOF" >> $GITHUB_OUTPUT
+          echo "$FIXED_RULES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # Clean up the report file
+          rm -f "$REPORT_FILE"
+
+      - name: Commit and push fixes
+        if: steps.autofix.outputs.has_changes == 'true' && fromJSON(steps.pr.outputs.result).isFork == false
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          
+          echo -e "🎨 Auto-fix ESLint issues\n\nFixed the following:\n${{ steps.autofix.outputs.fixed_rules }}\n\nTriggered by @${{ github.event.comment.user.login }}\nCo-authored-by: ${{ github.event.comment.user.login }} <${{ github.event.comment.user.id }}+${{ github.event.comment.user.login }}@users.noreply.github.com>" > commit_message.txt
+          
+          git commit -F commit_message.txt
+          git push
+
+      - name: Create patch for fork PRs
+        if: >-
+          steps.autofix.outputs.has_changes == 'true' && 
+          fromJSON(steps.pr.outputs.result).isFork == true
+        run: |
+          git diff > eslint-autofix.patch
+          echo "📦 Patch created for fork PR"
+
+      - name: Upload patch artifact (fork PRs)
+        if: >-
+          steps.autofix.outputs.has_changes == 'true' && 
+          fromJSON(steps.pr.outputs.result).isFork == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-autofix-patch-pr-${{ github.event.issue.number }}
+
+          path: eslint-autofix.patch
+      
+      # All subsequent steps only run if the trigger was valid
+      - name: Update checkbox (if used)
+        if: steps.trigger.outputs.method == 'checkbox' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const comment = await github.rest.issues.getComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id
+              });
+              
+              let body = comment.data.body;
+              const success = '${{ steps.autofix.outputs.has_changes }}' === 'true';
+              
+              if (success) {
+                body = body.replace(/- $$x$$ 🎨 Auto-fix ESLint issues/i, '- [x] ~~🎨 Auto-fix ESLint issues~~ ✅ **Complete!**');
+              } else {
+                body = body.replace(/- $$x$$ 🎨 Auto-fix ESLint issues/i, '- [x] ~~🎨 Auto-fix ESLint issues~~ ⚠️ **No fixes needed**');
+              }
+              
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id,
+                body: body
+              });
+            } catch (error) {
+              console.error('Failed to update checkbox:', error);
+            }
+
+      - name: Post success comment
+        if: steps.autofix.outputs.has_changes == 'true' && fromJSON(steps.pr.outputs.result).isFork == false
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fixedRules = `${{ steps.autofix.outputs.fixed_rules }}`.trim();
+            let rulesTable = '';
+            
+            if (fixedRules) {
+              rulesTable = '| Rule | Fixes Applied |\n|------|--------------:|\n';
+              rulesTable += fixedRules.split('\n').map(line => {
+                const [count, ...ruleParts] = line.trim().split(/\s+/);
+                const rule = ruleParts.join(' ');
+                return `| ${rule} | ${count} |`;
+              }).join('\n');
+            }
+            
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.status_comment.outputs.result }},
+              body: `🎨✨ **ESLint Autofix Complete!**\n\n` +
+                    `The following lint issues were automatically fixed:\n\n` +
+                    `${rulesTable || 'No fixable issues found.'}\n\n` +
+                    `✅ Changes committed to branch. Check the latest commit for details.`
+            });
+
+      - name: Post patch comment (fork PR)
+        if: >-
+          steps.autofix.outputs.has_changes == 'true' && 
+          fromJSON(steps.pr.outputs.result).isFork == true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.status_comment.outputs.result }},
+              body: `🎨 **ESLint Autofix Complete!**\n\n` +
+                    `Since this is a fork PR, I can't push directly to your branch. But I'sm'se generated a patch file! 📦\n\n` +
+                    `**To apply the fixes:**\n` +
+                    `1. Download the patch from [workflow artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n` +
+                    `2. In your local repo: \`git apply eslint-autofix.patch\`\n` +
+                    `3. Commit and push the changes\n\n` +
+                    `**Or just run locally:**\n` +
+                    `\`\`\`bash\n` +
+                    `npx eslint . --fix\n` +
+                    `git add .\n` +
+                    `git commit -m "Fix ESLint issues"\n` +
+                    `git push\n` +
+                    `\`\`\`\n\n` +
+                    `⚡ Autofix complete!`
+            });
+
+      - name: Post no-changes comment
+        if: >-
+          steps.autofix.outputs.has_changes == 'false' || 
+          steps.autofix.outputs.no_files == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const noFiles = '${{ steps.autofix.outputs.no_files }}' === 'true';
+            const message = noFiles
+              ? `No JS/JSX files were changed in this PR, so there's nothing to lint! 📝`
+              : `ESLint ran with \`--fix\` but no changes were made. Either:\n` +
+                `- ✅ All issues are already fixed! 🎉\n` +
+                `- ⚠️ The remaining issues can't be auto-fixed (require manual intervention)\n\n` +
+                `Check the [inline annotations](https://github.com/${{ github.repository }}/pull/${{ github.event.issue.number }}/changes) for details!`;
+            
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.status_comment.outputs.result }},
+              body: `✨ **No Fixes Needed!**\n\n${message}`
+            });
+
+      - name: Post failure comment
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.status_comment.outputs.result }},
+              body: `❌ **ESLint Autofix Failed!**\n\n` +
+                    `Something went wrong during the autofix process.\n\n` +
+                    `Check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
+            });

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel='shortcut icon' type='image/x-icon' href='https://omniblocks.github.io/favicon.ico' />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#59C0C0"/>
+    <meta property="og:image" content="https://omniblocks.github.io/Boxy-sad.svg" />
+    <meta name="description" content="OmniBlocks is a Multi-Language IDE based on TurboWarp with enhanced features like a music editor and planned support for text-based languages." />
+    <title>Page Not Found - OmniBlocks</title>
+    <style type="text/css">
+        :root {
+            --motion-primary: #59C0C0;
+            --motion-primary-transparent: #59C0C0E6;
+            --motion-tertiary: #389499;
+            --looks-secondary: #59C0C0;
+            --looks-transparent: #59C0C059;
+            --looks-light-transparent: #59C0C026;
+            --looks-secondary-dark: hsla(180, 42%, 51%, 1);
+            --extensions-primary: hsla(180, 85%, 65%, 1);
+            --extensions-tertiary: hsla(180, 85%, 40%, 1);
+            --extensions-transparent: hsla(180, 85%, 65%, 0.35);
+            --extensions-light: hsla(180, 57%, 85%, 1);
+            --drop-highlight: #66BBCC;
+            --checkbox-active-background: #59C0C0;
+            --checkbox-active-border: #389499;
+            
+            --primary: #59C0C0;
+            --primary-dark: #389499;
+            --error: #FF6680;
+            --background: #F5F5F5;
+            --text: #333333;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #1E1E1E;
+                --text: #E0E0E0;
+                --motion-primary: #59C0C0;
+                --motion-tertiary: #5AD1D1;
+                --extensions-light: #2A2A2A;
+                --extensions-tertiary: #59C0C0;
+                --looks-light-transparent: #59C0C033;
+            }
+        }
+
+        html {
+            background: var(--background);
+            overflow-x: hidden;
+            font-size: large;
+            font-family: sans-serif;
+            line-height: 1.5;
+            color: var(--text);
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            max-width: 1000px;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .content {
+            flex: 1;
+            text-align: left;
+        }
+
+        .images {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            animation: bounce 2s infinite;
+        }
+
+        .boxy-sad {
+            width: 120px;
+            height: 120px;
+            animation: shake 0.5s ease-in-out infinite alternate;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 1rem 0;
+            color: var(--motion-tertiary);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            font-weight: normal;
+            color: var(--motion-primary);
+        }
+
+        p {
+            max-width: 600px;
+            margin: 1rem 0;
+        }
+
+        .url-display {
+            background: var(--extensions-light);
+            padding: 0.5rem;
+            border-radius: 4px;
+            word-break: break-all;
+            font-family: monospace;
+            border-left: 4px solid var(--extensions-tertiary);
+        }
+
+        .home-button {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 2rem;
+            transition: all 0.2s ease-in-out;
+            transform: scale(100%)
+        }
+
+        .home-button:hover {
+            background: var(--primary-dark);
+            transform: scale(120%);
+            box-shadow: 0 4px 8px var(--looks-light-transparent);
+        }
+
+        .home-button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shake {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+        }
+
+        .scrtxt {
+            color: transparent;
+            font-weight: bold;
+        }
+
+        .license {
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            color: #646464;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .content {
+                text-align: center;
+            }
+            
+            .images {
+                flex-direction: row;
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1>404 - Page Not Found</h1>
+            <h2>Looks like you hit a bug!</h2>
+            
+            <p>The requested URL couldn't be found. It may have been moved, renamed, or does not exist. :(</p>
+                        
+            <a href="/" class="home-button">
+                Back to Home
+            </a>
+        </div>
+        
+        <div class="images">
+            <img src="https://omniblocks.github.io/favicon.ico" alt="OmniBlocks Logo, with each side having a cube with a Python logo, an image of a retro computer with eyes and a mouth, and 3 blocks respectively." class="logo">
+            <img src="https://omniblocks.github.io/Boxy-sad.svg" alt="An image of a retro computer with eyes and a mouth." class="boxy-sad">
+        </div>
+    </div>
+    
+    <div class="license">
+        OmniBlocks is open source on <a href="https://github.com/OmniBlocks/scratch-gui">GitHub</a> (GNU GPL v3) | Media licensed CC BY-SA 4.0
+    </div>
+    <div class="scrtxt">
+        <p>There is a man here.<br>
+        He offers you an egg. Take it?<br>
+        You got the egg.<br>
+        It's an easter egg. Inside is an...<br>
+        OmniBlock...?
+    </div> 
+</body>
+</html>

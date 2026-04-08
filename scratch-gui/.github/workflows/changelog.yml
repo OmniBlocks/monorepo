@@ -1,0 +1,182 @@
+name: Changelog Updater
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update Changelog for Release
+        run: |
+          # Get release info
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          RELEASE_NAME="${{ github.event.release.name }}"
+          RELEASE_BODY="${{ github.event.release.body }}"
+          RELEASE_DATE=$(date -u +"%Y-%m-%d %H:%M:%S")
+          
+          # Get previous release tag
+          PREV_TAG=$(git tag --sort=-creatordate | grep -v "^${RELEASE_TAG}$" | head -n 1)
+          
+          # Determine if this is the initial release
+          if [ -z "$PREV_TAG" ]; then
+            RELEASE_SUBTITLE="### Initial release"
+          else
+            RELEASE_SUBTITLE="### Changes since ${PREV_TAG}"
+          fi
+          
+          # Get commits for this release
+          if [ -z "$PREV_TAG" ]; then
+            mapfile -t COMMIT_HASHES < <(git log ${RELEASE_TAG} --pretty=format:"%H")
+          else
+            mapfile -t COMMIT_HASHES < <(git log ${PREV_TAG}..${RELEASE_TAG} --pretty=format:"%H")
+          fi
+          
+          # Categorize commits
+          declare -A CATEGORIES
+          CATEGORIES=(
+            ["feat"]="#### ✨ Features"
+            ["fix"]="#### 🐛 Bug Fixes"
+            ["refactor"]="#### ♻️ Refactoring"
+            ["perf"]="#### ⚡ Performance"
+            ["docs"]="#### 📚 Documentation"
+            ["style"]="#### 💎 Styling"
+            ["test"]="#### 🧪 Tests"
+            ["build"]="#### 📦 Build"
+            ["ci"]="#### 🔧 CI/CD"
+            ["chore"]="#### 🔨 Chores"
+            ["revert"]="#### ⏪ Reverts"
+            ["uncategorized"]="#### 📝 Other Changes"
+          )
+          
+          # Create temporary files for each category
+          for cat in "${!CATEGORIES[@]}"; do
+            > /tmp/changelog_${cat}.txt
+          done
+          
+          # Process each commit
+          for hash in "${COMMIT_HASHES[@]}"; do
+            short_hash=$(git log -1 --format=%h "$hash")
+            subject=$(git log -1 --format=%s "$hash")
+            author=$(git log -1 --format=%an "$hash")
+            body=$(git log -1 --format=%b "$hash")
+            
+            # Skip [skip ci] commits
+            if [[ "$subject" == *"[skip ci]"* ]]; then
+              continue
+            fi
+            
+            # Detect category from conventional commit format
+            category="uncategorized"
+            if [[ "$subject" =~ ^(feat|fix|refactor|perf|docs|style|test|build|ci|chore|revert)(\(.*\))?:\ .* ]]; then
+              category="${BASH_REMATCH[1]}"
+              # Remove the prefix from subject for display
+              display_subject=$(echo "$subject" | sed -E 's/^(feat|fix|refactor|perf|docs|style|test|build|ci|chore|revert)(\(.*\))?:\ //')
+            else
+              display_subject="$subject"
+            fi
+            
+            # Add to category file
+            echo "- [\`${short_hash}\`](https://github.com/${{ github.repository }}/commit/${hash}) **${display_subject}** - *${author}*" >> /tmp/changelog_${category}.txt
+            
+            # Add body if exists
+            if [ -n "$body" ]; then
+              echo "$body" | sed 's/^/  > /' >> /tmp/changelog_${category}.txt
+            fi
+          done
+          
+          # Build the release section
+          RELEASE_SECTION="## Release [${RELEASE_TAG}](https://github.com/${{ github.repository }}/releases/tag/${RELEASE_TAG}) - ${RELEASE_DATE}
+          "
+          
+          if [ -n "${RELEASE_NAME}" ]; then
+            RELEASE_SECTION="${RELEASE_SECTION}
+          **${RELEASE_NAME}**
+          "
+          fi
+          
+          if [ -n "${RELEASE_BODY}" ]; then
+            RELEASE_SECTION="${RELEASE_SECTION}
+          ${RELEASE_BODY}
+          "
+          fi
+          
+          RELEASE_SECTION="${RELEASE_SECTION}
+          ${RELEASE_SUBTITLE}
+          "
+          
+          # Add categories in order (skip empty ones)
+          CATEGORY_ORDER=("feat" "fix" "refactor" "perf" "docs" "style" "test" "build" "ci" "chore" "revert" "uncategorized")
+          
+          for cat in "${CATEGORY_ORDER[@]}"; do
+            if [ -s /tmp/changelog_${cat}.txt ]; then
+              RELEASE_SECTION="${RELEASE_SECTION}
+
+          ${CATEGORIES[$cat]}
+
+          $(cat /tmp/changelog_${cat}.txt)
+          "
+            fi
+          done
+          
+          RELEASE_SECTION="${RELEASE_SECTION}
+
+          ---
+          "
+          
+          # Create new changelog
+          if [ -f CHANGELOG.md ]; then
+            # Extract everything after the UNRELEASED_COMMITS_END marker
+            EXISTING_RELEASES=$(sed -n '/UNRELEASED_COMMITS_END/,$p' CHANGELOG.md | tail -n +2)
+            
+            cat > CHANGELOG.md << 'HEADER'
+          # Changelog
+
+          This file is automatically updated by the Changelog Updater bot.
+
+          <!-- UNRELEASED_COMMITS_START -->
+          <!-- UNRELEASED_COMMITS_END -->
+
+          HEADER
+            
+            echo "$RELEASE_SECTION" >> CHANGELOG.md
+            echo "$EXISTING_RELEASES" >> CHANGELOG.md
+          else
+            cat > CHANGELOG.md << 'HEADER'
+          # Changelog
+
+          This file is automatically updated by the Changelog Updater bot.
+
+          <!-- UNRELEASED_COMMITS_START -->
+          <!-- UNRELEASED_COMMITS_END -->
+
+          HEADER
+            
+            echo "$RELEASE_SECTION" >> CHANGELOG.md
+          fi
+
+      - name: Commit and Push Changes
+        run: |
+          git add CHANGELOG.md
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update CHANGELOG.md [skip ci]"
+            git push
+          fi

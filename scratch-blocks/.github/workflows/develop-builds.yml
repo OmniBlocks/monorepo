@@ -1,0 +1,77 @@
+name: Build and Deploy to develop-builds
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v3
+        with:
+          ref: develop
+          fetch-depth: 0  # Need full history to manage branches
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build compressed bundles
+        run: |
+          npm run prepublish
+          echo "✅ Build completed"
+
+
+      - name: Check for merge conflict markers
+        run: |
+          if grep -r "<<<<<<< HEAD\|=======\|>>>>>>>" blockly_compressed*.js blocks_compressed*.js; then
+            echo "❌ ERROR: Conflict markers found in compiled files"
+            exit 1
+          fi
+          echo "✅ No conflict markers found"
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # IMPORTANT: do NOT reset away the build.
+      # Instead, move the built tree into the develop-builds branch.
+      - name: Create or update local develop-builds branch from built tree
+        run: |
+          git fetch
+          git stash
+          git checkout develop-builds
+
+      - name: Commit and push compiled files
+        run: |
+          git stash pop
+          git status
+
+          # Stage compiled files and related dirs
+          git add .
+
+          # Only commit if there are actual changes
+          if git diff --staged --quiet; then
+            echo "✅ No changes to commit"
+            exit 0
+          fi
+          git pull
+          DEVELOP_SHA=$(git rev-parse --short origin/develop)
+          git commit -m "Auto-build: Update compiled files from develop (${DEVELOP_SHA})"
+
+          git push origin develop-builds
+          echo "✅ Successfully pushed to develop-builds"

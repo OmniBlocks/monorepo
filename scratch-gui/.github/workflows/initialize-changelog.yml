@@ -1,0 +1,244 @@
+name: Initialize Changelog (One-time Setup)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  initialize-changelog:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Generate Complete Changelog
+        run: |
+          REPO_URL="https://github.com/${{ github.repository }}"
+          
+          echo "🚀 Initializing changelog..."
+          echo "📦 Repository: ${REPO_URL}"
+          
+          # Create changelog header with markers
+          cat > CHANGELOG.md << 'HEADER'
+          # Changelog
+
+          This file is automatically updated by the Changelog Updater bot.
+
+          <!-- UNRELEASED_COMMITS_START -->
+          HEADER
+          
+          # Get all tags sorted by date (newest first)
+          mapfile -t TAGS < <(git tag --sort=-creatordate)
+          TAG_COUNT=${#TAGS[@]}
+          
+          echo "🏷️  Found ${TAG_COUNT} releases"
+          
+          # If we have releases, add unreleased commits since the latest release
+          if [ "$TAG_COUNT" -gt "0" ]; then
+            LATEST_TAG="${TAGS[0]}"
+            echo "📝 Adding unreleased commits since ${LATEST_TAG}..."
+            
+            # Get all commit hashes since the last release
+            mapfile -t COMMIT_HASHES < <(git log ${LATEST_TAG}..HEAD --pretty=format:"%H")
+            
+            for hash in "${COMMIT_HASHES[@]}"; do
+              short_hash=$(git log -1 --format=%h "$hash")
+              subject=$(git log -1 --format=%s "$hash")
+              author=$(git log -1 --format=%an "$hash")
+              date=$(git log -1 --format=%ci "$hash")
+              body=$(git log -1 --format=%b "$hash")
+              
+              # Skip changelog bot commits and [skip ci] commits
+              if [[ "$subject" == *"update CHANGELOG.md"* ]] || [[ "$subject" == *"[skip ci]"* ]]; then
+                continue
+              fi
+              
+              echo "### Commit [\`${short_hash}\`](${REPO_URL}/commit/${hash}) - ${date}" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              echo "**${subject}**" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              
+              if [ -n "$body" ]; then
+                echo "$body" >> CHANGELOG.md
+                echo "" >> CHANGELOG.md
+              fi
+              
+              echo "*Author: ${author}*" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              echo "---" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+            done
+          fi
+          
+          # Close the unreleased section
+          echo "<!-- UNRELEASED_COMMITS_END -->" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          
+          if [ "$TAG_COUNT" -eq "0" ]; then
+            echo "📝 No releases found, adding all commits..."
+            echo "## All Commits" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            
+            mapfile -t ALL_HASHES < <(git log --pretty=format:"%H")
+            
+            for hash in "${ALL_HASHES[@]}"; do
+              short_hash=$(git log -1 --format=%h "$hash")
+              subject=$(git log -1 --format=%s "$hash")
+              author=$(git log -1 --format=%an "$hash")
+              date=$(git log -1 --format=%ci "$hash")
+              body=$(git log -1 --format=%b "$hash")
+              
+              echo "### Commit [\`${short_hash}\`](${REPO_URL}/commit/${hash}) - ${date}" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              echo "**${subject}**" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              
+              if [ -n "$body" ]; then
+                echo "$body" >> CHANGELOG.md
+                echo "" >> CHANGELOG.md
+              fi
+              
+              echo "*Author: ${author}*" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              echo "---" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+            done
+          else
+            # Process each release with categorization
+            for i in "${!TAGS[@]}"; do
+              CURRENT_TAG="${TAGS[$i]}"
+              PREV_TAG=""
+              
+              if [ $((i + 1)) -lt ${TAG_COUNT} ]; then
+                PREV_TAG="${TAGS[$((i + 1))]}"
+              fi
+              
+              TAG_DATE=$(git log -1 --format=%ci "${CURRENT_TAG}")
+              
+              echo "📋 Processing release ${CURRENT_TAG}..."
+              
+              # Try to get release notes from GitHub
+              RELEASE_BODY=$(gh release view "${CURRENT_TAG}" --json body -q .body 2>/dev/null || echo "")
+              
+              # Determine if this is the initial release
+              if [ -z "$PREV_TAG" ]; then
+                RELEASE_SUBTITLE="### Initial release"
+                mapfile -t RELEASE_HASHES < <(git log "${CURRENT_TAG}" --pretty=format:"%H")
+              else
+                RELEASE_SUBTITLE="### Changes since ${PREV_TAG}"
+                mapfile -t RELEASE_HASHES < <(git log "${PREV_TAG}..${CURRENT_TAG}" --pretty=format:"%H")
+              fi
+              
+              # Categorize commits
+              declare -A CATEGORIES
+              CATEGORIES=(
+                ["feat"]="#### ✨ Features"
+                ["fix"]="#### 🐛 Bug Fixes"
+                ["refactor"]="#### ♻️ Refactoring"
+                ["perf"]="#### ⚡ Performance"
+                ["docs"]="#### 📚 Documentation"
+                ["style"]="#### 💎 Styling"
+                ["test"]="#### 🧪 Tests"
+                ["build"]="#### 📦 Build"
+                ["ci"]="#### 🔧 CI/CD"
+                ["chore"]="#### 🔨 Chores"
+                ["revert"]="#### ⏪ Reverts"
+                ["uncategorized"]="#### 📝 Other Changes"
+              )
+              
+              # Create temporary files for each category
+              for cat in "${!CATEGORIES[@]}"; do
+                > /tmp/changelog_${cat}_${CURRENT_TAG}.txt
+              done
+              
+              # Process commits
+              for hash in "${RELEASE_HASHES[@]}"; do
+                short_hash=$(git log -1 --format=%h "$hash")
+                subject=$(git log -1 --format=%s "$hash")
+                author=$(git log -1 --format=%an "$hash")
+                body=$(git log -1 --format=%b "$hash")
+                
+                if [[ "$subject" == *"[skip ci]"* ]]; then
+                  continue
+                fi
+                
+                category="uncategorized"
+                if [[ "$subject" =~ ^(feat|fix|refactor|perf|docs|style|test|build|ci|chore|revert)(\(.*\))?:\ .* ]]; then
+                  category="${BASH_REMATCH[1]}"
+                  display_subject=$(echo "$subject" | sed -E 's/^(feat|fix|refactor|perf|docs|style|test|build|ci|chore|revert)(\(.*\))?:\ //')
+                else
+                  display_subject="$subject"
+                fi
+                
+                echo "- [\`${short_hash}\`](${REPO_URL}/commit/${hash}) **${display_subject}** - *${author}*" >> /tmp/changelog_${category}_${CURRENT_TAG}.txt
+                
+                if [ -n "$body" ]; then
+                  echo "$body" | sed 's/^/  > /' >> /tmp/changelog_${category}_${CURRENT_TAG}.txt
+                fi
+              done
+              
+              # Write release section
+              {
+                echo "## Release [${CURRENT_TAG}](${REPO_URL}/releases/tag/${CURRENT_TAG}) - ${TAG_DATE}"
+                echo ""
+                
+                # Add release body if it exists
+                if [ -n "$RELEASE_BODY" ]; then
+                  echo "$RELEASE_BODY"
+                  echo ""
+                fi
+                
+                echo "${RELEASE_SUBTITLE}"
+                echo ""
+              } >> CHANGELOG.md
+              
+              # Add categories in order
+              CATEGORY_ORDER=("feat" "fix" "refactor" "perf" "docs" "style" "test" "build" "ci" "chore" "revert" "uncategorized")
+              
+              for cat in "${CATEGORY_ORDER[@]}"; do
+                if [ -s /tmp/changelog_${cat}_${CURRENT_TAG}.txt ]; then
+                  echo "${CATEGORIES[$cat]}" >> CHANGELOG.md
+                  echo "" >> CHANGELOG.md
+                  cat /tmp/changelog_${cat}_${CURRENT_TAG}.txt >> CHANGELOG.md
+                  echo "" >> CHANGELOG.md
+                fi
+              done
+              
+              echo "---" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+            done
+          fi
+          
+          echo "✅ Changelog initialized successfully!"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and Push Changelog
+        run: |
+          git add CHANGELOG.md
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: reinitialize CHANGELOG.md with categories [skip ci]"
+            git push
+            echo "📄 CHANGELOG.md has been updated!"
+          fi
+
+      - name: Summary
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            LINE_COUNT=$(wc -l < CHANGELOG.md)
+            echo "✅ Changelog initialized with ${LINE_COUNT} lines"
+            echo "🎉 Releases are now categorized!"
+          fi

@@ -1,0 +1,54 @@
+@import "../../css/units.css";
+@import "../../css/colors.css";
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 100vh;
+    box-sizing: border-box;
+    height: 100%;
+    background: $ui-white;
+    border-radius: $space;
+    overflow: hidden;
+}
+
+.toolbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.5rem;
+    background: $ui-tertiary;
+    border-bottom: 1px solid $ui-black-transparent;
+    gap: 0.5rem;
+}
+
+.iframe-wrapper {
+    flex: 1;
+    width: 100%;
+    min-width: 100vh;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: $ui-white;
+    max-width: 100vh;
+    box-sizing: border-box;
+}
+
+/* Ensure proper border radius integration */
+[dir="ltr"] .editor-container {
+    border-top-right-radius: $space;
+    border-bottom-right-radius: $space;
+}
+
+[dir="rtl"] .editor-container {
+    border-top-left-radius: $space;
+    border-bottom-left-radius: $space;
+}

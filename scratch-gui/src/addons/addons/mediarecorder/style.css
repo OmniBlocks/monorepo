@@ -1,0 +1,126 @@
+.mediaRecorderPopup {
+  box-sizing: border-box;
+  width: 700px;
+  max-height: min(800px, 80vh);
+  max-width: 85%;
+  margin-top: 12vh;
+  overflow-y: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mediaRecorderPopupContent {
+  padding: 1.5rem 2.25rem;
+}
+
+.mediaRecorderPopup p {
+  font-size: 1rem;
+  margin: 0.5rem auto;
+}
+
+.mediaRecorderPopup p :last-child {
+  margin-left: 1rem;
+}
+
+.mediaRecorderPopup[dir="rtl"] p :last-child {
+  margin-left: 0;
+  margin-right: 1rem;
+}
+
+p.mediaRecorderPopupOption {
+  display: flex;
+  align-items: center;
+}
+
+.mediaRecorderPopupOption input[type="checkbox"] {
+  height: 1.5rem;
+}
+
+#recordOptionSecondsInput,
+#recordOptionDelayInput {
+  width: 6rem;
+}
+
+.mediaRecorderPopupButtons {
+  margin-top: 1.5rem;
+}
+
+.mediaRecorderPopupButtons button {
+  margin-left: 0.5rem;
+}
+
+.sa-record {
+  display: flex;
+  align-items: center;
+}
+
+.sa-record-icon {
+  width: 2em; 
+  height: 2em;  
+  margin-right: 0.5em;  
+}
+
+.mediaRecorderPopupButtons button:nth-of-type(1) {
+  color: black;
+}
+
+
+
+.mediaRecorderProgressContainer {
+  width: 100%;
+  height: 18px;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.07));
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), inset 0 2px 5px rgba(0,0,0,0.12);
+}
+
+.mediaRecorderProgressBar {
+  height: 100%;
+  width: 0%;
+  border-radius: 9px;  
+  --mediaRecorderAccent: var(--motion-primary, var(--loop-accent, var(--editorDarkMode-accent, var(--looks-secondary, #4c97ff))));
+ 
+  background: var(--mediaRecorderAccent);
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(0, 0, 0, 0.05) 51%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: width 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mediaRecorderProgressBar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+ 
+  width: 150px; 
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    rgba(255, 255, 255, 0) 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    rgba(255, 255, 255, 0) 100%
+  );
+ 
+  transform: skewX(-25deg) translateX(-150%);
+  animation: win7Shimmer 2s infinite linear;
+}
+
+@keyframes win7Shimmer {
+  0% {
+    left: -150px;
+  }
+  100% { 
+    left: 100%;
+  }
+}

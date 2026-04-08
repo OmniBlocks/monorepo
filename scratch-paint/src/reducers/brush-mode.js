@@ -1,0 +1,58 @@
+import log from '../log/log';
+
+const CHANGE_BRUSH_SIZE = 'scratch-paint/brush-mode/CHANGE_BRUSH_SIZE';
+const CHANGE_SIMPLIFY_SIZE = 'scratch-paint/brush-mode/CHANGE_SIMPLIFY_SIZE';
+const CHANGE_BRUSH_TYPE = 'scratch-paint/brush-mode/CHANGE_BRUSH_TYPE';
+const initialState = { brushSize: 10, simplifySize: 10, brushType: "CIRCLE" };
+
+const reducer = function (state, action) {
+    if (typeof state === 'undefined') state = initialState;
+    let {simplifySize, brushSize, brushType} = state;
+    switch (action.type) {
+        case CHANGE_BRUSH_SIZE:
+            if (isNaN(action.brushSize)) {
+                log.warn(`Invalid brush size: ${action.brushSize}`);
+                return state;
+            }
+            return { brushSize: Math.max(1, action.brushSize), simplifySize, brushType };
+        case CHANGE_SIMPLIFY_SIZE:
+            if (isNaN(action.simplifySize)) {
+                log.warn(`Invalid simplify setting: ${action.simplifySize}`);
+                return state;
+            }
+            return { brushSize, simplifySize: Math.max(0, action.simplifySize), brushType };
+        case CHANGE_BRUSH_TYPE:
+            return { brushSize, simplifySize, brushType: String(action.brush) };
+        default:
+            return state;
+    }
+};
+
+// Action creators ==================================
+const changeBrushSize = function (brushSize) {
+    return {
+        type: CHANGE_BRUSH_SIZE,
+        brushSize: brushSize
+    };
+};
+
+const changeSimplifySize = function (simplifySize) {
+    return {
+        type: CHANGE_SIMPLIFY_SIZE,
+        simplifySize: simplifySize
+    };
+};
+
+const setBrushType = function (type) {
+    return {
+        type: CHANGE_BRUSH_TYPE,
+        brush: type
+    };
+};
+
+export {
+    reducer as default,
+    changeBrushSize,
+    changeSimplifySize,
+    setBrushType,
+};

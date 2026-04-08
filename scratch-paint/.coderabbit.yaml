@@ -1,0 +1,13 @@
+# CodeRabbit Configuration
+# Learn more at https://docs.coderabbit.ai
+
+reviews:
+  # Enable auto-approval workflow
+  request_changes_workflow: true
+  
+  # Optional: Set review level (can be "auto", "simple", "comprehensive", or "assertive")
+  # profile: "auto"
+  
+  # Optional: Configure which file changes to review
+  # path_filters:
+  #   - "!**/*.md"  # Example: Skip markdown files

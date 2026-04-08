@@ -1,0 +1,131 @@
+@import "../../css/colors.css";
+@import "../../css/units.css";
+
+.mode-tools {
+    display: flex;
+    min-height: 3rem;
+    align-items: center;
+}
+
+.mode-tools-icon {
+    margin-right: calc(2 * $grid-unit);
+    width: 2rem;
+    height: 2rem;
+}
+[theme="dark"] .mode-tools-icon {
+    filter: brightness(1.7);
+}
+
+[dir="ltr"] .mod-dashed-border {
+    border-right: 1px dashed $ui-pane-border;
+    padding-right: calc(3 * $grid-unit);
+}
+
+[dir="rtl"] .mod-dashed-border {
+    border-left: 1px dashed $ui-pane-border;
+    padding-left: calc(3 * $grid-unit);
+}
+
+.mod-labeled-icon-height {
+    display: flex;
+    height: 2.85rem; /* for the second row so the dashed borders are equal in size */
+    align-items: center;
+}
+
+.dropdown-max-item-list {
+    display: flex;
+    align-items: center;
+    width: 340px;
+    flex-wrap: wrap;
+}
+
+.flex-centerer {
+    align-items: center;
+    justify-content: center;
+}
+
+.drop-item-shape-tool-menu {
+    width: 500px;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+.drop-item-shape-tool {
+    width: 50px;
+    transition: filter 0.3s ease;
+    filter: saturate(1);
+}
+.drop-item-shape-tool:hover {
+    filter: saturate(8);
+}
+.drop-item-shape-tool-label {
+    width: 100%;
+    font-size: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+[theme="dark"] .drop-item-shape-tool-label {
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* TODO replace this when we add a brush selector dropdown */
+$border-radius: 0.25rem;
+
+.button-group-button {
+    display: inline-block;
+    border: 1px solid $ui-pane-border;
+    border-radius: 0;
+    padding: .35rem;
+}
+
+[dir="ltr"] .button-group-button {
+    border-left: none;
+}
+
+[dir="rtl"] .button-group-button {
+    border-right: none;
+}
+
+[dir="ltr"] .button-group-button:last-of-type {
+    border-top-right-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+}
+
+[dir="ltr"] .button-group-button:first-of-type {
+    border-left: 1px solid $ui-pane-border;
+    border-top-left-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+}
+
+[dir="rtl"] .button-group-button:last-of-type {
+    border-top-left-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+}
+
+[dir="rtl"] .button-group-button:first-of-type {
+    border-right: 1px solid $ui-pane-border;
+    border-top-right-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+}
+
+[dir="ltr"] .button-group-button.mod-start-border {
+    border-left: 1px solid $ui-pane-border;
+}
+
+[dir="rtl"] .button-group-button.mod-start-border {
+    border-right: 1px solid $ui-pane-border;
+}
+
+[dir="ltr"] .button-group-button.mod-no-end-border {
+    border-right: none;
+}
+
+[dir="rtl"] .button-group-button.mod-no-end-border {
+    border-left: none;
+}
+
+.button-group-button-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    vertical-align: middle;
+}

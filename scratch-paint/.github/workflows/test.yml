@@ -1,0 +1,94 @@
+name: Test Monitor (Auto-Issue on Fail)
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  test-monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      # 1. Checkout code
+      - uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      # 4. Run tests and capture output
+      - name: Run tests
+        id: tests
+        run: |
+          # Run tests and capture output
+          set +e
+          npm run test 2>&1 | tee test-output.txt
+          TEST_EXIT_CODE=${PIPESTATUS[0]}
+          set -e
+          
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo "TESTS_FAILED=true" >> $GITHUB_ENV
+          fi
+          
+          # Properly escape output for JSON
+          OUTPUT_CONTENT=$(cat test-output.txt | jq -Rs .)
+          echo "TEST_OUTPUT=${OUTPUT_CONTENT}" >> $GITHUB_ENV
+          echo "SHORT_SHA=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+
+      # 5. Generate failure summary with AI
+      - name: Generate failure report
+        if: env.TESTS_FAILED == 'true'
+        id: ai-summary
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            Analyze these test failures and create a GitHub issue report:
+            
+            Commit: ${{ env.SHORT_SHA }}
+            Test Output:
+            ${{ env.TEST_OUTPUT }}
+            
+            Format requirements:
+            1. Start with "🚨 Test Failures Detected"
+            2. List 2-3 key failures with file paths
+            3. Include actual vs expected differences
+            4. Add reproduction steps
+            5. Use clean markdown formatting
+            6. Keep under 200 words
+
+      # 6. Create issue if tests failed
+      - name: Create failure issue
+        if: env.TESTS_FAILED == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Parse the AI response
+            const aiResponse = `${{ steps.ai-summary.outputs.response }}`;
+            
+            // Create the issue
+            const { data: issue } = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 Test Failures in ${process.env.SHORT_SHA}`,
+              body: `
+                ${aiResponse}
+
+                **Full Test Output:**
+                <details>
+                  <pre>${process.env.TEST_OUTPUT}</pre>
+                </details>
+
+                *Triggered by push to ${context.ref}*
+                *Commit: ${process.env.SHORT_SHA}*
+              `,
+              labels: ['tests', 'bug', 'ci']
+            });

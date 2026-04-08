@@ -1,0 +1,77 @@
+name: PR Test Reporter
+
+on:
+  pull_request:
+    branches: [ main ]  # Adjust if your default branch is different
+
+jobs:
+  test-and-comment:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write  # Required to post comments
+
+    steps:
+      # 1. Checkout code
+      - uses: actions/checkout@v4
+
+      # 2. Setup Node.js (modify version as needed)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14.x
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Run tests and capture output
+      - name: Run tests
+        id: tests
+        run: |
+          # Run tests, save raw output to a file
+          npm run test > test-output.txt 2>&1 || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+          echo "TEST_OUTPUT=$(cat test-output.txt | jq -R -s -c '.')" >> $GITHUB_ENV
+
+      # 5. AI Summary Step (using GitHub's built-in AI)
+      - name: Generate test summary
+        id: ai-summary
+        uses: actions/ai@v0
+        with:
+          prompt: |
+            Summarize these test results for a GitHub PR comment:
+            - Focus on FAILURES first (if any)
+            - Highlight key errors (e.g., file names, error types)
+            - Keep it under 150 words
+            - Use markdown (bold/italics for emphasis)
+            - Format:
+              ```
+              **Test Summary** (✅ Passed/❌ Failed)
+              Key findings:
+              - [Concise bullet points]
+              ```
+
+            Raw test output:
+            ${{ env.TEST_OUTPUT }}
+
+      # 6. Post comment to PR
+      - name: Comment on PR
+        if: always()  # Run even if tests fail
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: comment } = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `
+                ### 🧪 Test Results (${{ env.TESTS_FAILED && '❌ Failed' || '✅ Passed' }})
+
+                ${{ steps.ai-summary.outputs.response }}
+
+                <details>
+                  <summary>📜 Full Test Output</summary>
+                  <pre>${{ env.TEST_OUTPUT }}</pre>
+                </details>
+              `
+            });

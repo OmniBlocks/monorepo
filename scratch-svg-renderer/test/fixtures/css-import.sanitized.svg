@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <style type="text/css">
+            /* TW: we rely on the iframe sandbox instead of sanitizing so this is not expected to be r emoved */
+            @import url('https://scratch.mit.edu/site-api/comments/user/auwhefi');
+            @import "https://scratch.mit.edu/site-api/comments/user/auwhefi";
+            .normal {
+                fill: "red";
+            }
+        </style>
+    </defs>
+</svg>

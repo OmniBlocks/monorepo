@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100" height="300">
+    <!-- should not change -->
+    <rect x="0" y="0" width="100" height="50" fill="#ff0000"/>
+
+    <!-- should add ry -->
+    <rect rx="15" x="0" y="50" width="100" height="50" fill="#00ff00"/>
+
+    <!-- should add rx -->
+    <rect ry="100.5" x="0" y="100" width="100" height="50" fill="#0000ff"/>
+
+    <!-- should not change -->
+    <rect ry="50" rx="10" x="0" y="150" width="100" height="50" fill="#00ffff"/>
+    <rect rx="22" ry="0" x="0" y="200" width="100" height="50" fill="#ff00ff"/>
+    <rect ry="0" rx="41" x="0" y="250" width="100" height="50" fill="#ffff00"/>
+</svg>

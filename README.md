@@ -1,35 +1,35 @@
 # OmniBlocks - The Ultimate MultiLanguage IDE
-# OmniBlocks/scratch-gui
-![Build Status](https://github.com/OmniBlocks/scratch-gui/workflows/CI/badge.svg)
-![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/scratch-gui)
+# OmniBlocks/monorepo
+![Build Status](https://github.com/OmniBlocks/monorepo/workflows/CI/badge.svg)
+![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/monorepo)
 ![GitHub](https://img.shields.io/badge/license-GPLv3-blue.svg)
-![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/scratch-gui)
+![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/monorepo)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
-![GitHub contributors](https://img.shields.io/github/contributors/OmniBlocks/scratch-gui)
-![GitHub package.json version](https://img.shields.io/github/package-json/v/OmniBlocks/scratch-gui)
-![GitHub repo size](https://img.shields.io/github/repo-size/OmniBlocks/scratch-gui)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/OmniBlocks/scratch-gui)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/OmniBlocks/scratch-gui)
+![GitHub contributors](https://img.shields.io/github/contributors/OmniBlocks/monorepo)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/OmniBlocks/monorepo)
+![GitHub repo size](https://img.shields.io/github/repo-size/OmniBlocks/monorepo)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/OmniBlocks/monorepo)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/OmniBlocks/monorepo)
 ![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB?logo=react)
 ![Powered by Webpack](https://img.shields.io/badge/Powered%20by-Webpack-8DD6F9?logo=webpack)
-![GitHub Repo stars](https://img.shields.io/github/stars/OmniBlocks/scratch-gui?style=flat)
-![GitHub forks](https://img.shields.io/github/forks/OmniBlocks/scratch-gui?style=flat)
+![GitHub Repo stars](https://img.shields.io/github/stars/OmniBlocks/monorepo?style=flat)
+![GitHub forks](https://img.shields.io/github/forks/OmniBlocks/monorepo?style=flat)
 ![Website](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fomniblocks.github.io)
-![GitHub language count](https://img.shields.io/github/languages/count/OmniBlocks/scratch-gui)
-![GitHub top language](https://img.shields.io/github/languages/top/OmniBlocks/scratch-gui)
-![GitHub Created At](https://img.shields.io/github/created-at/OmniBlocks/scratch-gui)
-![GitHub Release Date](https://img.shields.io/github/release-date-pre/OmniBlocks/scratch-gui)
+![GitHub language count](https://img.shields.io/github/languages/count/OmniBlocks/monorepo)
+![GitHub top language](https://img.shields.io/github/languages/top/OmniBlocks/monorepo)
+![GitHub Created At](https://img.shields.io/github/created-at/OmniBlocks/monorepo)
+![GitHub Release Date](https://img.shields.io/github/release-date-pre/OmniBlocks/monorepo)
 ![GitHub Sponsors](https://img.shields.io/github/sponsors/OmniBlocks?logo=githubsponsors)
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/OmniBlocks/scratch-gui)
-![GitHub number of milestones](https://img.shields.io/github/milestones/closed/OmniBlocks/scratch-gui)
-![GitHub License](https://img.shields.io/github/license/OmniBlocks/scratch-gui)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/OmniBlocks/monorepo)
+![GitHub number of milestones](https://img.shields.io/github/milestones/closed/OmniBlocks/monorepo)
+![GitHub License](https://img.shields.io/github/license/OmniBlocks/monorepo)
 ![GitHub followers](https://img.shields.io/github/followers/OmniBlocks?style=flat&logo=github)
 
-<a href="https://www.star-history.com/#OmniBlocks/scratch-gui&type=date&legend=top-left">
+<a href="https://www.star-history.com/#OmniBlocks/monorepo&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/monorepo&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/monorepo&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=OmniBlocks/monorepo&type=date&legend=top-left" />
  </picture>
 </a>
 
@@ -133,14 +133,14 @@ graph TD
     style K fill:#FF6680,color:#fff,font:Comic Sans
 
     %% Click Interactions
-    click A "https://github.com/OmniBlocks/scratch-gui" "View scratch-gui repo"
-    click B "https://github.com/OmniBlocks/scratch-vm" "View scratch-vm repo"
-    click C "https://github.com/OmniBlocks/scratch-render" "View scratch-render repo"
-    click D "https://github.com/OmniBlocks/scratch-paint" "View scratch-paint repo"
-    click E "https://github.com/OmniBlocks/scratch-blocks" "View scratch-blocks repo"
+    click A "https://github.com/OmniBlocks/monorepo/tree/main/scratch-gui" "View scratch-gui in monorepo"
+    click B "https://github.com/OmniBlocks/monorepo/tree/main/scratch-vm" "View scratch-vm in monorepo"
+    click C "https://github.com/OmniBlocks/monorepo/tree/main/scratch-render" "View scratch-render in monorepo"
+    click D "https://github.com/OmniBlocks/monorepo/tree/main/scratch-paint" "View scratch-paint in monorepo"
+    click E "https://github.com/OmniBlocks/monorepo/tree/main/scratch-blocks" "View scratch-blocks in monorepo"
     click F "https://github.com/OmniBlocks/scratch-audio" "View scratch-audio repo"
     click G "https://github.com/OmniBlocks/scratch-storage" "View scratch-storage repo"
-    click H "https://github.com/OmniBlocks/scratch-svg-renderer" "View scratch-svg-renderer repo"
+    click H "https://github.com/OmniBlocks/monorepo/tree/main/scratch-svg-renderer" "View scratch-svg-renderer in monorepo"
     click I "https://github.com/OmniBlocks/scratch-parser" "View scratch-parser repo"
     click J "https://github.com/OmniBlocks/scratch-l10n" "View scratch-l10n repo"
     click K "https://github.com/OmniBlocks/" "Us. This is us :D"
@@ -154,8 +154,8 @@ To actually mod Scratch, you need to build the GUI, as it is the main package th
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/OmniBlocks/scratch-gui # you can add a .git extension if you want, but it should work fine without it. 
-    cd scratch-gui
+    git clone https://github.com/OmniBlocks/monorepo # you can add a .git extension if you want, but it should work fine without it. 
+    cd monorepo/scratch-gui
     ```
 
 2.  **Install dependencies (recommended method):**

@@ -2040,7 +2040,7 @@ export class ChangeChannelCount extends Change {
                         for (let j: number = 0; j < Config.instrumentCountMin; j++) {
                             const instrument: Instrument = new Instrument(isNoise, isMod);
                             if (!isMod) {
-                                const presetValue: number = pickRandomPresetValue(isNoise,false);
+                                const presetValue: number = pickRandomPresetValue(isNoise,false,true);
                                 const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
                                 instrument.fromJsonObject(preset.settings, isNoise, isMod, doc.song.rhythm == 0 || doc.song.rhythm == 2, doc.song.rhythm >= 2);
                                 instrument.preset = presetValue;
@@ -3431,7 +3431,7 @@ export class ChangeAddChannelInstrument extends Change {
         const isMod: boolean = doc.song.getChannelIsMod(doc.channel);
         const maxInstruments: number = doc.song.getMaxInstrumentsPerChannel();
         if (channel.instruments.length >= maxInstruments) return;
-        const presetValue: number = pickRandomPresetValue(isNoise,false);
+        const presetValue: number = pickRandomPresetValue(isNoise,false,true);
         const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
         const instrument: Instrument = new Instrument(isNoise, isMod);
         instrument.fromJsonObject(preset.settings, isNoise, isMod, false, false, 1);
@@ -4371,14 +4371,21 @@ export class ChangeDetectKey extends ChangeGroup {
     }
 }
 
-export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boolean): number {
+export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boolean, ignoreTags: boolean = false): number {
     const eligiblePresetValues: number[] = [];
-    const _presetTagsInputBox = document.getElementById("presetTagsInputBox") as HTMLInputElement;
-    
-    let tagList: any = _presetTagsInputBox.value.toLowerCase().split(/\s+/);
 
+    //cannot define taglist before presetTagsInputBox is loaded
+    let _presetTagsInputBox: any = ""
+    let tagList: any = ""
+
+    if (!ignoreTags) {
+        _presetTagsInputBox = document.getElementById("presetTagsInputBox") as HTMLInputElement;
+        tagList = _presetTagsInputBox.value.toLowerCase().split(/\s+/);
+    }
+    
+    
     //checking for valid tags
-    if (!(tagList == "") && !(tagList.every((tag: any) => (fullTagList.includes(tag)) || (tag.startsWith("!") && fullTagList.includes(tag.slice(1)))))) {
+    if (!(tagList == "") && !(ignoreTags == true) && !(tagList.every((tag: any) => (fullTagList.includes(tag)) || (tag.startsWith("!") && fullTagList.includes(tag.slice(1)))))) {
         return -2;
     }
 
@@ -4387,7 +4394,7 @@ export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boole
         if ((category.name.includes("Novelty") && rollNoveltyPresets == false) || category.name == "Unmodified") continue;
         for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
             const preset: Preset = category.presets[presetIndex];
-            if ((preset.settings != undefined && (preset.isNoise == true) == isNoise) && ((tagList == "") || (
+            if ((preset.settings != undefined && (preset.isNoise == true) == isNoise) && ((tagList == "") || (ignoreTags == true) || (
                 
                 tagList.every((tag: any) => 
                 (tag.startsWith("!") && !preset.tags.includes(tag.slice(1))) || 
@@ -4395,6 +4402,7 @@ export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boole
 
             )))) {    
                 eligiblePresetValues.push((categoryIndex << 12) + presetIndex);
+                //console.log(preset.name)
             }
         }
     }
@@ -4460,7 +4468,7 @@ export function setDefaultInstruments(song: Song): void {
         for (const instrument of song.channels[channelIndex].instruments) {
             const isNoise: boolean = song.getChannelIsNoise(channelIndex);
             const isMod: boolean = song.getChannelIsMod(channelIndex);
-            const presetValue: number = (channelIndex == song.pitchChannelCount) ? EditorConfig.nameToPresetValue(Math.random() > 0.5 ? "chip noise" : "standard drumset")! : pickRandomPresetValue(isNoise,false);
+            const presetValue: number = (channelIndex == song.pitchChannelCount) ? EditorConfig.nameToPresetValue(Math.random() > 0.5 ? "chip noise" : "standard drumset")! : pickRandomPresetValue(isNoise,false,true);
             const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
             instrument.fromJsonObject(preset.settings, isNoise, isMod, song.rhythm == 0 || song.rhythm == 2, song.rhythm >= 2, 1);
             instrument.preset = presetValue;

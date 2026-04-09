@@ -85,6 +85,14 @@
             -webkit-text-stroke-width: 0;
         }
 
+        summary {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+        }
+
         .centerDiv {
 			margin: 0px auto;
 		}
@@ -219,6 +227,134 @@
                         JukeBox does not collect, track, or share any user data.
                     </p>
                 </section>
+                <section>
+                    <details>
+                        <summary>Keybinds List:</summary>
+                        <p>If you are new to BeepMods, know that the first 3 sections have the most important keybinds.</p>
+                        <h3>General</h3>
+                        <ul>
+                            <li><b>Spacebar</b>: play or pause the song</li>
+                            <li><b>Shift Spacebar</b>: play from mouse location</li>
+                            <li><b>Z</b>: undo</li>
+                            <li><b>Y or Shift Z</b>: redo</li>
+                            <li><b>C</b>: copy pattern from selection</li>
+                            <li><b>V</b>: paste pattern into selection</li>
+                            <li><b>X</b>: cut pattern</li>
+                            <li><b>+/-</b>: move notes up or down</li>
+                            <li><b>Shift & +/-</b>: move notes up or down one octave</li>
+                            <li><b>Shift + Drag</b>: Selects notes or patterns</li>
+                            
+                        </ul>
+                        <h3>Patterns, Channels, and Bars</h3>
+                        <ul>
+                            <li><b>0-9</b>: assign pattern number to selection</li>
+                            <li><b>Arrows</b>: move selection</li>
+                            <li><b>D</b>: duplicate a pattern</li>
+                            <li><b>N</b>: create a new blank pattern</li>
+                            <li><b>Delete</b>: clear pattern data</li>
+                            <li><b>A</b>: select entire song</li>
+                            <li><b>Shift A</b>: select current channel</li>
+                            <li><b>Enter</b>: add a new bar after currently selected one</li>
+                            <li><b>Shift Enter</b>: add a new bar before currently selected one</li>
+                            <li><b>Backspace</b>: delete currently selected bar</li>
+                            <li><b>Ctrl Enter</b>: add channel</li>
+                            <li><b>Ctrl Backspace</b>: delete currently selected channel</li>
+                            <li><b>Ctrl & Arrows</b>: move selected channel up or down</li>
+                            
+                        </ul>
+                        <h3>Channel Muting:</h3>
+                        <ul>
+                            <li><b>M</b> (or shift S): Mute/unmute a channel</li>
+                            <li><b>S</b>: Solo/unsolo a channel</li>
+                            <li><b>Shift M</b>: Mute/unmute entire song</li>
+                        </ul>
+                        <h3>Playhead</h3>
+                        <ul>
+                            <li><b>[ ]</b>: move playhead backward or forward one bar</li>
+                            <li><b>F</b>: move playhead to start</li>
+                            <li><b>Shift F</b>: move to start of loop</li>
+                            <li><b>H</b>: move playhead to highlighted pattern</li>
+                            <li><b>B</b>: loop selected bars</li>
+                        </ul>
+                        <h3>Instruments</h3>
+                        <ul>
+                            <li><b>Shift C</b>: copy instrument settings</li>
+                            <li><b>Shift C</b>: paste instrument settings</li>
+                            <li><b>R</b>: select random preset</li>
+                            <li><b>Shift R</b>: generate random instrument</li>
+                            <li><b>Alt R</b>: generate random instrument with same type</li>
+                            <li><b>T</b>: select next preset</li> 
+                            <li><b>Alt E</b>: open/close all envelope dropdowns</li>
+                            <li><b>Alt F</b>: open/close all fm dropdowns</li>
+                        </ul>
+                        <h3>Simultaneous Instrument Per Channel (if enabled):</h3>
+                        <ul>
+                            <li><b>Alt Enter</b>: add instrument within channel</li>
+                            <li><b>Alt Backspace</b> delete instrument within channel</li>
+                            <li><b>Shift 0-9</b> select/toggle corresponding instrument within channel</li>
+                        </ul>
+                        <h3>Song Player:</h3>
+                        <ul>
+                            <li><b>Spacebar</b>: play or pause the song</li>
+                            <li><b>[ ]</b>: move playhead backward or forward one bar</li>
+                            <li><b>F</b>: move to first pattern</li>
+                            <li><b>L</b>: toggle loop</li>
+                            <li><b>Z/+/-</b>: toggle zoom</li>
+                            <li><b>Shift E/P</b>: return to editor</li>
+                            <li><b>Shift U</b>: shorten song player link</li>
+                        </ul>
+                        <h3>Miscellaneous</h3>
+                        <ul>
+                            <li><b>Shift ~</b>: new blank song</li>
+                            <li><b>Shift P</b>: open song player</li>
+                            <li><b>Shift U</b>: shorten song url</li>
+                        </ul>
+                    <!--
+                    <p>For the complete list of keybinds, check the <a onclick="window.open('https://beepbox.miraheze.org/wiki/Keybinds')">BeepBox Wiki</a> for more info.</p>
+                    -->
+                    </details>
+                    <details>
+                        <summary>Preset Tags List:</summary>
+                        <p>Note that all tags have no spaces and are case insensitive</p>
+                        <h3>BeepBox Category Tags:</h3>
+                        <ul>
+                            Retro, Keys, Idiophone, Guitar, Picked, Distortion, String, Vocal, Brass, Reed, Flute, Pad, 
+                            Drums (all drum types), HiHat, Snare, Kick, Novelty
+                        </ul>
+                        <h3>Special Category Tags:</h3>
+                        <ul>
+                            <b>Featured:</b> The top 5-10% of instruments picked out by CoolTasDude<br>
+                            <b>Bass:</b> Instruments that work best at low pitches<br>
+                            <b>Lead:</b> Instruments that work best at high pitches<br>
+                            <b>Ambience:</b> Ambient background sounds, like wind <br>
+                            <b>Chiptune:</b> Chipwaves with minimal effects<br>
+                            <b>Dubstep:</b> wub wub bwwooooOOOOWWWWWwwww<br>
+                            <b>SFX:</b> Instruments that resemble specific sound effects. 
+                            <b></b>
+                        </ul>
+                        <h3>Instrument Type Tags:</h3>
+                        <ul>
+                            Chip (any), ChipWave, CustomChip,
+                            FM (any), FM4op, FM6op,
+                            Supersaw, PWM (pulse width), PickedString, Harmonics, Spectrum, Noise, Drumset
+                        </ul>
+                        <h3>BeepMod Tags:</h3>
+                        <p>These tags only exist for BeepMods with 10 or more presets</p>
+                        <ul>
+                            JukeBox, BeepBox, JummBox, UltraBox, SandBox, MidBox, AbyssBox, AwesomeBox, LemmBox, BulbBox, Slarmoo’sBox, Unbox
+                        </ul>
+                        <h3>Community Tags:</h3>
+                        <p>These tags are for users with 10 or more non-novelty presets:</p>
+                        <ul>
+                            CoolTasDude, DX7FM, HoneyKitKD, Calamity, ThatBeepboxGuy, truemori, TheTuneCrusher, Bagel, ia.kisha, snowirei, Krmailence, DamageLoL, 
+                            HappyLemonLime, spendog, SomethingOriginal, eggfry, august, Treethletress, Synthetic, SuP3R, RBLX_INST, Jayden256, 3001ideaz, ex1,
+                            Ashiiware, Jacobar475, Formskooooo, dragoncoder047
+                        </ul>
+                        
+
+                    </details>
+                </section>
+    <ul></ul>
     </div>
             <div style="justify-content: center; display: flex; cursor: pointer;">
                 <div onclick="window.open('./manual/introduction.html')" style="height: 80px; background: black; width: 430px; border-radius: 20px; border: solid 1px #444; display: flex; flex-direction: row; align-items: center;">

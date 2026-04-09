@@ -5270,7 +5270,7 @@ export class SongEditor {
         } else if (presetValue == -1) { //no results
             alert("Either you are using incompatible tags, or you are using a tag combination that no preset has. \n\nPlease double check your tag combination.")
         } else if (presetValue == -2) { //incorrect tag
-            alert("One or more of the tags you entered doesn't exist. \n\nPlease double check your spelling.")
+            alert("One or more of the tags you entered doesn't exist. \nPlease double check your spelling. \n\nIf you don't know what tags exist, you can reffer to the tag list in the description below.")
         }
         
     }
@@ -5282,7 +5282,7 @@ export class SongEditor {
         if (presetValue > 0) {
             this.doc.record(new ChangePreset(this.doc, presetValue));
         } else if (presetValue == -1) { //no results
-            alert("Either you are using incompatible tags, or you are using a tag combination that no preset has. \n\nPlease double check your tag combination.")
+            alert("One or more of the tags you entered doesn't exist. \nPlease double check your spelling. \n\nIf you don't know what tags exist, you can reffer to the tag list in the description below.")
         } else if (presetValue == -2) { //incorrect tag
             alert("One or more of the tags you entered doesn't exist. \n\nPlease double check your spelling.")
         }

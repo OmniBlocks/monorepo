@@ -155,7 +155,7 @@ To actually mod Scratch, you need to build the GUI, as it is the main package th
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/OmniBlocks/monorepo # you can add a .git extension if you want, but it should work fine without it. 
-    cd monorepo
+    cd monorepo/scratch-gui
     ```
 
 2.  **Install dependencies (recommended method):**

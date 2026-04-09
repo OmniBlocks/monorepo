@@ -1,2 +1,9 @@
 packages:
   - scratch-*
+
+onlyBuiltDependencies:
+  - chromedriver
+  - core-js
+  - es5-ext
+  - fsevents
+  - playwright-chromium

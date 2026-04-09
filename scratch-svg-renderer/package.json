@@ -19,14 +19,12 @@
     "type": "git",
     "url": "https://github.com/PenguinMod/penguinmod-svg-renderer.git"
   },
-  "peerDependencies": {
-    "scratch-render-fonts": "github:PenguinMod/penguinmod-render-fonts#master"
-  },
   "dependencies": {
     "@turbowarp/nanolog": "^0.2.0",
     "base64-js": "1.2.1",
     "base64-loader": "1.0.0",
     "dompurify": "^2.5.6",
+    "scratch-render-fonts": "github:PenguinMod/penguinmod-render-fonts#master",
     "transformation-matrix": "1.15.0"
   },
   "devDependencies": {

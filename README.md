@@ -134,13 +134,13 @@ graph TD
 
     %% Click Interactions
     click A "https://github.com/OmniBlocks/monorepo/tree/main/scratch-gui" "View scratch-gui in monorepo"
-    click B "https://github.com/OmniBlocks/scratch-vm" "View scratch-vm repo"
-    click C "https://github.com/OmniBlocks/scratch-render" "View scratch-render repo"
-    click D "https://github.com/OmniBlocks/scratch-paint" "View scratch-paint repo"
-    click E "https://github.com/OmniBlocks/scratch-blocks" "View scratch-blocks repo"
+    click B "https://github.com/OmniBlocks/monorepo/tree/main/scratch-vm" "View scratch-vm in monorepo"
+    click C "https://github.com/OmniBlocks/monorepo/tree/main/scratch-render" "View scratch-render in monorepo"
+    click D "https://github.com/OmniBlocks/monorepo/tree/main/scratch-paint" "View scratch-paint in monorepo"
+    click E "https://github.com/OmniBlocks/monorepo/tree/main/scratch-blocks" "View scratch-blocks in monorepo"
     click F "https://github.com/OmniBlocks/scratch-audio" "View scratch-audio repo"
     click G "https://github.com/OmniBlocks/scratch-storage" "View scratch-storage repo"
-    click H "https://github.com/OmniBlocks/scratch-svg-renderer" "View scratch-svg-renderer repo"
+    click H "https://github.com/OmniBlocks/monorepo/tree/main/scratch-svg-renderer" "View scratch-svg-renderer in monorepo"
     click I "https://github.com/OmniBlocks/scratch-parser" "View scratch-parser repo"
     click J "https://github.com/OmniBlocks/scratch-l10n" "View scratch-l10n repo"
     click K "https://github.com/OmniBlocks/" "Us. This is us :D"

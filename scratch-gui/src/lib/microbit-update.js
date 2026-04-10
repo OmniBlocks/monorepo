@@ -1,5 +1,5 @@
 // ob: We don't support this.
-const updateMicroBit = () => {}
+const selectAndUpdateMicroBit = () => {}
 
 
 /**

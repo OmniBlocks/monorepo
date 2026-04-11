@@ -107,17 +107,17 @@ Here's a diagram to help you understand how these are connected:
 
 ```mermaid
 graph TD
-    A["scratch-gui<br/>Main Editor Interface"] --> B["scratch-vm<br/>Virtual Machine"]
-    A --> C["scratch-render<br/>WebGL Renderer"]
+    MR["Monorepo"] --> A["scratch-gui<br/>Main Editor Interface"]
+    A --> B["scratch-vm<br/>Virtual Machine"]
+    B --> C["scratch-render<br/>WebGL Renderer"]
     A --> D["scratch-paint<br/>Vector Editor"]
     A --> E["scratch-blocks<br/>Block Editor"]
-    A --> F["scratch-audio<br/>Audio Engine"]
+    B --> F["scratch-audio<br/>Audio Engine"]
     B --> G["scratch-storage<br/>Asset Manager"]
     C --> H["scratch-svg-renderer<br/>SVG Processor"]
     B --> I["scratch-parser<br/>Project Parser"]
     A --> G
     A --> J["scratch-l10n<br/>i18n System"]
-    K["Developers<br/>(Thats us!)"] --> L["scratch-caffeine-<br/>WAIT A MINUTE THIS WAS A<br/>JOKE!<br/>How did this get into here?!"]
     
     %% Styles
     style A fill:#4C97FF,color:#fff
@@ -130,7 +130,6 @@ graph TD
     style H fill:#FFAB19,color:#fff
     style I fill:#FF6680,color:#fff
     style J fill:#FF6680,color:#fff
-    style K fill:#FF6680,color:#fff,font:Comic Sans
 
     %% Click Interactions
     click A "https://github.com/OmniBlocks/monorepo/tree/main/scratch-gui" "View scratch-gui in monorepo"
@@ -144,7 +143,6 @@ graph TD
     click I "https://github.com/OmniBlocks/scratch-parser" "View scratch-parser repo"
     click J "https://github.com/OmniBlocks/scratch-l10n" "View scratch-l10n repo"
     click K "https://github.com/OmniBlocks/" "Us. This is us :D"
-    click L "https://www.target.com/p/folgers-gourmet-supreme-ground-coffee/-/A-94500862?preselect=13376546#lnk=sametab" "Okay... why IS this here though... It was only a joke!"
 ```
 
 

@@ -1,0 +1,135 @@
+name: Sync Upstream TurboWarp Changes
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
+  workflow_dispatch:      # Allow manual runs too
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    name: Sync ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false   # Don't cancel sibling jobs if one fails/has conflicts
+      matrix:
+        include:
+          - package: scratch-gui
+            upstream: https://github.com/TurboWarp/scratch-gui.git
+            branch: develop
+          - package: scratch-vm
+            upstream: https://github.com/TurboWarp/scratch-vm.git
+            branch: develop
+          - package: scratch-render
+            upstream: https://github.com/TurboWarp/scratch-render.git
+            branch: develop
+          - package: scratch-paint
+            upstream: https://github.com/TurboWarp/scratch-paint.git
+            branch: develop
+          - package: scratch-blocks
+            upstream: https://github.com/TurboWarp/scratch-blocks.git
+            branch: develop
+
+    steps:
+      - name: Checkout monorepo (full history needed for subtree)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for existing open sync PR
+        id: existing_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COUNT=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --state open \
+            --label upstream-sync \
+            --search "chore: sync TurboWarp/${{ matrix.package }}" \
+            --json number \
+            --jq 'length')
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Create sync branch
+        if: steps.existing_pr.outputs.count == '0'
+        run: |
+          BRANCH="upstream-sync/${{ matrix.package }}-$(date +%Y%m%d-%H%M)"
+          git checkout -b "$BRANCH"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+      - name: Pull upstream TurboWarp changes via git subtree
+        if: steps.existing_pr.outputs.count == '0'
+        id: subtree_pull
+        run: |
+          git subtree pull \
+            --prefix="${{ matrix.package }}" \
+            "${{ matrix.upstream }}" \
+            "${{ matrix.branch }}" \
+            --squash \
+            -m "chore: sync TurboWarp/${{ matrix.package }} upstream changes"
+        continue-on-error: true   # Merge conflicts won't fail the whole workflow
+
+      - name: Check if subtree pull produced new commits
+        if: steps.existing_pr.outputs.count == '0' && steps.subtree_pull.outcome == 'success'
+        id: has_changes
+        run: |
+          COUNT=$(git rev-list HEAD ^origin/main --count 2>/dev/null || echo 0)
+          echo "commit_count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Push sync branch
+        if: >
+          steps.existing_pr.outputs.count == '0' &&
+          steps.subtree_pull.outcome == 'success' &&
+          steps.has_changes.outputs.commit_count != '0'
+        run: git push origin "$BRANCH"
+
+      - name: Open Pull Request
+        if: >
+          steps.existing_pr.outputs.count == '0' &&
+          steps.subtree_pull.outcome == 'success' &&
+          steps.has_changes.outputs.commit_count != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --repo "${{ github.repository }}" \
+            --title "chore: sync TurboWarp/${{ matrix.package }} upstream changes" \
+            --body "## Automated upstream sync
+
+          This PR merges the latest changes from the upstream TurboWarp fork into the \`${{ matrix.package }}\` subtree.
+
+          **Upstream repo:** [${{ matrix.upstream }}](${{ matrix.upstream }})
+          **Branch pulled:** \`${{ matrix.branch }}\`
+
+          > ⚠️ Please review for conflicts with OmniBlocks-specific patches before merging." \
+            --base main \
+            --head "$BRANCH" \
+            --label upstream-sync
+
+      - name: Report conflict (no PR opened)
+        if: >
+          steps.existing_pr.outputs.count == '0' &&
+          steps.subtree_pull.outcome != 'success'
+        run: |
+          echo "::warning title=Merge conflict in ${{ matrix.package }}::git subtree pull failed — likely a merge conflict. Manual resolution required."
+          exit 1
+
+      - name: Report already up-to-date
+        if: >
+          steps.existing_pr.outputs.count == '0' &&
+          steps.subtree_pull.outcome == 'success' &&
+          steps.has_changes.outputs.commit_count == '0'
+        run: echo "✅ ${{ matrix.package }} is already up-to-date with TurboWarp upstream."
+
+      - name: Report skipped (existing PR)
+        if: steps.existing_pr.outputs.count != '0'
+        run: echo "⏭️ Skipped — an open upstream-sync PR for ${{ matrix.package }} already exists."

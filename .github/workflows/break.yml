@@ -1,0 +1,25 @@
+name: cool CI
+on: push
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install deps
+        run: pnpm install
+      - name: build
+        run: pnpm run build
+        
+          
+    
+    

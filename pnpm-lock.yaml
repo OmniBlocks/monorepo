@@ -378,6 +378,9 @@ importers:
       raf:
         specifier: 3.4.1
         version: 3.4.1
+      react-is:
+        specifier: ^19.2.5
+        version: 19.2.5
       react-test-renderer:
         specifier: 16.14.0
         version: 16.14.0(react@16.14.0)
@@ -7726,6 +7729,9 @@ packages:
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
+
+  react-is@19.2.5:
+    resolution: {integrity: sha512-Dn0t8IQhCmeIT3wu+Apm1/YVsJXsGWi6k4sPdnBIdqMVtHtv0IGi6dcpNpNkNac0zB2uUAqNX3MHzN8c+z2rwQ==}
 
   react-lifecycles-compat@3.0.4:
     resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
@@ -19580,6 +19586,8 @@ snapshots:
   react-is@16.13.1: {}
 
   react-is@18.3.1: {}
+
+  react-is@19.2.5: {}
 
   react-lifecycles-compat@3.0.4: {}
 

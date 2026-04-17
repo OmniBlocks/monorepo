@@ -7,6 +7,9 @@ on:
 permissions:
   contents: read
   pull-requests: read
+engine:
+  id: copilot
+  model: gemini-3.1-pro
 tools:
   playwright: {}
   cache-memory: true

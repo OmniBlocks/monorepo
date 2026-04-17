@@ -74,7 +74,7 @@ const Backpack = ({
                     tooltipId="backpack-tooltip"
                 >
                     <FormattedMessage
-                        defaultMessage="Backpack"
+                        defaultMessage="skibidi 67 mewimg"
                         description="Button to open the backpack"
                         id="gui.backpack.header"
                     />

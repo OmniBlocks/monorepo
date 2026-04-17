@@ -23,7 +23,7 @@
     "@turbowarp/nanolog": "^0.2.0",
     "base64-js": "1.2.1",
     "base64-loader": "1.0.0",
-    "dompurify": "^2.5.6",
+    "dompurify": "^3.4.0",
     "scratch-render-fonts": "github:PenguinMod/penguinmod-render-fonts#master",
     "transformation-matrix": "1.15.0"
   },
@@ -32,21 +32,21 @@
     "babel-eslint": "^10.1.0",
     "babel-loader": "7.1.5",
     "babel-preset-env": "1.6.1",
-    "copy-webpack-plugin": "4.6.0",
+    "copy-webpack-plugin": "14.0.0",
     "eslint": "8.55.0",
     "eslint-config-scratch": "9.0.3",
     "eslint-plugin-import": "2.29.0",
-    "jsdom": "13.2.0",
-    "json": "9.0.6",
+    "jsdom": "29.0.2",
+    "json": "11.0.0",
     "lodash.defaultsdeep": "4.6.1",
     "mkdirp": "2.0.0",
     "rimraf": "3.0.2",
     "scratch-render-fonts": "github:PenguinMod/penguinmod-render-fonts#master",
-    "tap": "11.1.5",
-    "webpack": "4.47.0",
-    "webpack-cli": "3.3.12",
-    "webpack-dev-server": "3.11.2",
-    "xmldom": "0.1.31"
+    "tap": "21.7.1",
+    "webpack": "5.106.2",
+    "webpack-cli": "7.0.2",
+    "webpack-dev-server": "5.2.1",
+    "xmldom": "0.6.0"
   },
   "overrides": {
     "webpack@4.47.0": {

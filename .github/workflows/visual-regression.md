@@ -9,7 +9,7 @@ permissions:
   pull-requests: read
 engine:
   id: copilot
-  model: gemini-3.1-pro
+  model: claude-haiku-4.5
 tools:
   playwright: {}
   cache-memory: true

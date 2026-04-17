@@ -7,6 +7,9 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
+engine:
+  id: copilot
+  model: claude-haiku-4.5
 tools:
   github:
     toolsets: [default]

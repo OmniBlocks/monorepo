@@ -13,12 +13,7 @@ tools:
   bash: true
 safe-outputs:
   create-pull-request:
-    max: 5
-steps:
-  - name: Install git-filter-repo
-    run: |
-      sudo apt-get update
-      sudo apt-get install -y git-filter-repo
+    max: 6
 ---
 
 # Auto Upstream Merger
@@ -36,11 +31,9 @@ You are an AI agent responsible for syncing local packages with their upstream r
    - `scratch-paint` -> `https://github.com/PenguinMod/PenguinMod-Paint.git`
 
 2. For each package listed above:
-   - Clone the upstream repository into a temporary directory.
-   - Since these are brought in as standard folders and not subtrees, use `git-filter-repo --to-subdirectory-filter <package-name>` on the cloned repo to rewrite everything into the corresponding directory format.
-   - We need to merge them into our monorepo. Add the rewritten local path as a remote: `git remote add upstream-<package-name> <path>`
-   - `git fetch upstream-<package-name>`
-   - Do a test commit bringing the thingies into a new branch (do not commit to the main branch).
+   - Fetch the upstream branch using `git fetch <upstream_url> master` (or their default branch).
+   - Perform a subtree-aware merge using `git merge --allow-unrelated-histories -s ort -Xsubtree=<package-name> FETCH_HEAD` (do not use --squash).
+   - Commit the merge result to a dedicated branch named `upstream-sync/<package-name>-<YYYYMMDD>`; do not push to the default branch.
 
 3. Create a pull request using the `create-pull-request` safe output:
    - Request reviewers: `supervoidcoder`, `ampelc`.

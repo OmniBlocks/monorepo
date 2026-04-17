@@ -13,7 +13,7 @@
     padding: 0.25rem;
     text-align: center;
     font-size: 0.85rem;
-    color: $text-primary;
+    color: #FF0000; 
     transition: 0.2s;
     cursor: pointer;
     user-select: none;

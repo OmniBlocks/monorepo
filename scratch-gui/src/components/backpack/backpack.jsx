@@ -64,7 +64,7 @@ const Backpack = ({
         >
             {onToggle ? (
                 <FormattedMessage
-                    defaultMessage="Backpack"
+                    defaultMessage="skibidi 67 mewimg"
                     description="Button to open the backpack"
                     id="gui.backpack.header"
                 />
@@ -145,7 +145,7 @@ const Backpack = ({
                         ) : (
                             <div className={styles.statusMessage}>
                                 <FormattedMessage
-                                    defaultMessage="Backpack is empty"
+                                    defaultMessage="the skibidi aura is so full its overfloiwing is empty"
                                     description="Empty backpack message"
                                     id="gui.backpack.emptyBackpack"
                                 />

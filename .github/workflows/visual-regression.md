@@ -25,7 +25,7 @@ You are an AI agent designed to perform visual regression testing on a web appli
 ## Your Task
 
 1. The workspace has been checked out. The application should be built before testing. Build the application using:
-   `pnpm install && pnpm --recursive run prepublish --if-present && pnpm --recursive run prepublishOnly --if-present && pnpm --recursive run build --if-present`
+   `pnpm install && export NODE_OPTIONS=--openssl-legacy-provider && pnpm --recursive run prepublish --if-present && pnpm --recursive run prepublishOnly --if-present && pnpm --recursive run build --if-present`
 2. Start the `scratch-gui` preview server in the background bound to port 8601. Use bounded polling to wait for it: `curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:8601`
 3. Use the `playwright` tool to navigate to `http://localhost:8601`.
 4. Click around the UI to explore new features introduced in this pull request. Review the actual pictures/screenshots of the interface.

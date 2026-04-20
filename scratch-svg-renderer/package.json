@@ -14,17 +14,19 @@
     "watch": "webpack --progress --colors --watch"
   },
   "license": "MPL-2.0",
-  "homepage": "https://github.com/PenguinMod/penguinmod-svg-renderer#readme",
+  "homepage": "https://github.com/TurboWarp/scratch-svg-renderer#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/PenguinMod/penguinmod-svg-renderer.git"
+    "url": "https://github.com/TurboWarp/scratch-svg-renderer.git"
+  },
+  "peerDependencies": {
+    "scratch-render-fonts": "github:TurboWarp/scratch-render-fonts#master"
   },
   "dependencies": {
     "@turbowarp/nanolog": "^0.2.0",
     "base64-js": "1.2.1",
     "base64-loader": "1.0.0",
     "dompurify": "^2.5.6",
-    "scratch-render-fonts": "github:PenguinMod/penguinmod-render-fonts#master",
     "transformation-matrix": "1.15.0"
   },
   "devDependencies": {
@@ -41,7 +43,7 @@
     "lodash.defaultsdeep": "4.6.1",
     "mkdirp": "2.0.0",
     "rimraf": "3.0.2",
-    "scratch-render-fonts": "github:PenguinMod/penguinmod-render-fonts#master",
+    "scratch-render-fonts": "github:TurboWarp/scratch-render-fonts#master",
     "tap": "11.1.5",
     "webpack": "4.47.0",
     "webpack-cli": "3.3.12",

@@ -44,50 +44,14 @@ const ArgumentType = {
     IMAGE: 'image',
 
     /**
-     * pm: creates an input with n x,y inputs
-     */
-    POLYGON: 'polygon',
-
-    /**
-     * pm: creates an user-defined DOM input
-     */
-    CUSTOM: 'custom',
-
-    /**
-     * Costume menu (taken from tw)
+     * Name of costume in the current target
      */
     COSTUME: 'costume',
 
     /**
-     * Sound menu (taken from tw)
+     * Name of sound in the current target
      */
-    SOUND: 'sound',
-
-    /**
-     * pm: Variable menu
-     * @deprecated Not functioning as intended
-     * @todo Fix args returning variable value instead of object
-     */
-    VARIABLE: 'variable',
-
-    /**
-     * pm: List menu
-     * @deprecated Not functioning as intended
-     * @todo Fix menu resetting on update & args returning "[object Object]" instead of object
-     */
-    LIST: 'list',
-
-    /**
-     * pm: Broadcast menu
-     * @deprecated Not functioning as intended
-     * @todo Fix menu resetting on update
-     */
-    BROADCAST: 'broadcast',
-
-    /**
-     * pm: Vertical seperator
-     */
-    SEPERATOR: 'seperator'
+    SOUND: 'sound'
 };
 
 module.exports = ArgumentType;

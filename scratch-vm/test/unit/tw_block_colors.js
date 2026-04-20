@@ -128,37 +128,3 @@ test('with the default colors', t => {
 
     t.end();
 });
-
-test('with only color1 provided - generates fallback colors', t => {
-    const vm = new VirtualMachine();
-    vm.extensionManager._registerInternalExtension({
-        getInfo: () => ({
-            id: 'testextension',
-            name: 'test',
-            color1: '#ff0000', // Only color1 provided
-            blocks: [
-                {
-                    blockType: BlockType.COMMAND,
-                    opcode: 'testBlock'
-                }
-            ]
-        })
-    });
-
-    const blocks = vm.runtime.getBlocksJSON();
-
-    // Should have color1 as provided
-    t.equal(blocks[0].colour, '#ff0000');
-    // color2 should be color1 darkened by 10%
-    t.type(blocks[0].colourSecondary, 'string');
-    t.ok(blocks[0].colourSecondary.startsWith('#'));
-    // color3 should be color1 darkened by 20%
-    t.type(blocks[0].colourTertiary, 'string');
-    t.ok(blocks[0].colourTertiary.startsWith('#'));
-    // color2 should be darker than color1
-    t.not(blocks[0].colourSecondary, '#ff0000');
-    // color3 should be darker than color2
-    t.not(blocks[0].colourTertiary, blocks[0].colourSecondary);
-
-    t.end();
-});

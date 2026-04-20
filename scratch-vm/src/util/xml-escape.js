@@ -15,7 +15,7 @@ const xmlEscape = function (unsafe) {
             // See #1030
             unsafe = String(unsafe);
         } else {
-            log.warn(`Unexptected type ${typeof unsafe} in xmlEscape at: ${new Error().stack}`);
+            log.error('Unexpected input recieved in replaceUnsafeChars');
             return unsafe;
         }
     }
@@ -30,15 +30,4 @@ const xmlEscape = function (unsafe) {
     });
 };
 
-/**
- * Creates escaped text suitable for attributes
- * @param {string} unsafe the contents to escape
- * @returns {string} escaped contents
- */
-const escapeAttribute = unsafe => {
-    const escaped = xmlEscape(unsafe);
-    return JSON.stringify(escaped).slice(1, -1);
-};
-
 module.exports = xmlEscape;
-module.exports.escapeAttribute = escapeAttribute;

@@ -34,7 +34,7 @@ const messages = defineMessages({
         id: 'tw.loader.projectData'
     },
     downloadingAssets: {
-        defaultMessage: 'Downloading assets ({complete}/{total}) from remote source …',
+        defaultMessage: 'Downloading assets ({complete}/{total}) …',
         description: 'Appears when loading project assets from a project on a remote website',
         id: 'tw.loader.downloadingAssets'
     },
@@ -45,55 +45,8 @@ const messages = defineMessages({
     }
 });
 
-const funFacts = [
-    'Fun fact: OmniBlocks is currently loading.',
-    'Fun fact: OmniBlocks is very cool!',
-    'Actual Fun fact: NPM stands for Node Package Manager. It is very painful to use.',
-    'OmniBlocks is great, but Scratch was the foundation of it all. Please try it out!',
-    'Fun fact: Funding for OmniBlocks is provided by Boxys like you! ',
-    'Fun fa-Sadly, this fact was eaten by an evil kumquat.',
-    'rt89qeywybprqwbyrpecrq;wr qwr;fq fwwf.wf.e3333332 sorry my cat ate my keyboard',
-    "I'm sorry, Dave. I'm afraid I can't do that.",
-    "TARS, what's your humor setting?",
-    "Your cue light is broken.",
-    "You're not a wizard, Harry.",
-    'Fun fact: The person who typed this fact had too much caffeine!',
-    'SIX SEEVEN',
-    'Fun fact: six seven',
-    'how to 101: todo',
-    'I JUST ATE A HAM SANDWICH FOR BRUNDINNER',
-    'Fun? fact: OmniBlocks is not loading. Oops :(',
-    "Did you know? OmniBlocks isn't complete yet. Yup, we're still in alpha!",
-    "Fun fact: I'm running out of fun facts.",
-    "My jokes are funny, right?",
-    "Fun fact: This isn't even my final form!",
-    "Practice makes perfect. You should try practicing to code like... six or seven times a day, y'know?",
-    "Why did the programmer quit his job? Because he didn't get arrays.",
-    'Why do Java developers wear glasses? Because they don\'t see sharp.',
-    'How many programmers does it take to change a light bulb? None, that\'s a hardware problem.',
-    'Why do programmers prefer dark mode? Because light attracts bugs.',
-    'What is a programmer\'s favorite hangout place? Foo Bar.',
-    'Why do Python programmers have low self-esteem? Because they\'re constantly comparing their self to others.',
-    'What do you call a group of 8 Hobbits? A Hobbyte.',
-    'Why did the developer go broke? Because he used up all his cache.',
-    "Fun fact:",
-    "What did the fish say when it hit the wall? Dam.",
-    "I'm reading a book about anti-gravity. It's impossible to put down!",
-    "OmniBlocks is an alpha male sigma project.",
-    "Are you liking the corny generic jokes yet?",
-    "Did you know??? Boxy is a CLANKER.",
-    'Preparing emojis...',
-    'Herding cats...',
-    'Growing apples...',
-    'Removing dangos...',
-    'Modifying features...',
-    'Converting legacy lists...',
-    'Reticulating splines...',
-    'Constructing Boxys...',
-    'Breathing air...',
-    'Contemplating life choices...',
-    'Contemplating caffeine intake...'
-];
+// Because progress events are fired so often during the very performance-critical loading
+// process and React updates are very slow, we bypass React for updating the progress bar.
 
 class LoaderComponent extends React.Component {
     constructor (props) {
@@ -102,16 +55,11 @@ class LoaderComponent extends React.Component {
             'handleAssetProgress',
             'handleProjectLoaded',
             'barInnerRef',
-            'messageRef',
-            'funFactRef',
-            'updateFunFact'
+            'messageRef'
         ]);
         this.barInnerEl = null;
         this.messageEl = null;
-        this.funFactEl = null;
         this.ignoreProgress = false;
-        this.funFactInterval = null;
-        this.lastFunFactIndex = -1;
     }
     componentDidMount () {
         this.handleAssetProgress(
@@ -120,28 +68,10 @@ class LoaderComponent extends React.Component {
         );
         this.props.vm.on('ASSET_PROGRESS', this.handleAssetProgress);
         this.props.vm.runtime.on('PROJECT_LOADED', this.handleProjectLoaded);
-        this.updateFunFact();
-        this.funFactInterval = setInterval(this.updateFunFact, 3000);
     }
     componentWillUnmount () {
         this.props.vm.off('ASSET_PROGRESS', this.handleAssetProgress);
         this.props.vm.runtime.off('PROJECT_LOADED', this.handleProjectLoaded);
-        clearInterval(this.funFactInterval);
-    }
-    updateFunFact () {
-        if (this.funFactEl) {
-            this.funFactEl.classList.remove(styles.funFactSlideIn);
-            void this.funFactEl.offsetWidth; // Trigger reflow
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * funFacts.length);
-            } while (randomIndex === this.lastFunFactIndex);
-            this.lastFunFactIndex = randomIndex;
-            const randomFact = funFacts[randomIndex];
-            this.funFactEl.textContent = randomFact;
-            this.funFactEl.classList.add(styles.funFactSlideIn);
-            this.funFactEl.classList.add(styles.funFactRoulette);
-        }
     }
     handleAssetProgress (finished, total) {
         if (this.ignoreProgress || !this.barInnerEl || !this.messageEl) {
@@ -175,57 +105,48 @@ class LoaderComponent extends React.Component {
     messageRef (message) {
         this.messageEl = message;
     }
-    funFactRef (funFact) {
-        this.funFactEl = funFact;
-    }
     render () {
         return (
             <div
-            className={classNames(styles.background, {
-                [styles.fullscreen]: this.props.isFullScreen
-            })}
+                className={classNames(styles.background, {
+                    [styles.fullscreen]: this.props.isFullScreen
+                })}
             >
-            
-            <div className={styles.container}>
-                <div className={styles.blockAnimation}>
-                <img
-                    className={styles.topBlock}
-                    src={topBlock}
-                    draggable={false}
-                />
-                <img
-                    className={styles.middleBlock}
-                    src={middleBlock}
-                    draggable={false}
-                />
-                <img
-                    className={styles.bottomBlock}
-                    src={bottomBlock}
-                    draggable={false}
-                />
+                <div className={styles.container}>
+                    <div className={styles.blockAnimation}>
+                        <img
+                            className={styles.topBlock}
+                            src={topBlock}
+                            draggable={false}
+                        />
+                        <img
+                            className={styles.middleBlock}
+                            src={middleBlock}
+                            draggable={false}
+                        />
+                        <img
+                            className={styles.bottomBlock}
+                            src={bottomBlock}
+                            draggable={false}
+                        />
+                    </div>
+
+                    <div className={styles.title}>
+                        {mainMessages[this.props.messageId]}
+                    </div>
+
+                    <div
+                        className={styles.message}
+                        ref={this.messageRef}
+                    />
+
+                    <div className={styles.barOuter}>
+                        <div
+                            className={styles.barInner}
+                            ref={this.barInnerRef}
+                        />
+                    </div>
                 </div>
-
-                <div className={styles.title}>
-                {mainMessages[this.props.messageId]}
-                </div>
-
-                <div
-                className={styles.message}
-                ref={this.messageRef}
-                />
-
-                <div className={styles.barOuter}>
-                <div
-                    className={styles.barInner}
-                    ref={this.barInnerRef}
-                />
-                </div>
-
-                <div
-                className={styles.funFact}
-                ref={this.funFactRef}
-                />
-            </div>
             </div>
         );
     }

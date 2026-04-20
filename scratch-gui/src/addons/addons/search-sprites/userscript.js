@@ -1,12 +1,12 @@
-import addSmallStageClass from "../../libraries/common/cs/small-stage.js";
-
 export default async function ({ addon, console, msg }) {
   let spritesContainer;
   let spriteSelectorContainer;
 
   const container = document.createElement("div");
-  container.className = "sa-search-sprites-container sa-search-sprites-empty";
-  addon.tab.displayNoneWhileDisabled(container);
+  container.className = "sa-search-sprites-container";
+  addon.tab.displayNoneWhileDisabled(container, {
+    display: "flex",
+  });
 
   const searchBox = document.createElement("input");
   searchBox.className = "sa-search-sprites-box";
@@ -27,48 +27,29 @@ export default async function ({ addon, console, msg }) {
       const visible =
         !query ||
         containsQuery(sprite.children[0].children[1].innerText) ||
-        (sprite.children[0].classList.contains("sa-folders-folder") &&
-          containsQuery(sprite.children[0].children[2].children[0].innerText));
+        (containsQuery(sprite.children[0].children[2].children[0].innerText) &&
+          sprite.children[0].classList.contains("sa-folders-folder"));
       sprite.style.display = visible ? "" : "none";
     }
   };
 
   searchBox.addEventListener("input", (e) => {
-    container.classList.toggle("sa-search-sprites-empty", !e.target.value);
     search(e.target.value);
   });
-
-  const searchIcon = document.createElement("img");
-  searchIcon.className = "sa-search-sprites-icon";
-  searchIcon.src = addon.self.getResource("/search-icon.svg");
-  searchIcon.alt = "";
-  searchIcon.draggable = false;
 
   const reset = () => {
     search("");
     searchBox.value = "";
-    container.classList.add("sa-search-sprites-empty");
   };
 
   const resetButton = document.createElement("button");
   resetButton.className = "sa-search-sprites-reset";
-  resetButton.addEventListener("click", () => {
-    reset();
-    searchBox.focus();
-  });
+  resetButton.addEventListener("click", reset);
+  resetButton.textContent = "×";
   addon.self.addEventListener("disabled", reset);
 
-  const resetIcon = document.createElement("img");
-  resetIcon.src = addon.self.getResource("/reset-icon.svg");
-  resetIcon.alt = msg("clear");
-  resetIcon.draggable = false;
-  resetButton.appendChild(resetIcon);
-
   container.appendChild(searchBox);
-  container.appendChild(searchIcon);
   container.appendChild(resetButton);
-
-  addSmallStageClass();
 
   while (true) {
     await addon.tab.waitForElement("div[class^='sprite-selector_items-wrapper']", {
@@ -78,8 +59,8 @@ export default async function ({ addon, console, msg }) {
     });
 
     spritesContainer = document.querySelector('[class^="sprite-selector_items-wrapper"]');
-    spriteSelectorContainer = document.querySelector('[class^="sprite-selector_sprite-selector"]');
-    spriteSelectorContainer.appendChild(container);
+    spriteSelectorContainer = document.querySelector('[class^="sprite-selector_scroll-wrapper"]');
+    spriteSelectorContainer.insertBefore(container, spritesContainer);
     reset(); // Clear search box after going outside then inside
   }
 }

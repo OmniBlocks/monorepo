@@ -6,12 +6,10 @@ import {intlShape, injectIntl} from 'react-intl';
 
 import {
     openSpriteLibrary,
-    closeSpriteLibrary,
-    openExportJustModal
+    closeSpriteLibrary
 } from '../reducers/modals';
 import {activateTab, COSTUMES_TAB_INDEX, BLOCKS_TAB_INDEX} from '../reducers/editor-tab';
 import {setReceivedBlocks} from '../reducers/hovered-target';
-import {setExportJustId} from '../reducers/export-just';
 import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 import {setRestore} from '../reducers/restore-deletion';
 import DragConstants from '../lib/drag-constants';
@@ -44,7 +42,6 @@ class TargetPane extends React.Component {
             'handleDrop',
             'handleDuplicateSprite',
             'handleExportSprite',
-            'handleOpenExportJustModal',
             'handleNewSprite',
             'handleSelectSprite',
             'handleSurpriseSpriteClick',
@@ -94,18 +91,6 @@ class TargetPane extends React.Component {
     handleDuplicateSprite (id) {
         this.props.vm.duplicateSprite(id);
     }
-
-
-    /* To avoid confusion, please know that the following function is NOT the regular export sound function
-    that you would find while normally exporting an individual sound from the sounds tab. This is the extra
-    "export all sounds" function to add to the sprite menu. The original individual export can be found in
-    sound-tab.jsx at lines 94-98. */
-
-    /*
-    async handleExportSounds(id) { // literally just reskined handleexportcostumes with sounds instead
-    // ... existing implementation moved to export-just-modal.jsx
-    }
-    */
     handleExportSprite (id) {
         const spriteName = this.props.vm.runtime.getTargetById(id).getName();
         const saveLink = document.createElement('a');
@@ -115,23 +100,6 @@ class TargetPane extends React.Component {
             downloadBlob(`${spriteName}.sprite3`, content);
         });
     }
-
-    // handleExportCostumes and handleExportSounds methods have been moved to the ExportJustModal container
-    // These are kept for reference and can be removed once the modal is confirmed working
-    /*
-    async handleExportCostumes (id) {
-        // ... existing implementation moved to export-just-modal.jsx
-    }
-
-    async handleExportSounds (id) {
-        // ... existing implementation moved to export-just-modal.jsx
-    }
-    */
-
-    handleOpenExportJustModal (id) {
-        this.props.onOpenExportJustModal(id);
-    }
-
     handleSelectSprite (id) {
         this.props.vm.setEditingTarget(id);
         if (this.props.stage && id !== this.props.stage.id) {
@@ -273,7 +241,6 @@ class TargetPane extends React.Component {
                 onDrop={this.handleDrop}
                 onDuplicateSprite={this.handleDuplicateSprite}
                 onExportSprite={this.handleExportSprite}
-                onExportJustButtonClick={this.handleOpenExportJustModal}
                 onFileUploadClick={this.handleFileUploadClick}
                 onPaintSpriteClick={this.handlePaintSpriteClick}
                 onSelectSprite={this.handleSelectSprite}
@@ -299,18 +266,12 @@ TargetPane.propTypes = {
 
 const mapStateToProps = state => ({
     editingTarget: state.scratchGui.targets.editingTarget,
-    hoveredTarget: {
-        ...state.scratchGui.hoveredTarget,
-        sprite: state.scratchGui.hoveredTarget.sprite === null ?
-            null :
-            String(state.scratchGui.hoveredTarget.sprite)
-    },
+    hoveredTarget: state.scratchGui.hoveredTarget,
     isRtl: state.locales.isRtl,
     spriteLibraryVisible: state.scratchGui.modals.spriteLibrary,
     sprites: state.scratchGui.targets.sprites,
     stage: state.scratchGui.targets.stage,
     raiseSprites: state.scratchGui.blockDrag,
-    exportingSpriteId: state.scratchGui.exportJust.exportingSpriteId,
     workspaceMetrics: state.scratchGui.workspaceMetrics
 });
 
@@ -321,10 +282,6 @@ const mapDispatchToProps = dispatch => ({
     },
     onRequestCloseSpriteLibrary: () => {
         dispatch(closeSpriteLibrary());
-    },
-    onOpenExportJustModal: id => {
-        dispatch(setExportJustId(id));
-        dispatch(openExportJustModal());
     },
     onActivateTab: tabIndex => {
         dispatch(activateTab(tabIndex));

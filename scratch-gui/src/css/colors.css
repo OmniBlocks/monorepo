@@ -22,6 +22,7 @@ $text-primary-transparent: var(--ui-text-primary-transparent);
 
 $motion-primary: var(--motion-primary);
 $motion-tertiary: var(--motion-tertiary);
+
 $looks-secondary: var(--looks-secondary);
 $looks-transparent: var(--looks-transparent);
 $looks-light-transparent: var(--looks-light-transparent);

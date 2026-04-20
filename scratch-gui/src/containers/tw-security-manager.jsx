@@ -24,11 +24,8 @@ const manuallyTrustExtension = url => {
  * @returns {boolean} True if the extension can is trusted
  */
 const isTrustedExtension = url => (
-    // Always trust TW's official extension repostiory.
+    // Always trust our official extension repostiory.
     url.startsWith('https://extensions.turbowarp.org/') ||
-
-    // ours too
-    url.startsWith('https://omniblocks.github.io/extensions/') ||
 
     // For development.
     url.startsWith('http://localhost:8000/') ||
@@ -37,16 +34,16 @@ const isTrustedExtension = url => (
 );
 
 /**
- * Set of fetch resource origins that were manually trusted by the user.
+ * Set of fetch resource hosts that were manually trusted by the user.
  * @type {Set<string>}
  */
-const fetchOriginsTrustedByUser = new Set();
+const fetchHostsTrustedByUser = new Set();
 
 /**
- * Set of origins manually trusted by the user for embedding.
+ * Set of hosts manually trusted by the user for embedding.
  * @type {Set<string>}
  */
-const embedOriginsTrustedByUser = new Set();
+const embedHostsTrustedByUser = new Set();
 
 /**
  * @param {URL} parsed Parsed URL object
@@ -134,7 +131,6 @@ let allowedGeolocation = false;
 const SECURITY_MANAGER_METHODS = [
     'getSandboxMode',
     'canLoadExtensionFromProject',
-    'canUnsandbox',
     'canFetch',
     'canOpenWindow',
     'canRedirect',
@@ -285,17 +281,6 @@ class TWSecurityManagerComponent extends React.Component {
     }
 
     /**
-     * @param {string} extensionName The extension's display name
-     * @returns {Promise<boolean>} True if the extension can run without sandbox
-     */
-    async canUnsandbox (extensionName) {
-        const {showModal} = await this.acquireModalLock();
-        return showModal(SecurityModals.Unsandbox, {
-            extensionName
-        });
-    }
-
-    /**
      * @param {string} url The resource to fetch
      * @returns {Promise<boolean>} True if the resource is allowed to be fetched
      */
@@ -308,16 +293,21 @@ class TWSecurityManagerComponent extends React.Component {
             return true;
         }
         const {showModal, releaseLock} = await this.acquireModalLock();
-        const origin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.origin : null;
-        if (origin && fetchOriginsTrustedByUser.has(origin)) {
+        const host = (
+            parsed.protocol === 'http:' ||
+            parsed.protocol === 'https:' ||
+            parsed.protocol === 'ws:' ||
+            parsed.protocol === 'wss:'
+        ) ? parsed.host : null;
+        if (host && fetchHostsTrustedByUser.has(host)) {
             releaseLock();
             return true;
         }
         const allowed = await showModal(SecurityModals.Fetch, {
             url
         });
-        if (origin && allowed) {
-            fetchOriginsTrustedByUser.add(origin);
+        if (host && allowed) {
+            fetchHostsTrustedByUser.add(host);
         }
         return allowed;
     }
@@ -416,15 +406,15 @@ class TWSecurityManagerComponent extends React.Component {
         if (!parsed) {
             return false;
         }
-        const origin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.origin : null;
+        const host = (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.host : null;
         const {showModal, releaseLock} = await this.acquireModalLock();
-        if (origin && embedOriginsTrustedByUser.has(origin)) {
+        if (host && embedHostsTrustedByUser.has(host)) {
             releaseLock();
             return true;
         }
         const allowed = await showModal(SecurityModals.Embed, {url});
-        if (origin && allowed) {
-            embedOriginsTrustedByUser.add(origin);
+        if (host && allowed) {
+            embedHostsTrustedByUser.add(host);
         }
         return allowed;
     }

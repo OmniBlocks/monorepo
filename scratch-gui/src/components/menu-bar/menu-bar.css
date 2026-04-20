@@ -8,7 +8,6 @@
     justify-content: space-between;
     flex-wrap: nowrap;
     gap: 0.5rem;
-    transition: all 0.2s ease-in-out;
 
     /*
         For most things, we shouldn't explicitly set height, and let the
@@ -42,7 +41,6 @@
     align-items: center;
     flex-grow: 1;
     gap: 0.5rem;
-    
 }
 .inactive {
     opacity: 0;
@@ -65,7 +63,6 @@
     align-items: center;
     white-space: nowrap;
     height: $menu-bar-height;
-    transition: all 0.1s ease-in-out;
 }
 
 .menu-bar-item.hoverable {

@@ -1,7 +1,7 @@
 /* make sure to keep these in sync with other constants,
 e.g. STAGE_DIMENSION_DEFAULTS in lib/screen-utils.js */
 
-$space: 0.75rem;
+$space: 0.5rem;
 
 $sprites-per-row: 5;
 

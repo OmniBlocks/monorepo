@@ -24,6 +24,6 @@ const manifest = {
   ],
   "dynamicDisable": true,
   "tags": [],
-  "enabledByDefault": true
+  "enabledByDefault": false
 };
 export default manifest;

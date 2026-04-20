@@ -41,47 +41,22 @@ import AddonChannels from '../addons/channels';
 import {loadServiceWorker} from './load-service-worker';
 import runAddons from '../addons/entry';
 import InvalidEmbed from '../components/tw-invalid-embed/invalid-embed.jsx';
-import {APP_NAME, APP_VERSION} from '../lib/brand.js';
-import {loadFileHandler} from './load-file-handler';
-import {setProjectTitle} from '../reducers/project-title';
+import {APP_NAME} from '../lib/brand.js';
 
 import styles from './interface.css';
 
-const isInvalidEmbed = false;
+const isInvalidEmbed = window.parent !== window;
 
 const handleClickAddonSettings = addonId => {
     // addonId might be a string of the addon to focus on, undefined, or an event (treat like undefined)
     const path = process.env.ROUTING_STYLE === 'wildcard' ? 'addons' : 'addons.html';
     const url = `${process.env.ROOT}${path}${typeof addonId === 'string' ? `#${addonId}` : ''}`;
-    const width = 600;
-const height = 800;
-// my teacher told me write descriptive variable names :)
-// so that my self from 6 or 7 months later can understand what the heck I was thinking >:) 
-// did you see how many months i said
-
-// center popup
-const left = (window.screen.width / 2) - (width / 2);
-const top = (window.screen.height / 2) - (height / 2);
-// yes i know this isn't perfect because it doesn't account for taskbars or whatever but it's close enough
-// and it's better than nothing
-// also it doesn't work properly with multiple monitors but oh well
-// wait what about phonse i didn't even think of that
-window.open(
-  url,
-  '_blank',
-  `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes`
-);
-
-/* make it open as a popup, i always found it kinda jarring that it just opened as a new tab, especially
-if you're using OmniBlocks as  PWA, and the link just opens in your browser
-the only downside i can think of is getting blocked by browser protections but welp ¯\_(ツ)_/¯ */
-// i just realized this could be a problem when developing the electron based desktop app
-// todo: make the electorn app handle this properly or something idk
+    window.open(url);
 };
 
 const messages = defineMessages({
     defaultTitle: {
-        defaultMessage: 'The Ultimate MultiLanguage IDE',
+        defaultMessage: 'Run Scratch projects faster',
         description: 'Title of homepage',
         id: 'tw.guiDefaultTitle'
     }
@@ -113,35 +88,22 @@ const Footer = () => (
                 <FormattedMessage
                     // eslint-disable-next-line max-len
                     defaultMessage="{APP_NAME} is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation."
-                    description="Disclaimer that OmniBlocks or Turbowarp are not connected to Scratch"
+                    description="Disclaimer that TurboWarp is not connected to Scratch"
                     id="tw.footer.disclaimer"
                     values={{
                         APP_NAME
                     }}
                 />
             </div>
+
             <div className={styles.footerText}>
                 <FormattedMessage
                     // eslint-disable-next-line max-len
-                    defaultMessage="{APP_NAME} {APP_VERSION}"
-                    /* six seven */
-                    description="Says what version of the app is running"
-                    id="tw.version.indicator"
-                    values={{
-                        APP_NAME, 
-                        APP_VERSION
-                    }}
-                />
-            </div>
-                    
-            <div className={styles.footerText}>
-                <FormattedMessage
-                    // eslint-disable-next-line max-len
-                    defaultMessage="Scratch is a project of the Scratch Foundation."
+                    defaultMessage="Scratch is a project of the Scratch Foundation. It is available for free at {scratchDotOrg}."
                     description="A disclaimer that Scratch requires when referring to Scratch. {scratchDotOrg} is a link with text 'https://scratch.org/'"
                     id="tw.footer.scratchDisclaimer"
                     values={{
-                        scratchSiteGone: (
+                        scratchDotOrg: (
                             <a
                                 href="https://scratch.org/"
                                 target="_blank"
@@ -161,13 +123,6 @@ const Footer = () => (
                             defaultMessage="Credits"
                             description="Credits link in footer"
                             id="tw.footer.credits"
-                        />
-                    </a>
-                    <a href="https://github.com/sponsors/GarboMuffin">
-                        <FormattedMessage
-                            defaultMessage="Donate"
-                            description="Donation link in footer"
-                            id="tw.footer.donate"
                         />
                     </a>
                 </div>
@@ -196,35 +151,21 @@ const Footer = () => (
                     </a>
                     <a href="https://docs.turbowarp.org/">
                         <FormattedMessage
-                            defaultMessage="TurboWarp Documentation"
+                            defaultMessage="Documentation"
                             description="Link in footer to additional documentation"
                             id="tw.footer.documentation"
                         />
                     </a>
-                    <a href="https://omniblocks.miraheze.org/">
-                        <FormattedMessage
-                            defaultMessage="OmniBlocks Wiki"
-                            description="Link in footer to OmniBlocks wiki"
-                            id="tw.footer.wiki"
-                        />
-                    </a>
-                    <a href="https://omniblocks.github.io/NotebookWriter">
-                        <FormattedMessage
-                            defaultMessage="OmniBlocks Writer"
-                            description="Link in footer to OmniBlocks Writer, our word processor"
-                            id="tw.footer.writer"
-                        />
-                    </a>
                 </div>
                 <div className={styles.footerSection}>
-                    <a href="https://github.com/OmniBlocks/scratch-gui/issues/new">
+                    <a href="https://scratch.mit.edu/users/GarboMuffin/#comments">
                         <FormattedMessage
                             defaultMessage="Feedback & Bugs"
                             description="Link to feedback/bugs page"
                             id="tw.feedback"
                         />
                     </a>
-                    <a href="https://github.com/OmniBlocks/">
+                    <a href="https://github.com/TurboWarp/">
                         <FormattedMessage
                             defaultMessage="Source Code"
                             description="Link to source code"
@@ -252,7 +193,6 @@ class Interface extends React.Component {
     componentDidUpdate (prevProps) {
         if (prevProps.isLoading && !this.props.isLoading) {
             loadServiceWorker();
-            loadFileHandler(this.props.vm, this.props.onSetProjectTitle, this.context.store); // register PWA file handler once project is loaded and pass Redux store
         }
     }
     handleUpdateProjectTitle (title, isDefault) {
@@ -330,10 +270,7 @@ class Interface extends React.Component {
                                 <div className={classNames(styles.infobox, styles.unsharedUpdate)}>
                                     <p>
                                         <FormattedMessage
-                                            defaultMessage="Unshared projects are not visible."
-                                            /* changed from "no longer visible" to "not visible" to
-                                            not dissapoint the new users that might not have known you used to be able to 
-                                            see unshared projects */
+                                            defaultMessage="Unshared projects are no longer visible."
                                             description="Appears on unshared projects"
                                             id="tw.unshared2.1"
                                         />
@@ -392,8 +329,8 @@ class Interface extends React.Component {
                                 <p>
                                     <FormattedMessage
                                         // eslint-disable-next-line max-len
-                                        defaultMessage="{APP_NAME} is a Scratch mod that has many different features with different editors. Some notable features include free client-side python execution, and music creation built in."
-                                        description="Description of Omniblocks on the homepage"
+                                        defaultMessage="{APP_NAME} is a Scratch mod that compiles projects to JavaScript to make them run really fast. Try it out by inputting a project ID or URL above or choosing a featured project below."
+                                        description="Description of TurboWarp on the homepage"
                                         id="tw.home.description"
                                         values={{
                                             APP_NAME
@@ -428,12 +365,7 @@ Interface.propTypes = {
     isLoading: PropTypes.bool,
     isPlayerOnly: PropTypes.bool,
     isRtl: PropTypes.bool,
-    projectId: PropTypes.string,
-    onSetProjectTitle: PropTypes.func
-};
-
-Interface.contextTypes = {
-    store: PropTypes.object
+    projectId: PropTypes.string
 };
 
 const mapStateToProps = state => ({
@@ -447,9 +379,7 @@ const mapStateToProps = state => ({
     projectId: state.scratchGui.projectState.projectId
 });
 
-const mapDispatchToProps = dispatch => ({
-    onSetProjectTitle: title => dispatch(setProjectTitle(title))
-});
+const mapDispatchToProps = () => ({});
 
 const ConnectedInterface = injectIntl(connect(
     mapStateToProps,

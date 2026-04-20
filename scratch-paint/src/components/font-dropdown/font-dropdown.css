@@ -16,13 +16,17 @@
 }
 
 .mod-menu-item:hover {
-    background: $looks-secondary;
+    background: $motion-primary;
     color: white;
 }
 
 .mod-context-menu {
     display: flex;
     flex-direction: column;
+}
+.font-context-menu {
+    display: grid;
+    grid-template-columns: auto auto auto;
 }
 
 .mod-unselect {
@@ -33,11 +37,6 @@
     font-size: .8rem;
     overflow: hidden;
     white-space: nowrap;
-}
-
-.font-context-menu {
-    display: grid;
-    grid-template-columns: auto auto auto;
 }
 
 .font-dropdown {

@@ -343,7 +343,7 @@ class ModeTools extends React.Component {
         });
     }
 
-    async handleMergeShape (specificOperation) {
+    async handleMergeShape (event, operation = "unite") {
         const selectedItems = getSelectedRootItems();
         if (selectedItems.length < 2) {
             // If nothing or not enough items are selected,
@@ -351,7 +351,7 @@ class ModeTools extends React.Component {
             return;
         }
 
-        // Convert text items to paths
+        // Convert possible text items to paths
         for (let i = 0; i < selectedItems.length; i++) {
             if (selectedItems[i].className === "PointText") {
                 const path = await this.convertText2Path(selectedItems[i]);
@@ -359,36 +359,41 @@ class ModeTools extends React.Component {
             }
         }
 
-        const topItem = selectedItems[0];
+        let topItem = selectedItems[0];
         if (topItem.className !== "PointText" && !topItem.unite) {
             // we cant unite this item, cancel
             return;
         }
 
-        if (typeof specificOperation !== "string") specificOperation = "unite";
+        if (typeof operation !== "string") operation = "unite";
+
         // unite the shapes together, creating a clone on top of the original
-        const results = [];
+        let oldTopItem;
         for (let i = 1; i < selectedItems.length; i++) {
-            const result = topItem[specificOperation](selectedItems[i]);
-            results.push(result);
+            topItem = topItem[operation](selectedItems[i]);
+            if (oldTopItem) oldTopItem.remove();
+            oldTopItem = topItem;
         }
 
-        if (results.length <= 1) {
-            setItemSelection(results[0], true);
-            this.props.onUpdateImage();
-        } else {
-            groupItems(results, this.props.clearSelectedItems, this.props.setSelectedItems, this.props.onUpdateImage);
+        // if shift is pressed, remove the old items
+        if (event.shiftKey) {
+            for (const item of selectedItems) {
+                item.remove();
+            }
         }
+
+        setItemSelection(topItem, true);
+        this.props.onUpdateImage();
     }
 
-    handleMaskShape () {
-        this.handleMergeShape("intersect");
+    handleMaskShape (event) {
+        this.handleMergeShape(event, "intersect");
     }
-    handleSubtractShape () {
-        this.handleMergeShape("subtract");
+    handleSubtractShape (event) {
+        this.handleMergeShape(event, "subtract");
     }
-    handleExcludeShape () {
-        this.handleMergeShape("exclude");
+    handleExcludeShape (event) {
+        this.handleMergeShape(event, "exclude");
     }
 
     _handleFlip (horizontalScale, verticalScale, selectedItems) {

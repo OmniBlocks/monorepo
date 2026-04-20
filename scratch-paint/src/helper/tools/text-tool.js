@@ -176,22 +176,14 @@ class TextTool extends paper.Tool {
         const textBoxMtx = this.textBox.matrix;
         const calculated = new paper.Matrix();
 
-        // In RTL, the element is moved relative to its parent's right edge instead of its left
-        // edge. We need to correct for this in order for the element to overlap the object in paper.
-        let tx = 0;
-        if ((this.alignment === "right") && this.element.parentElement) {
-            tx = -this.element.parentElement.clientWidth;
-        }
-        if ((this.alignment === "center") && this.element.parentElement) {
-            tx = -this.element.parentElement.clientWidth / 2;
-        }
         // The transform origin in paper is x at justification side, y at the baseline of the text.
         // The offset from (0, 0) to the upper left corner is recorded by internalBounds
         // (so this.textBox.internalBounds.y is negative).
         // Move the transform origin down to the text baseline to match paper
         this.element.style.transformOrigin = `${-this.textBox.internalBounds.x}px ${-this.textBox.internalBounds.y}px`;
+
         // Start by translating the element up so that its (0, 0) is now at the text baseline, like in paper
-        calculated.translate(tx, this.textBox.internalBounds.y);
+        calculated.translate(this.textBox.internalBounds.x, this.textBox.internalBounds.y);
         calculated.append(viewMtx);
         calculated.append(textBoxMtx);
         this.element.style.transform = `matrix(${calculated.a}, ${calculated.b}, ${calculated.c}, ${calculated.d},
@@ -323,6 +315,7 @@ class TextTool extends paper.Tool {
         if (this.mode === TextTool.TEXT_EDIT_MODE) {
             this.textBox.content = this.element.value;
         }
+        if (this.alignment !== "left") this.calculateMatrix(paper.view.matrix);
         this.resizeGuide();
     }
     resizeGuide () {
@@ -332,15 +325,18 @@ class TextTool extends paper.Tool {
         // Prevent line from wrapping
         this.element.style.width = `${this.textBox.internalBounds.width + 1}px`;
         this.element.style.height = `${this.textBox.internalBounds.height}px`;
+        this.element.style.textAlign = "left";
+
         // The transform origin needs to be updated in RTL because this.textBox.internalBounds.x
         // changes as you type
         if (this.alignment === "right") {
+            this.element.style.textAlign = "right";
             this.element.style.transformOrigin =
                 `${-this.textBox.internalBounds.x}px ${-this.textBox.internalBounds.y}px`;
         }
-        if (this.alignment === "center") {
-            this.element.style.transformOrigin =
-                `${-this.textBox.internalBounds.x / 2}px ${-this.textBox.internalBounds.y}px`;
+        if (this.alignment === "center") {  
+            this.element.style.textAlign = "center";
+            this.element.style.transformOrigin = `center ${-this.textBox.internalBounds.y}px`;
         }
     }
     beginSelect () {

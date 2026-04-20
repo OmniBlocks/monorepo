@@ -8,8 +8,9 @@ $ui-background-blue: #e8edf1;
 
 $text-primary: var(--paint-text-primary, #575e75);
 
-$looks-secondary: var(--paint-looks-secondary, #855CD6);
-$looks-transparent: var(--paint-looks-transparent, hsla(260, 60%, 60%, 0.35)); /* 35% transparent version of looks-secondary */
+$motion-primary: hsla(194, 100%, 50%);
+$motion-tertiary: #007da3;
+$motion-transparent: hsla(194, 100%, 50%, 0.35);
 
 $red-primary: #FF661A;
 $red-tertiary: #E64D00;
@@ -22,7 +23,3 @@ $control-primary: #FFAB19;
 $data-primary: #FF8C1A;
 
 $form-border: var(--paint-form-border, #E9EEF2);
-
-$input-background: var(--paint-input-background, #FFFFFF);
-
-$popover-background: var(--paint-popover-background, #FFFFFF);

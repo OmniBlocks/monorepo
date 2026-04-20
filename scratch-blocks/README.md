@@ -2,8 +2,8 @@
 
 ## Playgrounds
 
- - **Vertical blocks**: https://omniblocks.github.io/scratch-blocks/tests/vertical_playground_compressed.html
- - **Horizontal blocks**: https://omniblocks.github.io/scratch-blocks/tests/horizontal_playground_compressed.html
+ - **Vertical blocks**: https://turbowarp.github.io/scratch-blocks/tests/vertical_playground_compressed.html
+
 ## Local development
 
 Requires Node.js (16 or later), Python (2 or 3), and Java. It is known to work in these environments but should work in many others:
@@ -18,12 +18,7 @@ Install dependencies:
 npm ci
 ```
 
-Open the playgrounds in a browser for development. For a local page that works without fetching Closure from node_modules, use the compressed playgrounds:
-
-- Horizontal (compressed): `tests/horizontal_playground_compressed.html`
-- Vertical (compressed): `tests/vertical_playground_compressed.html`
-
-You don't need to rebuild compressed versions for most changes. Rebuild compressed versions when you want to update the bundled artifacts.
+Open tests/vertical_playground.html in a browser for development. You don't need to rebuild compressed versions for most changes. Open tests/vertical_playground_compressed.html instead to test if the compressed versions built properly.
 
 To re-build compressed versions, run:
 

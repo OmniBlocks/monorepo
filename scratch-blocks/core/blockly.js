@@ -35,15 +35,12 @@ goog.require('Blockly.DropDownDiv');
 goog.require('Blockly.Events');
 goog.require('Blockly.FieldAngle');
 goog.require('Blockly.FieldCheckbox');
-goog.require('Blockly.FieldCheckboxOriginal');
 goog.require('Blockly.FieldColour');
 goog.require('Blockly.FieldColourSlider');
 // Date picker commented out since it increases footprint by 60%.
 // Add it only if you need it.
 //goog.require('Blockly.FieldDate');
 goog.require('Blockly.FieldDropdown');
-goog.require('Blockly.FieldExpandableAdd');
-goog.require('Blockly.FieldExpandableRemove');
 goog.require('Blockly.FieldIconMenu');
 goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldNote');
@@ -55,7 +52,6 @@ goog.require('Blockly.FieldNumberDropdown');
 goog.require('Blockly.FieldMatrix');
 goog.require('Blockly.FieldVariable');
 goog.require('Blockly.FieldVerticalSeparator');
-goog.require('Blockly.FieldCustom');
 goog.require('Blockly.Generator');
 goog.require('Blockly.Msg');
 goog.require('Blockly.Procedures');
@@ -125,49 +121,6 @@ Blockly.hueToRgb = function(hue) {
   return goog.color.hsvToHex(hue, Blockly.HSV_SATURATION,
       Blockly.HSV_VALUE * 255);
 };
-
-/**
- * constrains a number to a specified range
- * @param {Number} number the number to constrain
- * @param {Number} min the lower wall
- * @param {Number} max the uper wall
- * @returns {Number} the constrained number
- */
-goog.constrain = function(number, min, max) {
-  var num = Math.min(Math.max(number, min), max)
-  if (!num && num !== 0) num = 0
-  return num
-}
-
-/**
- * converts hsva to rgba
- * @param {Number} hue the color
- * @param {Number} saturation the saturation
- * @param {Number} value the brightness
- * @param {Number} alpha the transparency
- * @returns {Number} the hex color
- */
-goog.color.hsvaToHex = function(hue, saturation, value, alpha) {
-  var hex = goog.color.hsvToHex(hue, saturation, value)
-  var alpha = goog.constrain(Math.floor(alpha * 255), 0, 255).toString(16)
-  if (alpha.length === 1) alpha = '0' + alpha
-  return hex + alpha
-}
-
-/**
- * convert hex to hsva
- * @param {String|Number} hex the hex 
- * @returns {Array} the hsva
- */
-goog.color.hexToHsva = function(decimal) {
-  var alpha = (() => {
-    if (typeof decimal === 'string') return parseInt(decimal.slice(7, 9), 16)
-    return decimal & 0xFF
-  })() / 255
-  
-  var [hue, saturation, value] = goog.color.hexToHsv(decimal.slice(0, 7))
-  return [hue,saturation,value,alpha];
-}
 
 /**
  * Returns the dimensions of the specified SVG image.
@@ -451,24 +404,6 @@ Blockly.prompt = function(message, defaultValue, callback, _opt_title,
 };
 
 /**
- * Custom Modal API, overwritten in penguinmod.github.io repo
- * @param {{title:string, scrollable:boolean?}} config The config for the modal
- * @param {{content:CSSStyleDeclaration?, overlay:CSSStyleDeclaration?}?} styles Sets styles on parts of the modal. If specified, at least one of the parts should have styles.
- * @param {Array<{
- *      name:string,
- *      role:"ok"|"close"|null,
- *      class:"ok"|"cancel"|null,
- *      style:CSSStyleDeclaration?,
- *      dontClose:boolean?,
- *      callback:function():void
- * }>?} buttons Buttons to place onto the modal. `role` makes the button callback run for other types of interactions.
- * @returns {Promise<HTMLElement>}
- */
-Blockly.customPrompt = function (config, styles, enterInfo, closeInfo) {
-    throw new Error("Custom Modal API not implemented here");
-};
-
-/**
  * A callback for status buttons. The window.alert is here for testing and
  * should be overridden.
  * @param {string} id An identifier.
@@ -509,7 +444,7 @@ Blockly.jsonInitFactory_ = function(jsonDef) {
  * by the Blockly Developer Tools.
  * @param {!Array.<!Object>} jsonArray An array of JSON block definitions.
  */
-Blockly.defineBlocksWithJsonArray = function(jsonArray, ignoreOverites) {
+Blockly.defineBlocksWithJsonArray = function(jsonArray) {
   for (var i = 0; i < jsonArray.length; i++) {
     var elem = jsonArray[i];
     if (!elem) {
@@ -523,13 +458,6 @@ Blockly.defineBlocksWithJsonArray = function(jsonArray, ignoreOverites) {
             'Block definition #' + i +
             ' in JSON array is missing a type attribute. Skipping.');
       } else {
-        if (Blockly.Blocks[typename]) {
-          if (!ignoreOverites) {
-            console.warn(
-                'Block definition #' + i + ' in JSON array' +
-                ' overwrites prior definition of "' + typename + '".');
-          }
-        }
         Blockly.Blocks[typename] = {
           init: Blockly.jsonInitFactory_(elem)
         };
@@ -689,5 +617,4 @@ if (!goog.global['Blockly']) {
 }
 goog.global['Blockly']['getMainWorkspace'] = Blockly.getMainWorkspace;
 goog.global['Blockly']['goog'] = goog;
-goog.global['ScratchBlocks'] = goog.global['Blockly'];
 Blockly.goog = goog;

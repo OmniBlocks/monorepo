@@ -17,6 +17,7 @@ tools:
 safe-outputs:
   create-pull-request:
     max: 6
+    patch-format: bundle
 ---
 
 # Auto Upstream Merger

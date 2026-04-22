@@ -40,6 +40,10 @@ const manifest = {
   "tags": [
     "recommended"
   ],
+<<<<<<< HEAD
   "enabledByDefault": true
+=======
+  "enabledByDefault": false
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 };
 export default manifest;

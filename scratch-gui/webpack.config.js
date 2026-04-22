@@ -13,7 +13,10 @@ const postcssImport = require('postcss-import');
 
 const STATIC_PATH = process.env.STATIC_PATH || '/static';
 const {APP_NAME} = require('./src/lib/brand');
+<<<<<<< HEAD
 const {version} = require('./package.json');
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 const root = process.env.ROOT || '';
 if (root.length > 0 && !root.endsWith('/')) {
@@ -38,10 +41,13 @@ const base = {
         disableHostCheck: true,
         compress: true,
         port: process.env.PORT || 8601,
+<<<<<<< HEAD
         headers: {
             "Cross-Origin-Embedder-Policy": "require-corp",
             "Cross-Origin-Opener-Policy": "same-origin"
         },
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         // allows ROUTING_STYLE=wildcard to work properly
         historyApiFallback: {
             rewrites: [
@@ -51,8 +57,12 @@ const base = {
                 {from: /^\/\d+\/embed\/?$/, to: '/embed.html'},
                 {from: /^\/addons\/?$/, to: '/addons.html'}
             ]
+<<<<<<< HEAD
         },
             hot: true
+=======
+        }
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     },
     output: {
         library: 'GUI',
@@ -142,7 +152,10 @@ const base = {
 
 if (!process.env.CI) {
     base.plugins.push(new webpack.ProgressPlugin());
+<<<<<<< HEAD
         base.plugins.push(new webpack.HotModuleReplacementPlugin());
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 module.exports = [
@@ -187,13 +200,21 @@ module.exports = [
                 'process.env.ENABLE_SERVICE_WORKER': JSON.stringify(process.env.ENABLE_SERVICE_WORKER || ''),
                 'process.env.ROOT': JSON.stringify(root),
                 'process.env.ROUTING_STYLE': JSON.stringify(process.env.ROUTING_STYLE || 'filehash'),
+<<<<<<< HEAD
                 'process.env.APP_VERSION': JSON.stringify(version || '') 
+=======
+                'process.env.ENABLE_WINDCHIMES': JSON.stringify(process.env.ENABLE_WINDCHIMES || '')
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             }),
             new HtmlWebpackPlugin({
                 chunks: ['editor'],
                 template: 'src/playground/index.ejs',
                 filename: 'editor.html',
+<<<<<<< HEAD
                 title: `${APP_NAME} - The Ultimate MultiLanguage IDE | Editor`,
+=======
+                title: `${APP_NAME} - Run Scratch projects faster`,
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 isEditor: true,
                 ...htmlWebpackPluginCommon
             }),
@@ -201,14 +222,22 @@ module.exports = [
                 chunks: ['player'],
                 template: 'src/playground/index.ejs',
                 filename: 'index.html',
+<<<<<<< HEAD
                 title: `${APP_NAME} - The Ultimate MultiLanguage IDE`,
+=======
+                title: `${APP_NAME} - Run Scratch projects faster`,
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['fullscreen'],
                 template: 'src/playground/index.ejs',
                 filename: 'fullscreen.html',
+<<<<<<< HEAD
                 title: `${APP_NAME} - The Ultimate MultiLanguage IDE`,
+=======
+                title: `${APP_NAME} - Run Scratch projects faster`,
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
@@ -229,7 +258,11 @@ module.exports = [
                 chunks: ['credits'],
                 template: 'src/playground/simple.ejs',
                 filename: 'credits.html',
+<<<<<<< HEAD
                 title: `${APP_NAME} - Credits`,
+=======
+                title: `${APP_NAME} Credits`,
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 ...htmlWebpackPluginCommon
             }),
             new CopyWebpackPlugin({

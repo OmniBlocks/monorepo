@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" value="notranslate">
+<<<<<<< HEAD
     <meta name="description" content="<%= htmlWebpackPlugin.options.APP_NAME %> is a beta Multi-Language IDE for creating projects with code, paint, sound, and music editing capabilities. Based on Scratch 3 with enhanced features." />
     
     <!-- PWA Meta Tags -->
@@ -33,6 +34,15 @@
         --status-info: #4c97ff;
       }
       
+=======
+    <meta name="description" content="<%= htmlWebpackPlugin.options.APP_NAME %> is a Scratch mod with a compiler to run projects faster, dark mode for your eyes, a bunch of addons to improve the editor, and more." />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <link rel="apple-touch-icon" href="<%= htmlWebpackPlugin.options.root %>images/apple-touch-icon.png">
+    <% if (htmlWebpackPlugin.options.root === "/" || htmlWebpackPlugin.options.root === "") { %>
+      <link rel="manifest" href="<%= htmlWebpackPlugin.options.root %>manifest.webmanifest">
+    <% } %>
+    <style>
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       .splash-screen {
         position: absolute;
         width: 100%;
@@ -51,8 +61,13 @@
         display: none;
       }
       .splash-screen[data-theme="dark"] {
+<<<<<<< HEAD
         background-color: var(--offline-ui-bg);
         color: var(--offline-text);
+=======
+        background-color: #333;
+        color: white;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       }
       .splash-screen > * {
         max-width: 80%;
@@ -95,6 +110,7 @@
       .splash-reset:disabled {
         opacity: 0.8;
       }
+<<<<<<< HEAD
       
       /* Offline indicator styles */
       .offline-indicator {
@@ -161,6 +177,11 @@
       <button onclick="window.location.reload()">Update</button>
     </div>
     
+=======
+    </style>
+  </head>
+  <body>
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     <noscript>
       <div class="splash-screen">
         <div>
@@ -173,7 +194,11 @@
     <div class="splash-screen spash-waiting-for-js" hidden>
       <div class="splash-spinner"></div>
 
+<<<<<<< HEAD
       <div class="splash-error-title" hidden>Something went wrong. <a href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments" target="_blank" rel="noreferrer">Please report</a> with the information below.</div>
+=======
+      <div class="splash-error-title" hidden>Something went wrong. <a href="https://scratch.mit.edu/users/GarboMuffin/#comments" target="_blank" rel="noreferrer">Please report</a> with the information below.</div>
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       <div class="splash-errors" hidden></div>
       <button class="splash-reset" hidden>Click here to reset caches (can fix some errors)</button>
     </div>
@@ -183,7 +208,11 @@
         'use strict';
 
         var theme = '';
+<<<<<<< HEAD
         var accent = '#59C0C0';
+=======
+        var accent = '#ff4c4c';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
         try {
           var themeSetting = localStorage.getItem('tw:theme');
@@ -242,8 +271,17 @@
         splashReset.onclick = function () {
           splashReset.disabled = true;
           function hardRefresh() {
+<<<<<<< HEAD
             var search = location.search.replace(/[?&]nocache=\d+/, '');
             location.replace(location.pathname + search + (search ? '&' : '?') + 'nocache=' + Math.floor(Math.random() * 100000));
+=======
+            var search = location.search.replace(/[?&]nocache=[\d.]+(?=$|&)/, '');
+            // This is a functional cookie used so that we respond with Clear-Site-Data just once. No tracking.
+            // Can't use nocache parameter to trigger this because people might accidentally bookmark that, and
+            // then we would be clearing their cache on every visit.
+            document.cookie = 'tw_clear_cache_once=1; max-age=60; path=/; samesite=strict; secure';
+            location.replace(location.pathname + search + (search ? '&' : '?') + 'nocache=' + Math.floor(Math.random() * 10000000));
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
           }
           if ('serviceWorker' in navigator) {
             setTimeout(hardRefresh, 5000);
@@ -264,6 +302,7 @@
           splash.hidden = true;
           window.onerror = null;
         };
+<<<<<<< HEAD
         
         var offlineIndicatorTimer = null;
         window.showOfflineIndicator = function(isOffline) {
@@ -298,6 +337,8 @@
         if (!navigator.onLine) {
           window.showOfflineIndicator(true);
         }
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       })();
     </script>
 

@@ -39,6 +39,7 @@
     "mediarecorder/record-after-flag": "Ne kezdődjön el a felvétel, amíg a zöld zászlóra rá nem kattintasz",
     "mediarecorder/record-audio": "Projekt hangok felvétele",
     "mediarecorder/record-audio-description": "Ez nem tartalmaz Text-to-Speech-t.",
+<<<<<<< HEAD
     "mediarecorder/gif-quality": "GIF minőség",
     "mediarecorder/gif-quality-high": "Magas",
     "mediarecorder/gif-quality-medium": "Közepes",
@@ -46,6 +47,8 @@
     "mediarecorder/gif-quality-very-low": "Nagyon alacsony",
     "mediarecorder/gif-quality-garbage": "Szemét",
     "mediarecorder/gif-quality-literally-unusable": "Szó szerint használhatatlan",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Felvétel Időtartama (másodperc)",
     "mediarecorder/record-mic": "Mikrofon hangjának felvétele",
     "mediarecorder/record-until-stop": "Felvétel leállítása miután a projekt megállt",
@@ -54,11 +57,14 @@
     "mediarecorder/start-delay": "Kezdési késleltetés (másodperc)",
     "mediarecorder/starting-in": "Kezdés {secs} másodperc múlva...",
     "mediarecorder/stop": "Felvétel Leállítása",
+<<<<<<< HEAD
     "mediarecorder/format": "Formátum",
     "mediarecorder/converting": "Konvertálás...", 
     "mediarecorder/exporting": "Videó exportálása...",
     "mediarecorder/starting-export": "Videó exportálásának indítása...",
     "mediarecorder/conversion-failed": "Nem sikerült a videót MP4 formátumba konvertálni",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-breakpoint": "töréspont",
     "debugger/block-error": "hibajelentés %s-vel",
     "debugger/block-log": "naplózd %s-t",

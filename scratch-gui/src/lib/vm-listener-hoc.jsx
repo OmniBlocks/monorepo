@@ -25,6 +25,10 @@ import {
 import {setCustomStageSize} from '../reducers/custom-stage-size';
 import {openUnknownPlatformModal} from '../reducers/modals';
 import implementGuiAPI from './tw-extension-gui-api';
+<<<<<<< HEAD
+=======
+import {BLOCKS_TAB_INDEX} from '../reducers/editor-tab';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 let compileErrorCounter = 0;
 
@@ -176,6 +180,26 @@ const vmListenerHOC = function (WrappedComponent) {
             if (e.keyCode === 8) {
                 e.preventDefault();
             }
+<<<<<<< HEAD
+=======
+
+            // TW: prevent delete and backspace from deleting blocks in the editor while in fullscreen
+            // or in the editor too if the project has been using these keys for something
+            const blockEditorDeleteOperation = scratchKey => (
+                this.props.isEditorObscured || (
+                    this.props.isEditorUsable &&
+                    this.props.vm.runtime.ioDevices.keyboard.hasUsedKey(scratchKey)
+                )
+            );
+            if (
+                (e.keyCode === 8 && blockEditorDeleteOperation('backspace')) ||
+                (e.keyCode === 46 && blockEditorDeleteOperation('delete'))
+            ) {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            }
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             // tw: prevent ' and / from opening quick find in Firefox
             if (e.keyCode === 222 || e.keyCode === 191) {
                 e.preventDefault();
@@ -200,6 +224,11 @@ const vmListenerHOC = function (WrappedComponent) {
             const {
                 /* eslint-disable no-unused-vars */
                 attachKeyboardEvents,
+<<<<<<< HEAD
+=======
+                isEditorObscured,
+                isEditorUsable,
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 projectChanged,
                 shouldUpdateTargets,
                 shouldUpdateProjectChanged,
@@ -237,6 +266,11 @@ const vmListenerHOC = function (WrappedComponent) {
     }
     VMListener.propTypes = {
         attachKeyboardEvents: PropTypes.bool,
+<<<<<<< HEAD
+=======
+        isEditorObscured: PropTypes.bool.isRequired,
+        isEditorUsable: PropTypes.bool.isRequired,
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         onBlockDragUpdate: PropTypes.func.isRequired,
         onGreenFlag: PropTypes.func,
         onKeyDown: PropTypes.func,
@@ -275,6 +309,18 @@ const vmListenerHOC = function (WrappedComponent) {
     };
     const mapStateToProps = state => ({
         hasCloudVariables: state.scratchGui.tw.hasCloudVariables,
+<<<<<<< HEAD
+=======
+        isEditorObscured: (
+            !state.scratchGui.mode.isPlayerOnly &&
+            state.scratchGui.mode.isFullScreen
+        ),
+        isEditorUsable: (
+            !state.scratchGui.mode.isPlayerOnly &&
+            !state.scratchGui.mode.isFullScreen &&
+            state.scratchGui.editorTab.activeTabIndex === BLOCKS_TAB_INDEX
+        ),
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         projectChanged: state.scratchGui.projectChanged,
         // Do not emit target or project updates in fullscreen or player only mode
         // or when recording sounds (it leads to garbled recordings on low-power machines)

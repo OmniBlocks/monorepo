@@ -10,6 +10,7 @@ export default async function (api) {
   addon.self.addEventListener("reenabled", enable);
   loadSettings(addon);
   const paper = await addon.tab.traps.getPaper();
+<<<<<<< HEAD
 
   // Find the select tool in paper.tools (OmniBlocks-Paint may change tool order or structure)
   let selectTool = null;
@@ -20,14 +21,23 @@ export default async function (api) {
   } else if (paper.tool && isSelectTool(paper.tool)) {
     selectTool = paper.tool;
   }
+=======
+  const [tool] = paper.tools;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
   toggle(addon.settings.get("enable-default"));
   setGuideColor(addon.settings.get("guide-color"));
   addon.settings.addEventListener("change", () => setGuideColor(addon.settings.get("guide-color")));
 
+<<<<<<< HEAD
   if (selectTool && isSelectTool(selectTool)) {
     updateSelectTool(paper, selectTool, addon.tab.traps.vm);
     updateScaleTool(paper, selectTool, addon.tab.traps.vm);
+=======
+  if (isSelectTool(tool)) {
+    updateSelectTool(paper, tool, addon.tab.traps.vm);
+    updateScaleTool(paper, tool, addon.tab.traps.vm);
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
   }
   initUI(api);
 }

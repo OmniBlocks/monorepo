@@ -41,6 +41,7 @@
     "mediarecorder/record-audio": "Includi suoni del progetto",
     "mediarecorder/record-audio-description": "Questo non include l'estensione Da Testo A Voce",
     "mediarecorder/record-description": "Registra lo stage come file {extension}. Quando la registrazione termina puoi salvarla sul tuo computer.\nNota: i monitor delle variabili e delle liste non saranno visibili.",
+<<<<<<< HEAD
     "mediarecorder/gif-size": "Dimensione GIF (px)",
     "mediarecorder/gif-fps": "FPS GIF",
     "mediarecorder/gif-quality": "Qualità GIF",
@@ -50,6 +51,8 @@
     "mediarecorder/gif-quality-very-low": "Molto bassa",
     "mediarecorder/gif-quality-garbage": "Spazzatura",
     "mediarecorder/gif-quality-literally-unusable": "Letteralmente inutilizzabile",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Durata Registrazione (in secondi)",
     "mediarecorder/record-mic": "Includi i suoni del microfono",
     "mediarecorder/record-until-stop": "Arresta la registrazione quando il progetto viene fermato",
@@ -58,11 +61,14 @@
     "mediarecorder/start-delay": "Ritardo Avvio (in secondi)",
     "mediarecorder/starting-in": "Inizierà tra {secs}...",
     "mediarecorder/stop": "Arresta Registrazione",
+<<<<<<< HEAD
     "mediarecorder/format": "Formato",
     "mediarecorder/converting": "Conversione...",
     "mediarecorder/exporting": "Esportazione video...",
     "mediarecorder/starting-export": "Avvio esportazione video...",
     "mediarecorder/conversion-failed": "Impossibile convertire il video in formato MP4",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-error": "errore %s",
     "debugger/block-warn": "avviso %s",
     "debugger/cannot-pause-player": "Il blocco breakpoint può essere usato solo nell'editor.",

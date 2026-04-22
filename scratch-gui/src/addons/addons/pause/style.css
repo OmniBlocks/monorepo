@@ -6,7 +6,10 @@
   user-select: none;
   user-drag: none;
   cursor: pointer;
+<<<<<<< HEAD
   transition: all 0.2s ease-in-out;
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .pause-btn:hover {

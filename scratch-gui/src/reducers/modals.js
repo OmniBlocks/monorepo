@@ -18,7 +18,10 @@ const MODAL_RESTORE_POINTS = 'restorePointModal';
 const MODAL_FONTS = 'fontsModal';
 const MODAL_UNKNOWN_PLATFORM = 'unknownPlatformModal';
 const MODAL_INVALID_PROJECT = 'invalidProjectModal';
+<<<<<<< HEAD
 const MODAL_EXPORT_JUST = 'exportJustModal';
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 const initialState = {
     [MODAL_BACKDROP_LIBRARY]: false,
@@ -37,8 +40,12 @@ const initialState = {
     [MODAL_RESTORE_POINTS]: false,
     [MODAL_FONTS]: false,
     [MODAL_UNKNOWN_PLATFORM]: false,
+<<<<<<< HEAD
     [MODAL_INVALID_PROJECT]: false,
     [MODAL_EXPORT_JUST]: false
+=======
+    [MODAL_INVALID_PROJECT]: false
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 };
 
 const reducer = function (state, action) {
@@ -119,9 +126,12 @@ const openUnknownPlatformModal = function () {
 const openInvalidProjectModal = function () {
     return openModal(MODAL_INVALID_PROJECT);
 };
+<<<<<<< HEAD
 const openExportJustModal = function () {
     return openModal(MODAL_EXPORT_JUST);
 };
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 const closeBackdropLibrary = function () {
     return closeModal(MODAL_BACKDROP_LIBRARY);
 };
@@ -173,9 +183,12 @@ const closeUnknownPlatformModal = function () {
 const closeInvalidProjectModal = function () {
     return closeModal(MODAL_INVALID_PROJECT);
 };
+<<<<<<< HEAD
 const closeExportJustModal = function () {
     return closeModal(MODAL_EXPORT_JUST);
 };
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 export {
     reducer as default,
     initialState as modalsInitialState,
@@ -196,7 +209,10 @@ export {
     openFontsModal,
     openUnknownPlatformModal,
     openInvalidProjectModal,
+<<<<<<< HEAD
     openExportJustModal,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     closeBackdropLibrary,
     closeCostumeLibrary,
     closeExtensionLibrary,
@@ -213,6 +229,10 @@ export {
     closeRestorePointModal,
     closeFontsModal,
     closeUnknownPlatformModal,
+<<<<<<< HEAD
     closeInvalidProjectModal,
     closeExportJustModal
+=======
+    closeInvalidProjectModal
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 };

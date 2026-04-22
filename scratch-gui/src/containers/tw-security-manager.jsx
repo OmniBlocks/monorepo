@@ -24,12 +24,18 @@ const manuallyTrustExtension = url => {
  * @returns {boolean} True if the extension can is trusted
  */
 const isTrustedExtension = url => (
+<<<<<<< HEAD
     // Always trust TW's official extension repostiory.
     url.startsWith('https://extensions.turbowarp.org/') ||
 
     // ours too
     url.startsWith('https://omniblocks.github.io/extensions/') ||
 
+=======
+    // Always trust our official extension repostiory.
+    url.startsWith('https://extensions.turbowarp.org/') ||
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     // For development.
     url.startsWith('http://localhost:8000/') ||
 
@@ -37,6 +43,7 @@ const isTrustedExtension = url => (
 );
 
 /**
+<<<<<<< HEAD
  * Set of fetch resource origins that were manually trusted by the user.
  * @type {Set<string>}
  */
@@ -47,6 +54,18 @@ const fetchOriginsTrustedByUser = new Set();
  * @type {Set<string>}
  */
 const embedOriginsTrustedByUser = new Set();
+=======
+ * Set of fetch resource hosts that were manually trusted by the user.
+ * @type {Set<string>}
+ */
+const fetchHostsTrustedByUser = new Set();
+
+/**
+ * Set of hosts manually trusted by the user for embedding.
+ * @type {Set<string>}
+ */
+const embedHostsTrustedByUser = new Set();
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 /**
  * @param {URL} parsed Parsed URL object
@@ -134,7 +153,10 @@ let allowedGeolocation = false;
 const SECURITY_MANAGER_METHODS = [
     'getSandboxMode',
     'canLoadExtensionFromProject',
+<<<<<<< HEAD
     'canUnsandbox',
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     'canFetch',
     'canOpenWindow',
     'canRedirect',
@@ -285,6 +307,7 @@ class TWSecurityManagerComponent extends React.Component {
     }
 
     /**
+<<<<<<< HEAD
      * @param {string} extensionName The extension's display name
      * @returns {Promise<boolean>} True if the extension can run without sandbox
      */
@@ -296,6 +319,8 @@ class TWSecurityManagerComponent extends React.Component {
     }
 
     /**
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
      * @param {string} url The resource to fetch
      * @returns {Promise<boolean>} True if the resource is allowed to be fetched
      */
@@ -308,16 +333,31 @@ class TWSecurityManagerComponent extends React.Component {
             return true;
         }
         const {showModal, releaseLock} = await this.acquireModalLock();
+<<<<<<< HEAD
         const origin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.origin : null;
         if (origin && fetchOriginsTrustedByUser.has(origin)) {
+=======
+        const host = (
+            parsed.protocol === 'http:' ||
+            parsed.protocol === 'https:' ||
+            parsed.protocol === 'ws:' ||
+            parsed.protocol === 'wss:'
+        ) ? parsed.host : null;
+        if (host && fetchHostsTrustedByUser.has(host)) {
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             releaseLock();
             return true;
         }
         const allowed = await showModal(SecurityModals.Fetch, {
             url
         });
+<<<<<<< HEAD
         if (origin && allowed) {
             fetchOriginsTrustedByUser.add(origin);
+=======
+        if (host && allowed) {
+            fetchHostsTrustedByUser.add(host);
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         }
         return allowed;
     }
@@ -416,15 +456,26 @@ class TWSecurityManagerComponent extends React.Component {
         if (!parsed) {
             return false;
         }
+<<<<<<< HEAD
         const origin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.origin : null;
         const {showModal, releaseLock} = await this.acquireModalLock();
         if (origin && embedOriginsTrustedByUser.has(origin)) {
+=======
+        const host = (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.host : null;
+        const {showModal, releaseLock} = await this.acquireModalLock();
+        if (host && embedHostsTrustedByUser.has(host)) {
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             releaseLock();
             return true;
         }
         const allowed = await showModal(SecurityModals.Embed, {url});
+<<<<<<< HEAD
         if (origin && allowed) {
             embedOriginsTrustedByUser.add(origin);
+=======
+        if (host && allowed) {
+            embedHostsTrustedByUser.add(host);
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         }
         return allowed;
     }

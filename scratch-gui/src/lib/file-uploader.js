@@ -238,6 +238,15 @@ const soundUpload = function (fileData, fileType, storage, handleSound, handleEr
 const spriteUpload = function (fileData, fileType, spriteName, vm, handleSprite, handleError = () => {}) {
     switch (fileType) {
     case '':
+<<<<<<< HEAD
+=======
+    // scratch-vm specifies application/x.scratch.sprite3 for sprite3 files. Real packages in the
+    // wild use hyphens instead of periods. We'll just support all of the reasonable variations.
+    case 'application/x-scratch2-sprite':
+    case 'application/x-scratch3-sprite':
+    case 'application/x.scratch2.sprite':
+    case 'application/x.scratch3.sprite':
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     case 'application/zip': { // We think this is a .sprite2 or .sprite3 file
         handleSprite(new Uint8Array(fileData));
         return;

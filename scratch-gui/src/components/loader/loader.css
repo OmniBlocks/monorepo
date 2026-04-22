@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 @import "../../css/colors.css";
 @import "../../css/z-index.css";
 @import "../../css/default-colors.css";
@@ -14,12 +17,18 @@
     justify-content: center;
     align-items: center;
     background-color: $menu-bar-background;
+<<<<<<< HEAD
     text-align: center;
     color: white;
     border-radius: 10px; 
     overflow: hidden; 
     cursor: progress;
     padding: 4em;
+=======
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
+    color: white;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .fullscreen {
@@ -27,8 +36,11 @@
     position: fixed;
     /* Use the fullscreen stage z-index to allow covering full-screen mode */
     z-index: $z-index-stage-wrapper-overlay;
+<<<<<<< HEAD
     border-radius: 0;
     padding: 0;
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .block-animation {
@@ -196,6 +208,7 @@
     height: 100%;
     background-color: $ui-white-default;
 }
+<<<<<<< HEAD
 
 .spinnerCircle {
   width: 64px;
@@ -220,3 +233,5 @@
     margin-top: 20px;
     font-size: 0.9rem;
 }
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

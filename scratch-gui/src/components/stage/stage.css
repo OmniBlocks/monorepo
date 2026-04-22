@@ -29,13 +29,19 @@
     /* reset dark styles inherited from dark mode */
     color-scheme: light;
     color: $text-primary-default;
+<<<<<<< HEAD
     
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .stage.full-screen {
     border: $stage-full-screen-border-width solid $ui-black-transparent;
+<<<<<<< HEAD
     transition: all 0.1s ease-in-out;
     
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .with-color-picker {

@@ -417,6 +417,7 @@ const control = function (isInitialSetup, isStage, targetId, colors) {
                 </shadow>
             </value>
         </block>
+<<<<<<< HEAD
         <block type="control_for_each">
             <value name="VALUE">
                 <shadow type="math_whole_number">
@@ -424,6 +425,8 @@ const control = function (isInitialSetup, isStage, targetId, colors) {
                 </shadow>
             </value>
         </block>
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         <block id="forever" type="control_forever"/>
         ${blockSeparator}
         <block type="control_if"/>
@@ -528,6 +531,10 @@ const sensing = function (isInitialSetup, isStage, targetId, colors) {
         <block id="current" type="sensing_current"/>
         <block type="sensing_dayssince2000"/>
         ${blockSeparator}
+<<<<<<< HEAD
+=======
+        <block id="online" type="sensing_online"/>
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         <block type="sensing_username"/>
         ${categorySeparator}
     </category>
@@ -608,6 +615,7 @@ const operators = function (isInitialSetup, isStage, targetId, colors) {
         </block>
         ${blockSeparator}
         <block type="operator_gt">
+<<<<<<< HEAD
     <value name="OPERAND1">
         <shadow type="text">
             <field name="TEXT"/>
@@ -668,6 +676,43 @@ const operators = function (isInitialSetup, isStage, targetId, colors) {
     </value>
 </block>
 
+=======
+            <value name="OPERAND1">
+                <shadow type="text">
+                    <field name="TEXT"/>
+                </shadow>
+            </value>
+            <value name="OPERAND2">
+                <shadow type="text">
+                    <field name="TEXT">50</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="operator_lt">
+            <value name="OPERAND1">
+                <shadow type="text">
+                    <field name="TEXT"/>
+                </shadow>
+            </value>
+            <value name="OPERAND2">
+                <shadow type="text">
+                    <field name="TEXT">50</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="operator_equals">
+            <value name="OPERAND1">
+                <shadow type="text">
+                    <field name="TEXT"/>
+                </shadow>
+            </value>
+            <value name="OPERAND2">
+                <shadow type="text">
+                    <field name="TEXT">50</field>
+                </shadow>
+            </value>
+        </block>
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         ${blockSeparator}
         <block type="operator_and"/>
         <block type="operator_or"/>

@@ -10,6 +10,7 @@ const hosts = [
     {
         name: 'US East',
         cloudHost: 'wss://clouddata.turbowarp.org'
+<<<<<<< HEAD
     },
     {
         name: 'EU',
@@ -18,6 +19,8 @@ const hosts = [
             name: '9gr',
             href: 'https://scratch.mit.edu/users/9gr/'
         }
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     }
 ];
 
@@ -63,7 +66,11 @@ const CloudVariableBadge = props => {
                 }}
             />
     
+<<<<<<< HEAD
             {selectedHost ? (
+=======
+            {selectedHost && hosts.length > 1 ? (
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 <div className={styles.servers}>
                     <FormattedMessage
                         defaultMessage="Pick a server near you:"
@@ -80,6 +87,12 @@ const CloudVariableBadge = props => {
                         />
                     ))}
                 </div>
+<<<<<<< HEAD
+=======
+            ) : selectedHost ? (
+                // No options, so don't render anything
+                null
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             ) : (
                 <FormattedMessage
                     defaultMessage="Using a custom cloud variable server: {server}"

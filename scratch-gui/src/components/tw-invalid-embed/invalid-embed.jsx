@@ -35,7 +35,11 @@ const InvalidEmbed = () => (
         <p>
             {'If you are seeing this page even though you aren\'t embedding anything, let us know on '}
             <a
+<<<<<<< HEAD
                 href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments"
+=======
+                href="https://scratch.mit.edu/users/GarboMuffin/#comments"
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 target="_blank"
                 rel="noreferrer"
             >

@@ -4,6 +4,7 @@ import serviceWorker from '!!file-loader?name=sw.js!./service-worker.js';
 let loaded = false;
 const actuallyLoadServiceWorker = () => {
     navigator.serviceWorker.register(serviceWorker)
+<<<<<<< HEAD
         .then(registration => {
             log.info('Service worker registered successfully:', registration);
             
@@ -38,12 +39,21 @@ const loadServiceWorker = () => {
         process.env.ENABLE_SERVICE_WORKER === '1';
     
     if (shouldEnableServiceWorker && 'serviceWorker' in navigator && !loaded) {
+=======
+        .catch(err => {
+            log.error('sw error', err);
+        });
+};
+const loadServiceWorker = () => {
+    if (process.env.ENABLE_SERVICE_WORKER && 'serviceWorker' in navigator && !loaded) {
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         loaded = true;
         if (document.readyState === 'complete') {
             actuallyLoadServiceWorker();
         } else {
             window.addEventListener('load', actuallyLoadServiceWorker);
         }
+<<<<<<< HEAD
     } else if (!('serviceWorker' in navigator)) {
         log.warn('Service workers are not supported in this browser');
     } else if (process.env.NODE_ENV !== 'production' && !process.env.ENABLE_SERVICE_WORKER) {
@@ -91,4 +101,11 @@ if (typeof window !== 'undefined') {
 export {
     loadServiceWorker,
     isOffline
+=======
+    }
+};
+
+export {
+    loadServiceWorker
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 };

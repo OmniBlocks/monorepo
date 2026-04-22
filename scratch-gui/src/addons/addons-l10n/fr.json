@@ -40,6 +40,7 @@
     "mediarecorder/record-after-flag": "Ne démarrez pas l'enregistrement tant que le drapeau vert n'est pas été cliqué",
     "mediarecorder/record-audio": "Inclure les sons du projet",
     "mediarecorder/record-audio-description": "Cela n'inclut pas la synthèse vocale.",
+<<<<<<< HEAD
     "mediarecorder/gif-quality": "Qualité GIF",
     "mediarecorder/gif-quality-high": "Haute",
     "mediarecorder/gif-quality-medium": "Moyenne",
@@ -47,6 +48,8 @@
     "mediarecorder/gif-quality-very-low": "Très basse",
     "mediarecorder/gif-quality-garbage": "Déchet",
     "mediarecorder/gif-quality-literally-unusable": "Littéralement inutilisable",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Durée de l'enregistrement (en secondes)",
     "mediarecorder/record-mic": "Inclure les sons du microphone",
     "mediarecorder/record-until-stop": "Arrêter l'enregistrement quand le projet se termine",
@@ -55,11 +58,14 @@
     "mediarecorder/start-delay": "Délai de démarrage (en secondes)",
     "mediarecorder/starting-in": "Démarrage dans{secs} ...",
     "mediarecorder/stop": "Arrêter l'enregistrement",
+<<<<<<< HEAD
     "mediarecorder/format": "Format",
     "mediarecorder/converting": "Conversion...",
     "mediarecorder/exporting": "Exportation de la vidéo...",
     "mediarecorder/starting-export": "Démarrage de l'exportation...",
     "mediarecorder/conversion-failed": "Échec de la conversion de la vidéo au format MP4",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-breakpoint": "point d'arrêt",
     "debugger/block-error": "afficher erreur %s",
     "debugger/block-log": "afficher message %s",

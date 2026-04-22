@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [class*="sprite-selector_items-wrapper_"] {
   padding-bottom: 4.75rem;
 }
@@ -35,10 +36,17 @@
 
 .sa-search-sprites-container:focus-within {
   box-shadow: 0 0 0 6px var(--editorDarkMode-primary-transparent35, hsla(260, 60%, 60%, 0.35));
+=======
+.sa-search-sprites-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 input.sa-search-sprites-box {
   width: 100%;
+<<<<<<< HEAD
   height: 100%;
   box-sizing: border-box;
   padding: 0;
@@ -91,11 +99,20 @@ input.sa-search-sprites-box::placeholder {
 .sa-search-sprites-container:focus-within .sa-search-sprites-icon,
 .sa-search-sprites-container:not(.sa-search-sprites-empty) .sa-search-sprites-icon {
   filter: var(--editorDarkMode-highlightText-iconFilter, none);
+=======
+  box-sizing: border-box;
+  background-color: transparent;
+  border: 0px;
+  border-bottom: 1px solid var(--ui-black-transparent);
+  outline: none;
+  padding: 5px 20px 5px 10px;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .sa-search-sprites-reset {
   display: none;
   margin: 0;
+<<<<<<< HEAD
   width: 2.75rem;
   height: 2.75rem;
   padding: 0;
@@ -128,4 +145,19 @@ input.sa-search-sprites-box::placeholder {
 
 .sa-search-sprites-reset:hover img {
   transform: scale(1.2);
+=======
+  padding: 0;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  padding-right: 5px;
+  font-size: 25px;
+}
+
+.sa-search-sprites-box:not(:placeholder-shown) ~ .sa-search-sprites-reset {
+  display: block;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }

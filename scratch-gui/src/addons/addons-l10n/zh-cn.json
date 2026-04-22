@@ -43,6 +43,7 @@
     "mediarecorder/record-audio": "包含作品声音",
     "mediarecorder/record-audio-description": "这不包含文字转语音功能。",
     "mediarecorder/record-description": "录制舞台内容并保存为{extension}文件。你可以在录制结束后将它保存到你的电脑。\n注意：变量和列表显示器在录制时不可见。",
+<<<<<<< HEAD
     "mediarecorder/gif-size": "GIF 大小(px)",
     "mediarecorder/gif-fps": "GIF FPS",
     "mediarecorder/gif-quality": "GIF 质量",
@@ -52,6 +53,8 @@
     "mediarecorder/gif-quality-very-low": "极低",
     "mediarecorder/gif-quality-garbage": "垃圾",
     "mediarecorder/gif-quality-literally-unusable": "根本无法使用",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "录制时长（秒）",
     "mediarecorder/record-mic": "包含麦克风声音",
     "mediarecorder/record-until-stop": "在作品停止运行后停止录制",
@@ -60,11 +63,14 @@
     "mediarecorder/start-delay": "等待多久后开始（秒）",
     "mediarecorder/starting-in": "即将开始：{secs}...",
     "mediarecorder/stop": "停止录制",
+<<<<<<< HEAD
     "mediarecorder/format": "格式",
     "mediarecorder/converting": "正在转换...",
     "mediarecorder/exporting": "正在导出视频...",
     "mediarecorder/starting-export": "开始导出视频...",
     "mediarecorder/conversion-failed": "无法将视频转换为MP4格式",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-breakpoint": "断点",
     "debugger/block-error": "错误 %s",
     "debugger/block-log": "日志 %s",

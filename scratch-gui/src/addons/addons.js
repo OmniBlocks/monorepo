@@ -78,6 +78,7 @@ const addons = [
     'tw-straighten-comments',
     'tw-remove-backpack',
     'tw-remove-feedback',
+<<<<<<< HEAD
     'tw-disable-cloud-variables',
     'tw-disable-compiler',
     'editor-stepping',
@@ -87,6 +88,16 @@ const addons = [
 const newAddons = [
     'expanded-backpack',
     'qcode'
+=======
+    'tw-disable-vibration',
+    'tw-disable-cloud-variables',
+    'tw-disable-compiler',
+    'editor-stepping'
+];
+
+const newAddons = [
+    'expanded-backpack'
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 ];
 
 // eslint-disable-next-line import/no-commonjs

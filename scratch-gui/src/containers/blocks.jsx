@@ -144,6 +144,7 @@ class Blocks extends React.Component {
         this.ScratchBlocks.Procedures.externalProcedureDefCallback = this.props.onActivateCustomProcedures;
         this.ScratchBlocks.ScratchMsgs.setLocale(this.props.locale);
 
+<<<<<<< HEAD
         // Bridge FieldCustom from Closure-compiled Blockly → ScratchBlocks for the JS extension.
         // The develop-builds bundle defines window.Blockly.FieldCustom, while extensions call
         // ScratchBlocks.FieldCustom.registerInput(...). This assignment wires them together.
@@ -161,6 +162,8 @@ class Blocks extends React.Component {
                 'This usually means the Blockly → ScratchBlocks FieldCustom bridge is not configured correctly.');
         }
 
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         const Msg = this.ScratchBlocks.Msg;
         Msg.PROCEDURES_RETURN = this.props.intl.formatMessage(messages.PROCEDURES_RETURN, {
             v: '%1'

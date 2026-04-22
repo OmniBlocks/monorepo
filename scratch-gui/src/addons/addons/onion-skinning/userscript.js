@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+import {sanitizeSvg} from '@turbowarp/scratch-svg-renderer';
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 export default async function ({ addon, console, msg }) {
   const paper = await addon.tab.traps.getPaper();
 
@@ -300,6 +305,11 @@ export default async function ({ addon, console, msg }) {
 
   const makeVectorOnion = (opacity, costume, asset, isBefore) =>
     new Promise((resolve, reject) => {
+<<<<<<< HEAD
+=======
+      asset = sanitizeSvg.sanitizeSvgText(asset);
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       const { rotationCenterX, rotationCenterY } = costume;
       // https://github.com/scratchfoundation/scratch-paint/blob/cdf0afc217633e6cfb8ba90ea4ae38b79882cf6c/src/containers/paper-canvas.jsx#L196-L218
       asset = asset.split(/<\s*svg:/).join("<");

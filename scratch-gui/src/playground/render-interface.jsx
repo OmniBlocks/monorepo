@@ -41,6 +41,7 @@ import AddonChannels from '../addons/channels';
 import {loadServiceWorker} from './load-service-worker';
 import runAddons from '../addons/entry';
 import InvalidEmbed from '../components/tw-invalid-embed/invalid-embed.jsx';
+<<<<<<< HEAD
 import {APP_NAME, APP_VERSION} from '../lib/brand.js';
 import {loadFileHandler} from './load-file-handler';
 import {setProjectTitle} from '../reducers/project-title';
@@ -48,11 +49,19 @@ import {setProjectTitle} from '../reducers/project-title';
 import styles from './interface.css';
 
 const isInvalidEmbed = false;
+=======
+import {APP_NAME} from '../lib/brand.js';
+
+import styles from './interface.css';
+
+const isInvalidEmbed = window.parent !== window;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 const handleClickAddonSettings = addonId => {
     // addonId might be a string of the addon to focus on, undefined, or an event (treat like undefined)
     const path = process.env.ROUTING_STYLE === 'wildcard' ? 'addons' : 'addons.html';
     const url = `${process.env.ROOT}${path}${typeof addonId === 'string' ? `#${addonId}` : ''}`;
+<<<<<<< HEAD
     const width = 600;
 const height = 800;
 // my teacher told me write descriptive variable names :)
@@ -77,11 +86,18 @@ if you're using OmniBlocks as  PWA, and the link just opens in your browser
 the only downside i can think of is getting blocked by browser protections but welp ¯\_(ツ)_/¯ */
 // i just realized this could be a problem when developing the electron based desktop app
 // todo: make the electorn app handle this properly or something idk
+=======
+    window.open(url);
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 };
 
 const messages = defineMessages({
     defaultTitle: {
+<<<<<<< HEAD
         defaultMessage: 'The Ultimate MultiLanguage IDE',
+=======
+        defaultMessage: 'Run Scratch projects faster',
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         description: 'Title of homepage',
         id: 'tw.guiDefaultTitle'
     }
@@ -113,13 +129,18 @@ const Footer = () => (
                 <FormattedMessage
                     // eslint-disable-next-line max-len
                     defaultMessage="{APP_NAME} is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation."
+<<<<<<< HEAD
                     description="Disclaimer that OmniBlocks or Turbowarp are not connected to Scratch"
+=======
+                    description="Disclaimer that TurboWarp is not connected to Scratch"
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                     id="tw.footer.disclaimer"
                     values={{
                         APP_NAME
                     }}
                 />
             </div>
+<<<<<<< HEAD
             <div className={styles.footerText}>
                 <FormattedMessage
                     // eslint-disable-next-line max-len
@@ -142,6 +163,17 @@ const Footer = () => (
                     id="tw.footer.scratchDisclaimer"
                     values={{
                         scratchSiteGone: (
+=======
+
+            <div className={styles.footerText}>
+                <FormattedMessage
+                    // eslint-disable-next-line max-len
+                    defaultMessage="Scratch is a project of the Scratch Foundation. It is available for free at {scratchDotOrg}."
+                    description="A disclaimer that Scratch requires when referring to Scratch. {scratchDotOrg} is a link with text 'https://scratch.org/'"
+                    id="tw.footer.scratchDisclaimer"
+                    values={{
+                        scratchDotOrg: (
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                             <a
                                 href="https://scratch.org/"
                                 target="_blank"
@@ -163,6 +195,7 @@ const Footer = () => (
                             id="tw.footer.credits"
                         />
                     </a>
+<<<<<<< HEAD
                     <a href="https://github.com/sponsors/GarboMuffin">
                         <FormattedMessage
                             defaultMessage="Donate"
@@ -170,6 +203,8 @@ const Footer = () => (
                             id="tw.footer.donate"
                         />
                     </a>
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 </div>
                 <div className={styles.footerSection}>
                     <a href="https://desktop.turbowarp.org/">
@@ -196,11 +231,16 @@ const Footer = () => (
                     </a>
                     <a href="https://docs.turbowarp.org/">
                         <FormattedMessage
+<<<<<<< HEAD
                             defaultMessage="TurboWarp Documentation"
+=======
+                            defaultMessage="Documentation"
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                             description="Link in footer to additional documentation"
                             id="tw.footer.documentation"
                         />
                     </a>
+<<<<<<< HEAD
                     <a href="https://omniblocks.miraheze.org/">
                         <FormattedMessage
                             defaultMessage="OmniBlocks Wiki"
@@ -218,13 +258,22 @@ const Footer = () => (
                 </div>
                 <div className={styles.footerSection}>
                     <a href="https://github.com/OmniBlocks/scratch-gui/issues/new">
+=======
+                </div>
+                <div className={styles.footerSection}>
+                    <a href="https://scratch.mit.edu/users/GarboMuffin/#comments">
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                         <FormattedMessage
                             defaultMessage="Feedback & Bugs"
                             description="Link to feedback/bugs page"
                             id="tw.feedback"
                         />
                     </a>
+<<<<<<< HEAD
                     <a href="https://github.com/OmniBlocks/">
+=======
+                    <a href="https://github.com/TurboWarp/">
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                         <FormattedMessage
                             defaultMessage="Source Code"
                             description="Link to source code"
@@ -252,7 +301,10 @@ class Interface extends React.Component {
     componentDidUpdate (prevProps) {
         if (prevProps.isLoading && !this.props.isLoading) {
             loadServiceWorker();
+<<<<<<< HEAD
             loadFileHandler(this.props.vm, this.props.onSetProjectTitle, this.context.store); // register PWA file handler once project is loaded and pass Redux store
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         }
     }
     handleUpdateProjectTitle (title, isDefault) {
@@ -330,10 +382,14 @@ class Interface extends React.Component {
                                 <div className={classNames(styles.infobox, styles.unsharedUpdate)}>
                                     <p>
                                         <FormattedMessage
+<<<<<<< HEAD
                                             defaultMessage="Unshared projects are not visible."
                                             /* changed from "no longer visible" to "not visible" to
                                             not dissapoint the new users that might not have known you used to be able to 
                                             see unshared projects */
+=======
+                                            defaultMessage="Unshared projects are no longer visible."
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                                             description="Appears on unshared projects"
                                             id="tw.unshared2.1"
                                         />
@@ -392,8 +448,13 @@ class Interface extends React.Component {
                                 <p>
                                     <FormattedMessage
                                         // eslint-disable-next-line max-len
+<<<<<<< HEAD
                                         defaultMessage="{APP_NAME} is a Scratch mod that has many different features with different editors. Some notable features include free client-side python execution, and music creation built in."
                                         description="Description of Omniblocks on the homepage"
+=======
+                                        defaultMessage="{APP_NAME} is a Scratch mod that compiles projects to JavaScript to make them run really fast. Try it out by inputting a project ID or URL above or choosing a featured project below."
+                                        description="Description of TurboWarp on the homepage"
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                                         id="tw.home.description"
                                         values={{
                                             APP_NAME
@@ -428,12 +489,16 @@ Interface.propTypes = {
     isLoading: PropTypes.bool,
     isPlayerOnly: PropTypes.bool,
     isRtl: PropTypes.bool,
+<<<<<<< HEAD
     projectId: PropTypes.string,
     onSetProjectTitle: PropTypes.func
 };
 
 Interface.contextTypes = {
     store: PropTypes.object
+=======
+    projectId: PropTypes.string
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 };
 
 const mapStateToProps = state => ({
@@ -447,9 +512,13 @@ const mapStateToProps = state => ({
     projectId: state.scratchGui.projectState.projectId
 });
 
+<<<<<<< HEAD
 const mapDispatchToProps = dispatch => ({
     onSetProjectTitle: title => dispatch(setProjectTitle(title))
 });
+=======
+const mapDispatchToProps = () => ({});
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 const ConnectedInterface = injectIntl(connect(
     mapStateToProps,

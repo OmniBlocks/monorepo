@@ -43,6 +43,7 @@
     "mediarecorder/record-audio": "プロジェクトを録音する",
     "mediarecorder/record-audio-description": "音声合成は含まれません。",
     "mediarecorder/record-description": "ステージを{extension}ファイルとして録画します。録画後はコンピューター上に保存できます。変数やリストモニターは録画されません。",
+<<<<<<< HEAD
     "mediarecorder/gif-size": "GIFサイズ (px)",
     "mediarecorder/gif-fps": "GIF FPS",
     "mediarecorder/gif-quality": "GIFの品質",
@@ -52,6 +53,8 @@
     "mediarecorder/gif-quality-very-low": "とても低",
     "mediarecorder/gif-quality-garbage": "ゴミ",
     "mediarecorder/gif-quality-literally-unusable": "文字通り使えない",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "録画時間 (秒)",
     "mediarecorder/record-mic": "マイクの音を録音する",
     "mediarecorder/record-until-stop": "プロジェクトの停止後に録画も停止する",
@@ -60,11 +63,14 @@
     "mediarecorder/start-delay": "待ち時間 (秒)",
     "mediarecorder/starting-in": "{secs}秒後に開始...",
     "mediarecorder/stop": "録画を停止",
+<<<<<<< HEAD
     "mediarecorder/format": "フォーマット",
     "mediarecorder/converting": "変換中...",
     "mediarecorder/exporting": "ビデオをエクスポート中...",
     "mediarecorder/starting-export": "動画のエクスポートを開始します...",
     "mediarecorder/conversion-failed": "動画をMP4形式に変換できませんでした",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-breakpoint": "ブレークポイント",
     "debugger/block-error": "エラー%sを記録",
     "debugger/block-log": "%sをログに記録",

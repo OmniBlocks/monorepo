@@ -2,6 +2,7 @@
 
 /* this class must contain "see-inside-button" somewhere for the s3 dev tools to be able to reinject itself */
 /* https://github.com/griffpatch/Scratch3-Dev-Tools/blob/0.2.4/inject3.js#L1804-L1807 */
+<<<<<<< HEAD
 
 @keyframes spinner {
     0% {
@@ -12,12 +13,15 @@
     }
 }
 
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 .see-inside-button {
     box-shadow: 0 0 0 1px $ui-black-transparent;
 }
 
 .see-inside-button-icon {
     height: 1.25rem;
+<<<<<<< HEAD
     transition: transform 0.2s ease-in-out; 
 }
 
@@ -25,3 +29,6 @@
     animation: spinner 1.2s reverse ease-in-out infinite;
 }
 
+=======
+}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

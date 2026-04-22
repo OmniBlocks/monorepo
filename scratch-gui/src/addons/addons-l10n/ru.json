@@ -35,6 +35,7 @@
     "mediarecorder/record-audio": "Включить звуки проекта",
     "mediarecorder/record-audio-description": "Это не включает Text-to-Speech.",
     "mediarecorder/record-description": "Записать проект в файл типа {extension}. Его можно скачать на ваш ПК после завершения записи.\n(Примечание: переменные и списки не будут видны на записи.)",
+<<<<<<< HEAD
     "mediarecorder/gif-size": "Размер GIF (px)",
     "mediarecorder/gif-fps": "FPS GIF",
     "mediarecorder/gif-quality": "Качество GIF",
@@ -44,6 +45,8 @@
     "mediarecorder/gif-quality-very-low": "Очень низкое",
     "mediarecorder/gif-quality-garbage": "Мусор",
     "mediarecorder/gif-quality-literally-unusable": "Буквально неиспользуемое",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Продолжительность записи (в секундах)",
     "mediarecorder/record-mic": "Включить звуки из микрофона",
     "mediarecorder/record-until-stop": "Остановить запись после остановки проекта",
@@ -52,11 +55,14 @@
     "mediarecorder/start-delay": "Задержка старта (в секундах)",
     "mediarecorder/starting-in": "Старт через {secs}...",
     "mediarecorder/stop": "Остановить запись",
+<<<<<<< HEAD
     "mediarecorder/format": "Формат",
     "mediarecorder/converting": "Конвертация...",
     "mediarecorder/exporting": "Экспорт видео...",
     "mediarecorder/starting-export": "Запуск экспорта видео...",
     "mediarecorder/conversion-failed": "Не удалось конвертировать видео в формат MP4",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-breakpoint": "приостановить",
     "debugger/block-error": "ошибка %s",
     "debugger/block-log": "логировать %s",

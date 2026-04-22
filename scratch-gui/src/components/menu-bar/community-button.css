@@ -1,5 +1,6 @@
 @import "../../css/colors.css";
 
+<<<<<<< HEAD
 
 
 
@@ -12,12 +13,15 @@
     }
 }
 
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 .community-button {
     box-shadow: 0 0 0 1px $ui-black-transparent;
 }
 
 .community-button-icon {
     height: 1.25rem;
+<<<<<<< HEAD
     transition: transform 0.2s ease-in-out; 
     
 }
@@ -26,3 +30,6 @@
     animation: spinner 1.2s  ease-in-out infinite;
 }
 
+=======
+}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

@@ -229,7 +229,17 @@ class LibraryComponent extends React.Component {
                     }
                 }
                 if (dataItem.description) {
+<<<<<<< HEAD
                     search.push(dataItem.description);
+=======
+                    if (typeof dataItem.description === 'string') {
+                        search.push(dataItem.description);
+                    } else {
+                        search.push(this.props.intl.formatMessage(dataItem.description.props, {
+                            APP_NAME
+                        }));
+                    }
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 }
                 return search
                     .join('\n')

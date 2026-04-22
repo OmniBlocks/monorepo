@@ -4,17 +4,30 @@
 
 .page-wrapper {
     height: 100%;
+<<<<<<< HEAD
 }
 
 .body-wrapper {
     height: calc(100% - $menu-bar-height);
     background-color: $ui-primary;
     
+=======
+    display: flex;
+    flex-direction: column;
+}
+
+.body-wrapper {
+    flex-grow: 1;
+    background-color: $ui-primary;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .body-wrapper * {
     box-sizing: border-box;
+<<<<<<< HEAD
     
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .flex-wrapper {
@@ -57,7 +70,10 @@
 }
 
 .tab-list {
+<<<<<<< HEAD
     transition: all 0.2s ease-in-out;
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     height: $stage-menu-height;
     width: 250px; /* Match width of the toolbox */
     display: flex;
@@ -73,12 +89,19 @@
     border-bottom: 0 !important;
 
     color: $text-primary;
+<<<<<<< HEAD
     transition: all 0.2s ease-in-out;
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .tab {
     flex-grow: 1;
+<<<<<<< HEAD
     height: 80% !important;
+=======
+    height: 80%;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     margin-bottom: 0;
 
     border-radius: 1rem 1rem 0 0;
@@ -96,7 +119,10 @@
 
     user-select: none;
     white-space: nowrap;
+<<<<<<< HEAD
     transition: all 0.3s ease-in-out;
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 [dir="ltr"] .tab {
@@ -128,11 +154,18 @@
 
 .tab:hover {
   background-color: $ui-primary;
+<<<<<<< HEAD
   height: 85% !important;
 }
 
 .tab.is-selected {
     height: 100% !important;
+=======
+}
+
+.tab.is-selected {
+    height: 90%;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     color: $looks-secondary;
     background-color: $ui-white;
     z-index: 4; /* Make sure selected is always above */
@@ -200,7 +233,10 @@
 .blocks-wrapper {
     flex-grow: 1;
     position: relative;
+<<<<<<< HEAD
     transition: all 0.2s ease-in-out; /* SO WHAT IF I'M SPAMMING THIS LINE, IT WORKS AND LOOKS GOOD */
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .stage-and-target-wrapper {
@@ -220,7 +256,10 @@
 
     /* this will only ever be as wide as the stage */
     flex-basis: 0;
+<<<<<<< HEAD
     
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .target-wrapper {
@@ -251,7 +290,10 @@
 
     border: 1px solid $looks-secondary;
     box-sizing: content-box; /* To match scratch-block vertical toolbox borders */
+<<<<<<< HEAD
     
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 $fade-out-distance: 15px;
@@ -275,7 +317,10 @@ $fade-out-distance: 15px;
     height: 100%;
     cursor: pointer;
     user-select: none;
+<<<<<<< HEAD
     
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .extension-button-icon {
@@ -342,6 +387,7 @@ $fade-out-distance: 15px;
     /* overridden by JS; this will be used if the browser can't understand that color */
     background-color: white;
 }
+<<<<<<< HEAD
 
 /* Mobile support */
 @media (max-width: 768px) {
@@ -376,3 +422,5 @@ $fade-out-distance: 15px;
         font-size: 0.7rem;
     }
 }
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

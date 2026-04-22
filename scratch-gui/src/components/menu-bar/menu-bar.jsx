@@ -23,8 +23,11 @@ import {MenuItem, MenuSection} from '../menu/menu.jsx';
 import ProjectTitleInput from './project-title-input.jsx';
 import AuthorInfo from './author-info.jsx';
 import SB3Downloader from '../../containers/sb3-downloader.jsx';
+<<<<<<< HEAD
 import SB3FolderExporter from '../../containers/sb3-folder-exporter.jsx';
 import SB3FolderImporter from '../../containers/sb3-folder-importer.jsx';
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 import DeletionRestorer from '../../containers/deletion-restorer.jsx';
 import TurboMode from '../../containers/turbo-mode.jsx';
 import MenuBarHOC from '../../containers/menu-bar-hoc.jsx';
@@ -34,6 +37,10 @@ import FramerateChanger from '../../containers/tw-framerate-changer.jsx';
 import ChangeUsername from '../../containers/tw-change-username.jsx';
 import CloudVariablesToggler from '../../containers/tw-cloud-toggler.jsx';
 import TWSaveStatus from './tw-save-status.jsx';
+<<<<<<< HEAD
+=======
+import TWNews from './tw-news.jsx';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 import {openTipsLibrary, openSettingsModal, openRestorePointModal} from '../../reducers/modals';
 import {setPlayer} from '../../reducers/mode';
@@ -96,7 +103,11 @@ import fileIcon from './icon--file.svg';
 import editIcon from './icon--edit.svg';
 import addonsIcon from './addons.svg';
 import errorIcon from './tw-error.svg';
+<<<<<<< HEAD
 import advancedIcon from './Boxy-advanced5.svg';
+=======
+import advancedIcon from './tw-advanced.svg';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 import ninetiesLogo from './nineties_logo.svg';
 import catLogo from './cat_logo.svg';
@@ -233,7 +244,10 @@ class MenuBar extends React.Component {
     }
     componentDidMount () {
         document.addEventListener('keydown', this.handleKeyPress);
+<<<<<<< HEAD
         
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     }
     componentWillUnmount () {
         document.removeEventListener('keydown', this.handleKeyPress);
@@ -343,9 +357,15 @@ class MenuBar extends React.Component {
         if (modifier) {
             if (event.key.toLowerCase() === 's') {
                 this.props.handleSaveProject();
+<<<<<<< HEAD
                 event.preventDefault();
             } else if (event.key.toLowerCase() === 'o') {
                 event.preventDefault();
+=======
+                event.preventDefault();    
+            } else if (event.key.toLowerCase() === 'o') {
+                event.preventDefault();    
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 this.props.onStartSelectingFileUpload();
             }
         }
@@ -485,7 +505,11 @@ class MenuBar extends React.Component {
         );
         // Show the About button only if we have a handler for it (like in the desktop app)
         const aboutButton = this.buildAboutMenu(this.props.onClickAbout);
+<<<<<<< HEAD
         return (
+=======
+        const menuBar = (
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             <Box
                 className={classNames(
                     this.props.className,
@@ -555,7 +579,14 @@ class MenuBar extends React.Component {
                                 this.handleClickDesktopSettings
                             }
                             // eslint-disable-next-line react/jsx-no-bind
+<<<<<<< HEAD
                             onOpenCustomSettings={this.props.onClickAddonSettings.bind(null, 'editor-theme3')}
+=======
+                            onOpenCustomSettings={
+                                this.props.onClickAddonSettings &&
+                                this.props.onClickAddonSettings.bind(null, 'editor-theme3')
+                            }
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                             onRequestClose={this.props.onRequestCloseSettings}
                             onRequestOpen={this.props.onClickSettings}
                             settingsMenuOpen={this.props.settingsMenuOpen}
@@ -634,7 +665,10 @@ class MenuBar extends React.Component {
                                         >
                                             {this.props.intl.formatMessage(sharedMessages.loadFromComputerTitle)}
                                         </MenuItem>
+<<<<<<< HEAD
                                         
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                                         <SB3Downloader
                                             showSaveFilePicker={this.props.showSaveFilePicker}
                                         >
@@ -690,6 +724,7 @@ class MenuBar extends React.Component {
                                                 </React.Fragment>
                                             )}
                                         </SB3Downloader>
+<<<<<<< HEAD
                                         <SB3FolderImporter>
                                             {importProjectFromFolder => (
                                                 importProjectFromFolder ? (
@@ -722,6 +757,8 @@ class MenuBar extends React.Component {
                                                 ) : null
                                             )}
                                         </SB3FolderExporter>
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                                     </MenuSection>
                                     {this.props.onClickPackager && (
                                         <MenuSection>
@@ -1047,7 +1084,11 @@ class MenuBar extends React.Component {
                     <div className={styles.menuBarItem}>
                         <a
                             className={styles.feedbackLink}
+<<<<<<< HEAD
                             href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments"
+=======
+                            href="https://scratch.mit.edu/users/GarboMuffin/#comments"
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                             rel="noopener noreferrer"
                             target="_blank"
                         >
@@ -1075,6 +1116,16 @@ class MenuBar extends React.Component {
                 {aboutButton}
             </Box>
         );
+<<<<<<< HEAD
+=======
+
+        return (
+            <React.Fragment>
+                {menuBar}
+                {/* <TWNews /> */}
+            </React.Fragment>
+        );
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     }
 }
 

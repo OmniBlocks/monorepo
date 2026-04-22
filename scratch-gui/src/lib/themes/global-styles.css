@@ -22,6 +22,7 @@
     fill: $popover-background !important;
     stroke: $ui-black-transparent !important;
 }
+<<<<<<< HEAD
 /* so i literally JUST learnt that some people have animations disabled for epilepsy... or whatever it is they disable it for, and i don't wanna get sued to 
 oblivion and back so just disabling all animations if they have that setting on */
 @media (prefers-reduced-motion: reduce) {
@@ -30,6 +31,9 @@ oblivion and back so just disabling all animations if they have that setting on 
         animation: none !important; /* yes i'm turning off all animations, so what it's better than getting molded into a sphere by angry users*/
     }
 }
+=======
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 /* ScratchAdddons editor-dark-mode compatibility */
 :root {
     --editorDarkMode-primary: $looks-secondary;

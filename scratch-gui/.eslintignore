@@ -3,7 +3,10 @@ build/*
 dist/*
 test/*
 src/examples/*
+<<<<<<< HEAD
 static/*
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 # Files vendored from upstreams
 src/addons/addons

@@ -15,8 +15,12 @@ import {
     activateTab,
     BLOCKS_TAB_INDEX,
     COSTUMES_TAB_INDEX,
+<<<<<<< HEAD
     SOUNDS_TAB_INDEX,
     SONGS_TAB_INDEX
+=======
+    SOUNDS_TAB_INDEX
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 } from '../reducers/editor-tab';
 
 import {
@@ -100,6 +104,7 @@ class GUI extends React.Component {
             ...componentProps
         } = this.props;
         return (
+<<<<<<< HEAD
             <>
                 <GUIComponent
                     loading={fetchingProject || isLoading || loadingStateVisible}
@@ -109,6 +114,14 @@ class GUI extends React.Component {
                 </GUIComponent>
 
             </>
+=======
+            <GUIComponent
+                loading={fetchingProject || isLoading || loadingStateVisible}
+                {...componentProps}
+            >
+                {children}
+            </GUIComponent>
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         );
     }
 }
@@ -169,7 +182,10 @@ const mapStateToProps = state => {
         loadingStateVisible: state.scratchGui.modals.loadingProject,
         projectId: state.scratchGui.projectState.projectId,
         soundsTabVisible: state.scratchGui.editorTab.activeTabIndex === SOUNDS_TAB_INDEX,
+<<<<<<< HEAD
         songsTabVisible: state.scratchGui.editorTab.activeTabIndex === SONGS_TAB_INDEX,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         targetIsStage: (
             state.scratchGui.targets.stage &&
             state.scratchGui.targets.stage.id === state.scratchGui.targets.editingTarget
@@ -182,7 +198,10 @@ const mapStateToProps = state => {
         fontsModalVisible: state.scratchGui.modals.fontsModal,
         unknownPlatformModalVisible: state.scratchGui.modals.unknownPlatformModal,
         invalidProjectModalVisible: state.scratchGui.modals.invalidProjectModal,
+<<<<<<< HEAD
         exportJustModalVisible: state.scratchGui.modals.exportJustModal,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         vm: state.scratchGui.vm
     };
 };
@@ -192,7 +211,10 @@ const mapDispatchToProps = dispatch => ({
     onActivateTab: tab => dispatch(activateTab(tab)),
     onActivateCostumesTab: () => dispatch(activateTab(COSTUMES_TAB_INDEX)),
     onActivateSoundsTab: () => dispatch(activateTab(SOUNDS_TAB_INDEX)),
+<<<<<<< HEAD
     onActivateSongsTab: () => dispatch(activateTab(SONGS_TAB_INDEX)),
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     onRequestCloseBackdropLibrary: () => dispatch(closeBackdropLibrary()),
     onRequestCloseCostumeLibrary: () => dispatch(closeCostumeLibrary()),
     onRequestCloseTelemetryModal: () => dispatch(closeTelemetryModal())
@@ -206,9 +228,12 @@ const ConnectedGUI = injectIntl(connect(
 // note that redux's 'compose' function is just being used as a general utility to make
 // the hierarchy of HOC constructor calls clearer here; it has nothing to do with redux's
 // ability to compose reducers.
+<<<<<<< HEAD
 /* why are the og developers using double slashes
  for multiline comments? when you can just use
    /* and  */
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 const WrappedGui = compose(
     LocalizationHOC,
     ErrorBoundaryHOC('Top Level App'),

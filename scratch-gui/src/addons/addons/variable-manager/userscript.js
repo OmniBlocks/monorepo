@@ -280,7 +280,11 @@ export default async function ({ addon, console, msg }) {
   }
 
   function fullReload() {
+<<<<<<< HEAD
     if (addon.tab.redux.state?.scratchGui?.editorTab?.activeTabIndex !== 4 || preventUpdate) return;
+=======
+    if (addon.tab.redux.state?.scratchGui?.editorTab?.activeTabIndex !== 3 || preventUpdate) return;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
     const editingTarget = vm.runtime.getEditingTarget();
     const stage = vm.runtime.getTargetForStage();
@@ -313,7 +317,11 @@ export default async function ({ addon, console, msg }) {
   }
 
   function quickReload() {
+<<<<<<< HEAD
     if (addon.tab.redux.state?.scratchGui?.editorTab?.activeTabIndex !== 4 || preventUpdate) return;
+=======
+    if (addon.tab.redux.state?.scratchGui?.editorTab?.activeTabIndex !== 3 || preventUpdate) return;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
     for (const variable of localVariables) {
       variable.updateValue();
@@ -329,7 +337,11 @@ export default async function ({ addon, console, msg }) {
   }
 
   varTab.addEventListener("click", (e) => {
+<<<<<<< HEAD
     addon.tab.redux.dispatch({ type: "scratch-gui/navigation/ACTIVATE_TAB", activeTabIndex: 4 });
+=======
+    addon.tab.redux.dispatch({ type: "scratch-gui/navigation/ACTIVATE_TAB", activeTabIndex: 3 });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
   });
 
   function setVisible(visible) {
@@ -355,7 +367,11 @@ export default async function ({ addon, console, msg }) {
   addon.tab.redux.addEventListener("statechanged", ({ detail }) => {
     if (detail.action.type === "scratch-gui/navigation/ACTIVATE_TAB") {
       const varManagerWasSelected = document.body.contains(manager);
+<<<<<<< HEAD
       const switchedToVarManager = detail.action.activeTabIndex === 4;
+=======
+      const switchedToVarManager = detail.action.activeTabIndex === 3;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
       if (varManagerWasSelected && !switchedToVarManager) {
         // Fixes #5773
@@ -364,7 +380,11 @@ export default async function ({ addon, console, msg }) {
 
       setVisible(switchedToVarManager);
     } else if (detail.action.type === "scratch-gui/mode/SET_PLAYER") {
+<<<<<<< HEAD
       if (!detail.action.isPlayerOnly && addon.tab.redux.state.scratchGui.editorTab.activeTabIndex === 4) {
+=======
+      if (!detail.action.isPlayerOnly && addon.tab.redux.state.scratchGui.editorTab.activeTabIndex === 3) {
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         // DOM doesn't actually exist yet
         queueMicrotask(() => setVisible(true));
       }
@@ -398,7 +418,11 @@ export default async function ({ addon, console, msg }) {
   };
 
   addon.self.addEventListener("disabled", () => {
+<<<<<<< HEAD
     if (addon.tab.redux.state.scratchGui.editorTab.activeTabIndex === 4) {
+=======
+    if (addon.tab.redux.state.scratchGui.editorTab.activeTabIndex === 3) {
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       addon.tab.redux.dispatch({ type: "scratch-gui/navigation/ACTIVATE_TAB", activeTabIndex: 2 });
     }
   });

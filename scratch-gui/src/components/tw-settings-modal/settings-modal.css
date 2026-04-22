@@ -2,6 +2,7 @@
 @import "../../css/filters.css";
 @import "../../css/default-colors.css";
 
+<<<<<<< HEAD
 
 
 .modal-content {
@@ -14,6 +15,10 @@
     
     
     
+=======
+.modal-content {
+    max-width: 750px;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .body {
@@ -22,7 +27,10 @@
     min-height: 150px;
     max-height: calc(100vh - 250px);
     overflow-y: auto;
+<<<<<<< HEAD
     
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 /* For small screens, such as in the embed */
@@ -41,6 +49,7 @@
     padding: 0.5rem 1rem;
     margin: 0.25rem 0;
     border-radius: 4px;
+<<<<<<< HEAD
     transition: all 0.2s ease-in-out;
     /* max-height: 42px; try again next time i have no freaking clue how tomake this work */
     overflow: hidden; 
@@ -49,6 +58,11 @@
     /*max-height: 500px; */
     background: $badge-background;
     
+=======
+}
+.setting.active {
+    background: $badge-background;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 .setting:hover,
 .setting:focus-within {

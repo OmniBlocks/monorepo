@@ -207,7 +207,11 @@ export class BlockInputEnum extends BlockInput {
     this.values = [];
     for (let i = 0; i < options.length; i++) {
       if (typeof options[i][1] === "string" && BlockInputEnum.INVALID_VALUES.indexOf(options[i][1]) === -1) {
+<<<<<<< HEAD
         this.values.push({ value: options[i][1], string: options[i][0].replaceAll(String.fromCharCode(160), " ") });
+=======
+        this.values.push({ value: options[i][1], string: options[i][0].replace(/\u00a0/g, " ") });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       }
     }
     this.isRound = isRound;

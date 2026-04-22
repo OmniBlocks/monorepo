@@ -49,6 +49,7 @@ p.mediaRecorderPopupOption {
   margin-left: 0.5rem;
 }
 
+<<<<<<< HEAD
 .sa-record {
   display: flex;
   align-items: center;
@@ -124,3 +125,8 @@ p.mediaRecorderPopupOption {
     left: 100%;
   }
 }
+=======
+.mediaRecorderPopupButtons button:nth-of-type(1) {
+  color: black;
+}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

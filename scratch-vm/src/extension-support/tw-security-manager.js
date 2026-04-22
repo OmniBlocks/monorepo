@@ -152,6 +152,7 @@ class SecurityManager {
     canEmbed (documentURL) {
         return Promise.resolve(true);
     }
+<<<<<<< HEAD
     /**
      * pm: Used to prompt the user if they would like to unsandbox a feature in the extension.
      * @returns {Promise<boolean>|boolean} -
@@ -159,6 +160,9 @@ class SecurityManager {
     canUnsandbox() {
         return Promise.resolve(false);
     }
+=======
+
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     /**
      * Determine whether an extension is allowed to download a URL with a given name.
      * @param {string} resourceURL The URL to download
@@ -168,6 +172,7 @@ class SecurityManager {
     canDownload (resourceURL, name) {
         return Promise.resolve(true);
     }
+<<<<<<< HEAD
     shouldUseLocal(refrenceName) {
         return Promise.resolve(!confirm(`it seems that the extension ${refrenceName} has been updated, use the up-to-date code?`))
     }
@@ -189,6 +194,8 @@ class SecurityManager {
     canWriteFile (path) {
         return Promise.resolve(false);
     }
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 }
 
 module.exports = SecurityManager;

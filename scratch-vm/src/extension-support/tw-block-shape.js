@@ -9,6 +9,7 @@ const BlockShape = {
     /**
      * Output shape: hexagonal (booleans/predicates).
      */
+<<<<<<< HEAD
     HEXAGONAL: 1,
 
     /**
@@ -63,3 +64,19 @@ const BlockShape = {
 };
 
 module.exports = BlockShape;
+=======
+    HEXAGONAL: ScratchBlocksConstants.OUTPUT_SHAPE_HEXAGONAL,
+
+    /**
+     * Output shape: rounded (numbers).
+     */
+    ROUND: ScratchBlocksConstants.OUTPUT_SHAPE_ROUND,
+
+    /**
+     * Output shape: squared (any/all values; strings).
+     */
+    SQUARE: ScratchBlocksConstants.OUTPUT_SHAPE_SQUARE
+};
+
+module.exports = BlockShape;
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5

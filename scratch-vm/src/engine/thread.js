@@ -216,6 +216,7 @@ class Thread {
         this.procedures = null;
         this.executableHat = false;
         this.compatibilityStackFrame = null;
+<<<<<<< HEAD
 
         /**
          * omni: The object the web server stores a request in.
@@ -237,6 +238,8 @@ class Thread {
             status: null, // Initialized by the request listener hat.
             headers: '{}'
         };
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     }
 
     /**

@@ -97,7 +97,11 @@ class Color {
      * @return {!number} Number representing the color.
      */
     static rgbToDecimal (rgb) {
+<<<<<<< HEAD
         return (Math.round(rgb.r) << 16) + (Math.round(rgb.g) << 8) + Math.round(rgb.b);
+=======
+        return (rgb.r << 16) + (rgb.g << 8) + rgb.b;
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     }
 
     /**

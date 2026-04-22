@@ -17,5 +17,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+<<<<<<< HEAD
+=======
+      - run: npm run lint
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
       - run: npm run build
       - run: npm run tap

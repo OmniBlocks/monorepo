@@ -14,11 +14,18 @@ const BlockType = {
     BUTTON: 'button',
 
     /**
+<<<<<<< HEAD
      * A text label (not an actual block) for adding comments or labling blocks 
      */
     LABEL: 'label',
 
 
+=======
+     * A text label (not an actual block) for adding comments or labling blocks
+     */
+    LABEL: 'label',
+
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     /**
      * Command block
      */
@@ -58,4 +65,8 @@ const BlockType = {
     XML: 'xml'
 };
 
+<<<<<<< HEAD
 module.exports = BlockType;
+=======
+module.exports = BlockType;
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5

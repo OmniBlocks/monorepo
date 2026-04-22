@@ -1115,6 +1115,34 @@ const parseScratchAssets = function (object, runtime, zip) {
 };
 
 /**
+<<<<<<< HEAD
+=======
+ * Fix various backwards-incompatible changes that Scratch made in the spork migration.
+ * @param {object} blocks Blocks, mutated in-place.
+ */
+const fixSporkCompatibility = function (blocks) {
+    for (const blockId in blocks) {
+        if (!Object.prototype.hasOwnProperty.call(blocks, blockId)) continue;
+        const block = blocks[blockId];
+
+        // Custom block definition prototype blocks used to be marked as shadow: true, but spork marks as shadow: true.
+        // Our scratch-blocks relies on it being shadow: true to prevent moving, so we'll force it to be that way.
+        if (block.opcode === 'procedures_prototype') {
+            block.shadow = true;
+        } else if (
+            block.opcode === 'argument_reporter_string_number' ||
+            block.opcode === 'argument_reporter_boolean'
+        ) {
+            const parent = blocks[block.parent];
+            if (parent && parent.opcode === 'procedures_prototype') {
+                block.shadow = true;
+            }
+        }
+    }
+};
+
+/**
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
  * Parse a single "Scratch object" and create all its in-memory VM objects.
  * @param {!object} object From-JSON "Scratch object:" sprite, stage, watcher.
  * @param {!Runtime} runtime Runtime object to load all structures into.
@@ -1154,6 +1182,11 @@ const parseScratchObject = function (object, runtime, extensions, zip, assets) {
                 extensions.extensionIDs.add(extensionID);
             }
         }
+<<<<<<< HEAD
+=======
+        // Take a third pass to fix various things that spork broke.
+        fixSporkCompatibility(object.blocks);
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     }
     // Costumes from JSON.
     const {costumePromises} = assets;
@@ -1448,9 +1481,13 @@ const checkPlatformCompatibility = (json, runtime) => {
     }
 
     const projectPlatform = json.meta.platform.name;
+<<<<<<< HEAD
     if (projectPlatform === runtime.platform.name || 
         projectPlatform === 'TurboWarp' || 
         projectPlatform === 'Scratch') {
+=======
+    if (projectPlatform === runtime.platform.name) {
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
         return;
     }
 

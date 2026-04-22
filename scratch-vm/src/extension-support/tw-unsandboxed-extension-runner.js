@@ -5,7 +5,10 @@ const createTranslate = require('./tw-l10n');
 const staticFetch = require('../util/tw-static-fetch');
 
 /* eslint-disable require-await */
+<<<<<<< HEAD
 /* eslint-env node, browser */
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 
 /**
  * Parse a URL object or return null.
@@ -181,6 +184,7 @@ const teardownUnsandboxedExtensionAPI = () => {
 const loadUnsandboxedExtension = (extensionURL, vm) => new Promise((resolve, reject) => {
     setupUnsandboxedExtensionAPI(vm).then(resolve);
 
+<<<<<<< HEAD
     if (typeof process === 'undefined' || !process.versions?.node) {
         const script = document.createElement('script');
         script.onerror = () => {
@@ -197,6 +201,14 @@ const loadUnsandboxedExtension = (extensionURL, vm) => new Promise((resolve, rej
             });
         });
     }
+=======
+    const script = document.createElement('script');
+    script.onerror = () => {
+        reject(new Error(`Error in unsandboxed script ${extensionURL}. Check the console for more information.`));
+    };
+    script.src = extensionURL;
+    document.body.appendChild(script);
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 }).then(objects => {
     teardownUnsandboxedExtensionAPI();
     return objects;

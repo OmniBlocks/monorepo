@@ -80,10 +80,13 @@ test('rgbToHex', t => {
     t.strictEqual(color.rgbToHex({r: 0, g: 0, b: 0}), '#000000');
     t.strictEqual(color.rgbToHex({r: 255, g: 255, b: 255}), '#ffffff');
     t.strictEqual(color.rgbToHex({r: 0, g: 255, b: 170}), '#00ffaa');
+<<<<<<< HEAD
     // Float components from mixRgb must not produce hex strings with decimal points
     const mixed = color.mixRgb(color.hexToRgb('#d41c1c'), color.RGB_BLACK, 0.1);
     const hex = color.rgbToHex(mixed);
     t.ok(/^#[0-9a-f]{6}$/.test(hex), `rgbToHex with float inputs must return valid #rrggbb, got: ${hex}`);
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     t.end();
 });
 
@@ -91,8 +94,11 @@ test('rgbToDecimal', t => {
     t.strictEqual(color.rgbToDecimal({r: 0, g: 0, b: 0}), 0);
     t.strictEqual(color.rgbToDecimal({r: 255, g: 255, b: 255}), 16777215);
     t.strictEqual(color.rgbToDecimal({r: 0, g: 255, b: 170}), 65450);
+<<<<<<< HEAD
     // Float components (as produced by mixRgb) must round to valid integers
     t.strictEqual(color.rgbToDecimal({r: 190.8, g: 25.2, b: 25.2}), color.rgbToDecimal({r: 191, g: 25, b: 25}));
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     t.end();
 });
 

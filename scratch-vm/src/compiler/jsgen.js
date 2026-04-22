@@ -334,6 +334,7 @@ class JSGenerator {
             // No compile-time optimizations possible - use fallback method.
             return `compareGreaterThan(${this.descendInput(left)}, ${this.descendInput(right)})`;
         }
+<<<<<<< HEAD
         case InputOpcode.OP_GTOREQ: {
     const left = node.left;
     const right = node.right;
@@ -368,6 +369,8 @@ case InputOpcode.OP_LTOREQ: {
     return `compareLessThanOrEqual(${this.descendInput(left)}, ${this.descendInput(right)})`;
 }
 
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
         case InputOpcode.OP_JOIN:
             return `(${this.descendInput(node.left)} + ${this.descendInput(node.right)})`;
         case InputOpcode.OP_LENGTH:

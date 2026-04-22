@@ -5,9 +5,14 @@ if (typeof TextEncoder === 'undefined') {
     _TextEncoder = TextEncoder;
 }
 const EventEmitter = require('events');
+<<<<<<< HEAD
 
 const JSZip = require('@turbowarp/jszip');
 const ExtensionStorage = require('./util/deprecated-extension-storage.js');
+=======
+const JSZip = require('@turbowarp/jszip');
+
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 const Buffer = require('buffer').Buffer;
 const centralDispatch = require('./dispatch/central-dispatch');
 const ExtensionManager = require('./extension-support/extension-manager');
@@ -18,7 +23,11 @@ const RenderedTarget = require('./sprites/rendered-target');
 const Sprite = require('./sprites/sprite');
 const StringUtil = require('./util/string-util');
 const formatMessage = require('format-message');
+<<<<<<< HEAD
 const { SyntheticModule } = require('vm');
+=======
+
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 const Variable = require('./engine/variable');
 const newBlockIds = require('./util/new-block-ids');
 
@@ -52,7 +61,10 @@ const createRuntimeService = runtime => {
     const service = {};
     service._refreshExtensionPrimitives = runtime._refreshExtensionPrimitives.bind(runtime);
     service._registerExtensionPrimitives = runtime._registerExtensionPrimitives.bind(runtime);
+<<<<<<< HEAD
     service._removeExtensionPrimitive = runtime._removeExtensionPrimitive.bind(runtime);  // Add this line
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     return service;
 };
 
@@ -141,10 +153,13 @@ class VirtualMachine extends EventEmitter {
         this.runtime.on(Runtime.TOOLBOX_EXTENSIONS_NEED_UPDATE, () => {
             this.extensionManager.refreshBlocks();
         });
+<<<<<<< HEAD
         this.runtime.on(Runtime.EXTENSION_REMOVED, extensionId => {
             this.emit(Runtime.EXTENSION_REMOVED, extensionId);
             this.extensionManager.refreshBlocks();
         });
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
         this.runtime.on(Runtime.PERIPHERAL_LIST_UPDATE, info => {
             this.emit(Runtime.PERIPHERAL_LIST_UPDATE, info);
         });
@@ -209,7 +224,10 @@ class VirtualMachine extends EventEmitter {
         this.extensionManager = new ExtensionManager(this);
         this.securityManager = this.extensionManager.securityManager;
         this.runtime.extensionManager = this.extensionManager;
+<<<<<<< HEAD
         this.runtime.vm = this;
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 
         // Load core extensions
         for (const id of CORE_EXTENSIONS) {

@@ -128,6 +128,7 @@ test('with the default colors', t => {
 
     t.end();
 });
+<<<<<<< HEAD
 
 test('with only color1 provided - generates fallback colors', t => {
     const vm = new VirtualMachine();
@@ -162,3 +163,5 @@ test('with only color1 provided - generates fallback colors', t => {
 
     t.end();
 });
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5

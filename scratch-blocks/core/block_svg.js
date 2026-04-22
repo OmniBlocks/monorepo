@@ -244,6 +244,7 @@ Blockly.BlockSvg.prototype.setGlowStack = function(isGlowingStack) {
 };
 
 /**
+<<<<<<< HEAD
  * Glow the stack starting with this block, to highlight it visually as if it's errored.
  * @param {boolean} isGlowingStack Whether the stack starting with this block should glow.
  */
@@ -260,6 +261,8 @@ Blockly.BlockSvg.prototype.setErrorStack = function(isGlowingStack) {
 };
 
 /**
+=======
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
  * Block's mutator icon (if any).
  * @type {Blockly.Mutator}
  */
@@ -358,7 +361,11 @@ Blockly.BlockSvg.prototype.setParent = function(newParent) {
     // If we are a shadow block, inherit tertiary colour.
     if (this.isShadow()) {
       this.setColour(this.getColour(), this.getColourSecondary(),
+<<<<<<< HEAD
           newParent.getColourTertiary());
+=======
+          newParent.getColourTertiary(), this.getColourQuaternary());
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
     }
   }
   // If we are losing a parent, we want to move our DOM element to the
@@ -726,6 +733,7 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
   var block = this;
   var menuOptions = [];
   if (this.isDeletable() && this.isMovable() && !block.isInFlyout) {
+<<<<<<< HEAD
     menuOptions.push(Blockly.ContextMenu.blockDuplicateOption(block, e));
     if (this.isEditable() && this.workspace.options.comments) {
       menuOptions.push(Blockly.ContextMenu.blockCommentOption(block));
@@ -733,6 +741,15 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
     //menuOptions.push(Blockly.ContextMenu.blockCollapseOption(block));
     menuOptions.push(Blockly.ContextMenu.blockDeleteOption(block));
   } else if (this.parentBlock_ && this.isShadow_ && this.type !== 'polygon') {
+=======
+    menuOptions.push(
+        Blockly.ContextMenu.blockDuplicateOption(block, e));
+    if (this.isEditable() && this.workspace.options.comments) {
+      menuOptions.push(Blockly.ContextMenu.blockCommentOption(block));
+    }
+    menuOptions.push(Blockly.ContextMenu.blockDeleteOption(block));
+  } else if (this.parentBlock_ && this.isShadow_) {
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
     this.parentBlock_.showContextMenu_(e);
     return;
   }
@@ -1045,16 +1062,25 @@ Blockly.BlockSvg.prototype.setWarningText = function(text, opt_id) {
 /**
  * Give this block a mutator dialog.
  * @param {Blockly.Mutator} mutator A mutator dialog instance or null to remove.
+<<<<<<< HEAD
  * @param {Boolean} forceCreate Boolean for wether or not we should create the icon for the mutator
  */
 Blockly.BlockSvg.prototype.setMutator = function(mutator, forceCreate) {
+=======
+ */
+Blockly.BlockSvg.prototype.setMutator = function(mutator) {
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
   if (this.mutator && this.mutator !== mutator) {
     this.mutator.dispose();
   }
   if (mutator) {
     mutator.block_ = this;
     this.mutator = mutator;
+<<<<<<< HEAD
     if (forceCreate) mutator.createIcon();
+=======
+    mutator.createIcon();
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
   }
 };
 
@@ -1116,11 +1142,21 @@ Blockly.BlockSvg.prototype.setDeleteStyle = function(enable) {
  *    string.
  * @param {number|string} colourTertiary Tertiary HSV hue value, or #RRGGBB
  *    string.
+<<<<<<< HEAD
  */
 Blockly.BlockSvg.prototype.setColour = function(colour, colourSecondary,
     colourTertiary) {
   Blockly.BlockSvg.superClass_.setColour.call(this, colour, colourSecondary,
       colourTertiary);
+=======
+ * @param {number|string} colourQuaternary Quaternary HSV hue value, or #RRGGBB
+ *    string.
+ */
+Blockly.BlockSvg.prototype.setColour = function(colour, colourSecondary,
+    colourTertiary, colourQuaternary) {
+  Blockly.BlockSvg.superClass_.setColour.call(this, colour, colourSecondary,
+      colourTertiary, colourQuaternary);
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
 
   if (this.rendered) {
     this.updateColour();

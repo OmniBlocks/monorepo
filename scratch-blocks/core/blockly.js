@@ -35,15 +35,21 @@ goog.require('Blockly.DropDownDiv');
 goog.require('Blockly.Events');
 goog.require('Blockly.FieldAngle');
 goog.require('Blockly.FieldCheckbox');
+<<<<<<< HEAD
 goog.require('Blockly.FieldCheckboxOriginal');
+=======
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
 goog.require('Blockly.FieldColour');
 goog.require('Blockly.FieldColourSlider');
 // Date picker commented out since it increases footprint by 60%.
 // Add it only if you need it.
 //goog.require('Blockly.FieldDate');
 goog.require('Blockly.FieldDropdown');
+<<<<<<< HEAD
 goog.require('Blockly.FieldExpandableAdd');
 goog.require('Blockly.FieldExpandableRemove');
+=======
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
 goog.require('Blockly.FieldIconMenu');
 goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldNote');
@@ -55,7 +61,10 @@ goog.require('Blockly.FieldNumberDropdown');
 goog.require('Blockly.FieldMatrix');
 goog.require('Blockly.FieldVariable');
 goog.require('Blockly.FieldVerticalSeparator');
+<<<<<<< HEAD
 goog.require('Blockly.FieldCustom');
+=======
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
 goog.require('Blockly.Generator');
 goog.require('Blockly.Msg');
 goog.require('Blockly.Procedures');
@@ -127,6 +136,7 @@ Blockly.hueToRgb = function(hue) {
 };
 
 /**
+<<<<<<< HEAD
  * constrains a number to a specified range
  * @param {Number} number the number to constrain
  * @param {Number} min the lower wall
@@ -170,6 +180,8 @@ goog.color.hexToHsva = function(decimal) {
 }
 
 /**
+=======
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
  * Returns the dimensions of the specified SVG image.
  * @param {!Element} svg SVG image.
  * @return {!Object} Contains width and height properties.
@@ -451,6 +463,7 @@ Blockly.prompt = function(message, defaultValue, callback, _opt_title,
 };
 
 /**
+<<<<<<< HEAD
  * Custom Modal API, overwritten in penguinmod.github.io repo
  * @param {{title:string, scrollable:boolean?}} config The config for the modal
  * @param {{content:CSSStyleDeclaration?, overlay:CSSStyleDeclaration?}?} styles Sets styles on parts of the modal. If specified, at least one of the parts should have styles.
@@ -469,6 +482,8 @@ Blockly.customPrompt = function (config, styles, enterInfo, closeInfo) {
 };
 
 /**
+=======
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
  * A callback for status buttons. The window.alert is here for testing and
  * should be overridden.
  * @param {string} id An identifier.
@@ -509,7 +524,11 @@ Blockly.jsonInitFactory_ = function(jsonDef) {
  * by the Blockly Developer Tools.
  * @param {!Array.<!Object>} jsonArray An array of JSON block definitions.
  */
+<<<<<<< HEAD
 Blockly.defineBlocksWithJsonArray = function(jsonArray, ignoreOverites) {
+=======
+Blockly.defineBlocksWithJsonArray = function(jsonArray) {
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
   for (var i = 0; i < jsonArray.length; i++) {
     var elem = jsonArray[i];
     if (!elem) {
@@ -523,6 +542,7 @@ Blockly.defineBlocksWithJsonArray = function(jsonArray, ignoreOverites) {
             'Block definition #' + i +
             ' in JSON array is missing a type attribute. Skipping.');
       } else {
+<<<<<<< HEAD
         if (Blockly.Blocks[typename]) {
           if (!ignoreOverites) {
             console.warn(
@@ -530,6 +550,8 @@ Blockly.defineBlocksWithJsonArray = function(jsonArray, ignoreOverites) {
                 ' overwrites prior definition of "' + typename + '".');
           }
         }
+=======
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
         Blockly.Blocks[typename] = {
           init: Blockly.jsonInitFactory_(elem)
         };
@@ -689,5 +711,8 @@ if (!goog.global['Blockly']) {
 }
 goog.global['Blockly']['getMainWorkspace'] = Blockly.getMainWorkspace;
 goog.global['Blockly']['goog'] = goog;
+<<<<<<< HEAD
 goog.global['ScratchBlocks'] = goog.global['Blockly'];
+=======
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
 Blockly.goog = goog;

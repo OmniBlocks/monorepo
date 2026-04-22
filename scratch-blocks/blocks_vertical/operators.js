@@ -171,6 +171,7 @@ Blockly.Blocks['operator_lt'] = {
     });
   }
 };
+<<<<<<< HEAD
 Blockly.Blocks['operator_gtoreq'] = {
   init: function() {
     this.jsonInit({
@@ -210,6 +211,9 @@ Blockly.Blocks['operator_ltoreq'] = {
     });
   }
 };
+=======
+
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
 Blockly.Blocks['operator_equals'] = {
   /**
    * Block for equals comparator.

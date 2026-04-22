@@ -4,7 +4,11 @@
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -623,6 +627,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
       this.procCode_ += input.fieldRow[0].getValue();
     } else if (input.type == Blockly.INPUT_VALUE) {
       // Inspect the argument editor.
+<<<<<<< HEAD
       var target = input.connection ? input.connection.targetBlock() : null;
       if (target) {
         this.displayNames_.push(target.getFieldValue('TEXT'));
@@ -632,6 +637,15 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
         } else {
           this.procCode_ += '%s';
         }
+=======
+      var target = input.connection.targetBlock();
+      this.displayNames_.push(target.getFieldValue('TEXT'));
+      this.argumentIds_.push(input.name);
+      if (target.type == 'argument_editor_boolean') {
+        this.procCode_ += '%b';
+      } else {
+        this.procCode_ += '%s';
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
       }
     } else {
       throw new Error(
@@ -651,10 +665,15 @@ Blockly.ScratchBlocks.ProcedureUtils.focusLastEditor_ = function() {
       newInput.fieldRow[0].showEditor_();
     } else if (newInput.type == Blockly.INPUT_VALUE) {
       // Inspect the argument editor.
+<<<<<<< HEAD
       var target = newInput.connection ? newInput.connection.targetBlock() : null;
       if (target) {
         target.getField('TEXT').showEditor_();
       }
+=======
+      var target = newInput.connection.targetBlock();
+      target.getField('TEXT').showEditor_();
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
     }
   }
 };
@@ -741,7 +760,11 @@ Blockly.ScratchBlocks.ProcedureUtils.removeFieldCallback = function(field) {
     var input = this.inputList[n];
     if (input.connection) {
       var target = input.connection.targetBlock();
+<<<<<<< HEAD
       if (target && target.getField(field.name) == field) {
+=======
+      if (target.getField(field.name) == field) {
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
         inputNameToRemove = input.name;
       }
     } else {

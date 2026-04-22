@@ -7,7 +7,11 @@ import {connect} from 'react-redux';
 import check from './check.svg';
 import dropdownCaret from './dropdown-caret.svg';
 import {MenuItem, Submenu} from '../menu/menu.jsx';
+<<<<<<< HEAD
 import {ACCENT_BLUE, ACCENT_MAP, ACCENT_PURPLE, ACCENT_RED, ACCENT_AQUA, ACCENT_RAINBOW, Theme} from '../../lib/themes/index.js';
+=======
+import {ACCENT_BLUE, ACCENT_MAP, ACCENT_PURPLE, ACCENT_RED, ACCENT_RAINBOW, Theme} from '../../lib/themes/index.js';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 import {openAccentMenu, accentMenuOpen, closeSettingsMenu} from '../../reducers/menus.js';
 import {setTheme} from '../../reducers/theme.js';
 import {persistTheme} from '../../lib/themes/themePersistance.js';
@@ -30,11 +34,14 @@ const options = defineMessages({
         description: 'Name of the blue color scheme. Matches Scratch before the high contrast update.',
         id: 'tw.accent.blue'
     },
+<<<<<<< HEAD
     [ACCENT_AQUA]: {
         defaultMessage: 'Aqua',
         description: 'Name of the aqua color scheme used by OmniBlocks by default.',
         id: 'tw.accent.aqua'
     },
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     [ACCENT_RAINBOW]: {
         defaultMessage: 'Rainbow',
         description: 'Name of color scheme that uses a rainbow.',

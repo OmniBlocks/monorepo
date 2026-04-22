@@ -1648,6 +1648,24 @@
         "rotationCenterY": 180
     },
     {
+<<<<<<< HEAD
+=======
+        "name": "Cat 2",
+        "tags": [
+            "kitty",
+            "kitten",
+            "animals",
+            "mammal"
+        ],
+        "assetId": "7499cf6ec438d0c7af6f896bc6adc294",
+        "bitmapResolution": 1,
+        "dataFormat": "svg",
+        "md5ext": "7499cf6ec438d0c7af6f896bc6adc294.svg",
+        "rotationCenterX": 87,
+        "rotationCenterY": 39
+    },
+    {
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         "name": "Catcher-a",
         "tags": [
             "baseball",

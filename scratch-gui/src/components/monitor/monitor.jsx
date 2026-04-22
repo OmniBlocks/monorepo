@@ -45,7 +45,11 @@ const MonitorComponent = props => (
         // TW: if export is defined, we always show it, even outside of the editor
         disable={!props.draggable && !props.onExport}
         holdToDisplay={props.mode === 'slider' ? -1 : 1000}
+<<<<<<< HEAD
         id={`monitor-${props.label}`}
+=======
+        id={`monitor-${props.id}`}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     >
         <Draggable
             bounds=".monitor-overlay" // Class for monitor container
@@ -75,7 +79,11 @@ const MonitorComponent = props => (
             // positioning conflicts between the monitors `transform: scale` and
             // the context menus `position: fixed`. For more details, see
             // http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/
+<<<<<<< HEAD
             <ContextMenu id={`monitor-${props.label}`}>
+=======
+            <ContextMenu id={`monitor-${props.id}`}>
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 {props.draggable && props.onSetModeToDefault &&
                     <MenuItem onClick={props.onSetModeToDefault}>
                         <FormattedMessage

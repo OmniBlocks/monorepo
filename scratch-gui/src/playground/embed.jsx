@@ -60,4 +60,8 @@ render(<WrappedGUI
 
 if (urlParams.has('addons')) {
     runAddons();
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

@@ -28,8 +28,12 @@ class SpriteSelectorItem extends React.PureComponent {
             'handleMouseDown',
             'handleDragEnd',
             'handleDrag',
+<<<<<<< HEAD
             'handleTouchEnd',
             'handleExportJust'
+=======
+            'handleTouchEnd'
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         ]);
 
         this.dragRecognizer = new DragRecognizer({
@@ -107,6 +111,7 @@ class SpriteSelectorItem extends React.PureComponent {
         e.stopPropagation();
         this.props.onRenameButtonClick(this.props.id);
     }
+<<<<<<< HEAD
     async handleExportJust (e) {
         e.stopPropagation();
         console.log('Export just button clicked for sprite id:', this.props.id);
@@ -118,6 +123,8 @@ class SpriteSelectorItem extends React.PureComponent {
             }
         }
     }
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     handleMouseLeave () {
         this.props.dispatchSetHoveredSprite(null);
     }
@@ -138,7 +145,10 @@ class SpriteSelectorItem extends React.PureComponent {
             onDeleteButtonClick,
             onDuplicateButtonClick,
             onExportButtonClick,
+<<<<<<< HEAD
             onExportJustButtonClick,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             onRenameButtonClick,
             dragPayload,
             receivedBlocks,
@@ -155,7 +165,10 @@ class SpriteSelectorItem extends React.PureComponent {
                 onClick={this.handleClick}
                 onDeleteButtonClick={onDeleteButtonClick ? this.handleDelete : null}
                 onDuplicateButtonClick={onDuplicateButtonClick ? this.handleDuplicate : null}
+<<<<<<< HEAD
                 onExportJustButtonClick={onExportJustButtonClick ? this.handleExportJust : null}
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 onExportButtonClick={onExportButtonClick ? this.handleExport : null}
                 onRenameButtonClick={onRenameButtonClick ? this.handleRename : null}
                 onMouseDown={this.handleMouseDown}
@@ -183,7 +196,10 @@ SpriteSelectorItem.propTypes = {
     name: PropTypes.any,
     onClick: PropTypes.func,
     onDeleteButtonClick: PropTypes.func,
+<<<<<<< HEAD
     onExportJustButtonClick: PropTypes.func,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     onRenameButtonClick: PropTypes.func,
     onDrag: PropTypes.func.isRequired,
     onDuplicateButtonClick: PropTypes.func,

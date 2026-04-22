@@ -42,6 +42,7 @@
     "mediarecorder/record-after-flag": "Do not start recording until the Green Flag is clicked",
     "mediarecorder/record-audio": "Include project sounds",
     "mediarecorder/record-audio-description": "This does not include Text-to-Speech.",
+<<<<<<< HEAD
     "mediarecorder/record-description": "Record the stage as a video file. You can save it to your computer after the recording is finished.\nNote: variable and list monitors will not be visible.",
     "mediarecorder/gif-size": "GIF Size (px)",
     "mediarecorder/gif-fps": "GIF FPS",
@@ -52,6 +53,9 @@
     "mediarecorder/gif-quality-very-low": "Very Low",
     "mediarecorder/gif-quality-garbage": "Garbage",
     "mediarecorder/gif-quality-literally-unusable": "Literally Unusable",
+=======
+    "mediarecorder/record-description": "Record the stage as a {extension} file. You can save it to your computer after the recording is finished.\nNote: variable and list monitors will not be visible.",
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Record Duration (in seconds)",
     "mediarecorder/record-mic": "Include sounds from microphone",
     "mediarecorder/record-until-stop": "Stop recording after the project has stopped",
@@ -60,6 +64,7 @@
     "mediarecorder/start-delay": "Start Delay (in seconds)",
     "mediarecorder/starting-in": "Starting in {secs}...",
     "mediarecorder/stop": "Stop Recording",
+<<<<<<< HEAD
     "mediarecorder/format": "Format",
     "mediarecorder/converting": "Converting...",
     "mediarecorder/exporting": "Exporting Video...",
@@ -67,6 +72,10 @@
     "mediarecorder/conversion-failed": "Failed to convert video to MP4 format",
     "debugger/block-breakpoint": "breakpoint",
     "debugger/block-error": "error %s", 
+=======
+    "debugger/block-breakpoint": "breakpoint",
+    "debugger/block-error": "error %s",
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-log": "log %s",
     "debugger/block-warn": "warn %s",
     "debugger/cannot-pause-player": "Breakpoint block can only be used while on the editor.",

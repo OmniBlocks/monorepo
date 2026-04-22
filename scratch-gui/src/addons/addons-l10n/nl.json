@@ -41,6 +41,7 @@
     "mediarecorder/record-audio": "Projectgeluiden opnemen",
     "mediarecorder/record-audio-description": "Dit neemt Tekst-naar-Spraak niet op.",
     "mediarecorder/record-description": "Neem het speelveld op als een {extension}-bestand. Je kunt het opslaan op je computer nadat de opname klaar is.\nOpmerking: monitoren van variabelen en lijsten zijn niet zichtbaar.",
+<<<<<<< HEAD
     "mediarecorder/gif-size": "GIF-grootte (px)",
     "mediarecorder/gif-fps": "GIF-FPS",
     "mediarecorder/gif-quality": "GIF-kwaliteit",
@@ -50,6 +51,8 @@
     "mediarecorder/gif-quality-very-low": "Zeer laag",
     "mediarecorder/gif-quality-garbage": "Afval",
     "mediarecorder/gif-quality-literally-unusable": "Letterlijk onbruikbaar",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Opnamelengte (in seconden)",
     "mediarecorder/record-mic": "Microfoon opnemen",
     "mediarecorder/record-until-stop": "Stop met opnemen nadat het project is gestopt",
@@ -57,11 +60,14 @@
     "mediarecorder/start-delay": "Startvertraging (in seconden)",
     "mediarecorder/starting-in": "Start in {secs}…",
     "mediarecorder/stop": "Opname Stoppen",
+<<<<<<< HEAD
     "mediarecorder/format": "Formaat",
     "mediarecorder/converting": "Converteren...",
     "mediarecorder/exporting": "Video exporteren...",
     "mediarecorder/starting-export": "Video-export starten...",
     "mediarecorder/conversion-failed": "Kon video niet converteren naar MP4-formaat",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-breakpoint": "onderbreking",
     "debugger/block-warn": "waarschuw %s",
     "debugger/cannot-pause-player": "Onderbrekingsblokken kunnen alleen gebruikt worden in de editor.",

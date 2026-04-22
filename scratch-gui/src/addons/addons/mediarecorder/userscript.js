@@ -1,9 +1,15 @@
 import downloadBlob from "../../libraries/common/cs/download-blob.js";
+<<<<<<< HEAD
 import recordIcon from "./record.svg";
 
 export default async ({ addon, console, msg }) => {
   let recordElem;
   let recordTextSpan;
+=======
+
+export default async ({ addon, console, msg }) => {
+  let recordElem;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
   let isRecording = false;
   let isWaitingForFlag = false;
   let waitingForFlagFunc = null;
@@ -12,6 +18,7 @@ export default async ({ addon, console, msg }) => {
   let recordBuffer = [];
   let recorder;
   let timeout;
+<<<<<<< HEAD
   let ffmpeg = null;
   let persistedSelectedFormat = null;
   let persistedOpts = null;
@@ -73,13 +80,29 @@ const loadFFmpeg = async () => {
     document.head.appendChild(script);
   });
 };
+=======
+
+  const mimeType = [
+    // Chrome and Firefox only support encoding as webm
+    // VP9 is preferred as its playback is better supported across platforms
+    "video/webm; codecs=vp9",
+    // Firefox only supports encoding VP8
+    "video/webm",
+    // Safari only supports encoding H264 as mp4
+    "video/mp4",
+  ].find((i) => MediaRecorder.isTypeSupported(i));
+  const fileExtension = mimeType.split(";")[0].split("/")[1];
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
   while (true) {
     const elem = await addon.tab.waitForElement('div[class*="menu-bar_file-group"] > div:last-child:not(.sa-record)', {
       markAsSeen: true,
       reduxEvents: ["scratch-gui/mode/SET_PLAYER", "fontsLoaded/SET_FONTS_LOADED", "scratch-gui/locales/SELECT_LOCALE"],
     });
+<<<<<<< HEAD
     
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     const getOptions = () => {
       const { backdrop, container, content, closeButton, remove } = addon.tab.createModal(msg("option-title"), {
         isOpen: true,
@@ -91,12 +114,17 @@ const loadFFmpeg = async () => {
       content.appendChild(
         Object.assign(document.createElement("p"), {
           textContent: msg("record-description", {
+<<<<<<< HEAD
             extension: `.${defaultFileExtension}`,
+=======
+            extension: `.${fileExtension}`,
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
           }),
           className: "recordOptionDescription",
         })
       );
 
+<<<<<<< HEAD
         // Format selection dropdown
         let recordOptionFormatInput, gifOptionWidthInput, gifOptionHeightInput, gifOptionFpsInput, gifOptionQualityInput;
         if (availableFormats.length > 1) {
@@ -214,6 +242,8 @@ const loadFFmpeg = async () => {
         }
 
 
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       // Seconds
       const recordOptionSeconds = document.createElement("p");
       const recordOptionSecondsInput = Object.assign(document.createElement("input"), {
@@ -285,7 +315,11 @@ const loadFFmpeg = async () => {
       recordOptionMic.appendChild(recordOptionMicLabel);
       content.appendChild(recordOptionMic);
 
+<<<<<<< HEAD
       // Green flag    
+=======
+      // Green flag
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       const recordOptionFlag = Object.assign(document.createElement("p"), {
         className: "mediaRecorderPopupOption",
       });
@@ -363,11 +397,14 @@ const loadFFmpeg = async () => {
             micEnabled: recordOptionMicInput.checked,
             waitUntilFlag: recordOptionFlagInput.checked,
             useStopSign: !recordOptionStopInput.disabled && recordOptionStopInput.checked,
+<<<<<<< HEAD
             format: availableFormats.length > 1 ? recordOptionFormatInput.value : defaultFileExtension,
             gifWidth: gifOptionWidthInput ? Number(gifOptionWidthInput.value) : 480,
             gifHeight: gifOptionHeightInput ? Number(gifOptionHeightInput.value) : 360,
             gifFps: gifOptionFpsInput ? Number(gifOptionFpsInput.value) : 15,
             gifQuality: gifOptionQualityInput ? gifOptionQualityInput.value : "high",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
           }),
         { once: true }
       );
@@ -376,10 +413,16 @@ const loadFFmpeg = async () => {
 
       return optionPromise;
     };
+<<<<<<< HEAD
     
     const disposeRecorder = () => {
       isRecording = false;
       recordTextSpan.textContent = msg("record");
+=======
+    const disposeRecorder = () => {
+      isRecording = false;
+      recordElem.textContent = msg("record");
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       recordElem.title = "";
       recorder = null;
       recordBuffer = [];
@@ -390,6 +433,7 @@ const loadFFmpeg = async () => {
         stopSignFunc = null;
       }
     };
+<<<<<<< HEAD
     // Helper function to detect frame rate from video
 const detectFrameRate = async (ffmpeg, inputName) => {
   try {
@@ -632,6 +676,9 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress, opts) =>
   }
 };
     const stopRecording = async (force) => {
+=======
+    const stopRecording = (force) => {
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       if (isWaitingForFlag) {
         addon.tab.traps.vm.runtime.off("PROJECT_START", waitingForFlagFunc);
         isWaitingForFlag = false;
@@ -642,6 +689,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress, opts) =>
         return;
       }
       if (!isRecording || !recorder || recorder.state === "inactive") return;
+<<<<<<< HEAD
       
       if (force) {
         disposeRecorder();
@@ -723,12 +771,23 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress, opts) =>
           }
           
           downloadBlob(`${addon.tab.redux.state?.preview?.projectInfo?.title || "video"}.${finalExtension}`, blob);
+=======
+      if (force) {
+        disposeRecorder();
+      } else {
+        recorder.onstop = () => {
+          const blob = new Blob(recordBuffer, { type: mimeType });
+          downloadBlob(`${addon.tab.redux.state?.preview?.projectInfo?.title || "video"}.${fileExtension}`, blob);
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
           disposeRecorder();
         };
         recorder.stop();
       }
     };
+<<<<<<< HEAD
     
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     const startRecording = async (opts) => {
       // Timer
       const secs = Math.min(600, Math.max(1, opts.secs));
@@ -749,8 +808,15 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress, opts) =>
       }
       if (opts.waitUntilFlag) {
         isWaitingForFlag = true;
+<<<<<<< HEAD
         recordTextSpan.textContent = msg("click-flag");
         recordElem.title = msg("click-flag-description");
+=======
+        Object.assign(recordElem, {
+          textContent: msg("click-flag"),
+          title: msg("click-flag-description"),
+        });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         abortController = new AbortController();
         try {
           await Promise.race([
@@ -769,6 +835,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress, opts) =>
       }
       isWaitingForFlag = false;
       waitingForFlagFunc = abortController = null;
+<<<<<<< HEAD
       const audioOnlyFormats = ["mp3", "wav", "ogg"];
       const isAudioOnly = audioOnlyFormats.includes(opts.format);
 
@@ -779,6 +846,11 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress, opts) =>
       }
       // This way, if the user only wants audio, recording will take significantly less RAM and CPU
       // And more importantly, NOT blow up the user's computer (especially those stupid school laptops)
+=======
+      const stream = new MediaStream();
+      const videoStream = vm.runtime.renderer.canvas.captureStream();
+      stream.addTrack(videoStream.getVideoTracks()[0]);
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
       const ctx = new AudioContext();
       const dest = ctx.createMediaStreamDestination();
@@ -795,6 +867,7 @@ const convertVideo = async (inputBlob, inputExt, outputExt, onProgress, opts) =>
       if (opts.audioEnabled || opts.micEnabled) {
         stream.addTrack(dest.stream.getAudioTracks()[0]);
       }
+<<<<<<< HEAD
       
 // Determine recording format
 const selectedFormat = opts.format || defaultFileExtension;
@@ -816,6 +889,9 @@ if (selectedFormat === "mp4") {
 }
       
       recorder = new MediaRecorder(stream, { mimeType: recordMimeType });
+=======
+      recorder = new MediaRecorder(stream, { mimeType });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
       recorder.ondataavailable = (e) => {
         recordBuffer.push(e.data);
       };
@@ -823,6 +899,7 @@ if (selectedFormat === "mp4") {
         console.warn("Recorder error:", e.error);
         stopRecording(true);
       };
+<<<<<<< HEAD
       // Persist the user's chosen format for use during stop/timeout handlers
       persistedSelectedFormat = selectedFormat;
       persistedOpts = opts; // Quick persist for conversion
@@ -831,6 +908,11 @@ if (selectedFormat === "mp4") {
       timeout = setTimeout(() => stopRecording(false), secs * 1000);
       if (opts.useStopSign) {
         stopSignFunc = () => stopRecording(false);
+=======
+      timeout = setTimeout(() => stopRecording(false), secs * 1000);
+      if (opts.useStopSign) {
+        stopSignFunc = () => stopRecording();
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         vm.runtime.once("PROJECT_STOP_ALL", stopSignFunc);
       }
 
@@ -838,17 +920,27 @@ if (selectedFormat === "mp4") {
       const delay = opts.delay || 0;
       const roundedDelay = Math.floor(delay);
       for (let index = 0; index < roundedDelay; index++) {
+<<<<<<< HEAD
         recordTextSpan.textContent = msg("starting-in", { secs: roundedDelay - index });
+=======
+        recordElem.textContent = msg("starting-in", { secs: roundedDelay - index });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         await new Promise((resolve) => setTimeout(resolve, 975));
       }
       setTimeout(
         () => {
+<<<<<<< HEAD
           recordTextSpan.textContent = msg("stop");
+=======
+          recordElem.textContent = msg("stop");
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
           recorder.start(1000);
         },
         (delay - roundedDelay) * 1000
       );
     };
+<<<<<<< HEAD
 
     if (!recordElem) {
       recordElem = Object.assign(document.createElement("div"), {
@@ -867,6 +959,16 @@ if (selectedFormat === "mp4") {
         if (isRecording) {
           // Use the persisted format from when recording started
           stopRecording(false);
+=======
+    if (!recordElem) {
+      recordElem = Object.assign(document.createElement("div"), {
+        className: "sa-record " + elem.className,
+        textContent: msg("record"),
+      });
+      recordElem.addEventListener("click", async () => {
+        if (isRecording) {
+          stopRecording();
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         } else {
           const opts = await getOptions();
           if (!opts) {
@@ -877,7 +979,13 @@ if (selectedFormat === "mp4") {
         }
       });
     }
+<<<<<<< HEAD
 
     elem.parentElement.appendChild(recordElem);
   }
 };
+=======
+    elem.parentElement.appendChild(recordElem);
+  }
+};
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

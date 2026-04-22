@@ -1,5 +1,6 @@
 const generateRandomUsername = () => {
     const DIGITS = 4;
+<<<<<<< HEAD
     // Generate a cryptographically secure random number in [0, 10^DIGITS)
     let max = 10 ** DIGITS;
     let randomNumber;
@@ -23,6 +24,9 @@ const generateRandomUsername = () => {
         // Fallback to Math.random (not secure - but not recommended)
         randomNumber = Math.floor(Math.random() * max);
     }
+=======
+    const randomNumber = Math.round(Math.random() * (10 ** DIGITS));
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     const randomId = randomNumber.toString().padStart(DIGITS, '0');
     const randomUsername = `player${randomId}`;
     return randomUsername;

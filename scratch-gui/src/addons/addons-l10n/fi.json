@@ -43,6 +43,7 @@
     "mediarecorder/record-audio": "Sisällytä projektin äänet",
     "mediarecorder/record-audio-description": "Tämä ei sisällä teksti puheeksi -toimintoa.",
     "mediarecorder/record-description": "Nauhoita esiintymislavaa {extension}-tiedostona. Voit tallentaa nauhoiteen tietokoneellesi, kun nauhoitus on lopetettu.\nHuomaa: muuttujien ja listojen näyttimet eivät ole näkyvissä.",
+<<<<<<< HEAD
     "mediarecorder/gif-size": "GIF-koko (px)",
     "mediarecorder/gif-fps": "GIF-FPS",
     "mediarecorder/gif-quality": "GIF-laatu",
@@ -52,6 +53,8 @@
     "mediarecorder/gif-quality-very-low": "Erittäin matala",
     "mediarecorder/gif-quality-garbage": "Roskaa",
     "mediarecorder/gif-quality-literally-unusable": "Kirjaimellisesti käyttökelvoton",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Nauhoituksen kesto (sekunteina)",
     "mediarecorder/record-mic": "Sisällytä mikrofonin äänet",
     "mediarecorder/record-until-stop": "Lopeta nauhoittaminen projektin päättymisen jälkeen.",
@@ -60,11 +63,14 @@
     "mediarecorder/start-delay": "Alkuviive (sekunteina)",
     "mediarecorder/starting-in": "Alkaa {secs} sekunnissa... ",
     "mediarecorder/stop": "Lopeta nauhoitus",
+<<<<<<< HEAD
     "mediarecorder/format": "Muoto",
     "mediarecorder/converting": "Muunnetaan...",
     "mediarecorder/exporting": "Viedään videota...",
     "mediarecorder/starting-export": "Aloitetaan videon vienti...",
     "mediarecorder/conversion-failed": "Videon muuntaminen MP4-muotoon epäonnistui",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-breakpoint": "keskeytyskohta",
     "debugger/block-error": "kirjaa virhe %s",
     "debugger/block-log": "kirjaa lokimerkintä %s",

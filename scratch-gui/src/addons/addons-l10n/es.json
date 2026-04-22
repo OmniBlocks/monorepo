@@ -39,6 +39,7 @@
     "mediarecorder/record-after-flag": "No empezar grabación hasta que haga click en la Bandera Verde",
     "mediarecorder/record-audio": "Incluir sonidos del proyecto",
     "mediarecorder/record-audio-description": "Esto no incluye Text-to-Speech.",
+<<<<<<< HEAD
     "mediarecorder/record-description": "Grabe el escenario como un archivo de video. Puede guardarlo en su computadora luego de que la grabación haya finalizado.\nNota: los monitores de variables y listas no serán visibles.",
     "mediarecorder/gif-size": "Tamaño del GIF (px)",
     "mediarecorder/gif-fps": "FPS del GIF",
@@ -49,6 +50,9 @@
     "mediarecorder/gif-quality-very-low": "Muy baja",
     "mediarecorder/gif-quality-garbage": "Basura",
     "mediarecorder/gif-quality-literally-unusable": "Literalmente inutilizable",
+=======
+    "mediarecorder/record-description": "Grabe el escenario como un archivo {extension}. Puede guardarlo en su computadora luego de que la grabación haya finalizado.\nNota: los monitores de variables y listas no serán visibles.",
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Duración (en segundos)",
     "mediarecorder/record-mic": "Incluir sonidos del micrófono",
     "mediarecorder/record-until-stop": "Parar grabación luego de que el proyecto se detenga",
@@ -57,11 +61,14 @@
     "mediarecorder/start-delay": "Demora para empezar (en segundos)",
     "mediarecorder/starting-in": "Empezando en {secs}...",
     "mediarecorder/stop": "Detener Grabación",
+<<<<<<< HEAD
     "mediarecorder/format": "Formato",
     "mediarecorder/converting": "Convirtiendo...",
     "mediarecorder/exporting": "Exportando video...",
     "mediarecorder/starting-export": "Iniciando exportación de video...",
     "mediarecorder/conversion-failed": "No se pudo convertir el video a formato MP4",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-log": "loguear %s",
     "debugger/block-warn": "advertir %s",
     "debugger/cannot-pause-player": "El bloque breakpoint solo se puede usar mientras esté en el editor.",

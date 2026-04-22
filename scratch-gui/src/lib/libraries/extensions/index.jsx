@@ -10,6 +10,12 @@ import penInsetIconURL from './pen/pen-small.svg';
 import videoSensingIconURL from './videoSensing/video-sensing.png';
 import videoSensingInsetIconURL from './videoSensing/video-sensing-small.svg';
 
+<<<<<<< HEAD
+=======
+import faceSensingIconURL from './faceSensing/face-sensing.svg';
+import faceSensingInsetIconURL from './faceSensing/face-sensing-small.svg';
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 import text2speechIconURL from './text2speech/text2speech.png';
 import text2speechInsetIconURL from './text2speech/text2speech-small.svg';
 
@@ -46,6 +52,7 @@ import gdxforInsetIconURL from './gdxfor/gdxfor-small.svg';
 import gdxforConnectionIconURL from './gdxfor/gdxfor-illustration.svg';
 import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 
+<<<<<<< HEAD
 import jgJavascriptExtensionIcon from './javascript/javascript.png';
 
 import twIcon from './tw/tw.svg';
@@ -54,6 +61,12 @@ import serverIcon from './server/server.svg';
 import returnIcon from './custom/return.svg';
 import galleryIcon from './gallery/gallery.svg';
 import obgalleryIcon from './gallery/obgallery.svg';
+=======
+import twIcon from './tw/tw.svg';
+import customExtensionIcon from './custom/custom.svg';
+import returnIcon from './custom/return.svg';
+import galleryIcon from './gallery/gallery.svg';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 import {APP_NAME} from '../../brand';
 
 export default [
@@ -123,6 +136,31 @@ export default [
     {
         name: (
             <FormattedMessage
+<<<<<<< HEAD
+=======
+                defaultMessage="Face Sensing"
+                description="Name for the 'Face Sensing' extension"
+                id="tw.extension.faceSensing.name"
+            />
+        ),
+        extensionId: 'faceSensing',
+        extensionURL: 'https://extensions.turbowarp.org/lab/face-sensing.js',
+        iconURL: faceSensingIconURL,
+        insetIconURL: faceSensingInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Sense faces with the camera."
+                description="Description for the 'Face Sensing' extension"
+                id="tw.extension.faceSensing.description"
+            />
+        ),
+        tags: ['scratch'],
+        featured: true
+    },
+    {
+        name: (
+            <FormattedMessage
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 defaultMessage="Text to Speech"
                 description="Name for the Text to Speech extension"
                 id="gui.extension.text2speech.name"
@@ -167,6 +205,7 @@ export default [
         internetConnectionRequired: true
     },
     {
+<<<<<<< HEAD
         name: 'Web Server',
         extensionId: 'server',
         collaborator: 'LibreKitten',
@@ -182,6 +221,8 @@ export default [
         featured: true
     },
     {
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         name: 'Makey Makey',
         extensionId: 'makeymakey',
         collaborator: 'JoyLabz',
@@ -379,11 +420,19 @@ export default [
     {
         name: (
             <FormattedMessage
+<<<<<<< HEAD
                 defaultMessage="TurboWarp Blocks"
                 description="Name of the strange 'TurboWarp Blocks' extension"
                 id="tw.twExtension.name"
                 values={{
                     APP_NAME: 'TurboWarp'
+=======
+                defaultMessage="{APP_NAME} Blocks"
+                description="Name of the strange 'TurboWarp Blocks' extension"
+                id="tw.twExtension.name"
+                values={{
+                    APP_NAME
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 }}
             />
         ),
@@ -403,6 +452,7 @@ export default [
     {
         name: (
             <FormattedMessage
+<<<<<<< HEAD
                 defaultMessage="JavaScript V2"
                 description="JavaScriptv2 made by SharkPool"
                 id="ob.jsv2"
@@ -424,6 +474,8 @@ export default [
     {
         name: (
             <FormattedMessage
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 defaultMessage="Custom Extension"
                 description="Name of library item to load a custom extension from a remote source"
                 id="tw.customExtension.name"
@@ -447,9 +499,18 @@ export default [
 export const galleryLoading = {
     name: (
         <FormattedMessage
+<<<<<<< HEAD
             defaultMessage="TurboWarp Extension Gallery"
             description="Name of extensions.turbowarp.org in extension library"
             id="tw.extensionGallery.name"
+=======
+            defaultMessage="{APP_NAME} Extension Gallery"
+            description="Name of extensions.turbowarp.org in extension library"
+            id="tw.extensionGallery.name"
+            values={{
+                APP_NAME
+            }}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         />
     ),
     href: 'https://extensions.turbowarp.org/',
@@ -470,9 +531,18 @@ export const galleryLoading = {
 export const galleryMore = {
     name: (
         <FormattedMessage
+<<<<<<< HEAD
             defaultMessage="TurboWarp Extension Gallery"
             description="Name of extensions.turbowarp.org in extension library"
             id="tw.extensionGallery.name"
+=======
+            defaultMessage="{APP_NAME} Extension Gallery"
+            description="Name of extensions.turbowarp.org in extension library"
+            id="tw.extensionGallery.name"
+            values={{
+                APP_NAME
+            }}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         />
     ),
     href: 'https://extensions.turbowarp.org/',
@@ -493,9 +563,18 @@ export const galleryMore = {
 export const galleryError = {
     name: (
         <FormattedMessage
+<<<<<<< HEAD
             defaultMessage="TurboWarp Extension Gallery"
             description="Name of extensions.turbowarp.org in extension library"
             id="tw.extensionGallery.name"
+=======
+            defaultMessage="{APP_NAME} Extension Gallery"
+            description="Name of extensions.turbowarp.org in extension library"
+            id="tw.extensionGallery.name"
+            values={{
+                APP_NAME
+            }}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         />
     ),
     href: 'https://extensions.turbowarp.org/',
@@ -512,6 +591,7 @@ export const galleryError = {
     tags: ['tw'],
     featured: true
 };
+<<<<<<< HEAD
 
 // OmniBlocks Gallery
 export const galleryLoadingOB = {
@@ -579,3 +659,5 @@ export const galleryErrorOB = {
     tags: ['ob'],
     featured: true
 };
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

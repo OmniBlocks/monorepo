@@ -43,6 +43,7 @@
     "mediarecorder/record-audio": "Projektklänge einschließen",
     "mediarecorder/record-audio-description": "Dies schließt Text zu Sprache nicht ein.",
     "mediarecorder/record-description": "Nimmt die Bühne als Datei im Format {extension} auf. Du kannst die Aufnahme am Ende auf deinem Computer speichern.\nHinweis: Variablen- und Listenanzeigen werden nicht sichtbar sein.",
+<<<<<<< HEAD
     "mediarecorder/gif-size": "GIF-Größe (px)",
     "mediarecorder/gif-fps": "GIF-FPS",
     "mediarecorder/gif-quality": "GIF-Qualität",
@@ -52,6 +53,8 @@
     "mediarecorder/gif-quality-very-low": "Sehr niedrig",
     "mediarecorder/gif-quality-garbage": "Müll",
     "mediarecorder/gif-quality-literally-unusable": "Buchstäblich unbrauchbar",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Aufnahmedauer (in Sekunden)",
     "mediarecorder/record-mic": "Mikrofonklänge einschließen",
     "mediarecorder/record-until-stop": "Aufnahme anhalten, wenn das Projekt gestoppt wird",
@@ -60,11 +63,14 @@
     "mediarecorder/start-delay": "Startverzögerung (in Sekunden)",
     "mediarecorder/starting-in": "Startet in {secs}...",
     "mediarecorder/stop": "Aufnahme stoppen",
+<<<<<<< HEAD
     "mediarecorder/format": "Format",
     "mediarecorder/converting": "Konvertiere...",
     "mediarecorder/exporting": "Video exportieren...",
     "mediarecorder/starting-export": "Starte Video-Export...",
     "mediarecorder/conversion-failed": "Video konnte nicht ins MP4-Format konvertiert werden",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-breakpoint": "unterbrechen",
     "debugger/block-error": "schreibe Fehler %s im Log",
     "debugger/block-log": "schreibe %s im Log",

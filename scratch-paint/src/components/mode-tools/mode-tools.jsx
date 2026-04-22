@@ -187,6 +187,69 @@ const ModeToolsComponent = props => {
             defaultMessage: 'Center',
             description: 'Label for the button that moves the selected objects to the center of the canvas',
             id: 'paint.modeTools.movementCenter'
+<<<<<<< HEAD
+=======
+        },
+        joinSpiked: {
+            defaultMessage: 'Spiked',
+            description: 'Label for the button that sets the line join to miter',
+            id: 'pm.paint.modeTools.joinSpiked'
+        },
+        joinRounded: {
+            defaultMessage: 'Rounded',
+            description: 'Label for the button that sets the line join to round',
+            id: 'pm.paint.modeTools.joinRounded'
+        },
+        joinBeveled: {
+            defaultMessage: 'Beveled',
+            description: 'Label for the button that sets the line join to bevel',
+            id: 'pm.paint.modeTools.joinBeveled'
+        },
+        endRounded: {
+            defaultMessage: 'Rounded',
+            description: 'Label for the button that sets the line cap to round',
+            id: 'pm.paint.modeTools.endRounded'
+        },
+        endSquared: {
+            defaultMessage: 'Squared',
+            description: 'Label for the button that sets the line cap to square',
+            id: 'pm.paint.modeTools.endSquared'
+        },
+        merge: {
+            defaultMessage: 'Merge',
+            description: 'Label for the button that merges two selected objects together',
+            id: 'pm.paint.modeTools.merge'
+        },
+        subtract: {
+            defaultMessage: 'Subtract',
+            description: 'Label for the button that subtracts selected objects from eachother',
+            id: 'pm.paint.modeTools.subtract'
+        },
+        mask: {
+            defaultMessage: 'Mask',
+            description: 'Label for the button that ands two selected objects together',
+            id: 'pm.paint.modeTools.mask'
+        },
+        filter: {
+            defaultMessage: 'Filter',
+            description: 'Label for the button that xors two selected objects together',
+            id: 'pm.paint.modeTools.filter'
+        },
+        leftAlign: {
+            defaultMessage: 'Left Align',
+            description: 'Label for the button that sets text alignment to the left',
+            id: 'pm.paint.modeTools.leftAlign'
+        },
+        rightAlign: {
+            defaultMessage: 'Right Align',
+            description: 'Label for the button that sets text alignment to the right',
+            id: 'pm.paint.modeTools.rightAlign'
+        },
+        centerAlign: {
+            defaultMessage: 'Center Align',
+            description: 'Label for the button that sets text alignment to the center',
+            id: 'pm.paint.modeTools.centerAlign'
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
         }
     });
 
@@ -520,21 +583,33 @@ const ModeToolsComponent = props => {
                         disabled={props.hasSelectedMiterLineJoin}
                         hideLabel={hideLabel(props.intl.locale)}
                         imgSrc={miterLineJoin}
+<<<<<<< HEAD
                         title={'Spiked'}
+=======
+                        title={props.intl.formatMessage(messages.joinSpiked)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                         onClick={props.onMiterLineJoin}
                     />
                     <LabeledIconButton
                         disabled={props.hasSelectedRoundLineJoin}
                         hideLabel={hideLabel(props.intl.locale)}
                         imgSrc={roundLineJoin}
+<<<<<<< HEAD
                         title={'Rounded'}
+=======
+                        title={props.intl.formatMessage(messages.joinRounded)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                         onClick={props.onRoundLineJoin}
                     />
                     <LabeledIconButton
                         disabled={props.hasSelectedBevelLineJoin}
                         hideLabel={hideLabel(props.intl.locale)}
                         imgSrc={bevelLineJoin}
+<<<<<<< HEAD
                         title={'Beveled'}
+=======
+                        title={props.intl.formatMessage(messages.joinBeveled)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                         onClick={props.onBevelLineJoin}
                     />
                 </InputGroup>
@@ -572,14 +647,22 @@ const ModeToolsComponent = props => {
                             disabled={props.hasSelectedRoundEnds}
                             hideLabel={hideLabel(props.intl.locale)}
                             imgSrc={roundLine}
+<<<<<<< HEAD
                             title={'Rounded'}
+=======
+                            title={props.intl.formatMessage(messages.endRounded)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                             onClick={props.onRoundEnds}
                         />
                         <LabeledIconButton
                             disabled={props.hasSelectedSquareEnds}
                             hideLabel={hideLabel(props.intl.locale)}
                             imgSrc={squareLine}
+<<<<<<< HEAD
                             title={'Squared'}
+=======
+                            title={props.intl.formatMessage(messages.endSquared)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                             onClick={props.onSquareEnds}
                         />
                     </InputGroup>
@@ -617,25 +700,41 @@ const ModeToolsComponent = props => {
                     <LabeledIconButton
                         hideLabel={hideLabel(props.intl.locale)}
                         imgSrc={shapeMergeIcon}
+<<<<<<< HEAD
                         title={'Merge'}
+=======
+                        title={props.intl.formatMessage(messages.merge)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                         onClick={props.onMergeShape}
                     />
                     <LabeledIconButton
                         hideLabel={hideLabel(props.intl.locale)}
                         imgSrc={shapeMaskIcon}
+<<<<<<< HEAD
                         title={'Mask'}
+=======
+                        title={props.intl.formatMessage(messages.mask)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                         onClick={props.onMaskShape}
                     />
                     <LabeledIconButton
                         hideLabel={hideLabel(props.intl.locale)}
                         imgSrc={shapeSubtractIcon}
+<<<<<<< HEAD
                         title={'Subtract'}
+=======
+                        title={props.intl.formatMessage(messages.subtract)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                         onClick={props.onSubtractShape}
                     />
                     <LabeledIconButton
                         hideLabel={hideLabel(props.intl.locale)}
                         imgSrc={shapeFilterIcon}
+<<<<<<< HEAD
                         title={'Filter'}
+=======
+                        title={props.intl.formatMessage(messages.filter)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                         onClick={props.onExcludeShape}
                     />
                 </InputGroup>
@@ -768,19 +867,31 @@ const ModeToolsComponent = props => {
                         <LabeledIconButton
                             hideLabel
                             imgSrc={alignLeftIcon}
+<<<<<<< HEAD
                             title={'Left Align'}
+=======
+                            title={props.intl.formatMessage(messages.leftAlign)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                             onClick={props.onTextAlignLeft}
                         />
                         <LabeledIconButton
                             hideLabel
                             imgSrc={alignCenterIcon}
+<<<<<<< HEAD
                             title={'Center Align'}
+=======
+                            title={props.intl.formatMessage(messages.centerAlign)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                             onClick={props.onTextAlignCenter}
                         />
                         <LabeledIconButton
                             hideLabel
                             imgSrc={alignRightIcon}
+<<<<<<< HEAD
                             title={'Right Align'}
+=======
+                            title={props.intl.formatMessage(messages.rightAlign)}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
                             onClick={props.onTextAlignRight}
                         />
                     </InputGroup>

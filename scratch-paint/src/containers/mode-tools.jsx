@@ -343,7 +343,11 @@ class ModeTools extends React.Component {
         });
     }
 
+<<<<<<< HEAD
     async handleMergeShape (specificOperation) {
+=======
+    async handleMergeShape (event, operation = "unite") {
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
         const selectedItems = getSelectedRootItems();
         if (selectedItems.length < 2) {
             // If nothing or not enough items are selected,
@@ -351,7 +355,11 @@ class ModeTools extends React.Component {
             return;
         }
 
+<<<<<<< HEAD
         // Convert text items to paths
+=======
+        // Convert possible text items to paths
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
         for (let i = 0; i < selectedItems.length; i++) {
             if (selectedItems[i].className === "PointText") {
                 const path = await this.convertText2Path(selectedItems[i]);
@@ -359,12 +367,17 @@ class ModeTools extends React.Component {
             }
         }
 
+<<<<<<< HEAD
         const topItem = selectedItems[0];
+=======
+        let topItem = selectedItems[0];
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
         if (topItem.className !== "PointText" && !topItem.unite) {
             // we cant unite this item, cancel
             return;
         }
 
+<<<<<<< HEAD
         if (typeof specificOperation !== "string") specificOperation = "unite";
         // unite the shapes together, creating a clone on top of the original
         const results = [];
@@ -389,6 +402,37 @@ class ModeTools extends React.Component {
     }
     handleExcludeShape () {
         this.handleMergeShape("exclude");
+=======
+        if (typeof operation !== "string") operation = "unite";
+
+        // unite the shapes together, creating a clone on top of the original
+        let oldTopItem;
+        for (let i = 1; i < selectedItems.length; i++) {
+            topItem = topItem[operation](selectedItems[i]);
+            if (oldTopItem) oldTopItem.remove();
+            oldTopItem = topItem;
+        }
+
+        // if shift is pressed, remove the old items
+        if (event.shiftKey) {
+            for (const item of selectedItems) {
+                item.remove();
+            }
+        }
+
+        setItemSelection(topItem, true);
+        this.props.onUpdateImage();
+    }
+
+    handleMaskShape (event) {
+        this.handleMergeShape(event, "intersect");
+    }
+    handleSubtractShape (event) {
+        this.handleMergeShape(event, "subtract");
+    }
+    handleExcludeShape (event) {
+        this.handleMergeShape(event, "exclude");
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
     }
 
     _handleFlip (horizontalScale, verticalScale, selectedItems) {

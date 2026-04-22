@@ -34,7 +34,10 @@ const MouseWheel = require('../io/mouseWheel');
 const UserData = require('../io/userData');
 const Video = require('../io/video');
 
+<<<<<<< HEAD
 const Color = require('../util/color');
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 const StringUtil = require('../util/string-util');
 const uid = require('../util/uid');
 
@@ -115,6 +118,7 @@ const ArgumentTypeMap = (() => {
         // They are more analagous to the label on a block.
         fieldType: 'field_image'
     };
+<<<<<<< HEAD
     map[ArgumentType.POLYGON] = {
         check: 'math_polygon',
         shadow: {
@@ -124,6 +128,8 @@ const ArgumentTypeMap = (() => {
         map[ArgumentType.CUSTOM] = {
         fieldType: 'field_customInput'
     };
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     map[ArgumentType.COSTUME] = {
         shadow: {
             type: 'looks_costume',
@@ -398,6 +404,7 @@ class Runtime extends EventEmitter {
             limit: 10
         };
 
+<<<<<<< HEAD
         /**
          * Extension runtime configuration options.
          * Used by extensions to access runtime settings (e.g., sandboxing mode).
@@ -407,6 +414,8 @@ class Runtime extends EventEmitter {
             javascriptUnsandboxed: false
         };
 
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
         const newCloudDataManager = cloudDataManager(this.cloudOptions);
 
         /**
@@ -504,6 +513,7 @@ class Runtime extends EventEmitter {
         this.isPackaged = false;
 
         /**
+<<<<<<< HEAD
          * omni: We support a "privileged" mode. This usually is set when the project is running as a server,
          * but other privileged clients can use this too.
          * This is mainly to indicate that system APIs (possibly mocked and/or with a permission system)
@@ -520,6 +530,8 @@ class Runtime extends EventEmitter {
         this.privilegedUtils = Object.create(null);
 
         /**
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
          * Contains information about the external communication methods that the scripts inside the project
          * can use to send data from inside the project to an external server.
          * Do not update this directly. Use Runtime.setExternalCommunicationMethod() instead.
@@ -835,6 +847,7 @@ class Runtime extends EventEmitter {
     static get EXTENSION_ADDED () {
         return 'EXTENSION_ADDED';
     }
+<<<<<<< HEAD
     /**
      * Event name for reporting that an extension was removed.
      * @const {string}
@@ -842,6 +855,9 @@ class Runtime extends EventEmitter {
     static get EXTENSION_REMOVED () {
         return 'EXTENSION_REMOVED';
     }
+=======
+
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     /**
      * Event name for reporting that an extension as asked for a custom field to be added
      * @const {string}
@@ -970,6 +986,7 @@ class Runtime extends EventEmitter {
     }
 
     /**
+<<<<<<< HEAD
      * omni: Event name when a web request is forwarded to the VM.
      */
     static get SERVER_REQUEST () {
@@ -984,6 +1001,8 @@ class Runtime extends EventEmitter {
     }
 
     /**
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
      * How rapidly we try to step threads by default, in ms.
      */
     static get THREAD_STEP_INTERVAL () {
@@ -1120,6 +1139,7 @@ class Runtime extends EventEmitter {
         };
 
         if (extensionInfo.color1) {
+<<<<<<< HEAD
             const color1 = Color.hexToRgb(extensionInfo.color1);
             if (!color1) {
                 categoryInfo.color1 = defaultExtensionColors[0];
@@ -1138,12 +1158,21 @@ class Runtime extends EventEmitter {
                     categoryInfo.color3 = Color.rgbToHex(mixed);
                 }
             }
+=======
+            categoryInfo.color1 = extensionInfo.color1;
+            categoryInfo.color2 = extensionInfo.color2;
+            categoryInfo.color3 = extensionInfo.color3;
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
         } else {
             categoryInfo.color1 = defaultExtensionColors[0];
             categoryInfo.color2 = defaultExtensionColors[1];
             categoryInfo.color3 = defaultExtensionColors[2];
         }
+<<<<<<< HEAD
         categoryInfo.blockText = extensionInfo.blockText;
+=======
+
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
         this._blockInfo.push(categoryInfo);
 
         this._fillExtensionCategory(categoryInfo, extensionInfo);
@@ -1177,6 +1206,7 @@ class Runtime extends EventEmitter {
             this.emit(Runtime.BLOCKSINFO_UPDATE, categoryInfo);
         }
     }
+<<<<<<< HEAD
     /**
      * Remove an extension's primitives.
      * @param {string} extensionId - the ID of the extension to remove
@@ -1243,6 +1273,8 @@ class Runtime extends EventEmitter {
         this.requestToolboxExtensionsUpdate();
         this.emit(Runtime.EXTENSION_REMOVED, extensionId);
     }
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 
     /**
      * Read extension information, convert menus, blocks and custom field types
@@ -1281,13 +1313,21 @@ class Runtime extends EventEmitter {
 
         if (extensionInfo.docsURI) {
             const xml = '<button ' +
+<<<<<<< HEAD
                 `text="${xmlEscape.escapeAttribute(maybeFormatMessage({
+=======
+                `text="${xmlEscape(maybeFormatMessage({
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
                     id: 'tw.blocks.openDocs',
                     default: 'Open Documentation',
                     description: 'Button that opens site with more documentation about an extension'
                 }))}" ` +
                 'callbackKey="OPEN_EXTENSION_DOCS" ' +
+<<<<<<< HEAD
                 `callbackData="${xmlEscape.escapeAttribute(extensionInfo.docsURI)}"></button>`;
+=======
+                `callbackData="${xmlEscape(extensionInfo.docsURI)}"></button>`;
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
             const block = {
                 info: {},
                 xml
@@ -1374,7 +1414,10 @@ class Runtime extends EventEmitter {
                 colour: categoryInfo.color1,
                 colourSecondary: categoryInfo.color2,
                 colourTertiary: categoryInfo.color3,
+<<<<<<< HEAD
                 blockText: menuInfo.blockText ?? categoryInfo.blockText,
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
                 outputShape: menuInfo.acceptReporters ?
                     ScratchBlocksConstants.OUTPUT_SHAPE_ROUND : ScratchBlocksConstants.OUTPUT_SHAPE_SQUARE,
                 args0: [
@@ -1630,9 +1673,15 @@ class Runtime extends EventEmitter {
             ++outLineNum;
         }
 
+<<<<<<< HEAD
         const mutation = blockInfo.isDynamic ? `<mutation blockInfo="${xmlEscape.escapeAttribute(JSON.stringify(blockInfo))}"/>` : '';
         const inputs = context.inputList.join('');
         const blockXML = `<block type="${xmlEscape.escapeAttribute(extendedOpcode)}">${mutation}${inputs}</block>`;
+=======
+        const mutation = blockInfo.isDynamic ? `<mutation blockInfo="${xmlEscape(JSON.stringify(blockInfo))}"/>` : '';
+        const inputs = context.inputList.join('');
+        const blockXML = `<block type="${xmlEscape(extendedOpcode)}">${mutation}${inputs}</block>`;
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 
         if (blockInfo.extensions) {
             for (const extension of blockInfo.extensions) {
@@ -1670,10 +1719,16 @@ class Runtime extends EventEmitter {
      * @private
      */
     _convertLabelForScratchBlocks (blockInfo) {
+<<<<<<< HEAD
         const text = xmlEscape.escapeAttribute(blockInfo.text)
         return {
             info: blockInfo,
             xml: `<label text="${text}"></label>`
+=======
+        return {
+            info: blockInfo,
+            xml: `<label text="${xmlEscape(blockInfo.text)}"></label>`
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
         };
     }
     
@@ -1692,7 +1747,11 @@ class Runtime extends EventEmitter {
         if (nativeCallbackKeys.includes(buttonInfo.func)) {
             return {
                 info: buttonInfo,
+<<<<<<< HEAD
                 xml: `<button text="${xmlEscape.escapeAttribute(buttonText)}" callbackKey="${xmlEscape.escapeAttribute(buttonInfo.func)}"></button>`
+=======
+                xml: `<button text="${xmlEscape(buttonText)}" callbackKey="${xmlEscape(buttonInfo.func)}"></button>`
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
             };
         }
         // Callbacks with data will be forwarded from GUI
@@ -1701,9 +1760,15 @@ class Runtime extends EventEmitter {
         this.extensionButtons.set(id, buttonInfo.callFunc);
         return {
             info: buttonInfo,
+<<<<<<< HEAD
             xml: `<button text="${xmlEscape.escapeAttribute(buttonText)}"` +
                 ' callbackKey="EXTENSION_CALLBACK"' +
                 ` callbackData="${xmlEscape.escapeAttribute(id)}"></button>`
+=======
+            xml: `<button text="${xmlEscape(buttonText)}"` +
+                ' callbackKey="EXTENSION_CALLBACK"' +
+                ` callbackData="${xmlEscape(id)}"></button>`
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
         };
     }
 
@@ -1716,11 +1781,15 @@ class Runtime extends EventEmitter {
 
     handleExtensionButtonPress (buttonData) {
         const callback = this.extensionButtons.get(buttonData);
+<<<<<<< HEAD
         if (typeof callback === 'function') {
             callback();
         } else {
             log.warn(`No callback found for extension button with data: ${buttonData}`);
         }
+=======
+        callback();
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     }
 
     /**
@@ -1773,6 +1842,7 @@ class Runtime extends EventEmitter {
         // check if this is not one of those cases. E.g. an inline image on a block.
         if (argTypeInfo.fieldType === 'field_image') {
             argJSON = this._constructInlineImageJson(argInfo);
+<<<<<<< HEAD
         } else if (argTypeInfo.fieldType === 'field_customInput') {
             // Custom input fields (e.g. the Ace code editor) are inline fields on the block,
             // not connectable input slots. Pass through the id and default value so that
@@ -1783,6 +1853,8 @@ class Runtime extends EventEmitter {
                 id: argInfo.id,
                 value: argInfo.defaultValue
             };
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
         } else {
             // Construct input value
 
@@ -1793,9 +1865,14 @@ class Runtime extends EventEmitter {
             };
 
             const defaultValue =
+<<<<<<< HEAD
                 typeof argInfo.defaultValue === 'undefined' ? '' :
                     xmlEscape(maybeFormatMessage(
                         argInfo.defaultValue, this.makeMessageContextForTarget()).toString());
+=======
+                typeof argInfo.defaultValue === 'undefined' ? null :
+                    maybeFormatMessage(argInfo.defaultValue, this.makeMessageContextForTarget()).toString();
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 
             if (argTypeInfo.check) {
                 // Right now the only type of 'check' we have specifies that the
@@ -1825,6 +1902,7 @@ class Runtime extends EventEmitter {
                 shadowType = (argTypeInfo.shadow && argTypeInfo.shadow.type) || null;
                 fieldName = (argTypeInfo.shadow && argTypeInfo.shadow.fieldName) || null;
             }
+<<<<<<< HEAD
             // TODO: Allow fillIn to work with non-shadow.
             if (argInfo.fillIn || argInfo.fillInGlobal/* && argInfo.fillInShadow*/) {
                 shadowType = argInfo.fillInGlobal || `${context.categoryInfo.id}_${argInfo.fillIn}`;
@@ -1839,18 +1917,32 @@ class Runtime extends EventEmitter {
             // <value> is the ScratchBlocks name for a block input.
             if (valueName) {
                 context.inputList.push(`<value name="${xmlEscape.escapeAttribute(placeholder)}">`);
+=======
+
+            // <value> is the ScratchBlocks name for a block input.
+            if (valueName) {
+                context.inputList.push(`<value name="${xmlEscape(placeholder)}">`);
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
             }
 
             // The <shadow> is a placeholder for a reporter and is visible when there's no reporter in this input.
             // Boolean inputs don't need to specify a shadow in the XML.
             if (shadowType) {
+<<<<<<< HEAD
                 context.inputList.push(`<shadow type="${xmlEscape.escapeAttribute(shadowType)}">`);
+=======
+                context.inputList.push(`<shadow type="${xmlEscape(shadowType)}">`);
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
             }
 
             // A <field> displays a dynamic value: a user-editable text field, a drop-down menu, etc.
             // Leave out the field if defaultValue or fieldName are not specified
             if (defaultValue !== null && fieldName) {
+<<<<<<< HEAD
                 context.inputList.push(`<field name="${xmlEscape.escapeAttribute(fieldName)}">${defaultValue}</field>`);
+=======
+                context.inputList.push(`<field name="${xmlEscape(fieldName)}">${xmlEscape(defaultValue)}</field>`);
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
             }
 
             if (shadowType) {
@@ -1913,8 +2005,13 @@ class Runtime extends EventEmitter {
                 statusButtonXML = 'showStatusButton="true"';
             }
 
+<<<<<<< HEAD
             let xml = `<category name="${xmlEscape.escapeAttribute(name)}"`;
             xml += ` id="${xmlEscape.escapeAttribute(categoryInfo.id)}"`;
+=======
+            let xml = `<category name="${xmlEscape(name)}"`;
+            xml += ` id="${xmlEscape(categoryInfo.id)}"`;
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
             xml += ` ${statusButtonXML}`;
             xml += ` ${colorXML}`;
             xml += ` ${menuIconXML}>`;
@@ -2972,11 +3069,19 @@ class Runtime extends EventEmitter {
                 info: {},
                 xml:
                    '<block type="procedures_call" gap="16"><mutation generateshadows="true" warp="false"' +
+<<<<<<< HEAD
                     ` proccode="${xmlEscape.escapeAttribute(procedureCode)}"` +
                     ` argumentnames="${xmlEscape.escapeAttribute(JSON.stringify(names))}"` +
                     ` argumentids="${xmlEscape.escapeAttribute(JSON.stringify(ids))}"` +
                     ` argumentdefaults="${xmlEscape.escapeAttribute(JSON.stringify(defaults))}"` +
                     `${options.return ? ` return="${xmlEscape.escapeAttribute(options.return.toString())}"` : ''}` +
+=======
+                    ` proccode="${xmlEscape(procedureCode)}"` +
+                    ` argumentnames="${xmlEscape(JSON.stringify(names))}"` +
+                    ` argumentids="${xmlEscape(JSON.stringify(ids))}"` +
+                    ` argumentdefaults="${xmlEscape(JSON.stringify(defaults))}"` +
+                    `${options.return ? ` return="${xmlEscape(options.return.toString())}"` : ''}` +
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
                     '></mutation></block>'
             });
         }

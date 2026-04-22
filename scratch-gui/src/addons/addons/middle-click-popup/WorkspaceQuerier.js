@@ -2,8 +2,11 @@
  * @file Contains all the logic for the parsing of queries by the {@link WorkspaceQuerier}.
  * I'm really sorry if somebody other than me ever has to debug this.
  * Wish you luck <3
+<<<<<<< HEAD
  * 
  *
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
  *
  * Once you *think* you understand the function of the major classes, read the docs on
  * {@link WorkspaceQuerier._createTokenGroups} for some more specifics on the algorithm works,
@@ -735,6 +738,11 @@ class TokenTypeBlock extends TokenType {
           strings.push(...blockPart.toLowerCase().split(" "));
         } else if (blockPart.type === BlockInputType.ENUM) {
           for (const enumValue of blockPart.values) {
+<<<<<<< HEAD
+=======
+            if (this.stringForms.length >= WorkspaceQuerier.MAX_RESULTS) return;
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             enumerateStringForms(
               partIdx + 1,
               [...strings, ...enumValue.string.toLowerCase().split(" ")],
@@ -751,6 +759,16 @@ class TokenTypeBlock extends TokenType {
     };
 
     enumerateStringForms();
+<<<<<<< HEAD
+=======
+
+    if (this.stringForms.length >= WorkspaceQuerier.MAX_STRING_FORMS) {
+      console.warn(
+        "Warning: Block '" + this.block.id + "' has too many string forms. Search results may not be very good."
+      );
+      this.stringForms.length = 0;
+    }
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
   }
 
   /**
@@ -1074,7 +1092,11 @@ class QueryInfo {
     /** @type {WorkspaceQuerier} */
     this.querier = querier;
     /** @type {string} The query */
+<<<<<<< HEAD
     this.str = query.replaceAll(String.fromCharCode(160), " ");
+=======
+    this.str = query.replace(/\u00a0/g, " ");
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     /** @type {string} A lowercase version of the query. Used for case insensitive comparisons. */
     this.lowercase = this.str.toLowerCase();
     /** @type {number} A unique identifier for this query */
@@ -1166,6 +1188,7 @@ export default class WorkspaceQuerier {
   /**
    * The maximum number of tokens to find before giving up.
    */
+<<<<<<< HEAD
   static MAX_TOKENS = 10000;
 
   // Built in categories
@@ -1184,6 +1207,14 @@ export default class WorkspaceQuerier {
   'pen',         
 ]);
   // ^^^ The 'Lists' category will only show up if you have the 'Data category tweaks' addon enabled, which separates the Variables category into Variables and Lists.
+=======
+  static MAX_TOKENS = 100000;
+
+  /**
+   * The maximum number of string forms a block can have before we give up.
+   */
+  static MAX_STRING_FORMS = 500;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
   /**
    * Indexes a workspace in preparation for querying it.
@@ -1227,12 +1258,20 @@ export default class WorkspaceQuerier {
       }
       ++query.resultCount;
       if (!limited && query.resultCount >= WorkspaceQuerier.MAX_RESULTS) {
+<<<<<<< HEAD
         console.log("Warning: Workspace query exceeded maximum result count.");
+=======
+        console.warn("Warning: Workspace query exceeded maximum result count.");
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         limited = true;
       }
 
       if (!query.canCreateMoreTokens()) {
+<<<<<<< HEAD
         console.log("Warning: Workspace query exceeded maximum token count.");
+=======
+        console.warn("Warning: Workspace query exceeded maximum token count.");
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         limited = true;
         break;
       }
@@ -1242,6 +1281,7 @@ export default class WorkspaceQuerier {
     //  This step removes silly suggestions like `if <(1 + 1) = "2 then"> then`
     const canBeString = Array(queryStr.length).fill(true);
 
+<<<<<<< HEAD
     /**
      * Recursively marks character positions in the current query that cannot be interpreted as plain string input according to tokens that are proper, non-truncated, and are defining features.
      * 
@@ -1253,6 +1293,12 @@ export default class WorkspaceQuerier {
       const subtokens = token.type.getSubtokens(token, query);
       if (subtokens) for (const subtoken of subtokens) searchToken(subtoken);
       else if (!(token.type instanceof TokenTypeStringLiteral) && token.isProper && !token.isTruncated && token.isDefiningFeature)
+=======
+    function searchToken(token) {
+      const subtokens = token.type.getSubtokens(token, query);
+      if (subtokens) for (const subtoken of subtokens) searchToken(subtoken);
+      else if (!(token.type instanceof TokenTypeStringLiteral) && token.isProper && !token.isTruncated)
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         for (let i = token.start; i < token.end; i++) {
           canBeString[i] = false;
         }
@@ -1272,6 +1318,7 @@ export default class WorkspaceQuerier {
     for (const result of results) if (checkValidity(result.token)) validResults.push(result);
 
     validResults = validResults.sort((a, b) => {
+<<<<<<< HEAD
     const aLengths = a.getLengths();
     const bLengths = b.getLengths();
     
@@ -1289,6 +1336,13 @@ export default class WorkspaceQuerier {
     if (aLengths.stringLength != bLengths.stringLength) return aLengths.stringLength - bLengths.stringLength;
     return aLengths.tokenLength - bLengths.tokenLength;
   });
+=======
+      const aLengths = a.getLengths();
+      const bLengths = b.getLengths();
+      if (aLengths.stringLength != bLengths.stringLength) return aLengths.stringLength - bLengths.stringLength;
+      return aLengths.tokenLength - bLengths.tokenLength;
+    });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
     return {
       results: validResults,
@@ -1453,4 +1507,8 @@ export default class WorkspaceQuerier {
     this.tokenGroupStack = null;
     this.tokenGroupBlocks = null;
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

@@ -129,11 +129,15 @@ module.exports = [
             }, {
                 from: 'node_modules/scratch-render/dist/web'
             }, {
+<<<<<<< HEAD
                 from: path.join(
                     path.dirname(require.resolve('@turbowarp/scratch-svg-renderer/package.json')),
                     'dist',
                     'web'
                 )
+=======
+                from: 'node_modules/@turbowarp/scratch-svg-renderer/dist/web'
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
             }, {
                 from: 'src/playground'
             }])

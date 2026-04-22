@@ -16,7 +16,11 @@
 }
 
 .mod-menu-item:hover {
+<<<<<<< HEAD
     background: $looks-secondary;
+=======
+    background: $motion-primary;
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
     color: white;
 }
 
@@ -24,6 +28,13 @@
     display: flex;
     flex-direction: column;
 }
+<<<<<<< HEAD
+=======
+.font-context-menu {
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 
 .mod-unselect {
     user-select: none;
@@ -35,11 +46,14 @@
     white-space: nowrap;
 }
 
+<<<<<<< HEAD
 .font-context-menu {
     display: grid;
     grid-template-columns: auto auto auto;
 }
 
+=======
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 .font-dropdown {
     align-items: center;
     color: $text-primary;

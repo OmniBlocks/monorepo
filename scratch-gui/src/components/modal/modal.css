@@ -2,6 +2,7 @@
 @import "../../css/units.css";
 @import "../../css/z-index.css";
 
+<<<<<<< HEAD
 @keyframes ModalIn {
     from {
         opacity: 0;
@@ -49,6 +50,9 @@
 .modal-overlay {
     animation: OverLayIn 0.2s ease-in-out forwards;
     transition: background-color 0.2s ease-in-out forwards;
+=======
+.modal-overlay {
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     position: fixed;
     top: 0;
     left: 0;
@@ -57,8 +61,11 @@
     z-index: $z-index-modal;
     background-color: $ui-modal-overlay;
     color: $ui-modal-foreground;
+<<<<<<< HEAD
     
     backdrop-filter: blur(2px);
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .modal-content * {
@@ -66,7 +73,10 @@
 }
 
 .modal-content {
+<<<<<<< HEAD
     animation: ModalIn 0.2s ease-in-out forwards;
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     margin: 100px auto;
     outline: none;
     border: 4px solid $ui-white-transparent;
@@ -97,6 +107,7 @@
     border-radius: 0;
 }
 
+<<<<<<< HEAD
 .modal-content.closing {
     animation: ModalOut 0.2s ease-in-out forwards; /* Apply zoom-out animation when closing */
 }
@@ -105,6 +116,8 @@
 }
 
 
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 /*
     Modal header has 3 items:

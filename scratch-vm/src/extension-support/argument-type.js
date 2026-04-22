@@ -44,6 +44,7 @@ const ArgumentType = {
     IMAGE: 'image',
 
     /**
+<<<<<<< HEAD
      * pm: creates an input with n x,y inputs
      */
     POLYGON: 'polygon',
@@ -55,10 +56,14 @@ const ArgumentType = {
 
     /**
      * Costume menu (taken from tw)
+=======
+     * Name of costume in the current target
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
      */
     COSTUME: 'costume',
 
     /**
+<<<<<<< HEAD
      * Sound menu (taken from tw)
      */
     SOUND: 'sound',
@@ -91,3 +96,11 @@ const ArgumentType = {
 };
 
 module.exports = ArgumentType;
+=======
+     * Name of sound in the current target
+     */
+    SOUND: 'sound'
+};
+
+module.exports = ArgumentType;
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5

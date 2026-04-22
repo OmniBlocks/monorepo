@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: PR Test Reporter
 
 on:
@@ -16,10 +17,24 @@ jobs:
       - uses: actions/checkout@v4
 
       # 2. Setup Node.js (modify version as needed)
+=======
+name: Node.js CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 14.x
+<<<<<<< HEAD
 
       # 3. Install dependencies
       - name: Install dependencies
@@ -75,3 +90,11 @@ jobs:
                 </details>
               `
             });
+=======
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2.0.1
+        with:
+          token: ${{ secrets.t }}
+          event-type: update
+          repository: PenguinMod/penguinmod.github.io
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b

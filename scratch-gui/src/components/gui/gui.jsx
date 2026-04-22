@@ -20,7 +20,11 @@ import MenuBar from '../menu-bar/menu-bar.jsx';
 import CostumeLibrary from '../../containers/costume-library.jsx';
 import BackdropLibrary from '../../containers/backdrop-library.jsx';
 import Watermark from '../../containers/watermark.jsx';
+<<<<<<< HEAD
 import SongsTab from '../../containers/songs-tab.jsx';
+=======
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 import Backpack from '../../containers/backpack.jsx';
 import BrowserModal from '../browser-modal/browser-modal.jsx';
 import TipsLibrary from '../../containers/tips-library.jsx';
@@ -37,7 +41,11 @@ import TWRestorePointManager from '../../containers/tw-restore-point-manager.jsx
 import TWFontsModal from '../../containers/tw-fonts-modal.jsx';
 import TWUnknownPlatformModal from '../../containers/tw-unknown-platform-modal.jsx';
 import TWInvalidProjectModal from '../../containers/tw-invalid-project-modal.jsx';
+<<<<<<< HEAD
 import ExportJustModal from '../../containers/export-just-modal.jsx';
+=======
+import TWWindChimeSubmitter from '../../containers/tw-windchime-submitter.jsx';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 import {STAGE_SIZE_MODES, FIXED_WIDTH, UNCONSTRAINED_NON_STAGE_WIDTH} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
@@ -50,7 +58,11 @@ import addExtensionIcon from './icon--extensions.svg';
 import codeIcon from '!../../lib/tw-recolor/build!./icon--code.svg';
 import costumesIcon from '!../../lib/tw-recolor/build!./icon--costumes.svg';
 import soundsIcon from '!../../lib/tw-recolor/build!./icon--sounds.svg';
+<<<<<<< HEAD
 import songsIcon from '!../../lib/tw-recolor/build!./icon--songs.svg';
+=======
+
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 const messages = defineMessages({
     addExtension: {
         id: 'gui.gui.addExtension',
@@ -128,7 +140,10 @@ const GUIComponent = props => {
         onToggleLoginOpen,
         onActivateCostumesTab,
         onActivateSoundsTab,
+<<<<<<< HEAD
         onActivateSongsTab,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         onActivateTab,
         onClickLogo,
         onExtensionButtonClick,
@@ -149,7 +164,10 @@ const GUIComponent = props => {
         showOpenFilePicker,
         showSaveFilePicker,
         soundsTabVisible,
+<<<<<<< HEAD
         songsTabVisible,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         stageSizeMode,
         targetIsStage,
         telemetryModalVisible,
@@ -161,7 +179,10 @@ const GUIComponent = props => {
         fontsModalVisible,
         unknownPlatformModalVisible,
         invalidProjectModalVisible,
+<<<<<<< HEAD
         exportJustModalVisible,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         vm,
         ...componentProps
     } = omit(props, 'dispatch');
@@ -190,13 +211,20 @@ const GUIComponent = props => {
             <React.Fragment>
                 <TWSecurityManager securityManager={securityManager} />
                 <TWRestorePointManager />
+<<<<<<< HEAD
+=======
+                <TWWindChimeSubmitter isEmbedded={isEmbedded} />
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 {usernameModalVisible && <TWUsernameModal />}
                 {settingsModalVisible && <TWSettingsModal />}
                 {customExtensionModalVisible && <TWCustomExtensionModal />}
                 {fontsModalVisible && <TWFontsModal />}
                 {unknownPlatformModalVisible && <TWUnknownPlatformModal />}
                 {invalidProjectModalVisible && <TWInvalidProjectModal />}
+<<<<<<< HEAD
                 {exportJustModalVisible && <ExportJustModal />}
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             </React.Fragment>
         );
 
@@ -260,7 +288,14 @@ const GUIComponent = props => {
                     />
                 ) : null}
                 {isBrowserSupported() ? null : (
+<<<<<<< HEAD
                     <BrowserModal isRtl={isRtl} />
+=======
+                    <BrowserModal
+                        isRtl={isRtl}
+                        onClickDesktopSettings={onClickDesktopSettings}
+                    />
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 )}
                 {tipsLibraryVisible ? (
                     <TipsLibrary />
@@ -386,6 +421,7 @@ const GUIComponent = props => {
                                             id="gui.gui.soundsTab"
                                         />
                                     </Tab>
+<<<<<<< HEAD
                                     <Tab
                                         className={tabClassNames.tab}
                                         onClick={onActivateSongsTab}
@@ -400,6 +436,8 @@ const GUIComponent = props => {
                                             id="gui.gui.songsTab"
                                         />
                                     </Tab>
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                                 </TabList>
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     <Box className={styles.blocksWrapper}>
@@ -442,9 +480,12 @@ const GUIComponent = props => {
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     {soundsTabVisible ? <SoundTab vm={vm} /> : null}
                                 </TabPanel>
+<<<<<<< HEAD
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     {songsTabVisible ? <SongsTab vm={vm} /> : null}
                                 </TabPanel>
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                             </Tabs>
                             {backpackVisible ? (
                                 <Backpack host={backpackHost} />
@@ -559,7 +600,10 @@ GUIComponent.propTypes = {
     fontsModalVisible: PropTypes.bool,
     unknownPlatformModalVisible: PropTypes.bool,
     invalidProjectModalVisible: PropTypes.bool,
+<<<<<<< HEAD
     exportJustModalVisible: PropTypes.bool,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     vm: PropTypes.instanceOf(VM).isRequired
 };
 GUIComponent.defaultProps = {

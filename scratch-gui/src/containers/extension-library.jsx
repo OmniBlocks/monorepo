@@ -8,10 +8,14 @@ import log from '../lib/log';
 import extensionLibraryContent, {
     galleryError,
     galleryLoading,
+<<<<<<< HEAD
     galleryMore,
     galleryLoadingOB,
     galleryMoreOB,
     galleryErrorOB
+=======
+    galleryMore
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 } from '../lib/libraries/extensions/index.jsx';
 import extensionTags from '../lib/libraries/tw-extension-tags';
 
@@ -42,6 +46,7 @@ const translateGalleryItem = (extension, locale) => ({
     description: extension.descriptionTranslations[locale] || extension.description
 });
 
+<<<<<<< HEAD
 // Timeout constant for gallery loading
 const GALLERY_TIMEOUT_MS = 750;
 
@@ -50,6 +55,11 @@ let cachedGalleryTW = null;
 let cachedGalleryOB = null;
 
 const fetchLibraryTW = async () => {
+=======
+let cachedGallery = null;
+
+const fetchLibrary = async () => {
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     const res = await fetch('https://extensions.turbowarp.org/generated-metadata/extensions-v0.json');
     if (!res.ok) {
         throw new Error(`HTTP status ${res.status}`);
@@ -92,6 +102,7 @@ const fetchLibraryTW = async () => {
     }));
 };
 
+<<<<<<< HEAD
 const fetchLibraryOB = async () => {
     const res = await fetch('https://omniblocks.github.io/extensions/generated-metadata/extensions-v0.json');
     if (!res.ok) {
@@ -159,6 +170,8 @@ const loadGalleryWithTimeout = (fetchFunction, timeoutCallback, successCallback,
         });
 };
 
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 class ExtensionLibrary extends React.PureComponent {
     constructor (props) {
         super(props);
@@ -166,6 +179,7 @@ class ExtensionLibrary extends React.PureComponent {
             'handleItemSelect'
         ]);
         this.state = {
+<<<<<<< HEAD
             galleryTW: cachedGalleryTW,
             galleryOB: cachedGalleryOB,
             galleryTWError: null,
@@ -199,6 +213,36 @@ class ExtensionLibrary extends React.PureComponent {
                 },
                 error => this.setState({galleryOBError: error})
             );
+=======
+            gallery: cachedGallery,
+            galleryError: null,
+            galleryTimedOut: false
+        };
+    }
+    componentDidMount () {
+        if (!this.state.gallery) {
+            const timeout = setTimeout(() => {
+                this.setState({
+                    galleryTimedOut: true
+                });
+            }, 750);
+
+            fetchLibrary()
+                .then(gallery => {
+                    cachedGallery = gallery;
+                    this.setState({
+                        gallery
+                    });
+                    clearTimeout(timeout);
+                })
+                .catch(error => {
+                    log.error(error);
+                    this.setState({
+                        galleryError: error
+                    });
+                    clearTimeout(timeout);
+                });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         }
     }
     handleItemSelect (item) {
@@ -237,6 +281,7 @@ class ExtensionLibrary extends React.PureComponent {
         }
     }
     render () {
+<<<<<<< HEAD
         const library = extensionLibraryContent.map(toLibraryItem);
         library.push('---');
         
@@ -271,6 +316,26 @@ class ExtensionLibrary extends React.PureComponent {
             library.push(toLibraryItem(galleryErrorOB));
         } else if (this.state.galleryOBTimedOut) {
             library.push(toLibraryItem(galleryLoadingOB));
+=======
+        let library = null;
+        if (this.state.gallery || this.state.galleryError || this.state.galleryTimedOut) {
+            library = extensionLibraryContent.map(toLibraryItem);
+            library.push('---');
+            if (this.state.gallery) {
+                library.push(toLibraryItem(galleryMore));
+                const locale = this.props.intl.locale;
+                library.push(
+                    ...this.state.gallery
+                        .filter(i => i.extensionId !== 'faceSensing')
+                        .map(i => translateGalleryItem(i, locale))
+                        .map(toLibraryItem)
+                );
+            } else if (this.state.galleryError) {
+                library.push(toLibraryItem(galleryError));
+            } else {
+                library.push(toLibraryItem(galleryLoading));
+            }
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         }
 
         return (

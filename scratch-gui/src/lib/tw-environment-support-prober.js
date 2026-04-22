@@ -54,6 +54,7 @@ export const isBrowserSupported = () => (
     isRendererSupported() &&
     findIncompatibleUserscripts().length === 0
 );
+<<<<<<< HEAD
 
 let cachedWebGLActuallyWorks = null;
 export const canActuallyUseWebGL = () => {
@@ -135,3 +136,5 @@ export const canActuallyUseWebGL = () => {
     }
     return cachedWebGLActuallyWorks;
 };
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

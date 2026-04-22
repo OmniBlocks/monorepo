@@ -1,6 +1,9 @@
 @import "../../css/colors.css";
 @import "../../css/units.css";
+<<<<<<< HEAD
 @import "../../css/filters.css";
+=======
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 
 .editor-container {
     width: 100%;
@@ -9,6 +12,12 @@
     flex-direction: column;
     padding: calc(3 * $grid-unit);
 }
+<<<<<<< HEAD
+=======
+[theme="dark"] .editor-container {
+    color-scheme: dark;
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 
 .row {
     display: flex;
@@ -105,7 +114,13 @@ $border-radius: 0.25rem;
     width: 1.25rem;
     height: 1.25rem;
     vertical-align: middle;
+<<<<<<< HEAD
     filter: $filter-icon-gray;
+=======
+}
+[theme="dark"] .button-group-button-icon {
+    filter: brightness(1.7);
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 }
 
 .mod-mode-tools {
@@ -133,11 +148,21 @@ $border-radius: 0.25rem;
     width: 100%;
     flex-grow: 1;
     min-width: 402px; /* Leave room for the border */
+<<<<<<< HEAD
     border: 1px solid $ui-pane-border;
+=======
+    border: 1px solid #e8edf1;
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
     border-radius: .25rem;
     position: relative;
     overflow: visible;
 }
+<<<<<<< HEAD
+=======
+[theme="dark"] .canvas-container {
+    border-color: $form-border;
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 
 .mode-selector {
     display: flex;
@@ -173,7 +198,11 @@ $border-radius: 0.25rem;
 .bitmap-button {
     display: flex;
     border-radius: 5px;
+<<<<<<< HEAD
     background-color: $looks-secondary;
+=======
+    background-color: $motion-primary;
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
     padding: calc(2 * $grid-unit);
     line-height: 1.5rem;
     font-size: calc(3 * $grid-unit);
@@ -224,5 +253,9 @@ $border-radius: 0.25rem;
 
 .button-text {
     width: 100%; /* Fixes button text wrapping in Edge */
+<<<<<<< HEAD
     white-space: nowrap;
 }
+=======
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b

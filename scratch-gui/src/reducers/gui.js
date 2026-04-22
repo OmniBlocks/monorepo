@@ -27,7 +27,10 @@ import timeTravelReducer, {timeTravelInitialState} from './time-travel';
 import toolboxReducer, {toolboxInitialState} from './toolbox';
 import twReducer, {twInitialState} from './tw';
 import customStageSizeReducer, {customStageSizeInitialState} from './custom-stage-size';
+<<<<<<< HEAD
 import exportJustReducer, {exportJustInitialState} from './export-just';
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 import vmReducer, {vmInitialState} from './vm';
 import vmStatusReducer, {vmStatusInitialState} from './vm-status';
 import workspaceMetricsReducer, {workspaceMetricsInitialState} from './workspace-metrics';
@@ -46,7 +49,10 @@ const guiInitialState = {
     connectionModal: connectionModalInitialState,
     customStageSize: customStageSizeInitialState,
     customProcedures: customProceduresInitialState,
+<<<<<<< HEAD
     exportJust: exportJustInitialState,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     editorTab: editorTabInitialState,
     mode: modeInitialState,
     hoveredTarget: hoveredTargetInitialState,
@@ -153,7 +159,10 @@ const guiReducer = combineReducers({
     connectionModal: connectionModalReducer,
     customStageSize: customStageSizeReducer,
     customProcedures: customProceduresReducer,
+<<<<<<< HEAD
     exportJust: exportJustReducer,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     editorTab: editorTabReducer,
     mode: modeReducer,
     hoveredTarget: hoveredTargetReducer,

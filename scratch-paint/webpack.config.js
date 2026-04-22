@@ -20,7 +20,11 @@ const base = {
             include: path.resolve(__dirname, 'src'),
             options: {
                 plugins: ['transform-object-rest-spread'],
+<<<<<<< HEAD
                 presets: [['env', {browsers: ['last 3 versions', 'Safari >= 8', 'iOS >= 8']}], 'react']
+=======
+                presets: ['@babel/preset-env', '@babel/preset-react']
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
             }
         },
         {

@@ -116,7 +116,11 @@ $border-radius: 0.25rem;
 }
 
 .mod-menu-item:hover {
+<<<<<<< HEAD
     background: $looks-transparent;
+=======
+    background: $motion-transparent;
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 }
 
 .mod-disabled:hover {

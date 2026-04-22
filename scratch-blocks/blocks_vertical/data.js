@@ -48,9 +48,13 @@ Blockly.Blocks['data_variable'] = {
       ],
       "category": Blockly.Categories.data,
       "checkboxInFlyout": true,
+<<<<<<< HEAD
       // ob: allow variables in any input, like AmpMod and pang and joe's epic tw mod
       "output": null,
       "extensions": ["contextMenu_getVariableBlock", "colours_data", "shape_reporter"]
+=======
+      "extensions": ["contextMenu_getVariableBlock", "colours_data", "output_string"]
+>>>>>>> e859db9c67b2f2620bb89e0bfcbe42586ef6f48e
     });
   }
 };

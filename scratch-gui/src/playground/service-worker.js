@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Service Worker for OmniBlocks - Full Offline PWA Support
 /* eslint-disable func-style, require-jsdoc, no-use-before-define */
 const CACHE_NAME = 'omniblocks-v1';
@@ -493,4 +494,14 @@ self.addEventListener('notificationclick', event => {
     event.waitUntil(
         self.clients.openWindow('/editor.html')
     );
+=======
+self.addEventListener('install', () => {
+    // Remove old service worker as soon as possible
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+    // We don't use caches any more, so remove all of them
+    event.waitUntil(caches.keys().then(keys => Promise.all(keys.map(i => caches.delete(i)))));
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 });

@@ -1,5 +1,6 @@
 @import "../../css/colors.css";
 @import "../../css/units.css";
+<<<<<<< HEAD
 /* Modal overlay for effect progress */
 .modalOverlay {
     position: fixed;
@@ -48,6 +49,8 @@
     transition: width 0.2s;
 }
 
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 .editor-container {
     display: flex;

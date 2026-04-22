@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 chrome >= 102
+=======
+chrome >= 70
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 chromeandroid >= 70
 ios >= 12
 safari >= 12
 edge >= 18
+<<<<<<< HEAD
 firefox >= 68
+=======
+firefox >= 68
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

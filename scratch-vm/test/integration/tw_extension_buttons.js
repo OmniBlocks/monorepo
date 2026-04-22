@@ -3,6 +3,7 @@ const htmlparser = require('htmlparser2');
 const VM = require('../../src/virtual-machine');
 const BlockType = require('../../src/extension-support/block-type');
 
+<<<<<<< HEAD
 test('buttons with opcode', t => {
     const vm = new VM();
     let buttonRunCount = 0;
@@ -49,6 +50,8 @@ test('buttons with opcode', t => {
     t.end();
 });
 
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 test('buttons', t => {
     const vm = new VM();
     let buttonRunCount = 0;

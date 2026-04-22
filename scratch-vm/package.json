@@ -46,14 +46,21 @@
     "diff-match-patch": "1.0.4",
     "format-message": "6.2.1",
     "htmlparser2": "3.10.0",
+<<<<<<< HEAD
     "jsdom": "^24.1.0",
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
     "scratch-parser": "github:TurboWarp/scratch-parser#master",
     "scratch-sb1-converter": "0.2.7",
     "scratch-translate-extension-languages": "^1.0.7",
     "text-encoding": "0.7.0",
     "uuid": "8.3.2",
+<<<<<<< HEAD
     "worker-loader": "^1.1.1",
     "yargs": "^18.0.0"
+=======
+    "worker-loader": "^1.1.1"
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
   },
   "peerDependencies": {
     "@turbowarp/scratch-svg-renderer": "^1.0.0-202312300007-62fe825"

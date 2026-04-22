@@ -25,7 +25,10 @@
 
 .selected {
     visibility: visible;
+<<<<<<< HEAD
     transition: all 0.2s ease-in-out;
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 }
 
 .submenu-label {
@@ -80,6 +83,7 @@
 }
 
 .disabled {
+<<<<<<< HEAD
     transition: all 0.2s ease-in-out;
     opacity: 0.5;
 }
@@ -94,3 +98,14 @@
     margin-left: 0.5rem;
 }
 
+=======
+    opacity: 0.5;
+}
+.disabled img {
+    filter: grayscale(100%);
+}
+
+.open-link {
+    margin-left: 0.5rem;
+}
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

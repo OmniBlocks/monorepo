@@ -6,12 +6,19 @@ import {intlShape, injectIntl} from 'react-intl';
 
 import {
     openSpriteLibrary,
+<<<<<<< HEAD
     closeSpriteLibrary,
     openExportJustModal
 } from '../reducers/modals';
 import {activateTab, COSTUMES_TAB_INDEX, BLOCKS_TAB_INDEX} from '../reducers/editor-tab';
 import {setReceivedBlocks} from '../reducers/hovered-target';
 import {setExportJustId} from '../reducers/export-just';
+=======
+    closeSpriteLibrary
+} from '../reducers/modals';
+import {activateTab, COSTUMES_TAB_INDEX, BLOCKS_TAB_INDEX} from '../reducers/editor-tab';
+import {setReceivedBlocks} from '../reducers/hovered-target';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 import {setRestore} from '../reducers/restore-deletion';
 import DragConstants from '../lib/drag-constants';
@@ -44,7 +51,10 @@ class TargetPane extends React.Component {
             'handleDrop',
             'handleDuplicateSprite',
             'handleExportSprite',
+<<<<<<< HEAD
             'handleOpenExportJustModal',
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             'handleNewSprite',
             'handleSelectSprite',
             'handleSurpriseSpriteClick',
@@ -94,6 +104,7 @@ class TargetPane extends React.Component {
     handleDuplicateSprite (id) {
         this.props.vm.duplicateSprite(id);
     }
+<<<<<<< HEAD
 
 
     /* To avoid confusion, please know that the following function is NOT the regular export sound function
@@ -106,6 +117,8 @@ class TargetPane extends React.Component {
     // ... existing implementation moved to export-just-modal.jsx
     }
     */
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     handleExportSprite (id) {
         const spriteName = this.props.vm.runtime.getTargetById(id).getName();
         const saveLink = document.createElement('a');
@@ -115,6 +128,7 @@ class TargetPane extends React.Component {
             downloadBlob(`${spriteName}.sprite3`, content);
         });
     }
+<<<<<<< HEAD
 
     // handleExportCostumes and handleExportSounds methods have been moved to the ExportJustModal container
     // These are kept for reference and can be removed once the modal is confirmed working
@@ -132,6 +146,8 @@ class TargetPane extends React.Component {
         this.props.onOpenExportJustModal(id);
     }
 
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     handleSelectSprite (id) {
         this.props.vm.setEditingTarget(id);
         if (this.props.stage && id !== this.props.stage.id) {
@@ -273,7 +289,10 @@ class TargetPane extends React.Component {
                 onDrop={this.handleDrop}
                 onDuplicateSprite={this.handleDuplicateSprite}
                 onExportSprite={this.handleExportSprite}
+<<<<<<< HEAD
                 onExportJustButtonClick={this.handleOpenExportJustModal}
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                 onFileUploadClick={this.handleFileUploadClick}
                 onPaintSpriteClick={this.handlePaintSpriteClick}
                 onSelectSprite={this.handleSelectSprite}
@@ -299,18 +318,25 @@ TargetPane.propTypes = {
 
 const mapStateToProps = state => ({
     editingTarget: state.scratchGui.targets.editingTarget,
+<<<<<<< HEAD
     hoveredTarget: {
         ...state.scratchGui.hoveredTarget,
         sprite: state.scratchGui.hoveredTarget.sprite === null ?
             null :
             String(state.scratchGui.hoveredTarget.sprite)
     },
+=======
+    hoveredTarget: state.scratchGui.hoveredTarget,
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     isRtl: state.locales.isRtl,
     spriteLibraryVisible: state.scratchGui.modals.spriteLibrary,
     sprites: state.scratchGui.targets.sprites,
     stage: state.scratchGui.targets.stage,
     raiseSprites: state.scratchGui.blockDrag,
+<<<<<<< HEAD
     exportingSpriteId: state.scratchGui.exportJust.exportingSpriteId,
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     workspaceMetrics: state.scratchGui.workspaceMetrics
 });
 
@@ -322,10 +348,13 @@ const mapDispatchToProps = dispatch => ({
     onRequestCloseSpriteLibrary: () => {
         dispatch(closeSpriteLibrary());
     },
+<<<<<<< HEAD
     onOpenExportJustModal: id => {
         dispatch(setExportJustId(id));
         dispatch(openExportJustModal());
     },
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     onActivateTab: tabIndex => {
         dispatch(activateTab(tabIndex));
     },

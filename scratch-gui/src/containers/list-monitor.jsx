@@ -6,7 +6,11 @@ import {connect} from 'react-redux';
 import {getEventXY} from '../lib/touch-utils';
 import {getVariableValue, setVariableValue} from '../lib/variable-utils';
 import ListMonitorComponent from '../components/monitor/list-monitor.jsx';
+<<<<<<< HEAD
 import {Map} from 'immutable';
+=======
+import {safeStringify} from '../lib/tw-safe-stringify.js';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 class ListMonitor extends React.Component {
     constructor (props) {
@@ -25,6 +29,10 @@ class ListMonitor extends React.Component {
         this.state = {
             activeIndex: null,
             activeValue: null,
+<<<<<<< HEAD
+=======
+            inputDidChange: false,
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             width: props.width || 100,
             height: props.height || 200
         };
@@ -38,18 +46,38 @@ class ListMonitor extends React.Component {
 
         this.setState({
             activeIndex: index,
+<<<<<<< HEAD
             activeValue: this.props.value[index]
+=======
+            activeValue: safeStringify(this.props.value[index]),
+            inputDidChange: false
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         });
     }
 
     handleDeactivate () {
         // Submit any in-progress value edits on blur
         if (this.state.activeIndex !== null) {
+<<<<<<< HEAD
             const {vm, targetId, id: variableId} = this.props;
             const newListValue = getVariableValue(vm, targetId, variableId);
             newListValue[this.state.activeIndex] = this.state.activeValue;
             setVariableValue(vm, targetId, variableId, newListValue);
             this.setState({activeIndex: null, activeValue: null});
+=======
+            if (this.state.inputDidChange) {
+                const {vm, targetId, id: variableId} = this.props;
+                const newListValue = getVariableValue(vm, targetId, variableId);
+                newListValue[this.state.activeIndex] = this.state.activeValue;
+                setVariableValue(vm, targetId, variableId, newListValue);
+            }
+
+            this.setState({
+                activeIndex: null,
+                activeValue: null,
+                inputDidChange: false
+            });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         }
     }
 
@@ -75,7 +103,12 @@ class ListMonitor extends React.Component {
             const newIndex = this.wrapListIndex(previouslyActiveIndex + navigateDirection, this.props.value.length);
             this.setState({
                 activeIndex: newIndex,
+<<<<<<< HEAD
                 activeValue: this.props.value[newIndex]
+=======
+                activeValue: safeStringify(this.props.value[newIndex]),
+                inputDidChange: false
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             });
             e.preventDefault(); // Stop default tab behavior, handled by this state change
         } else if (e.key === 'Enter') {
@@ -90,13 +123,25 @@ class ListMonitor extends React.Component {
             const newIndex = this.wrapListIndex(previouslyActiveIndex + newValueOffset, newListValue.length);
             this.setState({
                 activeIndex: newIndex,
+<<<<<<< HEAD
                 activeValue: newListItemValue
+=======
+                activeValue: newListItemValue,
+                inputDidChange: false
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             });
         }
     }
 
     handleInput (e) {
+<<<<<<< HEAD
         this.setState({activeValue: e.target.value});
+=======
+        this.setState({
+            activeValue: e.target.value,
+            inputDidChange: true
+        });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     }
 
     handleRemove (e) {
@@ -110,7 +155,12 @@ class ListMonitor extends React.Component {
         const newActiveIndex = Math.min(newListValue.length - 1, this.state.activeIndex);
         this.setState({
             activeIndex: newActiveIndex,
+<<<<<<< HEAD
             activeValue: newListValue[newActiveIndex]
+=======
+            activeValue: safeStringify(newListValue[newActiveIndex]),
+            inputDidChange: false
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         });
     }
 
@@ -119,7 +169,15 @@ class ListMonitor extends React.Component {
         const {vm, targetId, id: variableId} = this.props;
         const newListValue = getVariableValue(vm, targetId, variableId).concat(['']);
         setVariableValue(vm, targetId, variableId, newListValue);
+<<<<<<< HEAD
         this.setState({activeIndex: newListValue.length - 1, activeValue: ''});
+=======
+        this.setState({
+            activeIndex: newListValue.length - 1,
+            activeValue: '',
+            inputDidChange: false
+        });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     }
 
     handleResizeMouseDown (e) {
@@ -141,11 +199,19 @@ class ListMonitor extends React.Component {
             onMouseMove(ev); // Make sure width/height are up-to-date
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseup', onMouseUp);
+<<<<<<< HEAD
             this.props.vm.runtime.requestUpdateMonitor(Map({
                 id: this.props.id,
                 height: this.state.height,
                 width: this.state.width
             }));
+=======
+            this.props.vm.runtime.requestUpdateMonitor({
+                id: this.props.id,
+                height: this.state.height,
+                width: this.state.width
+            });
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         };
 
         window.addEventListener('mousemove', onMouseMove);

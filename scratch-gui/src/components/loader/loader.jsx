@@ -34,7 +34,11 @@ const messages = defineMessages({
         id: 'tw.loader.projectData'
     },
     downloadingAssets: {
+<<<<<<< HEAD
         defaultMessage: 'Downloading assets ({complete}/{total}) from remote source …',
+=======
+        defaultMessage: 'Downloading assets ({complete}/{total}) …',
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
         description: 'Appears when loading project assets from a project on a remote website',
         id: 'tw.loader.downloadingAssets'
     },
@@ -45,6 +49,7 @@ const messages = defineMessages({
     }
 });
 
+<<<<<<< HEAD
 const funFacts = [
     'Fun fact: OmniBlocks is currently loading.',
     'Fun fact: OmniBlocks is very cool!',
@@ -94,6 +99,10 @@ const funFacts = [
     'Contemplating life choices...',
     'Contemplating caffeine intake...'
 ];
+=======
+// Because progress events are fired so often during the very performance-critical loading
+// process and React updates are very slow, we bypass React for updating the progress bar.
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 class LoaderComponent extends React.Component {
     constructor (props) {
@@ -102,6 +111,7 @@ class LoaderComponent extends React.Component {
             'handleAssetProgress',
             'handleProjectLoaded',
             'barInnerRef',
+<<<<<<< HEAD
             'messageRef',
             'funFactRef',
             'updateFunFact'
@@ -112,6 +122,13 @@ class LoaderComponent extends React.Component {
         this.ignoreProgress = false;
         this.funFactInterval = null;
         this.lastFunFactIndex = -1;
+=======
+            'messageRef'
+        ]);
+        this.barInnerEl = null;
+        this.messageEl = null;
+        this.ignoreProgress = false;
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     }
     componentDidMount () {
         this.handleAssetProgress(
@@ -120,12 +137,16 @@ class LoaderComponent extends React.Component {
         );
         this.props.vm.on('ASSET_PROGRESS', this.handleAssetProgress);
         this.props.vm.runtime.on('PROJECT_LOADED', this.handleProjectLoaded);
+<<<<<<< HEAD
         this.updateFunFact();
         this.funFactInterval = setInterval(this.updateFunFact, 3000);
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     }
     componentWillUnmount () {
         this.props.vm.off('ASSET_PROGRESS', this.handleAssetProgress);
         this.props.vm.runtime.off('PROJECT_LOADED', this.handleProjectLoaded);
+<<<<<<< HEAD
         clearInterval(this.funFactInterval);
     }
     updateFunFact () {
@@ -142,6 +163,8 @@ class LoaderComponent extends React.Component {
             this.funFactEl.classList.add(styles.funFactSlideIn);
             this.funFactEl.classList.add(styles.funFactRoulette);
         }
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     }
     handleAssetProgress (finished, total) {
         if (this.ignoreProgress || !this.barInnerEl || !this.messageEl) {
@@ -175,6 +198,7 @@ class LoaderComponent extends React.Component {
     messageRef (message) {
         this.messageEl = message;
     }
+<<<<<<< HEAD
     funFactRef (funFact) {
         this.funFactEl = funFact;
     }
@@ -226,6 +250,50 @@ class LoaderComponent extends React.Component {
                 ref={this.funFactRef}
                 />
             </div>
+=======
+    render () {
+        return (
+            <div
+                className={classNames(styles.background, {
+                    [styles.fullscreen]: this.props.isFullScreen
+                })}
+            >
+                <div className={styles.container}>
+                    <div className={styles.blockAnimation}>
+                        <img
+                            className={styles.topBlock}
+                            src={topBlock}
+                            draggable={false}
+                        />
+                        <img
+                            className={styles.middleBlock}
+                            src={middleBlock}
+                            draggable={false}
+                        />
+                        <img
+                            className={styles.bottomBlock}
+                            src={bottomBlock}
+                            draggable={false}
+                        />
+                    </div>
+
+                    <div className={styles.title}>
+                        {mainMessages[this.props.messageId]}
+                    </div>
+
+                    <div
+                        className={styles.message}
+                        ref={this.messageRef}
+                    />
+
+                    <div className={styles.barOuter}>
+                        <div
+                            className={styles.barInner}
+                            ref={this.barInnerRef}
+                        />
+                    </div>
+                </div>
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
             </div>
         );
     }
@@ -263,4 +331,8 @@ const mapDispatchToProps = () => ({});
 export default connect(
     mapStateToProps,
     mapDispatchToProps
+<<<<<<< HEAD
 )(injectIntl(LoaderComponent));
+=======
+)(injectIntl(LoaderComponent));
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571

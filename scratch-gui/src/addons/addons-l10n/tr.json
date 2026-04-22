@@ -43,6 +43,7 @@
     "mediarecorder/record-audio": "Proje seslerini de kaydet",
     "mediarecorder/record-audio-description": "Bu, Metinden Sese tekniğini desteklemez.",
     "mediarecorder/record-description": "Sahneyi bir {extension} dosyası olarak kaydedin. Kayıt bittikten sonra bilgisayarınıza kaydedebilirsiniz.\nNot: Kayıtta değişken ve liste göstergeleri gözükmez.",
+<<<<<<< HEAD
     "mediarecorder/gif-size": "GIF Boyutu (px)",
     "mediarecorder/gif-fps": "GIF FPS",
     "mediarecorder/gif-quality": "GIF Kalitesi",
@@ -52,6 +53,8 @@
     "mediarecorder/gif-quality-very-low": "Çok Düşük",
     "mediarecorder/gif-quality-garbage": "Çöp",
     "mediarecorder/gif-quality-literally-unusable": "Kesinlikle Kullanılamaz",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "mediarecorder/record-duration": "Kayıt Süresi (saniye ile)",
     "mediarecorder/record-mic": "Mikrofondaki sesleri de kaydet",
     "mediarecorder/record-until-stop": "Proje durduğunda kaydı durdur",
@@ -60,8 +63,11 @@
     "mediarecorder/start-delay": "Gecikmeyi Başlat (saniye ile)",
     "mediarecorder/starting-in": "{secs} saniye içinde başlıyor...",
     "mediarecorder/stop": "Kaydı Durdur",
+<<<<<<< HEAD
     "mediarecorder/format": "Biçim",
     "mediarecorder/converting": "Dönüştürülüyor...",    "mediarecorder/exporting": "Video dışa aktarılıyor...",    "mediarecorder/starting-export": "Video dışa aktarımı başlatılıyor...",    "mediarecorder/conversion-failed": "Video MP4 biçimine dönüştürülemedi",
+=======
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
     "debugger/block-breakpoint": "durdurucu",
     "debugger/block-error": "hata %s",
     "debugger/block-log": "günlük %s",

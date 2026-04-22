@@ -6,6 +6,10 @@ import {FormattedMessage} from 'react-intl';
 
 import styles from './monitor.css';
 import {List} from 'react-virtualized';
+<<<<<<< HEAD
+=======
+import {safeStringify} from '../../lib/tw-safe-stringify.js';
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
 
 class ListMonitorScroller extends React.Component {
     constructor (props) {
@@ -71,7 +75,13 @@ class ListMonitorScroller extends React.Component {
                         </div>
 
                     ) : (
+<<<<<<< HEAD
                         <div className={styles.valueInner}>{this.props.values[index]}</div>
+=======
+                        <div className={styles.valueInner}>
+                            {safeStringify(this.props.values[index])}
+                        </div>
+>>>>>>> c455eacd8a66d4b9086f751ca07e203c7ed36571
                     )}
                 </div>
             </div>

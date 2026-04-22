@@ -23,8 +23,11 @@ class Scratch3OperatorsBlocks {
             operator_lt: this.lt,
             operator_equals: this.equals,
             operator_gt: this.gt,
+<<<<<<< HEAD
             operator_ltoreq: this.ltoreq,
             operator_gtoreq: this.gtoreq,
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
             operator_and: this.and,
             operator_or: this.or,
             operator_not: this.not,
@@ -62,12 +65,15 @@ class Scratch3OperatorsBlocks {
     equals (args) {
         return Cast.compare(args.OPERAND1, args.OPERAND2) === 0;
     }
+<<<<<<< HEAD
     ltoreq (args) {
         return Cast.compare(args.OPERAND1, args.OPERAND2) <= 0; // less than or equals to
     }
     gtoreq (args) {
         return Cast.compare(args.OPERAND1, args.OPERAND2) >= 0; // greater than or equals to
     }
+=======
+>>>>>>> 7b521ff000780d61b18ac47bfb65625451caceb5
 
     gt (args) {
         return Cast.compare(args.OPERAND1, args.OPERAND2) > 0;

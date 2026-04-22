@@ -1,12 +1,18 @@
+<<<<<<< HEAD
 @import "../../css/colors";
 @import "../../css/units";
 @import "../../css/filters.css";
+=======
+@import "../../css/units";
+@import "../../css/colors";
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 
 /* Popover styles */
 /* body is for specificity to override some addons that set a lower z-index */
 body :global(.Popover) {
     /* should be above menu bar */
     z-index: 500;
+<<<<<<< HEAD
 
     /* color-scheme: dark causes very strange issues */
     color-scheme: light;
@@ -28,6 +34,22 @@ body :global(.Popover) {
 :global(.Popover-tipShape) {
     fill: $popover-background;
     stroke: $ui-pane-border;
+=======
+}
+
+:global(.Popover-body) {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 4px;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, .3);
+}
+
+:global(.Popover-tipShape) {
+    fill: white;
+    stroke: #ddd;
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 }
 
 .clickable {
@@ -43,17 +65,35 @@ body :global(.Popover) {
 .row-header {
     font-family: "Helvetica Neue", Helvetica, sans-serif;
     font-size: 0.65rem;
+<<<<<<< HEAD
     margin: 8px 8px 0 8px;
 }
+=======
+    color: #575E75;
+    margin: 8px 8px 0 8px;
+}
+[theme="dark"] .row-header {
+    color: #ccc;
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 
 .label-name {
     font-weight: bold;
 }
 
 .divider {
+<<<<<<< HEAD
     border-top: 1px solid $ui-pane-border;
     margin: 8px;
 }
+=======
+    border-top: 1px solid #ddd;
+    margin: 8px;
+}
+[theme="dark"] .divider {
+    border-color: #333;
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 
 .swap-button {
     margin-left: 8px;
@@ -67,12 +107,22 @@ body :global(.Popover) {
 .swatch {
     width: 1.5rem;
     height: 1.5rem;
+<<<<<<< HEAD
     border: 1px solid $ui-pane-border;
+=======
+    border: 1px solid #ddd;
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
     border-radius: 4px;
     box-sizing: content-box;
     display: flex;
     align-items: center;
 }
+<<<<<<< HEAD
+=======
+[theme="dark"] .swatch {
+    border-color: $form-border;
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 
 .large-swatch-icon {
     width: 1.75rem;
@@ -85,8 +135,13 @@ body :global(.Popover) {
 }
 
 .active-swatch {
+<<<<<<< HEAD
     border: 1px solid $looks-secondary;
     box-shadow: 0px 0px 0px 3px $looks-transparent;
+=======
+    border: 1px solid #00c3ff;
+    box-shadow: 0px 0px 0px 3px hsla(194, 100%, 50%, 0.2);
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 }
 
 .swatch-icon {
@@ -94,10 +149,13 @@ body :global(.Popover) {
     height: 1.5rem;
 }
 
+<<<<<<< HEAD
 .picker-icon {
     filter: $filter-icon-gray;
 }
 
+=======
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 .inactive-gradient {
     filter: saturate(0%);
 }
@@ -151,4 +209,8 @@ body :global(.Popover) {
 [dir="rtl"] .picker-row .picker-text {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b

@@ -6,10 +6,17 @@
     user-select: none;
 }
 .button:active {
+<<<<<<< HEAD
     background-color: $looks-transparent;
 }
 .highlighted.button {
     background-color: $looks-transparent;
+=======
+    background-color: $motion-transparent; 
+}
+.highlighted.button {
+    background-color: $motion-transparent; 
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
 }
 .mod-disabled {
     cursor: auto;
@@ -17,4 +24,8 @@
 }
 .mod-disabled:active {
     background: none;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b

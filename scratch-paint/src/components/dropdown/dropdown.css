@@ -7,7 +7,11 @@ $arrow-border-width: 14px;
     border-radius: 5px;
     overflow: visible;
     min-width: 3.5rem;
+<<<<<<< HEAD
     color: $looks-secondary;
+=======
+    color: $motion-primary;
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b
     padding: .5rem;
 }
 
@@ -34,4 +38,8 @@ $arrow-border-width: 14px;
     transform: rotate(180deg);
     padding-bottom: 0;
     padding-top: .2rem;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6083d544dc5ae6ac0bb8f05e0e2b5a7e8c6bf55b

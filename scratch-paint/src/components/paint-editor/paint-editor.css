@@ -1,6 +1,5 @@
 @import "../../css/colors.css";
 @import "../../css/units.css";
-@import "../../css/filters.css";
 
 .editor-container {
     width: 100%;
@@ -8,6 +7,9 @@
     display: flex;
     flex-direction: column;
     padding: calc(3 * $grid-unit);
+}
+[theme="dark"] .editor-container {
+    color-scheme: dark;
 }
 
 .row {
@@ -105,7 +107,9 @@ $border-radius: 0.25rem;
     width: 1.25rem;
     height: 1.25rem;
     vertical-align: middle;
-    filter: $filter-icon-gray;
+}
+[theme="dark"] .button-group-button-icon {
+    filter: brightness(1.7);
 }
 
 .mod-mode-tools {
@@ -133,10 +137,13 @@ $border-radius: 0.25rem;
     width: 100%;
     flex-grow: 1;
     min-width: 402px; /* Leave room for the border */
-    border: 1px solid $ui-pane-border;
+    border: 1px solid #e8edf1;
     border-radius: .25rem;
     position: relative;
     overflow: visible;
+}
+[theme="dark"] .canvas-container {
+    border-color: $form-border;
 }
 
 .mode-selector {
@@ -173,7 +180,7 @@ $border-radius: 0.25rem;
 .bitmap-button {
     display: flex;
     border-radius: 5px;
-    background-color: $looks-secondary;
+    background-color: $motion-primary;
     padding: calc(2 * $grid-unit);
     line-height: 1.5rem;
     font-size: calc(3 * $grid-unit);
@@ -224,5 +231,4 @@ $border-radius: 0.25rem;
 
 .button-text {
     width: 100%; /* Fixes button text wrapping in Edge */
-    white-space: nowrap;
 }

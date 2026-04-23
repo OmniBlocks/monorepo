@@ -8,7 +8,6 @@
 
 .stage-wrapper * {
     box-sizing: border-box;
-    
 }
 
 .stage-canvas-wrapper {
@@ -36,7 +35,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: all 0.1s ease-in-out;
 }
 
 .stage-wrapper.embedded {

@@ -10,6 +10,9 @@ import penInsetIconURL from './pen/pen-small.svg';
 import videoSensingIconURL from './videoSensing/video-sensing.png';
 import videoSensingInsetIconURL from './videoSensing/video-sensing-small.svg';
 
+import faceSensingIconURL from './faceSensing/face-sensing.svg';
+import faceSensingInsetIconURL from './faceSensing/face-sensing-small.svg';
+
 import text2speechIconURL from './text2speech/text2speech.png';
 import text2speechInsetIconURL from './text2speech/text2speech-small.svg';
 
@@ -46,14 +49,10 @@ import gdxforInsetIconURL from './gdxfor/gdxfor-small.svg';
 import gdxforConnectionIconURL from './gdxfor/gdxfor-illustration.svg';
 import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 
-import jgJavascriptExtensionIcon from './javascript/javascript.png';
-
 import twIcon from './tw/tw.svg';
 import customExtensionIcon from './custom/custom.svg';
-import serverIcon from './server/server.svg';
 import returnIcon from './custom/return.svg';
 import galleryIcon from './gallery/gallery.svg';
-import obgalleryIcon from './gallery/obgallery.svg';
 import {APP_NAME} from '../../brand';
 
 export default [
@@ -123,6 +122,28 @@ export default [
     {
         name: (
             <FormattedMessage
+                defaultMessage="Face Sensing"
+                description="Name for the 'Face Sensing' extension"
+                id="tw.extension.faceSensing.name"
+            />
+        ),
+        extensionId: 'faceSensing',
+        extensionURL: 'https://extensions.turbowarp.org/lab/face-sensing.js',
+        iconURL: faceSensingIconURL,
+        insetIconURL: faceSensingInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Sense faces with the camera."
+                description="Description for the 'Face Sensing' extension"
+                id="tw.extension.faceSensing.description"
+            />
+        ),
+        tags: ['scratch'],
+        featured: true
+    },
+    {
+        name: (
+            <FormattedMessage
                 defaultMessage="Text to Speech"
                 description="Name for the Text to Speech extension"
                 id="gui.extension.text2speech.name"
@@ -165,21 +186,6 @@ export default [
         tags: ['scratch'],
         featured: true,
         internetConnectionRequired: true
-    },
-    {
-        name: 'Web Server',
-        extensionId: 'server',
-        collaborator: 'LibreKitten',
-        iconURL: serverIcon,
-        description: (
-            <FormattedMessage
-                defaultMessage="Build a web server that can host an API and simple websites."
-                description="Description for the 'Web Server' extension"
-                id="omni.extension.server.description"
-            />
-        ),
-        tags: ['ob'],
-        featured: true
     },
     {
         name: 'Makey Makey',
@@ -379,11 +385,11 @@ export default [
     {
         name: (
             <FormattedMessage
-                defaultMessage="TurboWarp Blocks"
+                defaultMessage="{APP_NAME} Blocks"
                 description="Name of the strange 'TurboWarp Blocks' extension"
                 id="tw.twExtension.name"
                 values={{
-                    APP_NAME: 'TurboWarp'
+                    APP_NAME
                 }}
             />
         ),
@@ -398,27 +404,6 @@ export default [
         ),
         incompatibleWithScratch: true,
         tags: ['tw'],
-        featured: true
-    },
-    {
-        name: (
-            <FormattedMessage
-                defaultMessage="JavaScript V2"
-                description="JavaScriptv2 made by SharkPool"
-                id="ob.jsv2"
-            />
-        ),
-        extensionId: 'SPjavascriptV2',
-        iconURL: jgJavascriptExtensionIcon,
-        description: (
-            <FormattedMessage
-                defaultMessage="Run your own custom code written in JavaScript! Made by SharkPool."
-                description="Description for JavaScript V2 extension made by SharkPool"
-                id="ob.jsv2.description"
-            />
-        ),
-        incompatibleWithScratch: true,
-        tags: ['ob'],
         featured: true
     },
     {
@@ -447,9 +432,12 @@ export default [
 export const galleryLoading = {
     name: (
         <FormattedMessage
-            defaultMessage="TurboWarp Extension Gallery"
+            defaultMessage="{APP_NAME} Extension Gallery"
             description="Name of extensions.turbowarp.org in extension library"
             id="tw.extensionGallery.name"
+            values={{
+                APP_NAME
+            }}
         />
     ),
     href: 'https://extensions.turbowarp.org/',
@@ -470,9 +458,12 @@ export const galleryLoading = {
 export const galleryMore = {
     name: (
         <FormattedMessage
-            defaultMessage="TurboWarp Extension Gallery"
+            defaultMessage="{APP_NAME} Extension Gallery"
             description="Name of extensions.turbowarp.org in extension library"
             id="tw.extensionGallery.name"
+            values={{
+                APP_NAME
+            }}
         />
     ),
     href: 'https://extensions.turbowarp.org/',
@@ -493,9 +484,12 @@ export const galleryMore = {
 export const galleryError = {
     name: (
         <FormattedMessage
-            defaultMessage="TurboWarp Extension Gallery"
+            defaultMessage="{APP_NAME} Extension Gallery"
             description="Name of extensions.turbowarp.org in extension library"
             id="tw.extensionGallery.name"
+            values={{
+                APP_NAME
+            }}
         />
     ),
     href: 'https://extensions.turbowarp.org/',
@@ -510,72 +504,5 @@ export const galleryError = {
         />
     ),
     tags: ['tw'],
-    featured: true
-};
-
-// OmniBlocks Gallery
-export const galleryLoadingOB = {
-    name: (
-        <FormattedMessage
-            defaultMessage="OmniBlocks Extension Gallery"
-            description="Name of omniblocks.github.io/extensions in extension library"
-            id="ob.extensionGallery.name"
-        />
-    ),
-    href: 'https://omniblocks.github.io/extensions',
-    extensionId: 'galleryOB',
-    iconURL: obgalleryIcon,
-    description: (
-        <FormattedMessage
-            defaultMessage="Loading OmniBlocks extension gallery..."
-            description="Appears while loading extension list from OmniBlocks gallery"
-            id="ob.extensionGallery.loading"
-        />
-    ),
-    tags: ['ob'],
-    featured: true
-};
-
-export const galleryMoreOB = {
-    name: (
-        <FormattedMessage
-            defaultMessage="OmniBlocks Extension Gallery"
-            description="Name of omniblocks.github.io/extensions in extension library"
-            id="ob.extensionGallery.name"
-        />
-    ),
-    href: 'https://omniblocks.github.io/extensions',
-    extensionId: 'galleryOB',
-    iconURL: obgalleryIcon,
-    description: (
-        <FormattedMessage
-            defaultMessage="Learn more about extensions at omniblocks.github.io/extensions."
-            description="Appears after OmniBlocks gallery list was loaded"
-            id="ob.extensionGallery.more"
-        />
-    ),
-    tags: ['ob'],
-    featured: true
-};
-
-export const galleryErrorOB = {
-    name: (
-        <FormattedMessage
-            defaultMessage="OmniBlocks Extension Gallery"
-            description="Name of omniblocks.github.io/extensions in extension library"
-            id="ob.extensionGallery.name"
-        />
-    ),
-    href: 'https://omniblocks.github.io/extensions',
-    extensionId: 'galleryOB',
-    iconURL: obgalleryIcon,
-    description: (
-        <FormattedMessage
-            defaultMessage="Error loading OmniBlocks gallery. Visit omniblocks.github.io/extensions to find extensions."
-            description="Appears when OmniBlocks gallery fails to load"
-            id="ob.extensionGallery.error"
-        />
-    ),
-    tags: ['ob'],
     featured: true
 };

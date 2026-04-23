@@ -1,68 +1,45 @@
 import bindAll from 'lodash.bindall';
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import {connect} from 'react-redux';
 import VM from 'scratch-vm';
 import Box from '../components/box/box.jsx';
 import greenFlag from '../components/green-flag/icon--green-flag.svg';
 import {setStartedState} from '../reducers/vm-status.js';
 
-// CSS for hover effect
-const hoverStyles = `
-.green-flag-hover {
-    transition: transform 0.2s ease-out;
-    transform-origin: center;
-}
-
-.green-flag-hover:hover {
-    transform: scale(1.15);
-    cursor: pointer;
-}
-`;
-
 class GreenFlagOverlay extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         bindAll(this, [
             'handleClick'
         ]);
     }
 
-    handleClick() {
+    handleClick () {
         this.props.vm.start();
         this.props.vm.greenFlag();
+
+        // FIXME: some unknown edge cases are causing start() to be called but for the
+        // RUNTIME_STARTED listener to not update redux, causing this to always be
+        // shown and never go away. this is a temporary hack to avoid that...
         this.props.onStarted();
     }
 
-    componentDidMount() {
-       
-        const styleTag = document.createElement('style');
-        styleTag.innerHTML = hoverStyles;
-        this.styleRef = styleTag;
-        document.head.appendChild(styleTag);
-    }
-
-    componentWillUnmount() {
-
-        if (this.styleRef) {
-            document.head.removeChild(this.styleRef);
-        }
-    }
-
-    render() {
+    render () {
         return (
             <Box
                 className={this.props.wrapperClass}
                 onClick={this.handleClick}
             >
-               
-                <div className={`${this.props.className} green-flag-hover`}>
+                <div className={this.props.className}>
                     <img
                         draggable={false}
                         src={greenFlag}
                     />
                 </div>
             </Box>
+
         );
     }
 }

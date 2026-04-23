@@ -8,7 +8,7 @@ import {STAGE_DISPLAY_SIZES} from '../../lib/layout-constants.js';
 import StageHeader from '../../containers/stage-header.jsx';
 import Stage from '../../containers/stage.jsx';
 import Loader from '../loader/loader.jsx';
-import WebGlBrokenModal from '../../containers/webgl-broken-modal.jsx'; 
+
 import styles from './stage-wrapper.css';
 
 const StageWrapperComponent = function (props) {
@@ -42,18 +42,15 @@ const StageWrapperComponent = function (props) {
                 />
             </Box>
             <Box className={styles.stageCanvasWrapper}>
-    {
-        !isRendererSupported ? null :
-        !props.canActuallyUseWebGL ? (
-            <WebGlBrokenModal isRtl={isRtl} />
-        ) : (
-            <Stage
-                stageSize={stageSize}
-                vm={vm}
-            />
-        )
-    }
-</Box>
+                {
+                    isRendererSupported ?
+                        <Stage
+                            stageSize={stageSize}
+                            vm={vm}
+                        /> :
+                        null
+                }
+            </Box>
             {loading ? (
                 <Loader isFullScreen={isFullScreen} />
             ) : null}

@@ -1,28 +1,9 @@
 @import "../../css/colors.css";
 
-
-
-
-@keyframes spinner {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
 .community-button {
     box-shadow: 0 0 0 1px $ui-black-transparent;
 }
 
 .community-button-icon {
     height: 1.25rem;
-    transition: transform 0.2s ease-in-out; 
-    
 }
-
-.community-button:hover .community-button-icon {
-    animation: spinner 1.2s  ease-in-out infinite;
-}
-

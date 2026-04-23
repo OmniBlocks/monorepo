@@ -1,4 +1,3 @@
-
 @import "../../css/colors.css";
 @import "../../css/z-index.css";
 @import "../../css/default-colors.css";
@@ -14,12 +13,9 @@
     justify-content: center;
     align-items: center;
     background-color: $menu-bar-background;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: center;
     color: white;
-    border-radius: 10px; 
-    overflow: hidden; 
-    cursor: progress;
-    padding: 4em;
 }
 
 .fullscreen {
@@ -27,8 +23,6 @@
     position: fixed;
     /* Use the fullscreen stage z-index to allow covering full-screen mode */
     z-index: $z-index-stage-wrapper-overlay;
-    border-radius: 0;
-    padding: 0;
 }
 
 .block-animation {
@@ -195,28 +189,4 @@
     width: 0;
     height: 100%;
     background-color: $ui-white-default;
-}
-
-.spinnerCircle {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 6px solid;
-  border-color: $ui-white-default transparent $ui-white-default transparent;
-  animation: spin 1.2s linear infinite;
-  margin: auto;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.funFact {
-    margin-top: 20px;
-    font-size: 0.9rem;
 }

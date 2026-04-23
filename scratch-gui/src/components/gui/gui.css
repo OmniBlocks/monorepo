@@ -4,17 +4,17 @@
 
 .page-wrapper {
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .body-wrapper {
-    height: calc(100% - $menu-bar-height);
+    flex-grow: 1;
     background-color: $ui-primary;
-    
 }
 
 .body-wrapper * {
     box-sizing: border-box;
-    
 }
 
 .flex-wrapper {
@@ -57,7 +57,6 @@
 }
 
 .tab-list {
-    transition: all 0.2s ease-in-out;
     height: $stage-menu-height;
     width: 250px; /* Match width of the toolbox */
     display: flex;
@@ -73,12 +72,11 @@
     border-bottom: 0 !important;
 
     color: $text-primary;
-    transition: all 0.2s ease-in-out;
 }
 
 .tab {
     flex-grow: 1;
-    height: 80% !important;
+    height: 80%;
     margin-bottom: 0;
 
     border-radius: 1rem 1rem 0 0;
@@ -96,7 +94,6 @@
 
     user-select: none;
     white-space: nowrap;
-    transition: all 0.3s ease-in-out;
 }
 
 [dir="ltr"] .tab {
@@ -128,11 +125,10 @@
 
 .tab:hover {
   background-color: $ui-primary;
-  height: 85% !important;
 }
 
 .tab.is-selected {
-    height: 100% !important;
+    height: 90%;
     color: $looks-secondary;
     background-color: $ui-white;
     z-index: 4; /* Make sure selected is always above */
@@ -200,7 +196,6 @@
 .blocks-wrapper {
     flex-grow: 1;
     position: relative;
-    transition: all 0.2s ease-in-out; /* SO WHAT IF I'M SPAMMING THIS LINE, IT WORKS AND LOOKS GOOD */
 }
 
 .stage-and-target-wrapper {
@@ -220,7 +215,6 @@
 
     /* this will only ever be as wide as the stage */
     flex-basis: 0;
-    
 }
 
 .target-wrapper {
@@ -251,7 +245,6 @@
 
     border: 1px solid $looks-secondary;
     box-sizing: content-box; /* To match scratch-block vertical toolbox borders */
-    
 }
 
 $fade-out-distance: 15px;
@@ -275,7 +268,6 @@ $fade-out-distance: 15px;
     height: 100%;
     cursor: pointer;
     user-select: none;
-    
 }
 
 .extension-button-icon {
@@ -341,38 +333,4 @@ $fade-out-distance: 15px;
     height: 100%;
     /* overridden by JS; this will be used if the browser can't understand that color */
     background-color: white;
-}
-
-/* Mobile support */
-@media (max-width: 768px) {
-    .flex-wrapper {
-        flex-direction: column;
-    }
-
-    .editor-wrapper {
-        flex-basis: auto;
-        min-height: 50vh;
-        flex-shrink: 1;
-    }
-
-    .stage-and-target-wrapper {
-        flex-basis: auto;
-        min-height: 50vh;
-        flex-shrink: 1;
-    }
-
-    .tab-list {
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        justify-content: space-around;
-    }
-
-    .tab {
-        flex-grow: 0;
-        width: 25%;
-        height: 2rem !important;
-        padding: 0.25rem;
-        font-size: 0.7rem;
-    }
 }

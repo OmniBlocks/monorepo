@@ -1,53 +1,5 @@
 @import "../../css/colors.css";
 @import "../../css/units.css";
-/* Modal overlay for effect progress */
-.modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modalContent {
-    background: #fff;
-    border-radius: 8px;
-    padding: 32px 40px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
-    min-width: 320px;
-    text-align: center;
-}
-
-.progressText {
-    font-size: 1.2em;
-    margin-bottom: 24px;
-}
-
-.progressBarContainer {
-    width: 100%;
-    margin-top: 8px;
-}
-
-.progressBar {
-    width: 100%;
-    height: 16px;
-    background: #eee;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
-
-.progressBarFill {
-    height: 100%;
-    background: #4b9cff;
-    transition: width 0.2s;
-}
-
 
 .editor-container {
     display: flex;

@@ -25,7 +25,6 @@
 
 .selected {
     visibility: visible;
-    transition: all 0.2s ease-in-out;
 }
 
 .submenu-label {
@@ -80,17 +79,12 @@
 }
 
 .disabled {
-    transition: all 0.2s ease-in-out;
     opacity: 0.5;
 }
 .disabled img {
-    transition: all 0.2s ease-in-out;
     filter: grayscale(100%);
-
 }
 
 .open-link {
-    transition: all 0.2s ease-in-out;
     margin-left: 0.5rem;
 }
-

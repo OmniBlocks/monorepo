@@ -2,18 +2,8 @@
 @import "../../css/filters.css";
 @import "../../css/default-colors.css";
 
-
-
 .modal-content {
-    
     max-width: 750px;
-    border-radius: 15px;
-    backdrop-filter: blur(10px); 
-    -webkit-backdrop-filter: blur(10px); 
-    
-    
-    
-    
 }
 
 .body {
@@ -22,7 +12,6 @@
     min-height: 150px;
     max-height: calc(100vh - 250px);
     overflow-y: auto;
-    
 }
 
 /* For small screens, such as in the embed */
@@ -41,14 +30,9 @@
     padding: 0.5rem 1rem;
     margin: 0.25rem 0;
     border-radius: 4px;
-    transition: all 0.2s ease-in-out;
-    /* max-height: 42px; try again next time i have no freaking clue how tomake this work */
-    overflow: hidden; 
 }
 .setting.active {
-    /*max-height: 500px; */
     background: $badge-background;
-    
 }
 .setting:hover,
 .setting:focus-within {

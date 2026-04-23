@@ -27,7 +27,6 @@ import timeTravelReducer, {timeTravelInitialState} from './time-travel';
 import toolboxReducer, {toolboxInitialState} from './toolbox';
 import twReducer, {twInitialState} from './tw';
 import customStageSizeReducer, {customStageSizeInitialState} from './custom-stage-size';
-import exportJustReducer, {exportJustInitialState} from './export-just';
 import vmReducer, {vmInitialState} from './vm';
 import vmStatusReducer, {vmStatusInitialState} from './vm-status';
 import workspaceMetricsReducer, {workspaceMetricsInitialState} from './workspace-metrics';
@@ -46,7 +45,6 @@ const guiInitialState = {
     connectionModal: connectionModalInitialState,
     customStageSize: customStageSizeInitialState,
     customProcedures: customProceduresInitialState,
-    exportJust: exportJustInitialState,
     editorTab: editorTabInitialState,
     mode: modeInitialState,
     hoveredTarget: hoveredTargetInitialState,
@@ -153,7 +151,6 @@ const guiReducer = combineReducers({
     connectionModal: connectionModalReducer,
     customStageSize: customStageSizeReducer,
     customProcedures: customProceduresReducer,
-    exportJust: exportJustReducer,
     editorTab: editorTabReducer,
     mode: modeReducer,
     hoveredTarget: hoveredTargetReducer,

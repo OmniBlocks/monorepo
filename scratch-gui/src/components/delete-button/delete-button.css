@@ -18,21 +18,14 @@
   overflow: hidden;  /* Mask the icon animation */
   width: 1.75rem;
   height: 1.75rem;
-  box-shadow: 0px 0px 0px 2px var(--looks-transparent);
-  background-color: var(--looks-secondary);
-  color: var(--ui-white);
+  box-shadow: 0px 0px 0px 2px $looks-transparent;
+  background-color: $looks-secondary;
+  color: $ui-white;
   border-radius: 50%;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   user-select: none;
   cursor: pointer;
   transition: all 0.15s ease-out;
-
-}
-
-.delete-button-visible:hover {
-    background-color: rgb(255, 38, 38);
-    box-shadow: 0px 0px 0px 2px var(--looks-transparent), 0px 0px 8px 0px rgba(0, 0, 0, 0.3);
-    transform: scale(1.1);
 }
 
 .delete-icon {

@@ -171,45 +171,7 @@ Blockly.Blocks['operator_lt'] = {
     });
   }
 };
-Blockly.Blocks['operator_gtoreq'] = {
-  init: function() {
-    this.jsonInit({
-      "message0": "%1 ≥ %2",
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "OPERAND1"
-        },
-        {
-          "type": "input_value",
-          "name": "OPERAND2"
-        }
-      ],
-      "category": Blockly.Categories.operators,
-      "extensions": ["colours_operators", "output_boolean"]
-    });
-  }
-};
 
-Blockly.Blocks['operator_ltoreq'] = {
-  init: function() {
-    this.jsonInit({
-      "message0": "%1 ≤ %2",
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "OPERAND1"
-        },
-        {
-          "type": "input_value",
-          "name": "OPERAND2"
-        }
-      ],
-      "category": Blockly.Categories.operators,
-      "extensions": ["colours_operators", "output_boolean"]
-    });
-  }
-};
 Blockly.Blocks['operator_equals'] = {
   /**
    * Block for equals comparator.

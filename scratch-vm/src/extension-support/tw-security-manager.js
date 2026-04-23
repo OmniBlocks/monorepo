@@ -152,13 +152,7 @@ class SecurityManager {
     canEmbed (documentURL) {
         return Promise.resolve(true);
     }
-    /**
-     * pm: Used to prompt the user if they would like to unsandbox a feature in the extension.
-     * @returns {Promise<boolean>|boolean} -
-     */
-    canUnsandbox() {
-        return Promise.resolve(false);
-    }
+
     /**
      * Determine whether an extension is allowed to download a URL with a given name.
      * @param {string} resourceURL The URL to download
@@ -167,27 +161,6 @@ class SecurityManager {
      */
     canDownload (resourceURL, name) {
         return Promise.resolve(true);
-    }
-    shouldUseLocal(refrenceName) {
-        return Promise.resolve(!confirm(`it seems that the extension ${refrenceName} has been updated, use the up-to-date code?`))
-    }
-
-    /**
-     * omni: Determine whether a file can be read from a location. Meant for privileged environments.
-     * @param {string} path The file to read
-     * @returns {Promise<boolean>|boolean}
-     */
-    canReadFile (path) {
-        return Promise.resolve(false);
-    }
-
-    /**
-     * omni: Determine whether a file can be written to a location. Meant for privileged environments.
-     * @param {string} path The file to write
-     * @returns {Promise<boolean>|boolean}
-     */
-    canWriteFile (path) {
-        return Promise.resolve(false);
     }
 }
 

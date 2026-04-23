@@ -339,57 +339,6 @@ runtimeFunctions.compareLessThan = `const compareLessThanSlow = (v1, v2) => {
     return n1 < n2;
 };
 const compareLessThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !Number.isNaN(v2) ? v1 < v2 : compareLessThanSlow(v1, v2)`;
-/**
- * Determine if one value is greater than or equal to another.
- * @param {*} v1 First value
- * @param {*} v2 Second value
- * @returns {boolean} true if v1 >= v2
- */
-runtimeFunctions.compareGreaterThanOrEqual = `const compareGreaterThanOrEqualSlow = (v1, v2) => {
-    let n1 = +v1;
-    let n2 = +v2;
-    if (n1 === 0 && isNotActuallyZero(v1)) {
-        n1 = NaN;
-    } else if (n2 === 0 && isNotActuallyZero(v2)) {
-        n2 = NaN;
-    }
-    if (isNaN(n1) || isNaN(n2)) {
-        const s1 = ('' + v1).toLowerCase();
-        const s2 = ('' + v2).toLowerCase();
-        return s1 >= s2;
-    }
-    return n1 >= n2;
-};
-const compareGreaterThanOrEqual = (v1, v2) => 
-    (typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2))
-        ? v1 >= v2
-        : compareGreaterThanOrEqualSlow(v1, v2)`;
-
-/**
- * Determine if one value is less than or equal to another.
- * @param {*} v1 First value
- * @param {*} v2 Second value
- * @returns {boolean} true if v1 <= v2
- */
-runtimeFunctions.compareLessThanOrEqual = `const compareLessThanOrEqualSlow = (v1, v2) => {
-    let n1 = +v1;
-    let n2 = +v2;
-    if (n1 === 0 && isNotActuallyZero(v1)) {
-        n1 = NaN;
-    } else if (n2 === 0 && isNotActuallyZero(v2)) {
-        n2 = NaN;
-    }
-    if (isNaN(n1) || isNaN(n2)) {
-        const s1 = ('' + v1).toLowerCase();
-        const s2 = ('' + v2).toLowerCase();
-        return s1 <= s2;
-    }
-    return n1 <= n2;
-};
-const compareLessThanOrEqual = (v1, v2) => 
-    (typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2))
-        ? v1 <= v2
-        : compareLessThanOrEqualSlow(v1, v2)`;
 
 /**
  * Generate a random integer.

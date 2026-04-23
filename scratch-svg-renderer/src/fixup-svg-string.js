@@ -55,7 +55,7 @@ module.exports = function (svgString) {
     svgString = svgString.replace(/<metadata>[\s\S]*<\/metadata>/, '<metadata></metadata>');
 
     // Empty script tags and javascript executing
-    svgString = svgString.replace(/<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>/gi, '<script></script>');
+    svgString = svgString.replace(/<script[\s\S]*>[\s\S]*<\/script>/, '<script></script>');
 
     return svgString;
 };

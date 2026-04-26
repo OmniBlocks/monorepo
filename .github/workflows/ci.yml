@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --openssl-legacy-provider
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Monorepo
+        uses: ./.github/actions/setup-monorepo
+
+      - name: Run unit tests
+        run: pnpm --recursive run test --if-present

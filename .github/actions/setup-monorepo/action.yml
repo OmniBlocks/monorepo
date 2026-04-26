@@ -24,7 +24,7 @@ runs:
     - name: Run prepublish and build
       run: |
         export NODE_OPTIONS=--openssl-legacy-provider
-        pnpm --recursive run prepublish --if-present
-        pnpm --recursive run prepublishOnly --if-present
-        pnpm --recursive run build --if-present
+        pnpm --recursive run --if-present prepublish
+        pnpm --recursive run --if-present prepublishOnly
+        pnpm --recursive run --if-present build
       shell: bash

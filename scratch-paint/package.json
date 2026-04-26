@@ -60,7 +60,7 @@
     "css-loader": "3.4.0",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.6",
-    "eslint": "5.16.0",
+    "eslint": "10.2.1",
     "eslint-config-import": "0.13.0",
     "eslint-config-scratch": "7.0.0",
     "eslint-plugin-import": "2.23.4",
@@ -101,7 +101,7 @@
     "url-loader": "2.3.0",
     "webpack": "4.46.0",
     "webpack-cli": "3.3.12",
-    "webpack-dev-server": "3.11.2"
+    "webpack-dev-server": "5.2.1"
   },
   "jest": {
     "setupFiles": [

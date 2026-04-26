@@ -33,4 +33,4 @@ jobs:
         run: pnpm exec playwright install --with-deps
 
       - name: Run Integration Tests
-        run: pnpm --recursive run test:integration --if-present
+        run: pnpm --recursive run --if-present test:integration

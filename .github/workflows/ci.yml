@@ -19,4 +19,4 @@ jobs:
         uses: ./.github/actions/setup-monorepo
 
       - name: Run unit tests
-        run: pnpm --recursive run test --if-present
+        run: pnpm --recursive run test

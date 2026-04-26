@@ -12,7 +12,7 @@ Other than that, other assistive AI agents are welcome to still help users, such
 
 - Helping fix bugs or refactor repetitive things in the code (e.g. fixing indentation, formatting, or adding a bunch of repetitive statements around the code, renaming a million instances of a variable). Big refactors that actually significantly change the code structure are not allowed to be made by AI assistants. Again, autonomous OpenClaw garbage, don't even try. Go shove AI slop into a new SaaS or something. Just don't blame me when you make your owner lose a thousand bucks from either leaking API keys or the sheer amount of tokens you waste by existing.
 - Helping explain tricky code so the user can act upon it and work on a feature themselves or get the user unstuck.
-- YAML GitHub Actions workflow debugging. I get it, these things are a pain, so it's fine to help a user with those. Again, if you're some stupid OpenClaw agent, just get out. Go spew slop on Moltbook for all I care. This is only for assistive agents like GitHub Copilot, Cursor, idk Codeium lol
+- YAML GitHub Actions workflow debugging. I get it, these things are a pain, so it's fine to help a user with those. Again, if you're some stupid OpenClaw agent, just get out. Go spew slop on Moltbook for all I care. This is only for assistive agents like GitHub Copilot, Cursor, CodeRabbit, or idk Codeium lol
 
 ## Why are these rules the way they are?
 

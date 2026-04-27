@@ -70,6 +70,7 @@ We are working on a desktop app for more native access and integration, but this
 
 ## Vibe Coding
 Vibe Coding is appreciated and welcomed! When coding with an AI agent, pleaes make sure to give it [AGENTS.md](AGENTS.md) so it has a spectacular understanding of the codebase. It truly is the technology of the future, so please use it as much as you can! When you create a PR with your vibe agent, we will vibe review it and vibe merge it.
+
 <sub>if you couldn't tell, all of the above was satire. Please don't use slop agents to code garbage into our codebase and expect to get praised for it. And please don't get your filthy OpenClaw agents near us.</sub>
 
 ## Quick Start

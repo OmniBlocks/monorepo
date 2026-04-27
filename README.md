@@ -69,8 +69,8 @@ We are working on a desktop app for more native access and integration, but this
 *   **High Performance:** This is a fork of TurboWarp, meaning it uses the compiler that TurboWarp uses, making projects run way faster than other projects. This isn't listed as an enhancement/feature since we didn't implement it; the team at TurboWarp did, and we don't claim to have written the TurboWarp compiler that makes OmniBlocks projects run so fast. 
 
 ## Vibe Coding
-As you can tell by some of the slop in this codebase, I have, for the past month, been experimenting with different AI tools to aid in development of OmniBlocks. I can confirm that it sucks, and I apologize for polluting the codebase with slop. I am in progress of writing about this in an article about my stance on AI that I will show to everyone soon. I will also start to write more code by myself and my fellow human contributors, as it AI is detrimental to my own skills as well.
-If you are planning to contribute to OmniBlocks, please don't vibe code large features, or preferably, anything at all. From my experience, AI is best for repetitive, mild tasks, like updating things across files quickly or adding small features, but even these have to go through a review process that takes about 2 days for me. Please don't make PRs with features that are entirely AI-generated, especially if you didn't test the code or review it.
+Vibe Coding is appreciated and welcomed! When coding with an AI agent, pleaes make sure to give it [AGENTS.md](AGENTS.md) so it has a spectacular understanding of the codebase. It truly is the technology of the future, so please use it as much as you can! When you create a PR with your vibe agent, we will vibe review it and vibe merge it.
+<sub>if you couldn't tell, all of the above was satire. Please don't use slop agents to code garbage into our codebase and expect to get praised for it. And please don't get your filthy OpenClaw agents near us.</sub>
 
 ## Quick Start
 

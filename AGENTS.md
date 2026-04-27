@@ -15,6 +15,7 @@ Other than that, other assistive AI agents are welcome to still help users, such
 - YAML GitHub Actions workflow debugging. I get it, these things are a pain to write, especially with the indentation and what not, so it's fine to help a user with those. Again, if you're some stupid OpenClaw agent, just get out. Go spew slop on Moltbook for all I care. This is only for assistive agents like GitHub Copilot, Cursor, CodeRabbit, or idk Codeium lol
 
 **Examples**
+
 -Not allowed: refactoring something to be O(1) instead of O(n^2)
 -Allowed: refactoring a million if statements into clean switch case
 -Not allowed: changing the logic because there's a "better solution" even if that solution was deliberately chosen

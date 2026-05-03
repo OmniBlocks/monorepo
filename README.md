@@ -33,18 +33,18 @@
  </picture>
 </a>
 
-> A fork of the Scratch 3.0 GUI, modified and enhanced for the [TurboWarp](https://turbowarp.org/) compiler and the [OmniBlocks](https://omniblocks.github.io) multi-language IDE.
+OmniBlocks is a block-based programming language that builds upon Scratch and TurboWarp's foundation with improvements, addons, themes, and other features for an amazing coding experience.
 
-This repository contains the frontend interface of the Block-Based editor for OmniBlocks and TurboWarp. It builds upon Scratch and TurboWarp's foundation with improvements, addons, themes, and other features for an amazing coding experience.
-
-## Important for Developers!
-If you want to fork this repo or contribute with PR's (or modify OmniBlocks as your own), you must follow the following rules from the AGPLv3 license, or you are in violation of it.
-* 1. Your fork/mod must be public and open-source.
-* 2. Your fork/mod can be paid, but must be licensed under the same AGPLv3 license.
-
-## Try It Out
 Try out OmniBlocks: [https://omniblocks.github.io](https://omniblocks.github.io)
 
+### Enhancements and Improvements
+*   **Plenty of Addons:** Dozens of community-built addons for custom blocks, UI tweaks, and new functionality. Many are inherited from TurboWarp and other mods from now, but we will implement some new ones soon.
+*   **OmniBlocks IDE:** OmniBlocks plans to be a full-featured IDE extending beyond blocks. There will be editors for text languages like Python and C in the future!
+*   **Integrated Tools:** Includes a custom music editor and other quality-of-life improvements. Keep in mind that if you're seeing this, it means the music editor is currently not fully implemented. It works, you can go try it out, but it doesn't fully integrate with OmniBlocks just yet.
+*   **Quality of Life**: As said earlier, we add a bunch of subtle, but definitely cool or useful quality-of-life additions, even if they seem niche or workaroundable. Most of these stem from mild annoyances that we ourselves have had, and don't hesitate to report yours too in the issues tab!
+
+### A great feature inherited from TurboWarp: 
+*   **High Performance:** This is a fork of TurboWarp, meaning it uses the compiler that TurboWarp uses, making projects run way faster than other projects. This isn't listed as an enhancement/feature since we didn't implement it; the team at TurboWarp did, and we don't claim to have written the TurboWarp compiler that makes OmniBlocks projects run so fast. 
 
 ### Installation as PWA
 
@@ -59,17 +59,8 @@ https://github.com/user-attachments/assets/986de6a3-47e3-436b-91f5-e169a6a67a4a
 
 We are working on a desktop app for more native access and integration, but this is the best you can get for now, but it is quite great for what it has.
 
-### Enhancements and Improvements
-*   **Plenty of Addons:** Dozens of community-built addons for custom blocks, UI tweaks, and new functionality. Many are inherited from TurboWarp and other mods from now, but we will implement some new ones soon.
-*   **OmniBlocks IDE:** OmniBlocks plans to be a full-featured IDE extending beyond blocks. There will be editors for text languages like Python and C in the future!
-*   **Integrated Tools:** Includes a custom music editor and other quality-of-life improvements. Keep in mind that if you're seeing this, it means the music editor is currently not fully implemented. It works, you can go try it out, but it doesn't fully integrate with OmniBlocks just yet.
-*   **Quality of Life**: As said earlier, we add a bunch of subtle, but definitely cool or useful quality-of-life additions, even if they seem niche or workaroundable. Most of these stem from mild annoyances that we ourselves have had, and don't hesitate to report yours too in the issues tab!
-
-### A great feature inherited from TurboWarp: 
-*   **High Performance:** This is a fork of TurboWarp, meaning it uses the compiler that TurboWarp uses, making projects run way faster than other projects. This isn't listed as an enhancement/feature since we didn't implement it; the team at TurboWarp did, and we don't claim to have written the TurboWarp compiler that makes OmniBlocks projects run so fast. 
-
 ## Vibe Coding
-Vibe Coding is appreciated and welcomed! When coding with an AI agent, pleaes make sure to give it [AGENTS.md](AGENTS.md) so it has a spectacular understanding of the codebase. It truly is the technology of the future, so please use it as much as you can! When you create a PR with your vibe agent, we will vibe review it and vibe merge it.
+Vibe Coding is appreciated and welcomed! When coding with an AI agent, pleaes make sure to give it [AGENTS.md](AGENTS.md) so it has a spectacular understanding of the codebase. It truly is the technology of the future, so please use it as much as you can! When you vibe create a PR with your vibe agent, we will vibe review it and vibe merge it.
 
 <sub>if you couldn't tell, all of the above was satire. Please don't use slop agents to code garbage into our codebase and expect to get praised for it. And please don't get your filthy OpenClaw agents near us.</sub>
 
@@ -80,10 +71,10 @@ Want to create your own modification/fork of OmniBlocks, or help contribute to i
 
 ### Prerequisites
 
-*   Node.js version Node.js v22 (versions v18 or newer will probably work, but we can’t guarantee it)
-*   npm 
+*   Node v22+ (versions v16 or newer will probably work, but we can’t guarantee it)
+*   pnpm 
 *   Git (duhh) 
-If you're using a GitHub Codespace, all these things come preinstalled.
+If you're using a GitHub Codespace, all these things come preinstalled, but you may want to run `npm i -g pnpm` to update it.
 **Note about GitHub Codespaces**: to create a GitHub codespace, make sure you are on the repo you want to code in, such as your fork of OmniBlocks. When you are there, click the big green button that says "Code". On the Codespace tab, click the button saying "Create codespace on main". Now, just wait a few minutes, and it will install everything for you. 
 <!-- wait like 6 or 7 minutes lol !-->
 ### Dependencies
@@ -91,7 +82,7 @@ Some packages may want some additional things installed, so check the README in 
 
 OmniBlocks is a very large app that can require multiple gigabytes of disk space and memory to build.
  
-Scratch is broken up into a bunch of different packages, each implementing one part of the app. Our dependencies are:
+Scratch is broken up into a bunch of different packages, each implementing one part of the app. Our packages in this monorepo are:
 
 * scratch-gui implements much of the interface (eg. the sprite list), connects everything together, and is where addons live. There are instructions on most of that here :)
 * scratch-vm runs projects. It's where the compiler lives, as well as the JavaScript definitions for any blocks. To add a new block, define the block there, and add the gui entry for the block here in scratch-gui.
@@ -149,7 +140,7 @@ graph TD
 
 
 ### Installation & Running
-To actually mod Scratch, you need to build the GUI, as it is the main package that connects everything. Here's how to do it:
+To actually mod OmniBlocks, you need to build the GUI, as it is the main package that connects everything. Here's how to do it:
 
 1.  **Clone the repository:**
     ```bash
@@ -159,28 +150,34 @@ To actually mod Scratch, you need to build the GUI, as it is the main package th
 
 2.  **Install dependencies (recommended method):**
     ```bash
-    npm ci  # We prefer this as it doesn't modify package-lock.json, which keeps the dependencies the same. 
+    pnpm i
     ```
     *(If you do decide to use `npm install`, it has to be `npm install --legacy-peer-deps` so it doesn't error)*
 
 3.  **Start the development server:**
     ```bash
-    npm start
+    cd scratch-gui
+    pnpm start
     ```
     The GUI will open in your browser at `http://localhost:8601`. If you're using GitHub Codespaces, it will be `https://<codespace-name>-<codespace-hash>-8601.app.github.dev/`
 
 4.  **To create a production build:**
     ```bash
-    npm run build
+    cd scratch-gui
+    pnpm run build
     ```
     Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow or other CI to push to a website or something like that. If you go to our [site build repo,](https://github.com/OmniBlocks/omniblocks.github.io) you can use the `sh` script and `yml` workflow from there 😁
 
 
 ## Development Guide
 
+>[!NOTE]
+>This is outdated and specific to GUI!
+>
 This section is for developers looking to understand, modify, or contribute to the codebase.
 
 ### Data Flow & Structure
+
 <!--- **State Management:** Uses Redux. Reducers are located in `src/reducers/`.
 this is already part of the below -->
 - **Core GUI Logic:** Located in `src/`.
@@ -235,25 +232,7 @@ Original TurboWarp (GPL-3.0) License: https://github.com/TurboWarp/scratch-gui/b
 
 ## Contributing
 
-Contributions are welcome! We are especially interested in addons, bug fixes, and new features!
-
-1. Fork the project.
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`).
-3. Code your feature (make sure to follow our super strict style guide below)
-4. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-5. Push to the branch (`git push origin feature/AmazingFeature`).
-6. Open a Pull Request.
-7. Sit and wait as it gets reviewed :)
-8. (six seven)
-
-
-## 📝 The Super Strict Style Guide of Doom 😈
-As you may know from the earlier parts of the readme, this is all made in React JS, a modular JavaScript UI framework. We're pretty laid back, so we don't have a super strict style guide or coding conventions, just know the following:
-
--  Go all out on your code! It doesn't matter if you don't use proper indentation, or other stuff like that, just make sure to add comments explaining it. After all, this is JavaScript, not Python we're talking about, so any valid syntax is valid syntax.
--  Make sure your variables are readable. While everyone loves fun code, please make sure your variables are legible. For example, if you need a variable for a new multi-backpack feature you're planning to add (not quite sure what the feature would do, but it's just an example), we'd prefer "multibackpack" or even "backpackthing" over "qwnpvoitwegjk".
-- Absolutely NO profanity. I have seen other repos have profanity in commit messages or comments, and while it is relatable and even hilarious to see how miserably we fail at code sometimes, there is no need to use profanity. Since our project is for All Ages and open source, we assume anyone of all ages will also see the code. Some words, however, are not considered profanity, such as crap or heck. If you snoop in _OUR_ commit messages, we have some pretty hilarious frustrations in there too! Just no bad words.
-Other than that, Code On! We don't require much other than these rules. Have fun!
+Contributions are welcome! We are especially interested in addons, bug fixes, and new features! See [CONTIRBUTING.md](CONTRIBUTING.md)
 
 
 ## ❓ Frequently Asked Questions (FAQ)
@@ -329,7 +308,8 @@ A: Awesome! Read everything above for guidelines. Good starting points are:
 - Fixing bugs labeled "good first issue"
 - Improving documentation
 - Adding tests
-- Translating the interface
+<!-- - Translating the interface
+we dont have this yet -->
 
 **Q: Do I need permission to fork OmniBlocks?**  
 A: Not at all! That's what's so good about our open source license. You can use our code at the expense of anyone using your code too. Just make sure to follow the license terms and give proper attribution.
@@ -350,7 +330,6 @@ A: Ignore lint. It's only there because it is from upstream, but we don't actual
 ## Roadmap
 
 ### Current Focus
-- [ ] JavaScript Extension
 - [ ] Complete music editor integration 
 
 Update: As of 11/12/2025, there is even better integration with the music editor, but it is still largely lacking. The music editor still doesn't have blocks to play your songs with or are stored in the project, but the Iframe is styled way better so it doesn't look like an iframe anymore, and using postmessage, it allows for you to download your songs using the existing export buttons in the song editor, as well as a fullscreen button, so it is far more usable than before where you had to go to omniblocks.github.io/songeditor just for it to be useful (as it's the standalone html instead of the iframe.) We got this working by using a function in the HTML that if detected it was an iframe, it intercepted incoming downloaded files and sent them using postmessage to the mainwindow as payload to be downloaded.
@@ -375,15 +354,6 @@ Update: As of 11/12/2025, there is even better integration with the music editor
 **Still have questions?** Feel free to open an issue here or start a discussion on our GitHub organization!
 
 **Made a mod or a cool project?** We would love to see what people are creating! If you made your own mod of OmniBlocks or made a cool project in it, show it off in [the Discussion tab!](https://github.com/orgs/OmniBlocks/discussions)
-
-<!-- thisi is not a six seeven joke !-->
----
-
-**Note:** This is a fork designed specifically for OmniBlocks. If you want to make your own Scratch or TurboWarp mod, please refer to the [upstream scratch-gui repository](https://github.com/scratchfoundation/scratch-gui) or the [TurboWarp scratch-gui repository](https://github.com/TurboWarp/scratch-gui) instead.
-
-<details><summary>NASA Secret Information</summary>
-:egg:
-</details>
 
 ### Legal
 

@@ -1121,20 +1121,43 @@ const parseScratchAssets = function (object, runtime, zip) {
 const fixSporkCompatibility = function (blocks) {
     for (const blockId in blocks) {
         if (!Object.prototype.hasOwnProperty.call(blocks, blockId)) continue;
-        const block = blocks[blockId];
 
-        // Custom block definition prototype blocks used to be marked as shadow: true, but spork marks as shadow: true.
+        const block = blocks[blockId];
+        const opcode = block.opcode;
+
+        switch (opcode) {
+        // Custom block definition prototype blocks used to be marked as shadow: true, but spork marks as shadow: false.
         // Our scratch-blocks relies on it being shadow: true to prevent moving, so we'll force it to be that way.
-        if (block.opcode === 'procedures_prototype') {
+        case 'procedures_prototype':
             block.shadow = true;
-        } else if (
-            block.opcode === 'argument_reporter_string_number' ||
-            block.opcode === 'argument_reporter_boolean'
-        ) {
+            break;
+
+        // For completeness with the above, set the argument reporter generators to be shadow: true as well.
+        case 'argument_reporter_string_number':
+        case 'argument_reporter_boolean': {
             const parent = blocks[block.parent];
             if (parent && parent.opcode === 'procedures_prototype') {
                 block.shadow = true;
             }
+            break;
+        }
+
+        // control_stop used to define a mutation for whether it has a connection below, which is what old
+        // scratch-blocks relies on to determine if there is another conneciton below or not. Spork does not define
+        // this mutation and relies only on the STOP_OPTION field. We will generate the mutation if it's missing so
+        // that a "stop other scripts in sprite" block doesn't cause the workspace to fail to load.
+        case 'control_stop': {
+            if (!block.mutation) {
+                const stopOption = block.fields?.STOP_OPTION?.value;
+                const hasNext = stopOption === 'other scripts in sprite' || stopOption === 'other scripts in stage';
+                block.mutation = {
+                    tagName: 'mutation',
+                    hasnext: hasNext ? 'true' : 'false',
+                    children: []
+                };
+            }
+            break;
+        }
         }
     }
 };

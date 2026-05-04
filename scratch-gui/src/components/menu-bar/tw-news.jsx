@@ -6,7 +6,7 @@ import styles from './tw-news.css';
 const LOCAL_STORAGE_KEY = 'tw:closedNews';
 const NEWS_ID = 'scratch-vulnerability';
 
-const newsAppliesToUser = () => true;
+const newsAppliesToUser = () => false;
 
 const NewsBody = () => (
     <div

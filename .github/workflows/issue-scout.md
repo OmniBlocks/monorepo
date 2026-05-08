@@ -12,7 +12,10 @@ permissions:
   contents: read
   issues: read
   actions: read
-engine: copilot
+engine:
+  id: copilot
+  env:
+    COPILOT_MODEL: claude-haiku-4.5
 strict: true
 timeout-minutes: 10
 network:

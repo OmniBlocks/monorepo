@@ -74,7 +74,7 @@
     "format-message-cli": "6.2.0",
     "in-publish": "2.0.1",
     "js-md5": "0.7.3",
-    "jsdoc": "3.6.6",
+    "jsdoc": "3.6.11",
     "json": "^9.0.4",
     "lodash.defaultsdeep": "4.6.1",
     "pngjs": "3.3.3",
@@ -89,9 +89,9 @@
     "tap": "16.2.0",
     "tiny-worker": "2.3.0",
     "uglifyjs-webpack-plugin": "1.2.7",
-    "webpack": "4.47.0",
-    "webpack-cli": "3.1.0",
-    "webpack-dev-server": "3.11.2"
+    "webpack": "5.106.2",
+    "webpack-cli": "3.3.12",
+    "webpack-dev-server": "5.2.1"
   },
   "private": true
 }

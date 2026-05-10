@@ -101,7 +101,24 @@
 
       const text = await res.text();
 
-      const json = JSON.parse(text);
+      async getKey(args) {
+        const url = this._buildUrl(args.KEY);
+        const res = await Scratch.fetch(url);
+        if (!res.ok) return "";
+
+        const text = await res.text();
+
+        try {
+          const json = JSON.parse(text);
+          // Standard check to handle JSON objects vs primitives
+          return (typeof json === "object" && json !== null)
+            ? JSON.stringify(json)
+            : json;
+        } catch (e) {
+          console.error("Failed to parse JSON response:", e);
+          return "";
+        }
+      }
       // Standard check to handle JSON objects vs primitives
       return (typeof json === "object" && json !== null)
         ? JSON.stringify(json)
@@ -111,12 +128,20 @@
 
     async deleteKey(args) {
       const url = this._buildUrl(args.KEY);
+    async deleteKey(args) {
+      const key = encodeURIComponent(args.KEY);
 
-      await Scratch.fetch(url, {
-        method: "DELETE"
-        // Note: Admin DELETE requires an x-pass header in the Worker, 
-        // but we provide the standard call here.
-      });
+      try {
+        const res = await fetch(` {
+          method: "DELETE"
+        });
+
+        if (!res.ok) {
+          console.error(`Failed to delete key: ${res.status} ${res.statusText}`);
+        }
+      } catch (e) {
+        console.error("Network error deleting key:", e);
+      }
     }
   }
 

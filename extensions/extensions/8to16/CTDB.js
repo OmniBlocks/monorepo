@@ -15,14 +15,14 @@
     getInfo() {
       return {
         id: "ampctdbapi",
-        name: "Worldwide DB",
+        name: Scratch.translate("Worldwide DB"),
         color1: "#4f7cff",
         color2: "#2f5fe0",
         blocks: [
           {
             opcode: "setKey",
             blockType: Scratch.BlockType.COMMAND,
-            text: "set key [KEY] to [VALUE]",
+            text: Scratch.translate("set key [KEY] to [VALUE]"),
             arguments: {
               KEY: { type: Scratch.ArgumentType.STRING, defaultValue: "key" },
               VALUE: { type: Scratch.ArgumentType.STRING, defaultValue: "hello" }
@@ -31,7 +31,7 @@
           {
             opcode: "getKey",
             blockType: Scratch.BlockType.REPORTER,
-            text: "get key [KEY]",
+            text: Scratch.translate("get key [KEY]"),
             arguments: {
               KEY: { type: Scratch.ArgumentType.STRING, defaultValue: "key" }
             }
@@ -39,7 +39,7 @@
           {
             opcode: "deleteKey",
             blockType: Scratch.BlockType.COMMAND,
-            text: "delete key [KEY]",
+            text: Scratch.translate("delete key [KEY]"),
             arguments: {
               KEY: { type: Scratch.ArgumentType.STRING, defaultValue: "key" }
             }
@@ -51,7 +51,7 @@
     async setKey(args) {
       const key = encodeURIComponent(args.KEY);
 
-      await fetch(`https://ctdbapi.funstrangeegg.workers.dev/api/${key}`, {
+      await Scratch.fetch(`https://ctdbapi.funstrangeegg.workers.dev/api/${key}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(args.VALUE)
@@ -62,7 +62,7 @@
       const key = encodeURIComponent(args.KEY);
 
       try {
-        const res = await fetch(
+        const res = await Scratch.fetch(
           `https://ctdbapi.funstrangeegg.workers.dev/api/${key}`
         );
 
@@ -86,7 +86,7 @@
     async deleteKey(args) {
       const key = encodeURIComponent(args.KEY);
 
-      await fetch(`https://ctdbapi.funstrangeegg.workers.dev/api/${key}`, {
+      await Scratch.fetch(`https://ctdbapi.funstrangeegg.workers.dev/api/${key}`, {
         method: "DELETE"
       });
     }

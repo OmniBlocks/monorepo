@@ -1,5 +1,5 @@
 // Name: Worldwide Database
-// Id: ampctdbapi
+// ID: ampctdbapi
 // Description: Set and receive worldwide cloud values.
 // By: AmpElectrecuted
 // By: KV storage provided by Cloudflare

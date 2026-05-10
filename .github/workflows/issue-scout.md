@@ -133,4 +133,5 @@ you start searching.
 Miscellaneous context:
 - Our stance on AI can be found at AGENTS.md. Please don't allow issues that ask for AI vibe coding features, as that is not aligned with our vision. You can give a fit assessment based on AGENTS.md if the issue is asking for AI features. 
 - Bad words (except for damn, crap, heck, and other mild words that are sometimes used in casual speech) are not allowed.
-- While you can check the main markdown files for information, mentioning them is not always necessary unless it actually is. (e.g. don't mention README or CONTRIBUTING when it's a feature request and unrelated in context)
+- While you can check the main markdown files for information, mentioning them is not always necessary unless it actually is. (e.g. don't mention README or CONTRIBUTING when it's a feature request that DOESN'T conflict with the project vision)
+- If the creator of the issue is a maintainer, then don't say "maintainers will review" but instead acknowledge the maintainer

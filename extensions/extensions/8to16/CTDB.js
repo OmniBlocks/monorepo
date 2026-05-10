@@ -17,11 +17,11 @@
     getInfo() {
       return {
         id: "ampctdbapi",
-        name: Scratch.translate("Worldwide DB"),
+        name: Scratch.translate("Worldwide Database"),
         color1: "#4f7cff",
         color2: "#2f5fe0",
         blocks: [
-          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate("Scope (prevent collisions with another project)") },
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate("Scope (prevents collisions)") },
           {
             opcode: "setScope",
             blockType: Scratch.BlockType.COMMAND,
@@ -36,7 +36,7 @@
             text: Scratch.translate("project scope")
           },
           "---",
-          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate("KV API") },
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate("Storage") },
           {
             opcode: "setKey",
             blockType: Scratch.BlockType.COMMAND,
@@ -67,7 +67,7 @@
     }
 
     // Scope Management
-    setScope({SCOPE}) {
+    setScope({ SCOPE }) {
       this.projectScope = SCOPE || "CT";
     }
 
@@ -83,7 +83,7 @@
       return `${baseUrl}?name=${name}&scope=${scope}`;
     }
 
-    async setKey({KEY, VALUE}) {
+    async setKey({ KEY, VALUE }) {
       const url = this._buildUrl(KEY);
 
       await Scratch.fetch(url, {
@@ -99,40 +99,18 @@
       const res = await Scratch.fetch(url);
       if (!res.ok) return "";
 
-      const text = await res.text();
+      const json = await res.json();
 
-      async getKey(args) {
-        const url = this._buildUrl(args.KEY);
-        const res = await Scratch.fetch(url);
-        if (!res.ok) return "";
-
-        const text = await res.text();
-
-        try {
-          const json = JSON.parse(text);
-          // Standard check to handle JSON objects vs primitives
-          return (typeof json === "object" && json !== null)
-            ? JSON.stringify(json)
-            : json;
-        } catch (e) {
-          console.error("Failed to parse JSON response:", e);
-          return "";
-        }
-      }
-      // Standard check to handle JSON objects vs primitives
       return (typeof json === "object" && json !== null)
         ? JSON.stringify(json)
-        : json;
-
+        : String(json);
     }
 
     async deleteKey(args) {
       const url = this._buildUrl(args.KEY);
-    async deleteKey(args) {
-      const key = encodeURIComponent(args.KEY);
 
       try {
-        const res = await fetch(` {
+        const res = await Scratch.fetch(url, {
           method: "DELETE"
         });
 

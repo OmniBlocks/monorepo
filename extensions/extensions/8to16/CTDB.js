@@ -2,16 +2,17 @@
 // Id: ampctdbapi
 // Description: Set and receive worldwide cloud values.
 // By: AmpElectrecuted
-// By: KV storage provided by Cloudflare
 // License: MPL-2.0
-
-// this is basically the same extension as https://ctdbapi.funstrangeegg.workers.dev/extension.js
-// (which is made for CodeTorch)
 
 (function (Scratch) {
   "use strict";
 
   class WWDBExtension {
+    constructor() {
+      // Default scope is CT as per requirements
+      this.projectScope = "CT";
+    }
+
     getInfo() {
       return {
         id: "ampctdbapi",
@@ -19,6 +20,22 @@
         color1: "#4f7cff",
         color2: "#2f5fe0",
         blocks: [
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate("Scope (prevent collisions with another project)") },
+          {
+            opcode: "setScope",
+            blockType: Scratch.BlockType.COMMAND,
+            text: Scratch.translate("set project scope to [SCOPE]"),
+            arguments: {
+              SCOPE: { type: Scratch.ArgumentType.STRING, defaultValue: "CT" }
+            }
+          },
+          {
+            opcode: "getScope",
+            blockType: Scratch.BlockType.REPORTER,
+            text: Scratch.translate("project scope")
+          },
+          "---",
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate("KV API") },
           {
             opcode: "setKey",
             blockType: Scratch.BlockType.COMMAND,
@@ -48,46 +65,56 @@
       };
     }
 
-    async setKey(args) {
-      const key = encodeURIComponent(args.KEY);
+    // Scope Management
+    setScope({SCOPE}) {
+      this.projectScope = SCOPE || "CT";
+    }
 
-      await Scratch.fetch(`https://ctdbapi.funstrangeegg.workers.dev/api/${key}`, {
+    getScope() {
+      return this.projectScope;
+    }
+
+    // Helper to build v2 URLs
+    _buildUrl(key) {
+      const baseUrl = "https://ctdbapi.funstrangeegg.workers.dev/CTDBv2/Key";
+      const name = encodeURIComponent(key);
+      const scope = encodeURIComponent(this.projectScope);
+      return `${baseUrl}?name=${name}&scope=${scope}`;
+    }
+
+    async setKey({KEY, VALUE}) {
+      const url = this._buildUrl(KEY);
+
+      await Scratch.fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(args.VALUE)
+        body: JSON.stringify(VALUE)
       });
     }
 
     async getKey(args) {
-      const key = encodeURIComponent(args.KEY);
+      const url = this._buildUrl(args.KEY);
 
-      try {
-        const res = await Scratch.fetch(
-          `https://ctdbapi.funstrangeegg.workers.dev/api/${key}`
-        );
+      const res = await Scratch.fetch(url);
+      if (!res.ok) return "";
 
-        if (!res.ok) return "";
+      const text = await res.text();
 
-        const text = await res.text();
+      const json = JSON.parse(text);
+      // Standard check to handle JSON objects vs primitives
+      return (typeof json === "object" && json !== null)
+        ? JSON.stringify(json)
+        : json;
 
-        try {
-          const json = JSON.parse(text);
-          return typeof json === "object"
-            ? JSON.stringify(json)
-            : json;
-        } catch {
-          return text;
-        }
-      } catch (e) {
-        return "";
-      }
     }
 
     async deleteKey(args) {
-      const key = encodeURIComponent(args.KEY);
+      const url = this._buildUrl(args.KEY);
 
-      await Scratch.fetch(`https://ctdbapi.funstrangeegg.workers.dev/api/${key}`, {
+      await Scratch.fetch(url, {
         method: "DELETE"
+        // Note: Admin DELETE requires an x-pass header in the Worker, 
+        // but we provide the standard call here.
       });
     }
   }

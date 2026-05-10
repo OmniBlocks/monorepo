@@ -2,6 +2,7 @@
 // Id: ampctdbapi
 // Description: Set and receive worldwide cloud values.
 // By: AmpElectrecuted
+// By: KV storage provided by Cloudflare
 // License: MPL-2.0
 
 (function (Scratch) {

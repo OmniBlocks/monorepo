@@ -3,7 +3,7 @@ import {CHANGE_SELECTED_ITEMS} from './selected-items';
 import {getColorsFromSelection} from '../helper/style-path';
 
 const CHANGE_STROKE_WIDTH = 'scratch-paint/stroke-width/CHANGE_STROKE_WIDTH';
-const MAX_STROKE_WIDTH = 100;
+const MAX_STROKE_WIDTH = 9999; // we can expect people to do this responsibly
 const initialState = 4;
 
 const reducer = function (state, action) {

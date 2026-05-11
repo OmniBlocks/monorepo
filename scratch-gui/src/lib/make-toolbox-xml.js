@@ -745,23 +745,16 @@ const operators = function (isInitialSetup, isStage, targetId, colors) {
                     <field name="NUM"/>
                 </shadow>
             </value>
-        </block>
-                <block type="operator_mathop">
+        </block>       
+        <block type="operator_atan2">
             <value name="NUM">
                 <shadow type="math_number">
-                    <field name="NUM"/>
+                    <field name="NUM1"/>
                 </shadow>
             </value>
-        </block>
-        <block type="operator_atan2">
-            <value name="NUM1">
+            <value name="NUM">
                 <shadow type="math_number">
-                    <field name="NUM"/>
-                </shadow>
-            </value>
-            <value name="NUM2">
-                <shadow type="math_number">
-                    <field name="NUM"/>
+                    <field name="NUM2"/>
                 </shadow>
             </value>
         </block>

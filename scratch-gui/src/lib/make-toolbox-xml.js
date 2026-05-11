@@ -746,13 +746,6 @@ const operators = function (isInitialSetup, isStage, targetId, colors) {
                 </shadow>
             </value>
         </block>
-                <block type="operator_mathop">
-            <value name="NUM">
-                <shadow type="math_number">
-                    <field name="NUM"/>
-                </shadow>
-            </value>
-        </block>
         <block type="operator_atan2">
             <value name="NUM1">
                 <shadow type="math_number">
@@ -765,7 +758,6 @@ const operators = function (isInitialSetup, isStage, targetId, colors) {
                 </shadow>
             </value>
         </block>
-        ${categorySeparator}
         ${categorySeparator}
     </category>
     `;

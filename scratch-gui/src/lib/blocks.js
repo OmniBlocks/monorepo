@@ -156,6 +156,28 @@ export default function (vm) {
 
     const eventColors = ScratchBlocks.Colours.event;
 
+    if (!ScratchBlocks.Blocks.operator_atan2) {
+        ScratchBlocks.Blocks.operator_atan2 = {
+            init: function () {
+                this.jsonInit({
+                    message0: ScratchBlocks.Msg.OPERATORS_ATAN2 || 'atan2 of x: %1 y: %2',
+                    args0: [
+                        {
+                            type: 'input_value',
+                            name: 'NUM1'
+                        },
+                        {
+                            type: 'input_value',
+                            name: 'NUM2'
+                        }
+                    ],
+                    category: ScratchBlocks.Categories.operators,
+                    extensions: ['colours_operators', 'output_number']
+                });
+            }
+        };
+    }
+
     ScratchBlocks.Blocks.sound_sounds_menu.init = function () {
         const json = jsonForMenuBlock('SOUND_MENU', soundsMenu, soundColors, []);
         this.jsonInit(json);

@@ -749,12 +749,12 @@ const operators = function (isInitialSetup, isStage, targetId, colors) {
         <block type="operator_atan2">
             <value name="NUM">
                 <shadow type="math_number">
-                    <field name="NUM1"/>
+                    <field name="NUM"/>
                 </shadow>
             </value>
             <value name="NUM">
                 <shadow type="math_number">
-                    <field name="NUM2"/>
+                    <field name="NUM"/>
                 </shadow>
             </value>
         </block>

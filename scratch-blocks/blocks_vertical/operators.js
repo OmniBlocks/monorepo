@@ -506,3 +506,26 @@ Blockly.Blocks['operator_mathop'] = {
     });
   }
 };
+Blockly.Blocks['operator_atan2'] = {
+  /**
+   * Block for atan2 of x and y.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.OPERATORS_ATAN2,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "NUM1"
+        },
+        {
+          "type": "input_value",
+          "name": "NUM2"
+        }
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_number"]
+    });
+  }
+};

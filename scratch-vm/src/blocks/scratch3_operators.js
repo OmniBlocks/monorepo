@@ -35,7 +35,8 @@ class Scratch3OperatorsBlocks {
             operator_contains: this.contains,
             operator_mod: this.mod,
             operator_round: this.round,
-            operator_mathop: this.mathop
+            operator_mathop: this.mathop,
+            operator_atan2: this.atan2
         };
     }
 
@@ -159,6 +160,12 @@ class Scratch3OperatorsBlocks {
         case '10 ^': return Math.pow(10, n);
         }
         return 0;
+    }
+
+    atan2 (args) {
+        const x = Cast.toNumber(args.NUM1);
+        const y = Cast.toNumber(args.NUM2);
+        return (Math.atan2(y, x) * 180) / Math.PI;
     }
 }
 

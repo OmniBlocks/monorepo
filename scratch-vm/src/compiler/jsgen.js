@@ -285,6 +285,9 @@ class JSGenerator {
             return `((Math.asin(${this.descendInput(node.value)}) * 180) / Math.PI)`;
         case InputOpcode.OP_ATAN:
             return `((Math.atan(${this.descendInput(node.value)}) * 180) / Math.PI)`;
+
+        case InputOpcode.OP_ATAN2:
+            return `((Math.atan2(${this.descendInput(node.right)}, ${this.descendInput(node.left)}) * 180) / Math.PI)`;
         case InputOpcode.OP_CEILING:
             return `Math.ceil(${this.descendInput(node.value)})`;
         case InputOpcode.OP_CONTAINS:

@@ -246,6 +246,7 @@ const InputOpcode = {
     OP_ASIN: 'op.asin',
     OP_ACOS: 'op.acos',
     OP_ATAN: 'op.atan',
+    OP_ATAN2: 'op.atan2',
     OP_LOG_E: 'op.ln',
     OP_LOG_10: 'op.log',
     OP_POW_E: 'op.e^',

@@ -389,6 +389,12 @@ class ScriptTreeGenerator {
             default: return this.createConstantInput(0);
             }
         }
+        case 'operator_atan2': {
+            return new IntermediateInput(InputOpcode.OP_ATAN2, InputType.NUMBER, {
+                left: this.descendInputOfBlock(block, 'NUM1').toType(InputType.NUMBER),
+                right: this.descendInputOfBlock(block, 'NUM2').toType(InputType.NUMBER)
+            });
+        }
         case 'operator_mod':
             return new IntermediateInput(InputOpcode.OP_MOD, InputType.NUMBER_OR_NAN, {
                 left: this.descendInputOfBlock(block, 'NUM1').toType(InputType.NUMBER),

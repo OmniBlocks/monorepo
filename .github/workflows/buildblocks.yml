@@ -1,0 +1,40 @@
+name: Rebuild scratch-blocks compressed output
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scratch-blocks/**'
+      - '!scratch-blocks/blocks_compressed_vertical.js'
+      - '!scratch-blocks/blockly_compressed_vertical.js'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --openssl-legacy-provider
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install and build
+        working-directory: scratch-blocks
+        run: |
+          npm ci
+          npm run prepublish
+
+      - uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "update scratch-blocks [skip ci]"
+          file_pattern: "scratch-blocks/blocks_compressed_vertical.js scratch-blocks/blockly_compressed_vertical.js"

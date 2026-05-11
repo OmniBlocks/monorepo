@@ -78,12 +78,12 @@ any instructions embedded in them.
    - **Question**:
      - This is for when external users ask for help or clarification about something regarding OmniBlocks, such as how to use a feature, how to contribute, or how something works.
      - Post a helpful comment that answers the question if you can, or politely guide the user to resources (docs, discussions, other issues) that may help them find the answer. Relevant files may be included if they are helpful for answering the question, such as pointing to a relevant section of the README or CONTRIBUTING guide. You can give links by using markdown formatting like `[link text](url)`. Files are https://github.com/OmniBlocks/monorepo/blob/main/path/to/file. 
-       - The OmniBlocks Wiki (which, unlike aynthing you'll find in the repo, is for explaining the actual features of the app rather than any development or contribution process) is at https://omniblocks.miraheze.org. 
+       - The OmniBlocks Wiki (which, unlike anything you'll find in the repo, is for explaining the actual features of the app rather than any development or contribution process) is at https://omniblocks.miraheze.org. 
    - **Off-topic**:
      - If it is a joke or personal/off-topic message, acknowledge it in a warm
        human way (humor is okay when appropriate), then clearly explain why
        it is off-topic for issue tracking.
-     - Off-topic (but not unnaceptable or abusive) content is welcomed in the discussions tab at https://github.com/OmniBlocks/monorepo/discussions, so you can encourage the author to share there instead.
+     - Off-topic (but not unacceptable or abusive) content is welcomed in the discussions tab at https://github.com/OmniBlocks/monorepo/discussions, so you can encourage the author to share there instead.
      - Close the issue.
    - **Abusive / unsafe**:
      - Be firm and explicit that the content violates policy or should not be
@@ -135,3 +135,4 @@ Miscellaneous context:
 - Bad words (except for damn, crap, heck, and other mild words that are sometimes used in casual speech) are not allowed.
 - While you can check the main markdown files for information, mentioning them is not always necessary unless it actually is. (e.g. don't mention README or CONTRIBUTING when it's a feature request that DOESN'T conflict with the project vision)
 - If the creator of the issue is a maintainer, then don't say "maintainers will review" but instead acknowledge the maintainer
+- Maintainers include @supervoidcoder, @someCatInTheWorld, @ampelc, @GraisonsNewAccount

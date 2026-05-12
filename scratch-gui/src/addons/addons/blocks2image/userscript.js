@@ -92,7 +92,7 @@ export default async function ({ addon, console, msg }) {
           enabled: true,
           text: msg("export_selected_to_SVG"),
           callback: () => {
-            exportBlock(false, block);
+            exportBlock("svg", block);
           },
           separator: true,
         },
@@ -100,10 +100,18 @@ export default async function ({ addon, console, msg }) {
           enabled: true,
           text: msg("export_selected_to_PNG"),
           callback: () => {
-            exportBlock(true, block);
+            exportBlock("png", block);
           },
           separator: false,
-        }
+        },
+        {
+          enabled: true,
+          text: msg("export_selected_to_sblocks"),
+          callback: () => {
+            exportBlock("blocks", block);
+          },
+          separator: true,
+        },
       );
 
       return items;
@@ -111,12 +119,12 @@ export default async function ({ addon, console, msg }) {
     { blocks: true }
   );
 
-  async function exportBlock(isExportPNG, block) {
+  async function exportBlock(exportType, block) {
     let svg;
     if (block) {
-      svg = selectedBlocks(isExportPNG, block);
+      svg = selectedBlocks(exportType, block);
     } else {
-      svg = allBlocks(isExportPNG);
+      svg = allBlocks(exportType);
     }
     // resolve nbsp whitespace
     svg.querySelectorAll("text").forEach((text) => {
@@ -137,7 +145,7 @@ export default async function ({ addon, console, msg }) {
         item.setAttribute("xlink:href", dataUri);
       })
     );
-    if (!isExportPNG) {
+    if (exportType != "png") {
       exportData(new XMLSerializer().serializeToString(svg));
     } else {
       exportPNG(svg);

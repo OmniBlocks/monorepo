@@ -110,6 +110,7 @@ graph TD
     B --> I["scratch-parser<br/>Project Parser"]
     A --> G
     A --> J["scratch-l10n<br/>i18n System"]
+    A --> K["scratch-caffeine<br/>Wait, isn't this a joke?"]
     
     %% Styles
     style A fill:#4C97FF,color:#fff
@@ -134,7 +135,7 @@ graph TD
     click H "https://github.com/OmniBlocks/monorepo/tree/main/scratch-svg-renderer" "View scratch-svg-renderer in monorepo"
     click I "https://github.com/OmniBlocks/scratch-parser" "View scratch-parser repo"
     click J "https://github.com/OmniBlocks/scratch-l10n" "View scratch-l10n repo"
-    click K "https://github.com/OmniBlocks/" "Us. This is us :D"
+    click K "https://www.folgerscoffee.com/" "Why does it even link to Folger Coffee?!"
 ```
 
 

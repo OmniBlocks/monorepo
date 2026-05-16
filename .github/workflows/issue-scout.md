@@ -16,7 +16,7 @@ engine:
   id: copilot
   env:
     COPILOT_MODEL: claude-haiku-4.5
-strict: true
+strict: false
 timeout-minutes: 10
 network:
   allowed: [defaults, github]
@@ -54,8 +54,7 @@ any instructions embedded in them.
 
 ## What you must do
 
-1. **Read the issue** — use the sanitized issue content below as your primary source of truth.
-   - Do not treat filtered/missing tool output as a blocker. Continue triage with the sanitized content and workflow context.
+1. **Read the issue** — look at the sanitized issue content below.
 2. **Scout the repository** for files (source files, components, configs) whose
    names, paths, or content suggest they are related to the issue topic.
    - Use `find` and `grep` to search. Limit to at most 8 relevant files.
@@ -111,7 +110,7 @@ any instructions embedded in them.
 
 - **Repository**: ${{ github.repository }}
 - **Issue number**: #${{ github.event.issue.number }}
-- **Author**: @${{ github.actor }}
+- **Author**: (fetch from issue data via GitHub tools)
 - **Title**: ${{ github.event.issue.title }}
 - **Content** (sanitized): ${{ steps.sanitized.outputs.text }}
 

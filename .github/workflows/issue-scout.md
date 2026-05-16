@@ -24,6 +24,7 @@ tools:
   github:
     mode: local
     toolsets: [issues, repos]
+    min-integrity: unapproved
   bash: [find, cat, grep, head, ls]
 safe-outputs:
   add-comment:

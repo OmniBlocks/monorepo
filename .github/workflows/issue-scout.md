@@ -16,7 +16,7 @@ engine:
   id: copilot
   env:
     COPILOT_MODEL: claude-haiku-4.5
-strict: true
+strict: false
 timeout-minutes: 10
 network:
   allowed: [defaults, github]
@@ -24,6 +24,7 @@ tools:
   github:
     mode: local
     toolsets: [issues, repos]
+    min-integrity: unapproved
   bash: [find, cat, grep, head, ls]
 safe-outputs:
   add-comment:

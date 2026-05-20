@@ -5033,6 +5033,12 @@ export class SongEditor {
                 this._renderInstrumentBar(this.doc.song.channels[this.doc.channel], this.doc.getCurrentInstrument(), ColorConfig.getChannelColor(this.doc.song, this.doc.channel));
                 event.preventDefault();
                 break;
+            
+            case 191: // ? DEBUG KEYBIND
+                console.log(EditorConfig.idToPreset(857))
+                break;
+            
+            
             default:
                 this.doc.selection.digits = "";
                 this.doc.selection.instrumentDigits = "";

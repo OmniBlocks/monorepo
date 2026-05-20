@@ -1,9 +1,8 @@
-// Service Worker for OmniBlocks - Full Offline PWA Support
 /* eslint-disable func-style, require-jsdoc, no-use-before-define */
 const CACHE_NAME = 'omniblocks-v1';
 // bump to clear old entries with bad paths
-const STATIC_CACHE = 'omniblocks-static-v6';
-const DYNAMIC_CACHE = 'omniblocks-dynamic-v3';
+const STATIC_CACHE = 'omniblocks-static-v7';
+const DYNAMIC_CACHE = 'omniblocks-dynamic-v4';
 
 // --- URL helpers: make all paths scope-relative so GH Pages subpaths work ---
 const toRel = p => p.replace(/^\//, ''); // drop leading slash
@@ -40,7 +39,14 @@ const STATIC_ASSETS = mapURLs([
     'player/samples.js', 'player/samples2.js', 'player/samples3.js',
     'player/wario_samples.js', 'player/nintaribox_samples.js',
     'player/kirby_samples.js', 'player/drumsamples.js',
-    'player/mario_paintbox_samples.js'
+    'player/mario_paintbox_samples.js',
+    // ffmpeg-wasm
+    'ffmpeg/ffmpeg.min.js',
+    'ffmpeg/core/ffmpeg-core.js',
+    'ffmpeg/core/ffmpeg-core.wasm',
+    'ffmpeg/core-mt/ffmpeg-core.js',
+    'ffmpeg/core-mt/ffmpeg-core.wasm',
+    'ffmpeg/core-mt/ffmpeg-core.worker.js'
 ]);
 
 // canonical song editor URL for aliasing navigations
@@ -238,20 +244,47 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    let responsePromise;
+
     // Alias navigations for song editor routes to the actual static file
     if (request.mode === 'navigate') {
         const p = url.pathname.replace(/\/+$/, '');
         if (p.endsWith('/songeditor') || p.endsWith('/songeditor.html') || p.endsWith('/static/songeditor')) {
-            event.respondWith(
-                getCachedResponse(new Request(CANONICAL_SONGEDITOR)).then(hit => hit || fetch(CANONICAL_SONGEDITOR))
-            );
-            return;
+            responsePromise = getCachedResponse(new Request(CANONICAL_SONGEDITOR)).then(hit => hit || fetch(CANONICAL_SONGEDITOR));
+        } else {
+            responsePromise = handleRequest(request);
         }
+    } else {
+        responsePromise = handleRequest(request);
     }
-    
-    event.respondWith(
-        handleRequest(request)
-    );
+    // this feels sketchy
+    if (request.mode === 'navigate' || request.destination === 'worker') {
+        event.respondWith(
+            responsePromise.then(response => {
+                
+                if (!response || response.type === 'opaque' || response.status === 0) {
+                    return response;
+                }
+                
+                const newHeaders = new Headers(response.headers);
+                newHeaders.set('Cross-Origin-Embedder-Policy', 'credentialless');
+                newHeaders.set('Cross-Origin-Opener-Policy', 'same-origin');
+                // if it's this easy to use sharedarraybuffer isn't this kinda a security risk?
+                // better stay quiet
+                
+                return new Response(response.body, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: newHeaders
+                });
+            }).catch(error => {
+                console.error('[SW] COOP/COEP patching failed:', error);
+                return getOfflineFallback(request);
+            })
+        );
+    } else {
+        event.respondWith(responsePromise);
+    }
 });
 
 async function handleRequest (request) {

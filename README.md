@@ -135,7 +135,7 @@ graph TD
     click H "https://github.com/OmniBlocks/monorepo/tree/main/scratch-svg-renderer" "View scratch-svg-renderer in monorepo"
     click I "https://github.com/OmniBlocks/scratch-parser" "View scratch-parser repo"
     click J "https://github.com/OmniBlocks/scratch-l10n" "View scratch-l10n repo"
-    click K "https://www.folgerscoffee.com/" "Why does it even link to Folger Coffee?!"
+    click K "https://www.folgerscoffee.com/" "Why does it even link to Folgers Coffee?!"
 ```
 
 

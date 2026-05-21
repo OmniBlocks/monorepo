@@ -28,7 +28,10 @@ editor.mainLayer.getElementsByClassName("trackAndMuteContainer")[0].className +=
 editor.mainLayer.getElementsByClassName("barScrollBar")[0].className += " load";
 
 // Give select2 class to these
-$('#pitchPresetSelect').select2({ dropdownAutoWidth: true });
+$('#pitchPresetSelect').select2({ dropdownAutoWidth: true
+    //debug
+    // , templateSelection: (data:any, container:any) => { return "*" + data.text; } 
+});
 $('#drumPresetSelect').select2({ dropdownAutoWidth: true });
 // $('#envelopeSelect').select2({ dropdownAutoWidth: true });
 

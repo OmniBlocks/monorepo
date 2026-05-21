@@ -7,6 +7,7 @@ import { Deque } from "./Deque";
 import { events } from "../global/Events";
 import { FilterCoefficients, FrequencyResponse, DynamicBiquadFilter, warpInfinityToNyquist } from "./filtering";
 import { xxHash32 } from "js-xxhash";
+import { updateFromJukeBox4, updateFromUltraBox } from "./PresetUpdates";
 
 declare global {
     interface Window {
@@ -3282,7 +3283,7 @@ export class Song {
     private static readonly _oldestSlarmoosBoxVersion: number = 1;
     private static readonly _latestSlarmoosBoxVersion: number = 5;
     private static readonly _oldestJukeBoxVersion: number = 1;
-    private static readonly _latestJukeBoxVersion: number = 4;
+    private static readonly _latestJukeBoxVersion: number = 5;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
     //also "u" is ultrabox lol
     // private static readonly _variant = 0x73; //"S" - Slarmoo's Box
@@ -3724,7 +3725,7 @@ export class Song {
                 buffer.push(SongTagCode.startInstrument, base64IntToCharCode[instrument.type]);
                 buffer.push(SongTagCode.volume, base64IntToCharCode[(instrument.volume + Config.volumeRange / 2) >> 6], base64IntToCharCode[(instrument.volume + Config.volumeRange / 2) & 0x3f]);
                 buffer.push(SongTagCode.preset, base64IntToCharCode[instrument.preset >> 18], base64IntToCharCode[(instrument.preset >> 12) & 63], base64IntToCharCode[(instrument.preset >> 6) & 63], base64IntToCharCode[instrument.preset & 63]);
-
+                //debug
                 buffer.push(SongTagCode.eqFilter);
                 buffer.push(base64IntToCharCode[+instrument.eqFilterType]);
                 if (instrument.eqFilterType) {
@@ -4824,36 +4825,15 @@ export class Song {
                 }
             } break;
             case SongTagCode.preset: {
-                let presetValue: number
-                if (!fromJukeBox) {
-                    presetValue = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                } else { 
+                let presetValue: number = 0;
+                if (fromJukeBox && !beforeFive) {
                     presetValue = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                }
+                } else if (fromJukeBox && !beforeFour) { 
+                    presetValue = updateFromJukeBox4((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
+                } else if (fromUltraBox || fromJummBox || fromBeepBox) {
+                    presetValue = updateFromUltraBox((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
+                } 
                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = presetValue;
-                // Picked string was inserted before custom chip in JB v5, so bump up preset index.
-                if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)) {
-                    if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == InstrumentType.pickedString) {
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = InstrumentType.customChipWave;
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = InstrumentType.customChipWave;
-                    }
-                }
-                // Similar story, supersaw is also before custom chip (and mod, but mods can't have presets).
-                else if ((fromJummBox && beforeSix) || (fromUltraBox && beforeFive)) {
-                    if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == InstrumentType.supersaw) {
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = InstrumentType.customChipWave;
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = InstrumentType.customChipWave;
-                    }
-                    // ultra code for 6-op fm maybe
-                    if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == InstrumentType.mod) {
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = InstrumentType.fm6op;
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = InstrumentType.fm6op;
-                    }
-                }
-                // BeepBox directly tweaked "grand piano", but JB kept it the same. The most up to date version is now "grand piano 3"
-                if (fromBeepBox && presetValue == EditorConfig.nameToPresetValue("grand piano 1")) {
-                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = EditorConfig.nameToPresetValue("grand piano 3")!;
-                }
             } break;
             case SongTagCode.wave: {
                 if (beforeThree && fromBeepBox) {

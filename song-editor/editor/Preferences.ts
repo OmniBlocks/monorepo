@@ -25,7 +25,7 @@ export class Preferences {
 	public enableChannelMuting: boolean = true;
 	public colorTheme: string;
 	public layout: string;
-	//public displayBrowserUrl: boolean; //comment for testing
+	public displayBrowserUrl: boolean; //comment for testing
 	public displayBrowserUrl: boolean = false; //uncomment for testing
 	public volume: number = 75;
 	public visibleOctaves: number = Preferences.defaultVisibleOctaves;
@@ -68,7 +68,7 @@ export class Preferences {
 		this.instrumentImportExport = window.localStorage.getItem("instrumentImportExport") == "true";
 		this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") == "true";
 		this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") != "false";
-		//this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false"; //comment for testing
+		this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false"; //comment for testing
 		this.pressControlForShortcuts = window.localStorage.getItem("pressControlForShortcuts") == "true";
 		this.enableMidi = window.localStorage.getItem("enableMidi") != "false";
 		this.showRecordButton = window.localStorage.getItem("showRecordButton") == "true";

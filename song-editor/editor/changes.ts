@@ -8,6 +8,10 @@ import { SongDocument } from "./SongDocument";
 import { ColorConfig } from "./ColorConfig";
 import { Slider } from "./HTMLWrapper";
 
+function setModified(instrument: any) {
+    return instrument
+}
+
 export function patternsContainSameInstruments(pattern1Instruments: number[], pattern2Instruments: number[]): boolean {
     const pattern2Has1Instruments: boolean = pattern1Instruments.every(instrument => pattern2Instruments.indexOf(instrument) != -1);
     const pattern1Has2Instruments: boolean = pattern2Instruments.every(instrument => pattern1Instruments.indexOf(instrument) != -1);
@@ -4401,7 +4405,7 @@ export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boole
                 (!tag.startsWith("!") && preset.tags.includes(tag))
 
             )))) {    
-                eligiblePresetValues.push((categoryIndex << 12) + presetIndex);
+                eligiblePresetValues.push(preset.id);
                 //console.log(preset.name)
             }
         }
@@ -4446,8 +4450,8 @@ export function pickNextPresetValue(isNoise: boolean,rollNoveltyPresets: boolean
                 (!tag.startsWith("!") && preset.tags.includes(tag))
 
             )))) {    
-                eligiblePresetValues.push((categoryIndex << 12) + presetIndex);
-                if ((categoryIndex << 12) + presetIndex == currentPresetValue) {
+                eligiblePresetValues.push(preset.id);
+                if (preset.id == currentPresetValue) {
                     nextPresetIndex = eligiblePresetValues.length
                 }
             }

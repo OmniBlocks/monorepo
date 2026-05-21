@@ -33,45 +33,11 @@ export default async ({ addon, console, msg }) => {
   // Load FFmpeg.wasm v0.12.x (matches package.json)
 // Load FFmpeg.wasm v0.12.x from static bundled files
 const loadFFmpeg = async () => {
-  if (ffmpeg) return ffmpeg;
-  
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = "/ffmpeg/ffmpeg.min.js";
-    script.onload = async () => {
-      try {
-        const { FFmpeg } = window.FFmpegWASM || window.FFmpeg || {};
-        if (!FFmpeg) {
-          throw new Error("FFmpeg UMD bundle not found on window");
-        }
-        ffmpeg = new FFmpeg();
-        
-        // Set up logging
-        ffmpeg.on('log', ({ message }) => {
-          console.log('FFmpeg:', message);
-        });
-        
-        // Auto detect whether we can use multithreading
-        const useMt = window.crossOriginIsolated;
-        const coreType = useMt ? 'core-mt' : 'core';
-        
-        await ffmpeg.load({
-          coreURL: `/ffmpeg/${coreType}/ffmpeg-core.js`,
-          wasmURL: `/ffmpeg/${coreType}/ffmpeg-core.wasm`,
-          workerURL: useMt ? `/ffmpeg/${coreType}/ffmpeg-core.worker.js` : undefined
-        });
-        
-        console.log('FFmpeg loaded successfully. Multithreading:', useMt);
-        resolve(ffmpeg);
-      } catch (error) {
-        console.error('FFmpeg load error:', error);
-        ffmpeg = null;
-        reject(error);
-      }
-    };
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
+  if (window.ob_ffmpeg) {
+    return await window.ob_ffmpeg();
+  } else {
+    throw new Error("ffmpeg broke");
+  }
 };
 
   while (true) {

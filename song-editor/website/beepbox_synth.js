@@ -7046,8 +7046,18 @@ var beepbox = (() => {
     return newList[oldList.indexOf(oldID)];
   }
   __name(updateFromJukeBox4, "updateFromJukeBox4");
+  function updateFromJukeBox3(oldID) {
+    const newList = [];
+    const oldList = [];
+    if (oldID <= 10) return oldID;
+    return newList[oldList.indexOf(oldID)];
+  }
+  __name(updateFromJukeBox3, "updateFromJukeBox3");
   function updateFromUltraBox(oldID) {
-    return 1;
+    const newList = [];
+    const oldList = [];
+    if (oldID <= 10) return oldID;
+    return newList[oldList.indexOf(oldID)];
   }
   __name(updateFromUltraBox, "updateFromUltraBox");
 
@@ -11062,9 +11072,11 @@ var beepbox = (() => {
             let presetValue = 0;
             if (fromJukeBox && !beforeFive) {
               presetValue = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-            } else if (fromJukeBox && !beforeFour) {
+            } else if (fromJukeBox && version == 4) {
               presetValue = updateFromJukeBox4(base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-            } else if (fromUltraBox || fromJummBox || fromBeepBox) {
+            } else if (fromJukeBox && version == 3) {
+              presetValue = updateFromJukeBox3(base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+            } else if (fromUltraBox || fromGoldBox || fromJummBox || fromBeepBox) {
               presetValue = updateFromUltraBox(base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6 | base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
             }
             this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = presetValue;

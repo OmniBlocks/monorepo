@@ -22,11 +22,14 @@ export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boole
 */
 
 /*
-export function updateFromBeepmod(oldID: number) {
-    const newList = [];
-    const oldList = [];
-    if (oldID)
 
+export function updateFromBeepmod(oldID: number) {
+    const newList: number[] = [];
+    const oldList: number[] = [];
+    if (oldID <= 10) return oldID;
+
+    return newList[oldList.indexOf(oldID)];
+}
 
 */
 
@@ -39,8 +42,36 @@ export function updateFromJukeBox4(oldID: number) {
     return newList[oldList.indexOf(oldID)];
 }
 
+export function updateFromJukeBox3(oldID: number) {
+    const newList: number[] = [];
+    const oldList: number[] = [];
+    if (oldID <= 10) return oldID;
+
+    return newList[oldList.indexOf(oldID)];
+}
+
+export function updateFromJukeBox2(oldID: number) {
+    const newList: number[] = [];
+    const oldList: number[] = [];
+    if (oldID <= 10) return oldID;
+
+    return newList[oldList.indexOf(oldID)];
+}
+
+export function updateFromJukeBox1(oldID: number) {
+    const newList: number[] = [];
+    const oldList: number[] = [];
+    if (oldID <= 10) return oldID;
+
+    return newList[oldList.indexOf(oldID)];
+}
+
 export function updateFromUltraBox(oldID: number) {
-    return 1;
+    const newList: number[] = [];
+    const oldList: number[] = [];
+    if (oldID <= 10) return oldID;
+
+    return newList[oldList.indexOf(oldID)];
 }
 
 

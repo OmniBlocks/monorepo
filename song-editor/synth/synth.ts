@@ -7,7 +7,7 @@ import { Deque } from "./Deque";
 import { events } from "../global/Events";
 import { FilterCoefficients, FrequencyResponse, DynamicBiquadFilter, warpInfinityToNyquist } from "./filtering";
 import { xxHash32 } from "js-xxhash";
-import { updateFromJukeBox4, updateFromUltraBox } from "./PresetUpdates";
+import { updateFromJukeBox3, updateFromJukeBox4, updateFromUltraBox } from "./PresetUpdates";
 
 declare global {
     interface Window {
@@ -4828,9 +4828,11 @@ export class Song {
                 let presetValue: number = 0;
                 if (fromJukeBox && !beforeFive) {
                     presetValue = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                } else if (fromJukeBox && !beforeFour) { 
+                } else if (fromJukeBox && version == 4) { 
                     presetValue = updateFromJukeBox4((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
-                } else if (fromUltraBox || fromJummBox || fromBeepBox) {
+                } else if (fromJukeBox && version == 3) { 
+                    presetValue = updateFromJukeBox3((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
+                } else if (fromUltraBox || fromGoldBox || fromJummBox || fromBeepBox) {
                     presetValue = updateFromUltraBox((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
                 } 
                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = presetValue;

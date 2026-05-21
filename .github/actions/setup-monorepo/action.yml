@@ -8,8 +8,10 @@ runs:
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
+      env:
+        'FORCE_JAVASCRIPT_ACTIONS_TO_NODE24'=true
       with:
-        node-version: '22'
+        node-version: '24'
         cache: 'pnpm'
 
     - name: Setup Python

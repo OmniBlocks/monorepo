@@ -6,6 +6,9 @@ import {ScratchPaintReducer} from 'scratch-paint';
 import {setFullScreen, setPlayer} from './reducers/mode';
 import {remixProject} from './reducers/project-state';
 import {setAppElement} from 'react-modal';
+import { getFFmpeg } from './lib/king-ffmpeg-scourge-of-omniblocks-lord-of-cinder.js';
+
+window.ob_ffmpeg = getFFmpeg; // now everything can get the tiny lil ffmpeg bundle that's totally not like 30mb or anything mwahahah
 
 const guiReducers = {
     locales: LocalesReducer,

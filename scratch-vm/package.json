@@ -81,7 +81,7 @@
     "scratch-audio": "0.1.0-prerelease.20231221012053",
     "scratch-blocks": "0.1.0-prerelease.20230527085947",
     "scratch-l10n": "3.16.20231222031921",
-    "scratch-render": "0.1.0-prerelease.20231220210403",
+    "scratch-render": "2.2.84",
     "scratch-render-fonts": "github:TurboWarp/scratch-render-fonts#master",
     "scratch-storage": "2.3.1",
     "script-loader": "0.7.2",
@@ -91,7 +91,7 @@
     "uglifyjs-webpack-plugin": "1.2.7",
     "webpack": "4.47.0",
     "webpack-cli": "3.1.0",
-    "webpack-dev-server": "3.11.2"
+    "webpack-dev-server": "5.2.4"
   },
   "private": true
 }

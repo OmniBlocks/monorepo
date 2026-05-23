@@ -322,7 +322,9 @@ class RenderWebGL extends EventEmitter {
             PenSkin,
             SVGSkin,
             CanvasMeasurementProvider,
-            Rectangle
+            Rectangle,
+            EffectTransform,
+            ShaderManager
         };
     }
 

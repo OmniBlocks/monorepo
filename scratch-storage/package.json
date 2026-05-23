@@ -14,15 +14,12 @@
     "prepublishOnly": "npm run build",
     "build": "webpack --progress --colors --bail",
     "coverage": "tap ./test/{unit,integration}/*.js --coverage --coverage-report=lcov",
-    "commitmsg": "commitlint -e $GIT_PARAMS",
     "test": "npm run test:lint && jest \"test[\\\\/](unit|integration)\"",
     "test:clearCache": "jest --clearCache",
     "test:lint": "eslint .",
     "test:integration": "jest \"test[\\\\/]integration\"",
     "test:unit": "jest \"test[\\\\/]unit\"",
-    "version": "json -f package.json -I -e \"this.repository.sha = '$(git log -n1 --pretty=format:%H)'\"",
-    "watch": "webpack --progress --colors --watch",
-    "semantic-release": "semantic-release"
+    "watch": "webpack --progress --colors --watch"
   },
   "tap": {
     "check-coverage": false

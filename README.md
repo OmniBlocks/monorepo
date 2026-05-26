@@ -253,6 +253,9 @@ A: Yes! OmniBlocks is open-source and free forever! Unless you count paying your
 **Q: I hate Ommiblocks**  
 A: 67
 
+**Q: What happened to AmpMod and LibreKitten?**
+A: AmpMod and LibreKitten have merged into the OmniBlocks project to create what is arguably one of the most powerful mods of TurboWarp to date
+
 ### Compatibility
 
 **Q: Can I use my Scratch account with OmniBlocks?**  

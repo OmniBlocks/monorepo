@@ -10,7 +10,11 @@ overrides:
 
 importers:
 
-  .: {}
+  .:
+    dependencies:
+      modern-normalize:
+        specifier: ^3.0.1
+        version: 3.0.1
 
   scratch-blocks:
     dependencies:
@@ -6617,6 +6621,10 @@ packages:
     resolution: {integrity: sha512-0RVnjg1HJsXY2YFDoTNzcc1NKhYuXKRrBAG2gDygmJJA136Cs2QlRliZG1mA0ap7cuaT30mw16luAeln+4RiNA==}
     engines: {node: '>= 4.0.0'}
     hasBin: true
+
+  modern-normalize@3.0.1:
+    resolution: {integrity: sha512-VqlMdYi59Uch6fnUPxnpijWUQe+TW6zeWCvyr6Mb7JibheHzSuAAoJi2c71ZwIaWKpECpGpYHoaaBp6rBRr+/g==}
+    engines: {node: '>=6'}
 
   moo-color@1.0.3:
     resolution: {integrity: sha512-i/+ZKXMDf6aqYtBhuOcej71YSlbjT3wCO/4H1j8rPvxDJEifdwgg5MaFyu6iYAT8GBZJg2z0dkgK4YMzvURALQ==}
@@ -18169,6 +18177,8 @@ snapshots:
       he: 1.1.1
       mkdirp: 0.5.1
       supports-color: 4.4.0
+
+  modern-normalize@3.0.1: {}
 
   moo-color@1.0.3:
     dependencies:

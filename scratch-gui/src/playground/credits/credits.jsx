@@ -9,7 +9,7 @@ import {detectTheme} from '../../lib/themes/themePersistance';
 import UserData from './users';
 
 /* eslint-disable react/jsx-no-literals */
-
+ 
 applyGuiColors(detectTheme());
 document.documentElement.lang = 'en';
 

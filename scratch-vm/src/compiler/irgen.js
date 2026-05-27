@@ -214,6 +214,9 @@ class ScriptTreeGenerator {
         }
 
         switch (block.opcode) {
+        case 'boolean':
+            // ob: Mistake during the early development of AmpMod, which merged into OmniBlocks. Do nothing.
+            return new IntermediateInput(InputOpcode.NOP, InputType.BOOLEAN);
         case 'colour_picker':
             return this.createConstantInput(block.fields.COLOUR.value, true);
         case 'math_angle':
@@ -300,6 +303,14 @@ class ScriptTreeGenerator {
             return new IntermediateInput(InputOpcode.LOOKS_COSTUME_NAME, InputType.STRING);
         case 'looks_size':
             return new IntermediateInput(InputOpcode.LOOKS_SIZE_GET, InputType.NUMBER_POS | InputType.NUMBER_ZERO);
+        case 'looks_geteffect':
+            return new IntermediateInput(
+                InputOpcode.LOOKS_EFFECT_GET,
+                InputType.NUMBER_REAL,
+                {
+                    effect: block.fields.EFFECT.value
+                }
+            );
 
         case 'motion_direction':
             return new IntermediateInput(InputOpcode.MOTION_DIRECTION_GET, InputType.NUMBER_REAL);
@@ -310,6 +321,11 @@ class ScriptTreeGenerator {
 
         case 'operator_add':
             return new IntermediateInput(InputOpcode.OP_ADD, InputType.NUMBER_OR_NAN, {
+                left: this.descendInputOfBlock(block, 'NUM1').toType(InputType.NUMBER),
+                right: this.descendInputOfBlock(block, 'NUM2').toType(InputType.NUMBER)
+            });
+        case 'operator_exponent':
+            return new IntermediateInput(InputOpcode.OP_EXPO, InputType.NUMBER_OR_NAN, {
                 left: this.descendInputOfBlock(block, 'NUM1').toType(InputType.NUMBER),
                 right: this.descendInputOfBlock(block, 'NUM2').toType(InputType.NUMBER)
             });
@@ -354,6 +370,28 @@ class ScriptTreeGenerator {
                 left: this.descendInputOfBlock(block, 'STRING1').toType(InputType.STRING),
                 right: this.descendInputOfBlock(block, 'STRING2').toType(InputType.STRING)
             });
+        case 'operator_expandablejoin': {
+            const items = [];
+            const itemCount = Number(block.mutation.items) || 0;
+
+            for (let i = 0; i < itemCount; i++) {
+                const inputName = `ADD${i}`;
+                items.push(this.descendInputOfBlock(block, inputName).toType(InputType.STRING));
+            }
+
+            return new IntermediateInput(
+                InputOpcode.OP_JOIN,
+                InputType.ARRAY,
+                {
+                    items: items
+                }
+            );
+        }
+        case 'operator_arrayjoin':
+            return new IntermediateInput(InputOpcode.OP_ARRAYJOIN, InputType.STRING, {
+                array: this.descendInputOfBlock(block, 'ARRAY').toType(InputType.ARRAY),
+                delim: this.descendInputOfBlock(block, 'DELIM').toType(InputType.STRING)
+            });
         case 'operator_length':
             return new IntermediateInput(InputOpcode.OP_LENGTH, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO, {
                 string: this.descendInputOfBlock(block, 'STRING').toType(InputType.STRING)
@@ -389,6 +427,27 @@ class ScriptTreeGenerator {
             default: return this.createConstantInput(0);
             }
         }
+        case 'operator_mathconst': {
+            const constant = block.fields.CONSTANT.value;
+            switch (constant) {
+                case 'pi':
+                    return this.createConstantInput(Math.PI);
+                case 'e':
+                    return this.createConstantInput(Math.E);
+                case 'infinity':
+                    return this.createConstantInput(Infinity);
+                case '-infinity':
+                    return this.createConstantInput(-Infinity);
+                default:
+                    return this.createConstantInput(0);
+            }
+        }
+        case 'operator_substring':
+            return new IntermediateInput(InputOpcode.OP_SUBSTRING, InputType.STRING, {
+                start: this.descendInputOfBlock(block, 'START').toType(InputType.NUMBER_INDEX),
+                end: this.descendInputOfBlock(block, 'END').toType(InputType.NUMBER_INDEX),
+                string: this.descendInputOfBlock(block, 'STRING').toType(InputType.STRING)
+            });
         case 'operator_atan2': {
             return new IntermediateInput(InputOpcode.OP_ATAN2, InputType.NUMBER, {
                 left: this.descendInputOfBlock(block, 'NUM1').toType(InputType.NUMBER),
@@ -483,6 +542,8 @@ class ScriptTreeGenerator {
                 left: this.descendInputOfBlock(block, 'NUM1').toType(InputType.NUMBER),
                 right: this.descendInputOfBlock(block, 'NUM2').toType(InputType.NUMBER)
             });
+        case 'operator_newline':
+            return this.createConstantInput('\n', true);
 
         case 'procedures_call': {
             const procedureInfo = this.getProcedureInfo(block);
@@ -514,6 +575,12 @@ class ScriptTreeGenerator {
             return new IntermediateInput(InputOpcode.SENSING_DISTANCE, InputType.NUMBER_POS | InputType.NUMBER_ZERO, {
                 target: this.descendInputOfBlock(block, 'DISTANCETOMENU').toType(InputType.STRING)
             });
+        case 'sensing_mousebuttondown':
+            return new IntermediateInput(InputOpcode.SENSING_MOUSE_BUTTON_DOWN, InputType.BOOLEAN, {
+                button: this.descendInputOfBlock(block, 'MOUSEBUTTTONMENU').toType(InputType.NUMBER)
+            });
+        case 'sensing_lastkeypressed':
+            return new IntermediateInput(InputOpcode.TW_KEY_LAST_PRESSED, InputType.STRING);
         case 'sensing_keypressed':
             return new IntermediateInput(InputOpcode.SENSING_KEY_DOWN, InputType.BOOLEAN, {
                 key: this.descendInputOfBlock(block, 'KEY_OPTION', true)
@@ -586,8 +653,110 @@ class ScriptTreeGenerator {
         case 'control_get_counter':
             return new IntermediateInput(InputOpcode.CONTROL_COUNTER, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO);
 
+        case 'control_is_clone':
+            return new IntermediateInput(InputOpcode.CONTROL_IS_CLONE, InputType.BOOLEAN);
+
         case 'tw_getLastKeyPressed':
             return new IntermediateInput(InputOpcode.TW_KEY_LAST_PRESSED, InputType.STRING);
+
+        case 'arrays_empty_array':
+            return this.createConstantInput([]);
+
+        case 'arrays_delimited_to_array':
+            return new IntermediateInput(InputOpcode.ARRAYS_DELIMITED, InputType.ARRAY, {
+                text: this.descendInputOfBlock(block, 'TEXT').toType(InputType.STRING),
+                delimiter: this.descendInputOfBlock(block, 'DELIM').toType(InputType.STRING)
+            });
+        case "arrays_range":
+            return new IntermediateInput(
+                InputOpcode.ARRAYS_RANGE,
+                InputType.ARRAY,
+                {
+                    start: this.descendInputOfBlock(block, "START").toType(
+                        InputType.NUMBER
+                    ),
+                    end: this.descendInputOfBlock(block, "END").toType(
+                        InputType.NUMBER
+                    ),
+                }
+            );
+        case 'arrays_item_of':
+            return new IntermediateInput(
+                InputOpcode.ARRAYS_INDEX,
+                InputType.ANY,
+                {
+                    index: this.descendInputOfBlock(block, "INDEX"), // Cannot convert to number due to "last" and "random"
+                    array: this.descendInputOfBlock(block, "VALUE").toType(
+                        InputType.ARRAY
+                    ),
+                }
+            );
+        case 'arrays_length':
+            return new IntermediateInput(
+                InputOpcode.ARRAYS_LENGTH,
+                InputType.NUMBER,
+                {
+                    array: this.descendInputOfBlock(block, "VALUE").toType(
+                        InputType.ARRAY
+                    ),
+                }
+            );
+        case 'arrays_contains':
+            return new IntermediateInput(
+                InputOpcode.ARRAYS_CONTAINS,
+                InputType.BOOLEAN,
+                {
+                    array: this.descendInputOfBlock(block, "ARRAY").toType(
+                        InputType.ARRAY
+                    ),
+                    item: this.descendInputOfBlock(block, "VALUE"),
+                }
+            );
+        // the 2 below are swapped between their opcode and actual behaviour
+        // due to a development mistake in the early days of ampmod
+        case 'arrays_in_front_of':
+            return new IntermediateInput(
+                InputOpcode.ARRAYS_BEHIND,
+                InputType.ARRAY,
+                {
+                    array: this.descendInputOfBlock(block, "ARRAY").toType(
+                        InputType.ARRAY
+                    ),
+                    item: this.descendInputOfBlock(block, "ITEM"),
+                }
+            );
+        case 'arrays_behind':
+            return new IntermediateInput(
+                InputOpcode.ARRAYS_IN_FRONT_OF,
+                InputType.ARRAY,
+                {
+                    array: this.descendInputOfBlock(block, "ARRAY").toType(
+                        InputType.ARRAY
+                    ),
+                    item: this.descendInputOfBlock(block, "ITEM"),
+                }
+            );
+        case 'arrays_expandablemake': {
+            const items = [];
+            // Extract the count from the block's mutation
+            // In many Scratch-based IR generators, this is stored in block.mutation
+            const itemCount = Number(block.mutation.items) || 0;
+
+            for (let i = 0; i < itemCount; i++) {
+                // Descend into each dynamic input (ADD0, ADD1, etc.)
+                const inputName = `ADD${i}`;
+                items.push(this.descendInputOfBlock(block, inputName));
+            }
+
+            return new IntermediateInput(
+                InputOpcode.ARRAYS_EXPANDABLE_MAKE, // Ensure this opcode exists in your InputOpcode enum
+                InputType.ARRAY,
+                {
+                    items: items
+                }
+            );
+        }
+
 
         default: {
             const opcodeFunction = this.runtime.getOpcodeFunction(block.opcode);

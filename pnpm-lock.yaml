@@ -103,8 +103,8 @@ importers:
         specifier: ^0.0.202505311821
         version: 0.0.202505311821(encoding@0.1.13)(webpack@4.47.0)
       '@turbowarp/scratch-svg-renderer':
-        specifier: github:OmniBlocks/omniblocks-svg-renderer#develop
-        version: https://codeload.github.com/OmniBlocks/omniblocks-svg-renderer/tar.gz/62a2be1e440ff6993cf5a5f5fac6f8ac60423bfb(scratch-render-fonts@https://codeload.github.com/PenguinMod/penguinmod-render-fonts/tar.gz/4dda62c707f64505266aa62f7a6cc84f0e5812fd)
+        specifier: github:TurboWarp/scratch-svg-renderer#develop
+        version: https://codeload.github.com/TurboWarp/scratch-svg-renderer/tar.gz/4c7292fb9a20b3927a3ead6643c0ca20249d12ff(scratch-render-fonts@https://codeload.github.com/PenguinMod/penguinmod-render-fonts/tar.gz/4dda62c707f64505266aa62f7a6cc84f0e5812fd)
       '@turbowarp/startaudiocontext':
         specifier: ^1.0.0
         version: 1.0.0
@@ -705,82 +705,6 @@ importers:
       webpack-dev-server:
         specifier: 3.11.2
         version: 3.11.2(webpack-cli@3.3.12)(webpack@4.47.0)
-
-  scratch-svg-renderer:
-    dependencies:
-      '@turbowarp/nanolog':
-        specifier: ^0.2.0
-        version: 0.2.0
-      base64-js:
-        specifier: 1.2.1
-        version: 1.2.1
-      base64-loader:
-        specifier: 1.0.0
-        version: 1.0.0
-      dompurify:
-        specifier: ^2.5.6
-        version: 2.5.9
-      scratch-render-fonts:
-        specifier: github:PenguinMod/penguinmod-render-fonts#master
-        version: https://codeload.github.com/PenguinMod/penguinmod-render-fonts/tar.gz/4dda62c707f64505266aa62f7a6cc84f0e5812fd
-      transformation-matrix:
-        specifier: 1.15.0
-        version: 1.15.0
-    devDependencies:
-      babel-core:
-        specifier: 6.26.0
-        version: 6.26.0
-      babel-eslint:
-        specifier: ^10.1.0
-        version: 10.1.0(eslint@8.55.0)
-      babel-loader:
-        specifier: 7.1.5
-        version: 7.1.5(babel-core@6.26.0)(webpack@4.47.0)
-      babel-preset-env:
-        specifier: 1.6.1
-        version: 1.6.1
-      copy-webpack-plugin:
-        specifier: 4.6.0
-        version: 4.6.0
-      eslint:
-        specifier: 8.55.0
-        version: 8.55.0
-      eslint-config-scratch:
-        specifier: 9.0.3
-        version: 9.0.3(@babel/eslint-parser@7.28.6(@babel/core@7.29.0)(eslint@8.55.0))(eslint@8.55.0)
-      eslint-plugin-import:
-        specifier: 2.29.0
-        version: 2.29.0(eslint@8.55.0)
-      jsdom:
-        specifier: 13.2.0
-        version: 13.2.0
-      json:
-        specifier: 9.0.6
-        version: 9.0.6
-      lodash.defaultsdeep:
-        specifier: 4.6.1
-        version: 4.6.1
-      mkdirp:
-        specifier: 2.0.0
-        version: 2.0.0
-      rimraf:
-        specifier: 3.0.2
-        version: 3.0.2
-      tap:
-        specifier: 11.1.5
-        version: 11.1.5
-      webpack:
-        specifier: 4.47.0
-        version: 4.47.0(webpack-cli@3.3.12)
-      webpack-cli:
-        specifier: 3.3.12
-        version: 3.3.12(webpack@4.47.0)
-      webpack-dev-server:
-        specifier: 3.11.2
-        version: 3.11.2(webpack-cli@3.3.12)(webpack@4.47.0)
-      xmldom:
-        specifier: 0.1.31
-        version: 0.1.31
 
   scratch-vm:
     dependencies:
@@ -1856,11 +1780,11 @@ packages:
     peerDependencies:
       scratch-render-fonts: github:TurboWarp/scratch-render-fonts#master
 
-  '@turbowarp/scratch-svg-renderer@https://codeload.github.com/OmniBlocks/omniblocks-svg-renderer/tar.gz/62a2be1e440ff6993cf5a5f5fac6f8ac60423bfb':
-    resolution: {tarball: https://codeload.github.com/OmniBlocks/omniblocks-svg-renderer/tar.gz/62a2be1e440ff6993cf5a5f5fac6f8ac60423bfb}
-    version: 1.0.0
+  '@turbowarp/scratch-svg-renderer@https://codeload.github.com/TurboWarp/scratch-svg-renderer/tar.gz/4c7292fb9a20b3927a3ead6643c0ca20249d12ff':
+    resolution: {tarball: https://codeload.github.com/TurboWarp/scratch-svg-renderer/tar.gz/4c7292fb9a20b3927a3ead6643c0ca20249d12ff}
+    version: 1.1.0
     peerDependencies:
-      scratch-render-fonts: github:PenguinMod/penguinmod-render-fonts#master
+      scratch-render-fonts: github:TurboWarp/scratch-render-fonts#master
 
   '@turbowarp/startaudiocontext@1.0.0':
     resolution: {integrity: sha512-BJ7EVYVwuTH/Tr6tEaLaXA5TCi8qKxNWsxohNqxIEDzykN+FscgOALhEMUlNc6vgcmOi7yQFJ82Prx9bnY5DgA==}
@@ -1928,6 +1852,9 @@ packages:
 
   '@types/tapable@1.0.12':
     resolution: {integrity: sha512-bTHG8fcxEqv1M9+TD14P8ok8hjxoOCkfKc8XXLaaD05kI7ohpeI956jtDOD3XHKBQrlyPughUtzm1jtVhHpA5Q==}
+
+  '@types/trusted-types@2.0.7':
+    resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
   '@types/uglify-js@3.17.5':
     resolution: {integrity: sha512-TU+fZFBTBcXj/GpDpDaBmgWk/gn96kMZ+uocaFUlV2f8a6WdMzzI44QBCmGcCiYR0Y6ZlNRiyUyKKt5nl/lbzQ==}
@@ -2419,9 +2346,6 @@ packages:
   babel-code-frame@6.26.0:
     resolution: {integrity: sha512-XqYMR2dfdGMW+hd0IUZ2PwK+fGeFkOxZJ0wY+JaQAHzt1Zx8LcvpiZD2NiGkEG8qx0CfkAOr5xt76d1e8vG90g==}
 
-  babel-core@6.26.0:
-    resolution: {integrity: sha512-FSiqfr4SYrH5Zv5KgWahyY99VC+Aod1ioMRNvL1lPS4WTUqvPAdYo7ioWEhDHEDqZADapbJZMX0sBuRsc93bDQ==}
-
   babel-core@6.26.3:
     resolution: {integrity: sha512-6jyFLuDmeidKmUEb3NM+/yawG0M2bDZ9Z1qbZP59cyHLz8kYGKYwpJP0UwUKKUiTRNvxfLesJnTedqczP7cTDA==}
 
@@ -2691,9 +2615,6 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0 || ^8.0.0-0
 
-  babel-preset-env@1.6.1:
-    resolution: {integrity: sha512-W6VIyA6Ch9ePMI7VptNn2wBM6dbG0eSz25HEiL40nQXCsXGTGZSTZu1Iap+cj3Q0S5a7T9+529l/5Bkvd+afNA==}
-
   babel-preset-env@1.7.0:
     resolution: {integrity: sha512-9OR2afuKDneX2/q2EurSftUYM0xGu4O2D9adAhVfADDhrYDaxXV0rBbevVYoY9n6nyX1PmQW/0jtpJvUNr9CHg==}
 
@@ -2883,11 +2804,6 @@ packages:
 
   browserify-zlib@0.2.0:
     resolution: {integrity: sha512-Z942RysHXmJrhqk88FmKBVq/v5tqmSkDz7p54G/MGyjMnCFFnC79XWNbg+Vta8W6Wb2qtSZTSxIGkJrRpCFEiA==}
-
-  browserslist@2.11.3:
-    resolution: {integrity: sha512-yWu5cXT7Av6mVwzWc8lMsJMHWn4xyjSuGYi4IozbVTLUOEYPSagUB8kiMDUHA1fS3zjr8nkxkn9jdvug4BBRmA==}
-    deprecated: Browserslist 2 could fail on reading Browserslist >3.0 config used in other tools.
-    hasBin: true
 
   browserslist@3.2.8:
     resolution: {integrity: sha512-WHVocJYavUwVgVViC0ORikPHQquXwVh939TaelZ4WDqpWgTX/FsGhl/+P4qBUAGcRvtOgDgC+xftNWWp2RUTAQ==}
@@ -3808,6 +3724,9 @@ packages:
   dompurify@2.5.9:
     resolution: {integrity: sha512-i6mvVmWN4xo9LrhCOZrDgSs9noW6nOahbrmzjRbPF36YPyj5Ue5lgok0MHDWkG7xzpWFO2OYttXdzM7rJxHvNA==}
 
+  dompurify@3.4.7:
+    resolution: {integrity: sha512-2jBxDJY4RR06tQNy4w5FlFH7kfxsQZlufd0sbv+chfHCxeJwrFw2baUDsSwvBISD4K4RDbd0PTfy3uNXsR6siA==}
+
   domutils@1.7.0:
     resolution: {integrity: sha512-Lgd2XcJ/NjEw+7tFvfKxOzCYKZsdct5lczQ2ZaQY8Djz7pfAD3Gbp8ySJWtreII/vDlMVmxwa6pHmdxIYgttDg==}
 
@@ -4114,16 +4033,6 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
       eslint: ^2 || ^3 || ^4 || ^5 || ^6 || ^7.2.0
-    peerDependenciesMeta:
-      '@typescript-eslint/parser':
-        optional: true
-
-  eslint-plugin-import@2.29.0:
-    resolution: {integrity: sha512-QPOO5NO6Odv5lpoTkddtutccQjysJuFxoPS7fAHO+9m9udNHvTCPSAMW9zGAYj8lAIdr40I8yPCdUYrncXtrwg==}
-    engines: {node: '>=4'}
-    peerDependencies:
-      '@typescript-eslint/parser': '*'
-      eslint: ^2 || ^3 || ^4 || ^5 || ^6 || ^7.2.0 || ^8
     peerDependenciesMeta:
       '@typescript-eslint/parser':
         optional: true
@@ -6120,10 +6029,6 @@ packages:
   jsdom@11.12.0:
     resolution: {integrity: sha512-y8Px43oyiBM13Zc1z780FrfNLJCXTL40EWlty/LXUtcjykRBNgLlCjWXpfSPBl2iv+N7koQN+dvqszHZgT/Fjw==}
 
-  jsdom@13.2.0:
-    resolution: {integrity: sha512-cG1NtMWO9hWpqRNRR3dSvEQa8bFI6iLlqU2x4kwX51FQjp0qus8T9aBaAO6iGp3DeBrhdwuKxckknohkmfvsFw==}
-    engines: {node: '>=8'}
-
   jsdom@24.1.3:
     resolution: {integrity: sha512-MyL55p3Ut3cXbeBEG7Hcv0mVM8pp8PBNWxRqchZnSfAiES1v1mRnMeFfaHWIPULpwsYfvO+ZmMZz5tGCnjzDUQ==}
     engines: {node: '>=18'}
@@ -6702,11 +6607,6 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  mkdirp@2.0.0:
-    resolution: {integrity: sha512-M9ecBPkCu6jZ+H19zruhjw/JB97qqVhyi1H2Lxxo2XAoIMdpHKQ8MfQiMzXk9SH/oJXIbM3oSAfLB8qSWJdCLA==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   mkpath@1.0.0:
     resolution: {integrity: sha512-PbNHr7Y/9Y/2P5pKFv5XOGBfNQqZ+fdiHWcuf7swLACN5ZW5LU7J5tMU8LSBjpluAxAxKYGD9nnaIbdRy9+m1w==}
 
@@ -7215,9 +7115,6 @@ packages:
 
   parse5@4.0.0:
     resolution: {integrity: sha512-VrZ7eOd3T1Fk4XWNXMgiGBK/z0MG48BWG2uQNU4I72fkQuKUTZpl+u9k+CxEG0twMVzSmXEEz12z5Fnw1jIQFA==}
-
-  parse5@5.1.0:
-    resolution: {integrity: sha512-fxNG2sQjHvlVAYmzBZS9YlDp6PTSSDwa98vkD4QgVDDCAo84z5X1t5XyJQ62ImdLXx5NdIIfihey6xpum9/gRQ==}
 
   parse5@7.3.0:
     resolution: {integrity: sha512-IInvU7fabl34qmi9gY8XOVxhYyMyuH2xUNpb2q8/Y+7552KlejkRvqvD19nMoUW/uQGGbqNpA6Tufu5FL5BZgw==}
@@ -8149,10 +8046,6 @@ packages:
   sax@1.6.0:
     resolution: {integrity: sha512-6R3J5M4AcbtLUdZmRv2SygeVaM7IhrLXu9BmnOGmmACak8fiUtOsYNWUS4uK7upbmHIBbLBeFeI//477BKLBzA==}
     engines: {node: '>=11.0.0'}
-
-  saxes@3.1.11:
-    resolution: {integrity: sha512-Ydydq3zC+WYDJK1+gRxRapLIED9PWeSuuS41wqyoRmzvhhh9nc+QQrVMKJYzJFULazeGhzSV0QleN2wD3boh2g==}
-    engines: {node: '>=8'}
 
   saxes@6.0.0:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
@@ -9383,9 +9276,6 @@ packages:
     resolution: {integrity: sha512-z8P5DvDNjKDoFIHK7q8r8lackT6l+jo/Ye3HOle7l9nICP9lf1Ci25fy9vHd0JOWewkIFzXIEig3TdKT7JQ5fQ==}
     deprecated: Use your platform's native performance.now() and performance.timeOrigin.
 
-  w3c-xmlserializer@1.1.2:
-    resolution: {integrity: sha512-p10l/ayESzrBMYWRID6xbuCKh2Fp77+sA0doRuGn4tTIMrrZVeqfpKjXHY+oDh3K4nLdPgNwMTVP6Vp4pvqbNg==}
-
   w3c-xmlserializer@5.0.0:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
@@ -9678,11 +9568,6 @@ packages:
 
   xmlcreate@2.0.4:
     resolution: {integrity: sha512-nquOebG4sngPmGPICTS5EnxqhKbCmz5Ox5hsszI2T6U5qdrJizBc+0ilYSEjTSzU0yZcmvppztXe/5Al5fUwdg==}
-
-  xmldom@0.1.31:
-    resolution: {integrity: sha512-yS2uJflVQs6n+CyjHoaBmVSqIDevTAWrzMmjG1Gc7h1qQ7uVozNhEPJAwZXWyGQ/Gafo3fCwrcaokezLPupVyQ==}
-    engines: {node: '>=0.1'}
-    deprecated: Deprecated due to CVE-2021-21366 resolved in 0.5.0
 
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
@@ -11572,12 +11457,12 @@ snapshots:
       scratch-render-fonts: https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961
       transformation-matrix: 1.15.0
 
-  '@turbowarp/scratch-svg-renderer@https://codeload.github.com/OmniBlocks/omniblocks-svg-renderer/tar.gz/62a2be1e440ff6993cf5a5f5fac6f8ac60423bfb(scratch-render-fonts@https://codeload.github.com/PenguinMod/penguinmod-render-fonts/tar.gz/4dda62c707f64505266aa62f7a6cc84f0e5812fd)':
+  '@turbowarp/scratch-svg-renderer@https://codeload.github.com/TurboWarp/scratch-svg-renderer/tar.gz/4c7292fb9a20b3927a3ead6643c0ca20249d12ff(scratch-render-fonts@https://codeload.github.com/PenguinMod/penguinmod-render-fonts/tar.gz/4dda62c707f64505266aa62f7a6cc84f0e5812fd)':
     dependencies:
       '@turbowarp/nanolog': 0.2.0
       base64-js: 1.2.1
       base64-loader: 1.0.0
-      dompurify: 2.5.9
+      dompurify: 3.4.7
       scratch-render-fonts: https://codeload.github.com/PenguinMod/penguinmod-render-fonts/tar.gz/4dda62c707f64505266aa62f7a6cc84f0e5812fd
       transformation-matrix: 1.15.0
 
@@ -11659,6 +11544,9 @@ snapshots:
   '@types/stack-utils@2.0.3': {}
 
   '@types/tapable@1.0.12': {}
+
+  '@types/trusted-types@2.0.7':
+    optional: true
 
   '@types/uglify-js@3.17.5':
     dependencies:
@@ -12228,30 +12116,6 @@ snapshots:
       esutils: 2.0.3
       js-tokens: 3.0.2
 
-  babel-core@6.26.0:
-    dependencies:
-      babel-code-frame: 6.26.0
-      babel-generator: 6.26.1
-      babel-helpers: 6.24.1
-      babel-messages: 6.23.0
-      babel-register: 6.26.0
-      babel-runtime: 6.26.0
-      babel-template: 6.26.0
-      babel-traverse: 6.26.0
-      babel-types: 6.26.0
-      babylon: 6.18.0
-      convert-source-map: 1.9.0
-      debug: 2.6.9(supports-color@6.1.0)
-      json5: 0.5.1
-      lodash: 4.18.1
-      minimatch: 3.1.5
-      path-is-absolute: 1.0.1
-      private: 0.1.8
-      slash: 1.0.0
-      source-map: 0.5.7
-    transitivePeerDependencies:
-      - supports-color
-
   babel-core@6.26.3:
     dependencies:
       babel-code-frame: 6.26.0
@@ -12441,14 +12305,6 @@ snapshots:
       slash: 3.0.0
     transitivePeerDependencies:
       - supports-color
-
-  babel-loader@7.1.5(babel-core@6.26.0)(webpack@4.47.0):
-    dependencies:
-      babel-core: 6.26.0
-      find-cache-dir: 1.0.0
-      loader-utils: 1.4.2
-      mkdirp: 0.5.6
-      webpack: 4.47.0(webpack-cli@3.3.12)
 
   babel-loader@7.1.5(babel-core@6.26.3)(webpack@4.47.0):
     dependencies:
@@ -12825,41 +12681,6 @@ snapshots:
       '@babel/plugin-syntax-private-property-in-object': 7.14.5(@babel/core@7.29.0)
       '@babel/plugin-syntax-top-level-await': 7.14.5(@babel/core@7.29.0)
 
-  babel-preset-env@1.6.1:
-    dependencies:
-      babel-plugin-check-es2015-constants: 6.22.0
-      babel-plugin-syntax-trailing-function-commas: 6.22.0
-      babel-plugin-transform-async-to-generator: 6.24.1
-      babel-plugin-transform-es2015-arrow-functions: 6.22.0
-      babel-plugin-transform-es2015-block-scoped-functions: 6.22.0
-      babel-plugin-transform-es2015-block-scoping: 6.26.0
-      babel-plugin-transform-es2015-classes: 6.24.1
-      babel-plugin-transform-es2015-computed-properties: 6.24.1
-      babel-plugin-transform-es2015-destructuring: 6.23.0
-      babel-plugin-transform-es2015-duplicate-keys: 6.24.1
-      babel-plugin-transform-es2015-for-of: 6.23.0
-      babel-plugin-transform-es2015-function-name: 6.24.1
-      babel-plugin-transform-es2015-literals: 6.22.0
-      babel-plugin-transform-es2015-modules-amd: 6.24.1
-      babel-plugin-transform-es2015-modules-commonjs: 6.26.2
-      babel-plugin-transform-es2015-modules-systemjs: 6.24.1
-      babel-plugin-transform-es2015-modules-umd: 6.24.1
-      babel-plugin-transform-es2015-object-super: 6.24.1
-      babel-plugin-transform-es2015-parameters: 6.24.1
-      babel-plugin-transform-es2015-shorthand-properties: 6.24.1
-      babel-plugin-transform-es2015-spread: 6.22.0
-      babel-plugin-transform-es2015-sticky-regex: 6.24.1
-      babel-plugin-transform-es2015-template-literals: 6.22.0
-      babel-plugin-transform-es2015-typeof-symbol: 6.23.0
-      babel-plugin-transform-es2015-unicode-regex: 6.24.1
-      babel-plugin-transform-exponentiation-operator: 6.24.1
-      babel-plugin-transform-regenerator: 6.26.0
-      browserslist: 2.11.3
-      invariant: 2.2.4
-      semver: 5.7.2
-    transitivePeerDependencies:
-      - supports-color
-
   babel-preset-env@1.7.0:
     dependencies:
       babel-plugin-check-es2015-constants: 6.22.0
@@ -13163,11 +12984,6 @@ snapshots:
     dependencies:
       pako: 1.0.11
 
-  browserslist@2.11.3:
-    dependencies:
-      caniuse-lite: 1.0.30001787
-      electron-to-chromium: 1.5.334
-
   browserslist@3.2.8:
     dependencies:
       caniuse-lite: 1.0.30001787
@@ -13208,7 +13024,7 @@ snapshots:
 
   buffer@4.9.2:
     dependencies:
-      base64-js: 1.2.1
+      base64-js: 1.5.1
       ieee754: 1.2.1
       isarray: 1.0.0
 
@@ -14295,6 +14111,10 @@ snapshots:
 
   dompurify@2.5.9: {}
 
+  dompurify@3.4.7:
+    optionalDependencies:
+      '@types/trusted-types': 2.0.7
+
   domutils@1.7.0:
     dependencies:
       dom-serializer: 0.2.2
@@ -14819,31 +14639,6 @@ snapshots:
       pkg-up: 2.0.0
       read-pkg-up: 3.0.0
       resolve: 1.22.11
-      tsconfig-paths: 3.15.0
-    transitivePeerDependencies:
-      - eslint-import-resolver-typescript
-      - eslint-import-resolver-webpack
-      - supports-color
-
-  eslint-plugin-import@2.29.0(eslint@8.55.0):
-    dependencies:
-      array-includes: 3.1.9
-      array.prototype.findlastindex: 1.2.6
-      array.prototype.flat: 1.3.3
-      array.prototype.flatmap: 1.3.3
-      debug: 3.2.7(supports-color@6.1.0)
-      doctrine: 2.1.0
-      eslint: 8.55.0
-      eslint-import-resolver-node: 0.3.10
-      eslint-module-utils: 2.12.1(eslint-import-resolver-node@0.3.10)(eslint-import-resolver-webpack@0.11.1)(eslint@8.55.0)
-      hasown: 2.0.2
-      is-core-module: 2.16.1
-      is-glob: 4.0.3
-      minimatch: 3.1.5
-      object.fromentries: 2.0.8
-      object.groupby: 1.0.3
-      object.values: 1.2.1
-      semver: 6.3.1
       tsconfig-paths: 3.15.0
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
@@ -17745,38 +17540,6 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  jsdom@13.2.0:
-    dependencies:
-      abab: 2.0.6
-      acorn: 6.4.2
-      acorn-globals: 4.3.4
-      array-equal: 1.0.2
-      cssom: 0.3.8
-      cssstyle: 1.4.0
-      data-urls: 1.1.0
-      domexception: 1.0.1
-      escodegen: 1.14.3
-      html-encoding-sniffer: 1.0.2
-      nwsapi: 2.2.23
-      parse5: 5.1.0
-      pn: 1.1.0
-      request: 2.88.2
-      request-promise-native: 1.0.9(request@2.88.2)
-      saxes: 3.1.11
-      symbol-tree: 3.2.4
-      tough-cookie: 2.5.0
-      w3c-hr-time: 1.0.2
-      w3c-xmlserializer: 1.1.2
-      webidl-conversions: 4.0.2
-      whatwg-encoding: 1.0.5
-      whatwg-mimetype: 2.3.0
-      whatwg-url: 7.1.0
-      ws: 6.2.3
-      xml-name-validator: 3.0.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   jsdom@24.1.3:
     dependencies:
       cssstyle: 4.6.0
@@ -18384,8 +18147,6 @@ snapshots:
 
   mkdirp@1.0.4: {}
 
-  mkdirp@2.0.0: {}
-
   mkpath@1.0.0: {}
 
   mocha@4.1.0:
@@ -18989,8 +18750,6 @@ snapshots:
       parse5: 7.3.0
 
   parse5@4.0.0: {}
-
-  parse5@5.1.0: {}
 
   parse5@7.3.0:
     dependencies:
@@ -20032,10 +19791,6 @@ snapshots:
       xtend: 4.0.2
 
   sax@1.6.0: {}
-
-  saxes@3.1.11:
-    dependencies:
-      xmlchars: 2.2.0
 
   saxes@6.0.0:
     dependencies:
@@ -21641,12 +21396,6 @@ snapshots:
     dependencies:
       browser-process-hrtime: 1.0.0
 
-  w3c-xmlserializer@1.1.2:
-    dependencies:
-      domexception: 1.0.1
-      webidl-conversions: 4.0.2
-      xml-name-validator: 3.0.0
-
   w3c-xmlserializer@5.0.0:
     dependencies:
       xml-name-validator: 5.0.0
@@ -22012,8 +21761,6 @@ snapshots:
   xmlchars@2.2.0: {}
 
   xmlcreate@2.0.4: {}
-
-  xmldom@0.1.31: {}
 
   xtend@4.0.2: {}
 

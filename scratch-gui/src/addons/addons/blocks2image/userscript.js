@@ -67,6 +67,14 @@ export default async function ({ addon, console, msg }) {
             exportBlock(true);
           },
           separator: false,
+        },
+        {
+          enabled: !!svgchild?.childNodes?.length,
+          text: msg("export_all_to_sblocks") || "Export to scratchblocks",
+          callback: () => {
+            exportBlock("blocks");
+          },
+          separator: false,
         }
       );
 
@@ -119,7 +127,32 @@ export default async function ({ addon, console, msg }) {
     { blocks: true }
   );
 
+  function generateScratchBlocksText(block) {
+    let blockText = "";
+    // here its just parsing the thingy thing to get scratchblcoks
+    console.log(block.inputList)
+    let nextBlock = block.getNextBlock();
+    if (nextBlock) {
+      blockText += "\n" + generateScratchBlocksText(nextBlock);
+    }
+    return blockText;
+  }
+
   async function exportBlock(exportType, block) {
+    if (exportType === "blocks") {
+      let scratchBlocksText = "";
+      if (block) {
+        scratchBlocksText = generateScratchBlocksText(block);
+      } else {
+        const workspace = Blockly.getMainWorkspace();
+        const topBlocks = workspace.getTopBlocks(true);
+        scratchBlocksText = topBlocks.map(b => generateScratchBlocksText(b)).join("\n\n");
+      }
+      await navigator.clipboard.writeText(scratchBlocksText); // saved to clipboard. hopefully users aren't paranoid enough to reject it?!??!
+      // TODO: add a small confirmation ( a javascript alert seems out of place and too much)
+      return;
+    }
+
     let svg;
     if (block) {
       svg = selectedBlocks(exportType, block);

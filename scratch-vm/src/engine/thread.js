@@ -519,7 +519,7 @@ class Thread {
     }
 
     /**
-     * lk: Find the block context of a block.
+     * ob: Find the block context of a block.
      * @param {string} blockId The ID of the block.
      * @returns {?object} The block context, or null if nothing was found.
      */
@@ -529,7 +529,7 @@ class Thread {
     }
 
     /**
-     * lk: Set the block context of a block.
+     * ob: Set the block context of a block.
      * @param {string} blockId The ID of the block.
      * @param {object} value The value we want to set the block context to.
      * @throws {Error} Value must be an object.
@@ -540,7 +540,7 @@ class Thread {
     }
 
     /**
-     * lk: Delete the block context of a block.
+     * ob: Delete the block context of a block.
      * @param {string} blockId The ID of the block.
      */
     deleteBlockContext (blockId) {

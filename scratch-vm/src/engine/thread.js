@@ -237,6 +237,12 @@ class Thread {
             status: null, // Initialized by the request listener hat.
             headers: '{}'
         };
+
+        /**
+         * ob: The context of the thread for blocks to use (e.g. inside of a C block).
+         * @type {Map.<string, object>}
+         */
+        this._blockContext = new Map();
     }
 
     /**
@@ -366,6 +372,35 @@ class Thread {
     }
 
     /**
+     * ob: Pop back down the stack frame until we go past the block we're breaking or the stack frame is emptied.
+     */
+    break () {
+        const blocks = this.target.blocks;
+
+        const breakableBlocks = this.target.runtime.getBreakableBlocksRegExp();
+        const parentBlock = blocks.findParentBlockOfType(breakableBlocks, this.peekStack());
+        if (parentBlock === null) return;
+
+        if (parentBlock.opcode === 'control_case' || parentBlock.opcode === 'control_default') {
+            const switchBlock = blocks.findParentBlockOfType('control_switch', parentBlock.id);
+            const switchBlockContext = this.getBlockContext(switchBlock.id);
+            
+            if (switchBlockContext && switchBlockContext.fallthrough) {
+                delete switchBlockContext.fallthrough;
+                this.setBlockContext(switchBlock.id, switchBlockContext);
+            }
+        }
+        
+        while (blocks.getBlock(this.peekStack())?.opcode !== parentBlock.opcode) {
+            this.popStack();
+            if (this.peekStack() === null) return this.stopThisScript();
+        }
+
+        this.peekStackFrame().isLoop = false;
+        this.goToNextBlock();
+    }
+
+    /**
      * Get top stack item.
      * @return {?string} Block ID on top of stack.
      */
@@ -481,6 +516,35 @@ class Thread {
             if (--callCount < 0) return false;
         }
         return false;
+    }
+
+    /**
+     * lk: Find the block context of a block.
+     * @param {string} blockId The ID of the block.
+     * @returns {?object} The block context, or null if nothing was found.
+     */
+    getBlockContext (blockId) {
+        const context = this._blockContext.get(blockId);
+        return context ? context : null;
+    }
+
+    /**
+     * lk: Set the block context of a block.
+     * @param {string} blockId The ID of the block.
+     * @param {object} value The value we want to set the block context to.
+     * @throws {Error} Value must be an object.
+     */
+    setBlockContext (blockId, value) {
+        if (typeof value !== 'object') throw new Error('Invalid value.');
+        this._blockContext.set(blockId, value);
+    }
+
+    /**
+     * lk: Delete the block context of a block.
+     * @param {string} blockId The ID of the block.
+     */
+    deleteBlockContext (blockId) {
+        return this._blockContext.delete(blockId);
     }
 
     /**

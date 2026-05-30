@@ -32,6 +32,10 @@ class Scratch3ControlBlocks {
             control_wait_until: this.waitUntil,
             control_if: this.if,
             control_if_else: this.ifElse,
+            control_switch: this.switch,
+            control_case: this.case,
+            control_default: this.default,
+            control_break: this.break,
             control_stop: this.stop,
             control_create_clone_of: this.createClone,
             control_delete_this_clone: this.deleteClone,
@@ -135,6 +139,61 @@ class Scratch3ControlBlocks {
         } else {
             util.startBranch(2, false);
         }
+    }
+
+    switch (args, util) {
+        const blocks = util.target.blocks;
+        const thread = util.thread;
+
+        if (!blocks.validateSubstack(
+            thread.peekStack(),
+            'SUBSTACK',
+            child => child.opcode === 'control_case' || child.opcode === 'control_default'
+        )) return;
+
+        thread.setBlockContext(thread.peekStack(), {
+            type: 'switch',
+            value: Cast.toString(args.VALUE)
+        });
+        util.startBranch(1, false);
+    }
+
+    case (args, util) {
+        const thread = util.thread;
+        const blocks = util.target.blocks;
+        
+        const block = blocks.findParentBlock(thread.peekStack());
+        if (block === null || block.opcode !== 'control_switch') return;
+        const blockContext = thread.getBlockContext(block.id);
+        if (!blockContext || blockContext.type !== 'switch') return;
+        
+        if (blockContext.value === Cast.toString(args.VALUE) || blockContext.fallthrough) {
+            thread.setBlockContext(block.id, {
+                ...blockContext,
+                fallthrough: true
+            });
+            util.startBranch(1, false);
+        }
+    }
+
+    default (args, util) {
+        const thread = util.thread;
+        const blocks = util.target.blocks;
+        
+        const block = blocks.findParentBlock(thread.peekStack());
+        if (block === null || block.opcode !== 'control_switch') return;
+        const blockContext = thread.getBlockContext(block.id);
+        if (!blockContext || blockContext.type !== 'switch') return;
+        
+        thread.setBlockContext(block.id, {
+            ...blockContext,
+            fallthrough: false
+        });
+        util.startBranch(1, false);
+    }
+
+    break (args, util) {
+        util.thread.break();
     }
 
     stop (args, util) {

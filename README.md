@@ -2,7 +2,7 @@
 # OmniBlocks/monorepo
 ![Build Status](https://github.com/OmniBlocks/monorepo/workflows/CI/badge.svg)
 ![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/monorepo)
-![GitHub](https://img.shields.io/badge/license-GPLv3-blue.svg)
+![GitHub](https://img.shields.io/badge/license-AGPLv3-blue.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/monorepo)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![GitHub contributors](https://img.shields.io/github/contributors/OmniBlocks/monorepo)
@@ -10,20 +10,15 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/OmniBlocks/monorepo)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/OmniBlocks/monorepo)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/OmniBlocks/monorepo)
-![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB?logo=react)
+![Made with React](https://img.shields.io/badge/GUI%20made%20with-React-61DAFB?logo=react)
 ![Powered by Webpack](https://img.shields.io/badge/Powered%20by-Webpack-8DD6F9?logo=webpack)
 ![GitHub Repo stars](https://img.shields.io/github/stars/OmniBlocks/monorepo?style=flat)
 ![GitHub forks](https://img.shields.io/github/forks/OmniBlocks/monorepo?style=flat)
 ![Website](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fomniblocks.github.io)
-![GitHub language count](https://img.shields.io/github/languages/count/OmniBlocks/monorepo)
-![GitHub top language](https://img.shields.io/github/languages/top/OmniBlocks/monorepo)
 ![GitHub Created At](https://img.shields.io/github/created-at/OmniBlocks/monorepo)
 ![GitHub Release Date](https://img.shields.io/github/release-date-pre/OmniBlocks/monorepo)
-![GitHub Sponsors](https://img.shields.io/github/sponsors/OmniBlocks?logo=githubsponsors)
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/OmniBlocks/monorepo)
 ![GitHub number of milestones](https://img.shields.io/github/milestones/closed/OmniBlocks/monorepo)
-![GitHub License](https://img.shields.io/github/license/OmniBlocks/monorepo)
-![GitHub followers](https://img.shields.io/github/followers/OmniBlocks?style=flat&logo=github)
 
 <a href="https://www.star-history.com/#OmniBlocks/monorepo&type=date&legend=top-left">
  <picture>

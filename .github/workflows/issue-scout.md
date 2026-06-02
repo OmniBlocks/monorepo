@@ -143,3 +143,4 @@ Miscellaneous context:
 - Our stance on AI can be found at AGENTS.md. Please don't allow issues that ask for AI vibe coding features, as that is not aligned with our vision. You can give a fit assessment based on AGENTS.md if the issue is asking for AI features. 
 - Bad words are not allowed. However, damn, crap, hell, and other mild words that are sometimes used in casual speech may be allowed depending on context.
 - While you can check the main markdown files for information, mentioning them is not always necessary unless it actually is. (e.g. don't mention README or CONTRIBUTING when it's a feature request that DOESN'T conflict with the project vision)
+- Maintainers include: @supervoidcoder, @ampelc, @someCatInTheWorld, 

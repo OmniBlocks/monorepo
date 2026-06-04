@@ -297,7 +297,8 @@ class Blocks {
 
         // If it was cached, just return that.
         const validatedSubstacks = this._cache.validatedSubstacks;
-        if (validatedSubstacks[blockId]?.[input]) return validatedSubstacks[blockId][input];
+        const cached = validatedSubstacks[blockId]?.[input];
+        if (cached && cached.result && cached.validator === validator) return validatedSubstacks[blockId][input];
 
         validatedSubstacks[blockId] = validatedSubstacks[blockId] ?? {};
 
@@ -307,13 +308,23 @@ class Blocks {
         }
         while (walkedBlock) {
             if (!validator(walkedBlock)) {
-                if (validatedSubstacks[blockId]) validatedSubstacks[blockId][input] = false;
+                if (validatedSubstacks[blockId]) {
+                    validatedSubstacks[blockId][input] = {
+                        result: false,
+                        validator: validator
+                    };
+                }
                 return false;
             }
             walkedBlock = this.getBlock(walkedBlock.next);
         }
 
-        if (validatedSubstacks[blockId]) validatedSubstacks[blockId][input] = true;
+        if (validatedSubstacks[blockId]) {
+            validatedSubstacks[blockId][input] = {
+                result: true,
+                validator: validator
+            };
+        }
         return true;
     }
 

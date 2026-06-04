@@ -13,6 +13,7 @@ class AmpModArraysBlocks {
     getPrimitives() {
         return {
             arrays_empty_array: this.emptyArray,
+            arrays_expandablemake: this.expandableMake,
             arrays_item_of: this.itemOf,
             arrays_item_no_of: this.itemNoOf,
             arrays_contains: this.contains,
@@ -23,6 +24,15 @@ class AmpModArraysBlocks {
             arrays_range: this.range,
             arrays_delimited_to_array: this.delimitedToArray
         };
+    }
+    expandableMake(args) {
+        const result = [];
+        let i = 0;
+        while (Object.prototype.hasOwnProperty.call(args, `ADD${i}`)) {
+            result.push(args[`ADD${i}`]);
+            i++;
+        }
+        return result;
     }
     emptyArray() {
         return [];

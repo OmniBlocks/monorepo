@@ -303,6 +303,7 @@ class Blocks {
         validatedSubstacks[blockId] = validatedSubstacks[blockId] ?? {};
 
 
+        let walkedBlock;
         if (thisBlock.inputs[input].block) {
             walkedBlock = this.getBlock(thisBlock.inputs[input].block);
         }

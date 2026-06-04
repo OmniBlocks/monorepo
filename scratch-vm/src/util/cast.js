@@ -234,6 +234,17 @@ class Cast {
         }
         return index;
     }
+
+    /**
+     * Convert a value to an array. If the value is already an array, return it.
+     * Otherwise, return an empty array.
+     * @param {*} value The value to convert.
+     * @return {Array} The value as an array.
+     */
+    static toList (value) {
+        if (Array.isArray(value)) return value;
+        return [];
+    }
 }
 
 module.exports = Cast;

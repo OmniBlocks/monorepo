@@ -298,11 +298,11 @@ class Blocks {
         // If it was cached, just return that.
         const validatedSubstacks = this._cache.validatedSubstacks;
         const cached = validatedSubstacks[blockId]?.[input];
-        if (cached && cached.result && cached.validator === validator) return validatedSubstacks[blockId][input];
+        if (cached && cached.validator === validator) return cached.result;
 
         validatedSubstacks[blockId] = validatedSubstacks[blockId] ?? {};
 
-        let walkedBlock = null;
+
         if (thisBlock.inputs[input].block) {
             walkedBlock = this.getBlock(thisBlock.inputs[input].block);
         }

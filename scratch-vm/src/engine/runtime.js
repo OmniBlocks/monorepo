@@ -3680,11 +3680,11 @@ class Runtime extends EventEmitter {
      * ob: Compiles the breakable blocks array into a RegExp.
      */
     compileBreakableBlocks () {
-        let string = '(';
+        let string = '^(?:';
         for (let i = 0; i < this._breakableBlocksArray.length; i++) {
             string = string + (i === 0 ? '' : '|') + escapeRegExp(this._breakableBlocksArray[i]);
         }
-        string = `${string})`;
+        string = `${string})$`;
         this._breakableBlocksRegExp = new RegExp(string);
     }
 

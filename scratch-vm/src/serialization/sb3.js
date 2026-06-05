@@ -1489,11 +1489,11 @@ const deserialize = async function (json, runtime, zip, isSingleSprite) {
     const extensions = {
         extensionIDs: new Set(),
         extensionURLs: new Map()
-
+    };
 
     // Store the origin field (e.g. project originated at CSFirst) so that we can save it again.
     if (json.meta && json.meta.origin) {
-        // eslint-disable-next-line require-atomic-updates
+
         runtime.origin = json.meta.origin;
     } else {
         // eslint-disable-next-line require-atomic-updates

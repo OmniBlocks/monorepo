@@ -1,5 +1,5 @@
 language: en-US
-tone_instructions: ''
+tone_instructions: 'Anything related to Jameson is not allowed.'
 early_access: true
 enable_free_tier: true
 inheritance: false

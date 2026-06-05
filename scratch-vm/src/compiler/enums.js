@@ -88,10 +88,7 @@ const InputType = {
     ANY: 0x1FFF,
 
     /** An array of values in the form [R, G, B] */
-    COLOR: 0x2000,
-
-    /** amp: An array. */
-    ARRAY: 0x4000
+    COLOR: 0x2000
 };
 
 /**
@@ -105,7 +102,6 @@ const StackOpcode = {
     ADDON_CALL: 'addons.call',
     DEBUGGER: 'tw.debugger',
     VISUAL_REPORT: 'visualReport',
-    BLOCK_ERROR: 'blockError',
     COMPATIBILITY_LAYER: 'compat',
     OLD_COMPILER_COMPATIBILITY_LAYER: 'oldCompiler',
 
@@ -113,10 +109,6 @@ const StackOpcode = {
     HAT_PREDICATE: 'hat.predicate',
 
     CONTROL_IF_ELSE: 'control.if',
-    CONTROL_SWITCH: 'control.switch',
-    CONTROL_CASE: 'control.case',
-    CONTROL_DEFAULT: 'control.default',
-    CONTROL_BREAK: 'control.break',
     CONTROL_CLONE_CREATE: 'control.createClone',
     CONTROL_CLONE_DELETE: 'control.deleteClone',
     CONTROL_WHILE: 'control.while',
@@ -167,7 +159,6 @@ const StackOpcode = {
     MOTION_X_CHANGE: 'motion.changeX',
     MOTION_Y_SET: 'motion.setY',
     MOTION_Y_CHANGE: 'motion.changeY',
-    MOTION_CHANGE: 'motion.change',
     MOTION_XY_SET: 'motion.setXY',
     MOTION_IF_ON_EDGE_BOUNCE: 'motion.ifOnEdgeBounce',
     MOTION_STEP: 'motion.step',
@@ -211,7 +202,6 @@ const InputOpcode = {
     CAST_STRING: 'cast.toString',
     CAST_BOOLEAN: 'cast.toBoolean',
     CAST_COLOR: 'cast.toColor',
-    CAST_ARRAY: 'cast.toArray',
 
     COMPATIBILITY_LAYER: 'compat',
     OLD_COMPILER_COMPATIBILITY_LAYER: 'oldCompiler',
@@ -221,7 +211,6 @@ const InputOpcode = {
     LOOKS_COSTUME_NUMBER: 'looks.costumeNumber',
     LOOKS_COSTUME_NAME: 'looks.costumeName',
     LOOKS_SIZE_GET: 'looks.size',
-    LOOKS_EFFECT_GET: 'looks.getEffect',
 
     VAR_GET: 'var.get',
 
@@ -233,25 +222,20 @@ const InputOpcode = {
 
     MOTION_X_GET: 'motion.x',
     MOTION_Y_GET: 'motion.y',
-    MOTION_POSITION_GET: 'motion.position',
     MOTION_DIRECTION_GET: 'motion.direction',
 
     OP_ADD: 'op.add',
-    OP_EXPO: 'op.exponent',
     OP_AND: 'op.and',
     OP_CONTAINS: 'op.contains',
     OP_DIVIDE: 'op.divide',
     OP_EQUALS: 'op.equals',
-    // amp: Not really a new block but rather an alternate version of op.equals for when case sensitivity is enabled.
-    OP_EQUALS_CS: 'op.equals.cs',
     OP_GREATER: 'op.greater',
-    OP_GTOREQ: 'op.gtoreq', 
+    OP_GTOREQ: 'op.gtoreq', // unconventional name I know but would you really want the full name to be OP_GREATERTHANOREQUALTO
     OP_LTOREQ: 'op.ltoreq',
     OP_LESS: 'op.less',
     OP_JOIN: 'op.join',
     OP_LENGTH: 'op.length',
     OP_LETTER_OF: 'op.letterOf',
-    OP_SUBSTRING: 'op.substring',
     OP_ABS: 'op.abs',
     OP_FLOOR: 'op.floor',
     OP_CEILING: 'op.ceiling',
@@ -274,7 +258,6 @@ const InputOpcode = {
     OP_RANDOM: 'op.random',
     OP_ROUND: 'op.round',
     OP_SUBTRACT: 'op.subtract',
-    OP_ARRAYJOIN: 'op.arrayJoin',
 
     SENSING_ANSWER: 'sensing.answer',
     SENSING_COLOR_TOUCHING_COLOR: 'sensing.colorTouchingColor',
@@ -289,7 +272,6 @@ const InputOpcode = {
     SENSING_DISTANCE: 'sensing.distance',
     SENSING_KEY_DOWN: 'keyboard.pressed',
     SENSING_MOUSE_DOWN: 'mouse.down',
-    SENSING_MOUSE_BUTTON_DOWN: 'mouse.buttonDown',
     SENSING_MOUSE_X: 'mouse.x',
     SENSING_MOUSE_Y: 'mouse.y',
     SENSING_OF: 'sensing.of',
@@ -312,16 +294,6 @@ const InputOpcode = {
     PROCEDURE_ARGUMENT: 'procedures.argument',
 
     CONTROL_COUNTER: 'control.counter',
-    CONTROL_IS_CLONE: 'control.isClone',
-
-    ARRAYS_DELIMITED: 'arrays.delimited',
-    ARRAYS_RANGE: 'arrays.range',
-    ARRAYS_IN_FRONT_OF: 'arrays.front',
-    ARRAYS_BEHIND: 'arrays.behind',
-    ARRAYS_INDEX: 'arrays.index',
-    ARRAYS_LENGTH: 'arrays.length',
-    ARRAYS_CONTAINS: 'arrays.contains',
-    ARRAYS_EXPANDABLE_MAKE: 'arrays.expandableMake',
 
     TW_KEY_LAST_PRESSED: 'tw.lastKeyPressed'
 };

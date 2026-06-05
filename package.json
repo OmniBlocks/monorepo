@@ -15,8 +15,5 @@
       "webpack": "4.47.0",
       "webpack-cli": "3.3.12"
     }
-  },
-  "dependencies": {
-    "modern-normalize": "^3.0.1"
   }
 }

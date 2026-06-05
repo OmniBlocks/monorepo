@@ -645,24 +645,6 @@ case InputOpcode.OP_LTOREQ: {
             }
             this.source += `}\n`;
             break;
-        case StackOpcode.CONTROL_SWITCH:
-            this.source += `switch (${this.descendInput(node.value)}) {\n`;
-            this.descendStack(node.cases, new Frame(false));
-            this.source += `}\n`;
-            break;
-        case StackOpcode.CONTROL_CASE:
-            this.source += `case ${this.descendInput(node.value)}: {\n`;
-            this.descendStack(node.whenMatched, new Frame(false));
-            this.source += '}\n';
-            break;
-        case StackOpcode.CONTROL_DEFAULT:
-            this.source += `default: {\n`;
-            this.descendStack(node.whenNoMatches, new Frame(false));
-            this.source += `}\n`;
-            break;
-        case StackOpcode.CONTROL_BREAK:
-            this.source += `break;\n`;
-            break;
         case StackOpcode.CONTROL_REPEAT: {
             const i = this.localVariables.next();
             if (node.times.isAlwaysType(InputType.NUMBER_INT | InputType.NUMBER_INF)) {

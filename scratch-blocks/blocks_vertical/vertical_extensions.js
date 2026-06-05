@@ -167,17 +167,6 @@ Blockly.ScratchBlocks.VerticalExtensions.SHAPE_REPORTER = function() {
 };
 
 /**
- * Extension to make represent a square reporter in Scratch-Blocks.
- * That means the block has inline inputs, and a square output shape.
- * @this {Blockly.Block}
- * @readonly
- */
-Blockly.ScratchBlocks.VerticalExtensions.SHAPE_SQUARE = function() {
-  this.setInputsInline(true);
-  this.setOutputShape(Blockly.OUTPUT_SHAPE_SQUARE);
-};
-
-/**
  * Extension to make represent a boolean reporter in Scratch-Blocks.
  * That means the block has inline inputs, a round output shape, and a 'Boolean'
  * output type.
@@ -317,8 +306,6 @@ Blockly.ScratchBlocks.VerticalExtensions.registerAll = function() {
       Blockly.ScratchBlocks.VerticalExtensions.SHAPE_END);
   Blockly.Extensions.register('shape_reporter',
       Blockly.ScratchBlocks.VerticalExtensions.SHAPE_REPORTER);
-  Blockly.Extensions.register('shape_square',
-      Blockly.ScratchBlocks.VerticalExtensions.SHAPE_SQUARE);
 
 
   // Output shapes and types are related.

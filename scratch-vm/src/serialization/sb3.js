@@ -17,6 +17,7 @@ const MathUtil = require('../util/math-util');
 const StringUtil = require('../util/string-util');
 const VariableUtil = require('../util/variable-util');
 const compress = require('./tw-compress-sb3');
+const {patchAmpModProject} = require('./ob-ampmod-compat');
 
 const {loadCostume} = require('../import/load-costume.js');
 const {loadSound} = require('../import/load-sound.js');
@@ -1481,10 +1482,14 @@ const checkPlatformCompatibility = (json, runtime) => {
 const deserialize = async function (json, runtime, zip, isSingleSprite) {
     await checkPlatformCompatibility(json, runtime);
 
+    // ob: Patch AmpMod projects so their switch-case blocks use explicit breaks,
+    // matching the LibreKitten fallthrough-based runtime semantics.
+    patchAmpModProject(json);
+
     const extensions = {
         extensionIDs: new Set(),
         extensionURLs: new Map()
-    };
+
 
     // Store the origin field (e.g. project originated at CSFirst) so that we can save it again.
     if (json.meta && json.meta.origin) {

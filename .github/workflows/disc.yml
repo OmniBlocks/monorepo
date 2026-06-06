@@ -48,4 +48,4 @@ jobs:
           # Finalize
           gh issue comment ${{ github.event.issue.number }} --body "This issue is off-topic and has been migrated to a discussion: $DISCUSSION_URL"
           gh issue close ${{ github.event.issue.number }} --reason "not planned"
-          gh issue lock ${{ github.event.issue.number }} --reason "off-topic"
+          gh issue lock ${{ github.event.issue.number }} --reason "off_topic"

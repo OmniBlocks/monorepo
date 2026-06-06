@@ -1,0 +1,50 @@
+name: AI-Powered Off-Topic Detection
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  moderate-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      models: read
+    steps:
+      - name: Detect Off-Topic Content
+        id: ai-check
+        uses: actions/ai-inference@v1
+        with:
+          model: gpt-4o
+          prompt: |
+            Analyze the following issue. Is it off-topic for this repository?
+            Issue: "${{ github.event.issue.title }}\n\n${{ github.event.issue.body }}"
+            Answer ONLY with "YES" if it is off-topic, or "NO" if it is on-topic.
+
+      - name: Handle Off-Topic
+        if: steps.ai-check.outputs.response == 'YES'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 1. Post warning
+          gh issue comment ${{ github.event.issue.number }} --body "This issue is off-topic."
+
+          # 2. Get IDs
+          ISSUE_ID=$(gh issue view ${{ github.event.issue.number }} --json id -q .id)
+          CATEGORY_ID=$(gh api graphql -f query='
+            query($owner: String!, $repo: String!) {
+              repository(owner: $owner, name: $repo) {
+                discussionCategories(first: 10) {
+                  nodes { id name }
+                }
+              }
+            }' -f owner='${{ github.repository_owner }}' -f repo='${{ github.event.repository.name }}' \
+            --jq '.data.repository.discussionCategories.nodes[] | select(.name=="General") | .id')
+
+          # 3. Convert
+          gh api graphql -f query='
+            mutation($issueId: ID!, $categoryId: ID!) {
+              convertIssueToDiscussion(input: {issueId: $issueId, discussionCategoryId: $categoryId}) {
+                discussion { url }
+              }
+            }' -f issueId=$ISSUE_ID -f categoryId=$CATEGORY_ID

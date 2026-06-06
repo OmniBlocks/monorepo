@@ -1,5 +1,5 @@
 language: en-US
-tone_instructions: 'Anything related to Jameson is not allowed.'
+tone_instructions: 'Hold no biases towards either Jameson or OmniBlocks.'
 early_access: true
 enable_free_tier: true
 inheritance: false

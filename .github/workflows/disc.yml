@@ -36,16 +36,7 @@ jobs:
           CAT_ID="DIC_kwDOQLj5ts4C8Q4T"
           REPO_ID=$(gh api graphql -f query='{repository(owner: "${{ github.repository_owner }}", name: "${{ github.event.repository.name }}") {id}}' --jq '.data.repository.id')
 
-          # Create Discussion
-          DISCUSSION_URL=$(gh api graphql -f query='
-            mutation($repoId: ID!, $catId: ID!, $title: String!, $body: String!) {
-              createDiscussion(input: {repositoryId: $repoId, categoryId: $catId, title: $title, body: $body}) {
-                discussion { url }
-              }
-            }' -f repoId=$REPO_ID -f catId=$CAT_ID -f title="${{ github.event.issue.title }}" -f body="${{ github.event.issue.body }}" \
-            --jq '.data.createDiscussion.discussion.url')
-
           # Finalize
-          gh issue comment ${{ github.event.issue.number }} --body "This issue is off-topic and has been migrated to a discussion: $DISCUSSION_URL"
+          gh issue comment ${{ github.event.issue.number }} --body "This issue is off-topic and has been automatically closed as a result."
           gh issue close ${{ github.event.issue.number }} --reason "not planned"
-          gh issue lock ${{ github.event.issue.number }} --reason "off_topic"
+    

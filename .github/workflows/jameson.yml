@@ -1,11 +1,11 @@
-name: Monitor Jameson Comments
+name: Moderate Jameson Comments
 
 on:
   issue_comment:
-    types: [created]
+    types: [created, edited]
 
 jobs:
-  moderate-comment:
+  moderate:
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -15,34 +15,26 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const commentBody = context.payload.comment.body;
-            const issueNumber = context.issue.number;
+            const comment = context.payload.comment;
+            const body = comment.body;
             const warning = "> [!WARNING]\n> Opinions related to Jameson are not endorsed by OmniBlocks.\n\n";
 
-            // 1. Check for "Jameson" and prepend warning to issue body
-            if (commentBody.includes("Jameson")) {
-              const { data: issue } = await github.rest.issues.get({
+            // 1. Prepend warning to the specific comment if "Jameson" is found
+            if (body.includes("Jameson") && !body.includes("Opinions related to Jameson are not endorsed by OmniBlocks.")) {
+              await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: issueNumber,
+                comment_id: comment.id,
+                body: warning + body
               });
-
-              if (!issue.body || !issue.body.includes("Opinions related to Jameson are not endorsed by OmniBlocks.")) {
-                await github.rest.issues.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issueNumber,
-                  body: warning + (issue.body || "")
-                });
-              }
             }
 
-            // 2. Check for negative sentiment and add thumbs down
-            if (commentBody.includes("Jameson is better") || commentBody.includes("OmniBlocks is bad")) {
+            // 2. Thumbs down if specific phrases are found
+            if (body.includes("Jameson is better") || body.includes("OmniBlocks is bad")) {
               await github.rest.reactions.createForIssueComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                comment_id: context.payload.comment.id,
+                comment_id: comment.id,
                 content: "-1"
               });
             }

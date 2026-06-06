@@ -11,6 +11,10 @@ jobs:
       issues: write
       models: read
     steps:
+      # This step is required to provide the git context for the gh CLI
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Detect Off-Topic Content
         id: ai-check
         uses: actions/ai-inference@v1
@@ -18,7 +22,8 @@ jobs:
           model: gpt-4o
           prompt: |
             Analyze the following issue. Is it off-topic for this repository?
-            Issue: "${{ github.event.issue.title }}\n\n${{ github.event.issue.body }}"
+            Issue Title: "${{ github.event.issue.title }}"
+            Issue Body: "${{ github.event.issue.body }}"
             Answer ONLY with "YES" if it is off-topic, or "NO" if it is on-topic.
 
       - name: Handle Off-Topic
@@ -31,6 +36,8 @@ jobs:
 
           # 2. Get IDs
           ISSUE_ID=$(gh issue view ${{ github.event.issue.number }} --json id -q .id)
+          
+          # Using --repo flag explicitly is safer when running in actions
           CATEGORY_ID=$(gh api graphql -f query='
             query($owner: String!, $repo: String!) {
               repository(owner: $owner, name: $repo) {

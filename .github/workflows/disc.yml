@@ -1,27 +1,36 @@
-name: Migrate Off-Topic Issues
+name: Auto-Migrate Off-Topic Issues
 
 on:
   issues:
-    types: [labeled]
+    types: [opened, edited]
 
 jobs:
-  migrate:
-    if: github.event.label.name == 'off-topic'
+  migrate-off-topic:
     runs-on: ubuntu-latest
     permissions:
       issues: write
-      contents: read
+      models: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Detect Off-Topic Content
+        id: ai-check
+        uses: actions/ai-inference@v1
+        with:
+          model: gpt-4o
+          prompt: |
+            Analyze the following issue and determine if it is off-topic. OmniBlocks is a block-based IDE built on Scratch, specifically TurboWarp
+            Title: "${{ github.event.issue.title }}"
+            Body: "${{ github.event.issue.body }}"
+            Answer ONLY with "YES" if it is off-topic, or "NO" if it is on-topic.
+
       - name: Migrate Issue
+        if: steps.ai-check.outputs.response == 'YES'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 1. Fetch data
-          TITLE=$(gh issue view ${{ github.event.issue.number }} --json title -q .title)
-          BODY=$(gh issue view ${{ github.event.issue.number }} --json body -q .body)
+          # 1. Fetch Repository and Category IDs
           REPO_ID=$(gh api graphql -f query='{repository(owner: "${{ github.repository_owner }}", name: "${{ github.event.repository.name }}") {id}}' --jq '.data.repository.id')
           CATEGORY_ID=$(gh api graphql -f query='
             query($owner: String!, $repo: String!) {
@@ -33,15 +42,17 @@ jobs:
             }' -f owner='${{ github.repository_owner }}' -f repo='${{ github.event.repository.name }}' \
             --jq '.data.repository.discussionCategories.nodes[] | select(.name=="General") | .id')
 
-          # 2. Create Discussion
+          # 2. Create the Discussion
+          # We use printf to safely handle multi-line issue bodies
           DISCUSSION_URL=$(gh api graphql -f query='
             mutation($repoId: ID!, $catId: ID!, $title: String!, $body: String!) {
               createDiscussion(input: {repositoryId: $repoId, categoryId: $catId, title: $title, body: $body}) {
                 discussion { url }
               }
-            }' -f repoId=$REPO_ID -f catId=$CATEGORY_ID -f title="$TITLE" -f body="$BODY" \
+            }' -f repoId=$REPO_ID -f catId=$CATEGORY_ID -f title="${{ github.event.issue.title }}" -f body="${{ github.event.issue.body }}" \
             --jq '.data.createDiscussion.discussion.url')
 
-          # 3. Comment and Close
-          gh issue comment ${{ github.event.issue.number }} --body "This issue is off-topic and has been moved to a discussion: $DISCUSSION_URL"
+          # 3. Comment, Close, and Lock
+          gh issue comment ${{ github.event.issue.number }} --body "This issue has been identified as off-topic and migrated to a discussion: $DISCUSSION_URL"
           gh issue close ${{ github.event.issue.number }} --reason "not_planned"
+          gh issue lock ${{ github.event.issue.number }} --reason "off-topic"

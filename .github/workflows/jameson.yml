@@ -1,0 +1,48 @@
+name: Monitor Jameson Comments
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  moderate-comment:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Process Comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const commentBody = context.payload.comment.body;
+            const issueNumber = context.issue.number;
+            const warning = "> [!WARNING]\n> Opinions related to Jameson are not endorsed by OmniBlocks.\n\n";
+
+            // 1. Check for "Jameson" and prepend warning to issue body
+            if (commentBody.includes("Jameson")) {
+              const { data: issue } = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+              });
+
+              if (!issue.body || !issue.body.includes("Opinions related to Jameson are not endorsed by OmniBlocks.")) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: warning + (issue.body || "")
+                });
+              }
+            }
+
+            // 2. Check for negative sentiment and add thumbs down
+            if (commentBody.includes("Jameson is better") || commentBody.includes("OmniBlocks is bad")) {
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id,
+                content: "-1"
+              });
+            }

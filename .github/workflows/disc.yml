@@ -1,43 +1,28 @@
-name: AI-Powered Off-Topic Detection
+name: Migrate Off-Topic Issues
 
 on:
   issues:
-    types: [opened, edited]
+    types: [labeled]
 
 jobs:
-  moderate-issue:
+  migrate:
+    if: github.event.label.name == 'off-topic'
     runs-on: ubuntu-latest
     permissions:
       issues: write
-      models: read
+      contents: read
     steps:
-      # This step is required to provide the git context for the gh CLI
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Detect Off-Topic Content
-        id: ai-check
-        uses: actions/ai-inference@v1
-        with:
-          model: gpt-4o
-          prompt: |
-            Analyze the following issue. Is it off-topic for this repository?
-            Issue Title: "${{ github.event.issue.title }}"
-            Issue Body: "${{ github.event.issue.body }}"
-            Answer ONLY with "YES" if it is off-topic, or "NO" if it is on-topic.
-
-      - name: Handle Off-Topic
-        if: steps.ai-check.outputs.response == 'YES'
+      - name: Migrate Issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 1. Post warning
-          gh issue comment ${{ github.event.issue.number }} --body "This issue is off-topic."
-
-          # 2. Get IDs
-          ISSUE_ID=$(gh issue view ${{ github.event.issue.number }} --json id -q .id)
-          
-          # Using --repo flag explicitly is safer when running in actions
+          # 1. Fetch data
+          TITLE=$(gh issue view ${{ github.event.issue.number }} --json title -q .title)
+          BODY=$(gh issue view ${{ github.event.issue.number }} --json body -q .body)
+          REPO_ID=$(gh api graphql -f query='{repository(owner: "${{ github.repository_owner }}", name: "${{ github.event.repository.name }}") {id}}' --jq '.data.repository.id')
           CATEGORY_ID=$(gh api graphql -f query='
             query($owner: String!, $repo: String!) {
               repository(owner: $owner, name: $repo) {
@@ -48,10 +33,15 @@ jobs:
             }' -f owner='${{ github.repository_owner }}' -f repo='${{ github.event.repository.name }}' \
             --jq '.data.repository.discussionCategories.nodes[] | select(.name=="General") | .id')
 
-          # 3. Convert
-          gh api graphql -f query='
-            mutation($issueId: ID!, $categoryId: ID!) {
-              convertIssueToDiscussion(input: {issueId: $issueId, discussionCategoryId: $categoryId}) {
+          # 2. Create Discussion
+          DISCUSSION_URL=$(gh api graphql -f query='
+            mutation($repoId: ID!, $catId: ID!, $title: String!, $body: String!) {
+              createDiscussion(input: {repositoryId: $repoId, categoryId: $catId, title: $title, body: $body}) {
                 discussion { url }
               }
-            }' -f issueId=$ISSUE_ID -f categoryId=$CATEGORY_ID
+            }' -f repoId=$REPO_ID -f catId=$CATEGORY_ID -f title="$TITLE" -f body="$BODY" \
+            --jq '.data.createDiscussion.discussion.url')
+
+          # 3. Comment and Close
+          gh issue comment ${{ github.event.issue.number }} --body "This issue is off-topic and has been moved to a discussion: $DISCUSSION_URL"
+          gh issue close ${{ github.event.issue.number }} --reason "not_planned"

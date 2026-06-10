@@ -10,6 +10,9 @@ on:
 jobs:
   execute-script:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # Required to push upstream-update branch
+      pull-requests: write   # Required to create and comment on PRs
 
     steps:
       - name: Checkout repository

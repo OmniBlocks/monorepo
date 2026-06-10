@@ -45,7 +45,7 @@ git merge scratch-blocks --allow-unrelated-histories --no-edit
 git merge scratch-vm --allow-unrelated-histories --no-edit
 git merge scratch-render --allow-unrelated-histories --no-edit
  
-
+#TODO: ADD SCRATCH-PAINT IF NECESSARYRRYY @ampelc
 
 
 cd ../monorepo
@@ -56,6 +56,7 @@ git checkout -b upstream-update
 
 # TODO: parse it to look good in the PR description 
 
-
+# apparently you need to set this because STUPID GITHUB ACTIONS WILL EXPLODE VIOLENTLY AND DIE if you don't
+set +e
 
 if git merge upstream/develop --allow-unrelated-histories --no-edit

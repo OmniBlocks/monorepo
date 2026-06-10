@@ -1,4 +1,5 @@
 import OpcodeLabels from './opcode-labels.js';
+import {safeStringify} from './tw-safe-stringify.js';
 
 const isUndefined = a => typeof a === 'undefined';
 
@@ -14,7 +15,7 @@ const isUndefined = a => typeof a === 'undefined';
  * @param {VirtualMachine} block.vm - the VM instance which owns the block
  * @return {object} The adapted monitor with label and category
  */
-export default function ({id, spriteName, opcode, params, value, vm}) {
+export default function ({id, mode, spriteName, opcode, params, value, vm}) {
     // Extension monitors get their labels from the Runtime through `getLabelForOpcode`.
     // Other monitors' labels are hard-coded in `OpcodeLabels`.
     let {label, category, labelFn} = (vm && vm.runtime.getLabelForOpcode(opcode)) || OpcodeLabels.getLabel(opcode);
@@ -27,11 +28,12 @@ export default function ({id, spriteName, opcode, params, value, vm}) {
         label = `${spriteName}: ${label}`;
     }
 
-    // If value is a number, round it to six decimal places
-    if (typeof value === 'number') {
+    // If value is a normal, round it to six decimal places. -0 is handled in safeStringify, so don't break it here.
+    if (typeof value === 'number' && !Object.is(value, -0)) {
         value = Number(value.toFixed(6));
     }
 
+<<<<<<< HEAD
     // Turn the value to a string, for handle boolean values
     if (typeof value === 'boolean') {
         value = value.toString();
@@ -46,6 +48,12 @@ export default function ({id, spriteName, opcode, params, value, vm}) {
                 value[i] = item.toString();
             }
         }
+=======
+    // Convert scalars to a string now. That should help avoid unnecessary re-renders in a few edge cases.
+    // For lists, we stringify when we display the list row instead of doing a full list copy on every change.
+    if (mode !== 'list') {
+        value = safeStringify(value);
+>>>>>>> upstream/develop
     }
 
     return {id, label, category, value};

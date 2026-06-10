@@ -272,3 +272,51 @@ test('visual report -0', t => {
 
     t.end();
 });
+
+const makeMonitorBlock = () => ({
+    id: 'fakeMonitor',
+    opcode: 'data_variable',
+    fields: {
+        VARIABLE: {
+            name: 'VARIABLE',
+            value: 'x',
+            id: 'fakeMonitor'
+        }
+    },
+    inputs: {},
+    topLevel: true,
+    next: null,
+    parent: null,
+    shadow: false,
+    x: 0,
+    y: 0,
+    isMonitored: true,
+    targetId: null
+});
+
+test('_pushMonitors does nothing when no targets are installed', t => {
+    const rt = new Runtime();
+    rt.monitorBlocks.createBlock(makeMonitorBlock());
+
+    t.equal(rt.targets.length, 0);
+    rt._pushMonitors();
+    t.equal(rt.threads.length, 0);
+
+    t.end();
+});
+
+test('_pushMonitors queues threads once targets are installed', t => {
+    const rt = new Runtime();
+    rt.monitorBlocks.createBlock(makeMonitorBlock());
+
+    const stage = new Target(rt);
+    rt.targets.push(stage);
+    rt.setEditingTarget(stage);
+
+    rt._pushMonitors();
+    t.equal(rt.threads.length, 1);
+    t.equal(rt.threads[0].target, stage);
+    t.equal(rt.threads[0].updateMonitor, true);
+
+    t.end();
+});

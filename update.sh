@@ -13,14 +13,14 @@ git init
 git remote add upstream-gui https://github.com/TurboWarp/scratch-gui.git
 git fetch upstream-gui develop
 git checkout -b scratch-gui upstream-gui/develop
-git-filter-repo --to-subdirectory-filter scratch-gui 
+git-filter-repo --to-subdirectory-filter scratch-gui --refs scratch-gui
 
 
 
 git remote add upstream-blocks https://github.com/TurboWarp/scratch-blocks.git
 git fetch upstream-blocks develop
 git checkout -b scratch-blocks upstream-blocks/develop
-git-filter-repo --to-subdirectory-filter scratch-blocks
+git-filter-repo --to-subdirectory-filter scratch-blocks --refs scratch-blocks
 
 
 
@@ -28,7 +28,7 @@ git-filter-repo --to-subdirectory-filter scratch-blocks
 git remote add upstream-vm https://github.com/TurboWarp/scratch-vm.git
 git fetch upstream-vm develop
 git checkout -b scratch-vm upstream-vm/develop
-git-filter-repo --to-subdirectory-filter scratch-vm
+git-filter-repo --to-subdirectory-filter scratch-vm --refs scratch-vm
 
 
 
@@ -36,7 +36,7 @@ git-filter-repo --to-subdirectory-filter scratch-vm
 git remote add upstream-render https://github.com/TurboWarp/scratch-render.git
 git fetch upstream-render develop
 git checkout -b scratch-render upstream-render/develop
-git-filter-repo --to-subdirectory-filter scratch-render
+git-filter-repo --to-subdirectory-filter scratch-render --refs scratch-render
 
 git checkout -b develop
 

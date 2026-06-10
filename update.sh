@@ -38,6 +38,8 @@ git fetch upstream-render develop
 git checkout -b scratch-render upstream-render/develop
 git-filter-repo --to-subdirectory-filter scratch-render
 
+git checkout -b develop
+
 git merge scratch-gui --allow-unrelated-histories --no-edit
 git merge scratch-blocks --allow-unrelated-histories --no-edit
 git merge scratch-vm --allow-unrelated-histories --no-edit

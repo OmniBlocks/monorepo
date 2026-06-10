@@ -22,7 +22,7 @@ jobs:
     - uses: actions/stale@v5
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        stale-issue-message: 'Stale issue message'
-        stale-pr-message: 'Stale pull request message'
-        stale-issue-label: 'no-issue-activity'
-        stale-pr-label: 'no-pr-activity'
+        stale-issue-message: 'This issue has gone inactive, so I''m bringing it back to life. @coderabbitai Party time!'
+        stale-pr-message: 'This PR has gone inactive, so I''m bringing it back to life. @coderabbitai Party time!'
+        stale-issue-label: 'critical-priority'
+        stale-pr-label: 'help wanted'

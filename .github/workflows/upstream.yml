@@ -1,0 +1,21 @@
+name: Update upstream
+
+on:
+
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'
+    
+
+jobs:
+  execute-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run the bash script
+        run: |
+          chmod +x ./update.sh
+          ./update.sh

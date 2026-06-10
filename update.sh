@@ -38,7 +38,7 @@ git fetch upstream-render develop
 git checkout -b scratch-render upstream-render/develop
 git-filter-repo --to-subdirectory-filter scratch-render --refs scratch-render --force
 
-git checkout -b develop
+git checkout --orphan develop
 
 git merge scratch-gui --allow-unrelated-histories --no-edit
 git merge scratch-blocks --allow-unrelated-histories --no-edit
@@ -51,6 +51,7 @@ git merge scratch-render --allow-unrelated-histories --no-edit
 cd ../monorepo
 
 git remote add upstream ../temp-monorepo
+git fetch upstream
 
 git checkout -b upstream-update
 
@@ -60,10 +61,11 @@ git checkout -b upstream-update
 set +e
 
 if git merge upstream/develop --allow-unrelated-histories --no-edit; then
-    git push origin upstream-update
-    gh pr create --head upstream-update --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" --reviewer "OmniBlocks/coders" 
+    git push origin upstream-update --force
+    gh pr create --head upstream-update --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" --reviewer "OmniBlocks/coders" || gh pr comment upstream-update --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't  very nice" 
 else
     git add . 
     git commit --no-edit
     git push origin upstream-update --force
-    gh pr create --head upstream-update --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft --reviewer "OmniBlocks/coders"
+    gh pr create --head upstream-update --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft --reviewer "OmniBlocks/coders" || gh pr comment upstream-update --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't  very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨⚠️🚨⚠️⚠️⚠️⚠️⚠️⚠️🚨🚨🚨🚨🚨🚨" 
+fi

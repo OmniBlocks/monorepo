@@ -59,4 +59,15 @@ git checkout -b upstream-update
 # apparently you need to set this because STUPID GITHUB ACTIONS WILL EXPLODE VIOLENTLY AND DIE if you don't
 set +e
 
-if git merge upstream/develop --allow-unrelated-histories --no-edit
+if git merge upstream/develop --allow-unrelated-histories --no-edit; then
+    git add . 
+    git commit -m "chore: UPDATE UPSTREAM $(date)"
+    git checkout main
+    git push 
+    gh pr create --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r @OmniBlocks/coders 
+else
+    git add . 
+    git commit -m "chore: UPDATE UPSTREAM $(date)"
+    git checkout main
+    git push 
+    gh pr create --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r @OmniBlocks/coders 

@@ -51,7 +51,7 @@ cd ../monorepo
 git remote add upstream ../temp-monorepo
 git fetch upstream
 
-git checkout -B upstream-update
+git checkout -B upstream-update-$(date +%Y-%m-%d)
 
 # TODO: parse it to look good in the PR description 
 
@@ -67,3 +67,4 @@ else
     git merge --abort
     gh pr create --head upstream-update --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't  very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨⚠️🚨⚠️⚠️⚠️⚠️⚠️⚠️🚨🚨🚨🚨🚨🚨" 
 fi
+

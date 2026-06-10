@@ -59,6 +59,7 @@ git checkout -B upstream-update-$(date +%Y-%m-%d)
 set +e
 PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
 set -e
+git commit --allow-empty -m "[skip ci]"
 git push origin upstream-update-$(date +%Y-%m-%d) --force
 if git merge upstream/develop --allow-unrelated-histories --no-edit; then
     git push origin upstream-update-$(date +%Y-%m-%d) --force

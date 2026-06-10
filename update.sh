@@ -60,12 +60,10 @@ git checkout -b upstream-update
 set +e
 
 if git merge upstream/develop --allow-unrelated-histories --no-edit; then
-    git add . 
-    git commit -m "chore: UPDATE UPSTREAM $(date)"
     git push origin upstream-update
-    gh pr create --head upstream-update --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r @OmniBlocks/coders 
+    gh pr create --head upstream-update --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" --reviewer "OmniBlocks/coders" 
 else
     git add . 
     git commit -m "chore: UPDATE UPSTREAM $(date)"
     git push origin upstream-update
-    gh pr create --head upstream-update --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r @OmniBlocks/coders 
+    gh pr create --head upstream-update --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft --reviewer "OmniBlocks/coders"

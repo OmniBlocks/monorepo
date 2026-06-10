@@ -1,7 +1,7 @@
 #!/bin/bash
 
-git config user.name "github-actions[bot]"
-git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+git config --global user.name "github-actions[bot]"
+git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
 pip install git-filter-repo
 
@@ -58,6 +58,7 @@ git checkout -B upstream-update
 # apparently you need to set this because STUPID GITHUB ACTIONS WILL EXPLODE VIOLENTLY AND DIE if you don't
 set +e
 PR_NUMBER=$(gh pr list --head upstream-update --json number --jq '.[0].number')
+set -e
 
 if git merge upstream/develop --allow-unrelated-histories --no-edit; then
     git push origin upstream-update --force

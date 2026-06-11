@@ -35,64 +35,82 @@ git fetch upstream-paint develop
 git checkout -b scratch-paint upstream-paint/develop
 git-filter-repo --to-subdirectory-filter scratch-paint --refs scratch-paint --force
 
-git checkout -b develop scratch-gui
-git merge scratch-blocks --allow-unrelated-histories --no-edit
-git merge scratch-vm --allow-unrelated-histories --no-edit
-git merge scratch-render --allow-unrelated-histories --no-edit
-git merge scratch-paint --allow-unrelated-histories --no-edit
-
 cd ../monorepo
-
 git remote add upstream ../temp-monorepo
 git fetch upstream
 
-# Add --reverse so the oldest commits are at the top, and the newest matches are at the bottom
-git log upstream/develop --reverse --no-merges -p | git patch-id --stable > /tmp/upstream-pids.txt
-git log --reverse --no-merges -p | git patch-id --stable > /tmp/ours-pids.txt
-
-# Keep the exact same awk matching logic, but update it to track the last match found
-SYNC_POINT=$(awk 'NR==FNR{seen[$1]=1; next} seen[$1]{last=$2} END{print last}' \
-    /tmp/ours-pids.txt /tmp/upstream-pids.txt)
-echo "🔍 SYNC_POINT: $SYNC_POINT"
-
 git checkout -B upstream-update-$(date +%Y-%m-%d)
-
-set +e
 PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
 echo "🔍 PR_NUMBER: $PR_NUMBER"
 
-if [ -n "$SYNC_POINT" ]; then
-    echo "Sync point found at $SYNC_POINT. Applying new upstream commits..."
-    # Cherry-pick the exact range of new TurboWarp commits
-    git cherry-pick ${SYNC_POINT}..upstream/develop --no-commit
-else
-    echo "No sync point found. Falling back to standard merge..."
-    git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
+git log HEAD --no-merges --format="%ad %s" --date=unix > /tmp/our-commits.txt
+CONFLICT_FOUND=0
+set +e
+
+git log upstream/scratch-gui --no-merges --format="%ad %s|%H" --date=unix > /tmp/upstream-gui-commits.txt
+SYNC_POINT_GUI=$(awk -F'|' 'NR==FNR{hash[$1]=$2; next} $0 in hash {print hash[$0]; exit}' /tmp/upstream-gui-commits.txt /tmp/our-commits.txt)
+if [ -n "$SYNC_POINT_GUI" ]; then
+    git cherry-pick ${SYNC_POINT_GUI}..upstream/scratch-gui --no-commit
+    if [ $? -ne 0 ]; then
+        CONFLICT_FOUND=1
+        git add .
+        git commit -m "chore: upstream conflicts in scratch-gui" --allow-empty
+    fi
 fi
-MERGE_STATUS=$?
-echo "🔍 MERGE_STATUS: $MERGE_STATUS"
+
+git log upstream/scratch-blocks --no-merges --format="%ad %s|%H" --date=unix > /tmp/upstream-blocks-commits.txt
+SYNC_POINT_BLOCKS=$(awk -F'|' 'NR==FNR{hash[$1]=$2; next} $0 in hash {print hash[$0]; exit}' /tmp/upstream-blocks-commits.txt /tmp/our-commits.txt)
+if [ -n "$SYNC_POINT_BLOCKS" ]; then
+    git cherry-pick ${SYNC_POINT_BLOCKS}..upstream/scratch-blocks --no-commit
+    if [ $? -ne 0 ]; then
+        CONFLICT_FOUND=1
+        git add .
+        git commit -m "chore: upstream conflicts in scratch-blocks" --allow-empty
+    fi
+fi
+
+git log upstream/scratch-vm --no-merges --format="%ad %s|%H" --date=unix > /tmp/upstream-vm-commits.txt
+SYNC_POINT_VM=$(awk -F'|' 'NR==FNR{hash[$1]=$2; next} $0 in hash {print hash[$0]; exit}' /tmp/upstream-vm-commits.txt /tmp/our-commits.txt)
+if [ -n "$SYNC_POINT_VM" ]; then
+    git cherry-pick ${SYNC_POINT_VM}..upstream/scratch-vm --no-commit
+    if [ $? -ne 0 ]; then
+        CONFLICT_FOUND=1
+        git add .
+        git commit -m "chore: upstream conflicts in scratch-vm" --allow-empty
+    fi
+fi
+
+git log upstream/scratch-render --no-merges --format="%ad %s|%H" --date=unix > /tmp/upstream-render-commits.txt
+SYNC_POINT_RENDER=$(awk -F'|' 'NR==FNR{hash[$1]=$2; next} $0 in hash {print hash[$0]; exit}' /tmp/upstream-render-commits.txt /tmp/our-commits.txt)
+if [ -n "$SYNC_POINT_RENDER" ]; then
+    git cherry-pick ${SYNC_POINT_RENDER}..upstream/scratch-render --no-commit
+    if [ $? -ne 0 ]; then
+        CONFLICT_FOUND=1
+        git add .
+        git commit -m "chore: upstream conflicts in scratch-render" --allow-empty
+    fi
+fi
+
+git log upstream/scratch-paint --no-merges --format="%ad %s|%H" --date=unix > /tmp/upstream-paint-commits.txt
+SYNC_POINT_PAINT=$(awk -F'|' 'NR==FNR{hash[$1]=$2; next} $0 in hash {print hash[$0]; exit}' /tmp/upstream-paint-commits.txt /tmp/our-commits.txt)
+if [ -n "$SYNC_POINT_PAINT" ]; then
+    git cherry-pick ${SYNC_POINT_PAINT}..upstream/scratch-paint --no-commit
+    if [ $? -ne 0 ]; then
+        CONFLICT_FOUND=1
+        git add .
+        git commit -m "chore: upstream conflicts in scratch-paint" --allow-empty
+    fi
+fi
 set -e
 
-# If the new commits apply perfectly cleanly
-if [ $MERGE_STATUS -eq 0 ]; then
+if [ $CONFLICT_FOUND -eq 0 ]; then
     rm -f .git/CHERRY_PICK_HEAD .git/MERGE_HEAD
     git commit -m "chore: upstream update $(date)" --allow-empty
     git push origin upstream-update-$(date +%Y-%m-%d) --force
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice"
 else
-    # IF THERE ARE CONFLICTS:
-    # Do NOT run a loop that over-writes files. 
-    # Just leave the raw conflicts exactly as they are so GitHub detects them!
-    
-    echo "Conflicts detected in the new upstream commits. Pushing to PR for review."
-    
-    # Stage the conflicted states so git allows us to commit the branch
     git add . 
-    
-    # Commit it as a conflict-warning state
     git commit -m "chore: upstream update $(date) — needs manual conflict resolution" --allow-empty
     git push origin upstream-update-$(date +%Y-%m-%d) --force
-    
-    # Create the draft PR so you can review the conflicts on GitHub
-    gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨⚠️🚨⚠️⚠️⚠️⚠️⚠️⚠️🚨🚨🚨🚨🚨🚨"
+    gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨"
 fi

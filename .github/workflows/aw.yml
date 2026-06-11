@@ -1,0 +1,54 @@
+name: Recompile Agentic Workflows
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/**/*.md'
+  pull_request:
+    paths:
+      - '.github/workflows/**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  recompile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install GitHub Agentic Workflows CLI
+        run: |
+          echo "Installing gh-aw extension..."
+          gh extension install github/gh-aw
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Recompile Workflows
+        run: |
+          echo "Running compiler across all markdown workflows..."
+          gh aw compile --strict
+
+      - name: Check for Changes
+        id: git-check
+        run: |
+          git status --porcelain
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and Push Recompiled Lock Files
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          git add .github/workflows/*.lock.yml
+          git commit -m "chore: auto-recompile agentic workflows [skip ci]"
+          git push

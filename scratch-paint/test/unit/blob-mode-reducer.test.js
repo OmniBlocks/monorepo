@@ -14,6 +14,7 @@ test('initialState', () => {
 
 test('changeBrushSize', () => {
     let defaultState;
+    
     const newBrushSize = 8078;
     const initialSimplifySize = 10;
 

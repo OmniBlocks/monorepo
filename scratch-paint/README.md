@@ -3,6 +3,19 @@
 Modified version of scratch-paint from TurboWarp for use in OmniBlocks.
 Uses @turbowarp/paper as it includes some nice fixes.
 
+## Building
+
+```bash
+git clone https://github.com/TurboWarp/scratch-paint.git
+npm ci
+npm start
+npm run build
+```
+
+Development playground runs on http://localhost:8078/playground/. Note that http://localhost:8078/ gives you the **built** playground, not the development playground.
+
+For more information, see https://docs.turbowarp.org/development/getting-started
+
 ## License
 
 TurboWarp/scratch-paint is licensed under the GNU General Public License version 3.0. See LICENSE for more information.
@@ -32,6 +45,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 - Try it out at [https://llk.github.io/scratch-paint/](https://llk.github.io/scratch-paint/)
 
 - Or, to try it out as part of Scratch 3.0, visit [https://scratch.mit.edu/create](https://scratch.mit.edu/create) and click on the "Costumes" tab.
+
+### Prerequisites
+
+This package depends on Paper.js, so it depends indirectly on several native packages. Depending on your system
+configuration, you may or may not need to install them. If you see errors about `pixman`, `cairo`, etc., check here:
+<https://github.com/scratchfoundation/paper.js/#installing-native-dependencies>
 
 ### Installation
 It will be easiest if you develop on Mac or Linux. If you are using Windows, I recommend using Ubuntu on Windows, which will allow you to use Linux commands on Windows. You will need administrator permissions.

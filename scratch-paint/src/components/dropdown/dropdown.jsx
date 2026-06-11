@@ -6,7 +6,8 @@ import React from 'react';
 
 import styles from './dropdown.css';
 
-import dropdownIcon from './dropdown-caret.svg';
+import dropdownIcon from '!../../tw-recolor/build!./dropdown-caret.svg';
+import TWRenderRecoloredImage from '../../tw-recolor/render.jsx';
 
 class Dropdown extends React.Component {
     constructor (props) {
@@ -55,7 +56,7 @@ class Dropdown extends React.Component {
                     onClick={this.handleToggleOpenState}
                 >
                     {this.props.children}
-                    <img
+                    <TWRenderRecoloredImage
                         className={classNames(styles.dropdownIcon, {
                             [styles.modCaretUp]: this.state.isOpen
                         })}

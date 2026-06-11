@@ -11,10 +11,6 @@ on:
       - '.github/workflows/**/*.md'
   workflow_dispatch:
 
-permissions:
-  contents: write
-  workflows: write
-
 jobs:
   recompile:
     runs-on: ubuntu-latest

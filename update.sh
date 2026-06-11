@@ -15,23 +15,15 @@ git fetch upstream-gui develop
 git checkout -b scratch-gui upstream-gui/develop
 git-filter-repo --to-subdirectory-filter scratch-gui --refs scratch-gui --force
 
-
-
 git remote add upstream-blocks https://github.com/TurboWarp/scratch-blocks.git
 git fetch upstream-blocks develop
 git checkout -b scratch-blocks upstream-blocks/develop
 git-filter-repo --to-subdirectory-filter scratch-blocks --refs scratch-blocks --force
 
-
-
-
 git remote add upstream-vm https://github.com/TurboWarp/scratch-vm.git
 git fetch upstream-vm develop
 git checkout -b scratch-vm upstream-vm/develop
 git-filter-repo --to-subdirectory-filter scratch-vm --refs scratch-vm --force
-
-
-
 
 git remote add upstream-render https://github.com/TurboWarp/scratch-render.git
 git fetch upstream-render develop
@@ -49,8 +41,6 @@ git merge scratch-vm --allow-unrelated-histories --no-edit
 git merge scratch-render --allow-unrelated-histories --no-edit
 git merge scratch-paint --allow-unrelated-histories --no-edit
 
-
-
 cd ../monorepo
 
 git remote add upstream ../temp-monorepo
@@ -63,10 +53,14 @@ git log --no-merges -p | git patch-id --stable > /tmp/ours-pids.txt
 # Match: upstream patch-id that also appears in our history → that commit's upstream hash
 SYNC_POINT=$(awk 'NR==FNR{seen[$1]=1; next} seen[$1]{print $2; exit}' \
     /tmp/ours-pids.txt /tmp/upstream-pids.txt)
+echo "🔍 SYNC_POINT: $SYNC_POINT"
 
 git checkout -B upstream-update-$(date +%Y-%m-%d)
 
 set +e
+PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
+echo "🔍 PR_NUMBER: $PR_NUMBER"
+
 if [ -n "$SYNC_POINT" ]; then
     echo "Sync point found at $SYNC_POINT. Applying new upstream commits..."
     # Cherry-pick the exact range of new TurboWarp commits
@@ -76,6 +70,7 @@ else
     git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
 fi
 MERGE_STATUS=$?
+echo "🔍 MERGE_STATUS: $MERGE_STATUS"
 set -e
 
 # If the new commits apply perfectly cleanly
@@ -101,4 +96,3 @@ else
     # Create the draft PR so you can review the conflicts on GitHub
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨⚠️🚨⚠️⚠️⚠️⚠️⚠️⚠️🚨🚨🚨🚨🚨🚨"
 fi
- 

@@ -51,11 +51,23 @@ cd ../monorepo
 git remote add upstream ../temp-monorepo
 git fetch upstream
 
+# Find the most recent upstream commit already present in our history via patch-id
+git log upstream/develop --no-merges -p | git patch-id --stable > /tmp/upstream-pids.txt
+git log --no-merges -p | git patch-id --stable > /tmp/ours-pids.txt
+
+# Match: upstream patch-id that also appears in our history → that commit's upstream hash
+SYNC_POINT=$(awk 'NR==FNR{seen[$1]=1; next} seen[$1]{print $2; exit}' \
+    /tmp/ours-pids.txt /tmp/upstream-pids.txt)
+
 git checkout -B upstream-update-$(date +%Y-%m-%d)
 
 set +e
 PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
-git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
+if [ -n "$SYNC_POINT" ]; then
+    git merge ${SYNC_POINT}..upstream/develop --allow-unrelated-histories --no-commit --no-edit
+else
+    git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
+fi
 MERGE_STATUS=$?
 set -e
 

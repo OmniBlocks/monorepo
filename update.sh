@@ -51,7 +51,7 @@ cd ../monorepo
 git remote add upstream ../temp-monorepo
 git fetch upstream
 
-git checkout -B upstream-update-$(date +%Y-%m-%d) upstream/develop
+git checkout -fB upstream-update-$(date +%Y-%m-%d) upstream/develop
 
 # TODO: parse it to look good in the PR description 
 

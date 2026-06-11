@@ -64,7 +64,8 @@ git checkout -B upstream-update-$(date +%Y-%m-%d)
 set +e
 PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
 if [ -n "$SYNC_POINT" ]; then
-    git merge ${SYNC_POINT}..upstream/develop --allow-unrelated-histories --no-commit --no-edit
+    # Take the changes from SYNC_POINT to upstream/develop and replay them onto current branch
+    git rebase --onto HEAD ${SYNC_POINT} upstream/develop
 else
     git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
 fi

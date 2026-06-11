@@ -26,7 +26,7 @@ jobs:
           echo "Installing gh-aw extension..."
           gh extension install github/gh-aw
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_AW }}
+          GITHUB_TOKEN: ${{ secrets.AW_GITHUB_TOKEN }}
 
       - name: Recompile Workflows
         run: |

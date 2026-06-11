@@ -100,3 +100,5 @@ PYEOF
     git add .
     git commit -m "chore: upstream update $(date) — took upstream on conflicts"
     git push origin upstream-update-$(date +%Y-%m-%d) --force
+
+fi

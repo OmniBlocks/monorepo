@@ -3,7 +3,11 @@
 # Converts .json files into .js files for use within Blockly apps.
 #
 # Copyright 2013 Google Inc.
+<<<<<<< HEAD
 # https://developers.google.com/blockly/
+=======
+# http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,11 +23,18 @@
 
 import argparse
 import codecs      # for codecs.open(..., 'utf-8')
+<<<<<<< HEAD
 import glob
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 import json        # for json.load()
 import os          # for os.path()
 import subprocess  # for subprocess.check_call()
 from common import InputError
+<<<<<<< HEAD
+=======
+from common import insert_breaks
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 from common import read_json_file
 
 
@@ -100,11 +111,22 @@ def _process_file(path_to_json, target_lang, key_dict):
         if key != '@metadata':
             try:
                 identifier = key_dict[key]
+<<<<<<< HEAD
             except KeyError as e:
+=======
+            except KeyError, e:
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
                 print('Key "%s" is in %s but not in %s' %
                       (key, keyfile, args.key_file))
                 raise e
             target = j.get(key)
+<<<<<<< HEAD
+=======
+            # Only insert line breaks for tooltips.
+            if key.lower().find('tooltip') != -1:
+                target = insert_breaks(
+                    j.get(key), args.min_length, args.max_length)
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
             out_file.write(u"""
       <trans-unit id="{0}" datatype="html">
         <target>{1}</target>
@@ -124,6 +146,13 @@ def main():
     parser.add_argument('--key_file', default='json' + os.path.sep + 'keys.json',
                         help='relative path to input keys file')
     parser.add_argument('--template', default='template.soy')
+<<<<<<< HEAD
+=======
+    parser.add_argument('--min_length', default=30,
+                        help='minimum line length (not counting last line)')
+    parser.add_argument('--max_length', default=50,
+                        help='maximum line length (not guaranteed)')
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     parser.add_argument('--path_to_jar',
                         default='..' + os.path.sep + 'apps' + os.path.sep
                         + '_soy',
@@ -148,9 +177,12 @@ def main():
     # Process each input file.
     print('Creating .xlf files...')
     processed_langs = []
+<<<<<<< HEAD
     if len(args.files) == 1:
       # Windows does not expand globs automatically.
       args.files = glob.glob(args.files[0])
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     for arg_file in args.files:
       (path_to_json, filename) = os.path.split(arg_file)
       if not filename.endswith('.json'):
@@ -175,9 +207,16 @@ def main():
         print('Created ' + processed_lang_list + '.js in ' + args.output_dir)
       else:
         print('Created {' + processed_lang_list + '}.js in ' + args.output_dir)
+<<<<<<< HEAD
 
       for lang in processed_langs:
         os.remove(args.output_dir + lang + '.xlf')
+=======
+      command = ['rm']
+      command.extend(map(lambda s: args.output_dir + s + '.xlf',
+                         processed_langs))
+      subprocess.check_call(command)
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       print('Removed .xlf files.')
 
 

@@ -3,7 +3,11 @@
 # Gives the translation status of the specified apps and languages.
 #
 # Copyright 2013 Google Inc.
+<<<<<<< HEAD
 # https://developers.google.com/blockly/
+=======
+# http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,14 +52,21 @@ import re
 from common import write_files
 
 
+<<<<<<< HEAD
 _INPUT_DEF_PATTERN = re.compile("""Blockly.Msg.(\w*)\s*=\s*'(.*)';?\r?$""")
+=======
+_INPUT_DEF_PATTERN = re.compile("""Blockly.Msg.(\w*)\s*=\s*'([^']*)';?$""")
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 _INPUT_SYN_PATTERN = re.compile(
     """Blockly.Msg.(\w*)\s*=\s*Blockly.Msg.(\w*);""")
 
+<<<<<<< HEAD
 _CONSTANT_DESCRIPTION_PATTERN = re.compile(
     """{{Notranslate}}""", re.IGNORECASE)
 
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 def main():
   # Set up argument parser.
   parser = argparse.ArgumentParser(description='Create translation files.')
@@ -78,7 +89,10 @@ def main():
   # Read and parse input file.
   results = []
   synonyms = {}
+<<<<<<< HEAD
   constants = {}  # Values that are constant across all languages.
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   description = ''
   infile = codecs.open(args.input_file, 'r', 'utf-8')
   for line in infile:
@@ -90,6 +104,7 @@ def main():
     else:
       match = _INPUT_DEF_PATTERN.match(line)
       if match:
+<<<<<<< HEAD
         key = match.group(1)
         value = match.group(2).replace("\\'", "'")
         if not description:
@@ -103,6 +118,16 @@ def main():
           result['description'] = description
           results.append(result)
         description = ''
+=======
+        result = {}
+        result['meaning'] = match.group(1)
+        result['source'] = match.group(2)
+        if not description:
+          print('Warning: No description for ' + result['meaning'])
+        result['description'] = description
+        description = ''
+        results.append(result)
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       else:
         match = _INPUT_SYN_PATTERN.match(line)
         if match:
@@ -124,6 +149,7 @@ def main():
     print("Wrote {0} synonym pairs to {1}.".format(
         len(synonyms), synonym_file_name))
 
+<<<<<<< HEAD
   # Create constants.json
   constants_file_name = os.path.join(os.curdir, args.output_dir, 'constants.json')
   with open(constants_file_name, 'w') as outfile:
@@ -131,6 +157,8 @@ def main():
   if not args.quiet:
     print("Wrote {0} constant pairs to {1}.".format(
         len(constants), synonym_file_name))
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 if __name__ == '__main__':
   main()

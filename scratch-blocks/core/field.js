@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +26,11 @@
  */
 
 /**
+<<<<<<< HEAD
  * @fileoverview Field.  Used for editable titles, variables, etc.
+=======
+ * @fileoverview Input field.  Used for editable titles, variables, etc.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * This is an abstract class that defines the UI on the block.  Actual
  * instances would be Blockly.FieldTextInput, Blockly.FieldDropdown, etc.
  * @author fraser@google.com (Neil Fraser)
@@ -28,6 +39,7 @@
 
 goog.provide('Blockly.Field');
 
+<<<<<<< HEAD
 goog.require('Blockly.Events.BlockChange');
 goog.require('Blockly.Gesture');
 
@@ -184,10 +196,42 @@ Blockly.Field.prototype.useTouchInteraction_ = false;
 /**
  * Non-breaking space.
  * @const
+=======
+// TODO(scr): Fix circular dependencies
+// goog.require('Blockly.Block');
+goog.require('Blockly.BlockSvg');
+
+
+/**
+ * Class for an editable field.
+ * @param {string} text The initial content of the field.
+ * @constructor
+ */
+Blockly.Field = function(text) {
+  this.sourceBlock_ = null;
+  // Build the DOM.
+  this.fieldGroup_ = Blockly.createSvgElement('g', {}, null);
+  this.borderRect_ = Blockly.createSvgElement('rect',
+      {'rx': 4,
+       'ry': 4,
+       'x': -Blockly.BlockSvg.SEP_SPACE_X / 2,
+       'y': -12,
+       'height': 16}, this.fieldGroup_);
+  this.textElement_ = Blockly.createSvgElement('text',
+      {'class': 'blocklyText'}, this.fieldGroup_);
+  this.size_ = {height: 25, width: 0};
+  this.setText(text);
+  this.visible_ = true;
+};
+
+/**
+ * Non-breaking space.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  */
 Blockly.Field.NBSP = '\u00A0';
 
 /**
+<<<<<<< HEAD
  * Text offset used for IE/Edge.
  * @const
  */
@@ -197,10 +241,14 @@ Blockly.Field.IE_TEXT_OFFSET = '0.3em';
  * Editable fields usually show some sort of UI for the user to change them.
  * @type {boolean}
  * @public
+=======
+ * Editable fields are saved by the XML renderer, non-editable fields are not.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  */
 Blockly.Field.prototype.EDITABLE = true;
 
 /**
+<<<<<<< HEAD
  * Serializable fields are saved by the XML renderer, non-serializable fields
  * are not.  Editable fields should be serialized.
  * @type {boolean}
@@ -268,27 +316,54 @@ Blockly.Field.prototype.init = function() {
  * No-op by default.
  */
 Blockly.Field.prototype.initModel = function() {
+=======
+ * Install this field on a block.
+ * @param {!Blockly.Block} block The block containing this field.
+ */
+Blockly.Field.prototype.init = function(block) {
+  if (this.sourceBlock_) {
+    throw 'Field has already been initialized once.';
+  }
+  this.sourceBlock_ = block;
+  this.updateEditable();
+  block.getSvgRoot().appendChild(this.fieldGroup_);
+  this.mouseUpWrapper_ =
+      Blockly.bindEvent_(this.fieldGroup_, 'mouseup', this, this.onMouseUp_);
+  // Bump to set the colours for dropdown arrows.
+  this.setText(null);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
  * Dispose of all DOM objects belonging to this editable field.
  */
 Blockly.Field.prototype.dispose = function() {
+<<<<<<< HEAD
   if (this.mouseDownWrapper_) {
     Blockly.unbindEvent_(this.mouseDownWrapper_);
     this.mouseDownWrapper_ = null;
+=======
+  if (this.mouseUpWrapper_) {
+    Blockly.unbindEvent_(this.mouseUpWrapper_);
+    this.mouseUpWrapper_ = null;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   this.sourceBlock_ = null;
   goog.dom.removeNode(this.fieldGroup_);
   this.fieldGroup_ = null;
   this.textElement_ = null;
+<<<<<<< HEAD
   this.validator_ = null;
+=======
+  this.borderRect_ = null;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
  * Add or remove the UI indicating if this field is editable or not.
  */
 Blockly.Field.prototype.updateEditable = function() {
+<<<<<<< HEAD
   var group = this.fieldGroup_;
   if (!this.EDITABLE || !group) {
     return;
@@ -301,10 +376,28 @@ Blockly.Field.prototype.updateEditable = function() {
     Blockly.utils.addClass(group, 'blocklyNonEditableText');
     Blockly.utils.removeClass(group, 'blocklyEditableText');
     this.getClickTarget_().style.cursor = '';
+=======
+  if (!this.EDITABLE) {
+    return;
+  }
+  if (this.sourceBlock_.isEditable()) {
+    Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
+                      'blocklyEditableText');
+    Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
+                         'blocklyNoNEditableText');
+    this.fieldGroup_.style.cursor = this.CURSOR;
+  } else {
+    Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
+                      'blocklyNonEditableText');
+    Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
+                         'blocklyEditableText');
+    this.fieldGroup_.style.cursor = '';
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
 };
 
 /**
+<<<<<<< HEAD
  * Check whether this field is currently editable.  Some fields are never
  * editable (e.g. text labels).  Those fields are not serialized to XML.  Other
  * fields may be editable, and therefore serialized, but may exist on
@@ -316,6 +409,8 @@ Blockly.Field.prototype.isCurrentlyEditable = function() {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Gets whether this editable field is visible or not.
  * @return {boolean} True if visible.
  */
@@ -328,6 +423,7 @@ Blockly.Field.prototype.isVisible = function() {
  * @param {boolean} visible True if visible.
  */
 Blockly.Field.prototype.setVisible = function(visible) {
+<<<<<<< HEAD
   if (this.visible_ == visible) {
     return;
   }
@@ -412,6 +508,10 @@ Blockly.Field.prototype.callValidator = function(text) {
     }
   }
   return text;
+=======
+  this.visible_ = visible;
+  this.getRootElement().style.display = visible ? 'block' : 'none';
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -419,7 +519,11 @@ Blockly.Field.prototype.callValidator = function(text) {
  * Used for measuring the size and for positioning.
  * @return {!Element} The group element.
  */
+<<<<<<< HEAD
 Blockly.Field.prototype.getSvgRoot = function() {
+=======
+Blockly.Field.prototype.getRootElement = function() {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   return /** @type {!Element} */ (this.fieldGroup_);
 };
 
@@ -429,6 +533,7 @@ Blockly.Field.prototype.getSvgRoot = function() {
  * @private
  */
 Blockly.Field.prototype.render_ = function() {
+<<<<<<< HEAD
   if (this.visible_ && this.textElement_) {
     // Replace the text.
     this.textElement_.textContent = this.getDisplayText_();
@@ -497,10 +602,18 @@ Blockly.Field.prototype.updateWidth = function() {
   }
 
   // Set width of the field.
+=======
+  var width = this.textElement_.getComputedTextLength();
+  if (this.borderRect_) {
+    this.borderRect_.setAttribute('width',
+        width + Blockly.BlockSvg.SEP_SPACE_X);
+  }
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   this.size_.width = width;
 };
 
 /**
+<<<<<<< HEAD
  * Gets the width of a text element, caching it in the process.
  * @param {!Element} textElement An SVG 'text' element.
  * @return {number} Width of element.
@@ -564,6 +677,10 @@ Blockly.Field.stopCache = function() {
 /**
  * Returns the height and width of the field.
  * @return {!goog.math.Size} Height and width.
+=======
+ * Returns the height and width of the title.
+ * @return {!Object} Height and width.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  */
 Blockly.Field.prototype.getSize = function() {
   if (!this.size_.width) {
@@ -573,6 +690,7 @@ Blockly.Field.prototype.getSize = function() {
 };
 
 /**
+<<<<<<< HEAD
  * Returns the bounding box of the rendered field, accounting for workspace
  * scaling.
  * @return {!Object} An object with top, bottom, left, and right in pixels
@@ -622,6 +740,8 @@ Blockly.Field.prototype.getDisplayText_ = function() {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Get the text from this field.
  * @return {string} Current text.
  */
@@ -631,6 +751,7 @@ Blockly.Field.prototype.getText = function() {
 
 /**
  * Set the text in this field.  Trigger a rerender of the source block.
+<<<<<<< HEAD
  * @param {*} newText New text.
  */
 Blockly.Field.prototype.setText = function(newText) {
@@ -682,10 +803,21 @@ Blockly.Field.prototype.updateTextNode_ = function() {
   } else {
     this.textElement_.setAttribute('class', this.className_);
   }
+=======
+ * @param {?string} text New text.
+ */
+Blockly.Field.prototype.setText = function(text) {
+  if (text === null || text === this.text_) {
+    // No change if null.
+    return;
+  }
+  this.text_ = text;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   // Empty the text element.
   goog.dom.removeChildren(/** @type {!Element} */ (this.textElement_));
   // Replace whitespace with non-breaking spaces so the text doesn't collapse.
   text = text.replace(/\s/g, Blockly.Field.NBSP);
+<<<<<<< HEAD
   if (this.sourceBlock_.RTL && text) {
     // The SVG is LTR, force text to be RTL.
     if (this.sourceBlock_.editable_ && this.sourceBlock_.type === 'math_number') {
@@ -694,6 +826,8 @@ Blockly.Field.prototype.updateTextNode_ = function() {
       text = '\u202B' + text + '\u202C';
     }
   }
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   if (!text) {
     // Prevent the field from disappearing if empty.
     text = Blockly.Field.NBSP;
@@ -703,12 +837,25 @@ Blockly.Field.prototype.updateTextNode_ = function() {
 
   // Cached width is obsolete.  Clear it.
   this.size_.width = 0;
+<<<<<<< HEAD
+=======
+
+  if (this.sourceBlock_ && this.sourceBlock_.rendered) {
+    this.sourceBlock_.render();
+    this.sourceBlock_.bumpNeighbours_();
+    this.sourceBlock_.workspace.fireChangeEvent();
+  }
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
  * By default there is no difference between the human-readable text and
  * the language-neutral values.  Subclasses (such as dropdown) may define this.
+<<<<<<< HEAD
  * @return {string} Current value.
+=======
+ * @return {string} Current text.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  */
 Blockly.Field.prototype.getValue = function() {
   return this.getText();
@@ -717,6 +864,7 @@ Blockly.Field.prototype.getValue = function() {
 /**
  * By default there is no difference between the human-readable text and
  * the language-neutral values.  Subclasses (such as dropdown) may define this.
+<<<<<<< HEAD
  * @param {string} newValue New value.
  */
 Blockly.Field.prototype.setValue = function(newValue) {
@@ -752,10 +900,35 @@ Blockly.Field.prototype.onMouseDown_ = function(e) {
     gesture.setStartField(this);
   }
   this.useTouchInteraction_ = Blockly.Touch.getTouchIdentifierFromEvent(e) !== 'mouse';
+=======
+ * @param {string} text New text.
+ */
+Blockly.Field.prototype.setValue = function(text) {
+  this.setText(text);
+};
+
+/**
+ * Handle a mouse up event on an editable field.
+ * @param {!Event} e Mouse up event.
+ * @private
+ */
+Blockly.Field.prototype.onMouseUp_ = function(e) {
+  if (Blockly.isRightButton(e)) {
+    // Right-click.
+    return;
+  } else if (Blockly.Block.dragMode_ == 2) {
+    // Drag operation is concluding.  Don't open the editor.
+    return;
+  } else if (this.sourceBlock_.isEditable()) {
+    // Non-abstract sub-classes must define a showEditor_ method.
+    this.showEditor_();
+  }
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
  * Change the tooltip text for this field.
+<<<<<<< HEAD
  * @param {string|!Element} _newTip Text for tooltip or a parent element to
  *     link to for its tooltip.
  * @abstract
@@ -808,3 +981,11 @@ Blockly.Field.prototype.getAbsoluteXY_ = function() {
 Blockly.Field.prototype.referencesVariables = function() {
   return false;
 };
+=======
+ * @param {string|!Element} newTip Text for tooltip or a parent element to
+ *     link to for its tooltip.
+ */
+Blockly.Field.prototype.setTooltip = function(newTip) {
+  // Non-abstract sub-classes may wish to implement this.  See FieldLabel.
+};
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

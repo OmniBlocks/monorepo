@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +31,7 @@
  */
 'use strict';
 
+<<<<<<< HEAD
 /**
  * @name Blockly.Xml
  * @namespace
@@ -35,10 +43,17 @@ goog.require('Blockly.Events.VarCreate');
 
 goog.require('goog.asserts');
 goog.require('goog.dom');
+=======
+goog.provide('Blockly.Xml');
+
+// TODO(scr): Fix circular dependencies
+// goog.require('Blockly.Block');
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 
 /**
  * Encode a block tree as XML.
+<<<<<<< HEAD
  * @param {!Blockly.Workspace} workspace The workspace containing blocks.
  * @param {boolean=} opt_noId True if the encoder should skip the block IDs.
  * @return {!Element} XML document.
@@ -55,11 +70,27 @@ Blockly.Xml.workspaceToDom = function(workspace, opt_noId) {
   var blocks = workspace.getTopBlocks(true);
   for (var i = 0, block; block = blocks[i]; i++) {
     xml.appendChild(Blockly.Xml.blockToDomWithXY(block, opt_noId));
+=======
+ * @param {!Object} workspace The SVG workspace.
+ * @return {!Element} XML document.
+ */
+Blockly.Xml.workspaceToDom = function(workspace) {
+  var width = Blockly.svgSize().width;
+  var xml = goog.dom.createDom('xml');
+  var blocks = workspace.getTopBlocks(true);
+  for (var i = 0, block; block = blocks[i]; i++) {
+    var element = Blockly.Xml.blockToDom_(block);
+    var xy = block.getRelativeToSurfaceXY();
+    element.setAttribute('x', Blockly.RTL ? width - xy.x : xy.x);
+    element.setAttribute('y', xy.y);
+    xml.appendChild(element);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   return xml;
 };
 
 /**
+<<<<<<< HEAD
  * Encode a list of variables as XML.
  * @param {!Array.<!Blockly.VariableModel>} variableList List of all variable
  *     models.
@@ -200,6 +231,47 @@ Blockly.Xml.blockToDom = function(block, opt_noId) {
     element.appendChild(dataElement);
   }
 
+=======
+ * Encode a block subtree as XML.
+ * @param {!Blockly.Block} block The root block to encode.
+ * @return {!Element} Tree of XML elements.
+ * @private
+ */
+Blockly.Xml.blockToDom_ = function(block) {
+  var element = goog.dom.createDom('block');
+  element.setAttribute('type', block.type);
+  if (block.mutationToDom) {
+    // Custom data for an advanced block.
+    var mutation = block.mutationToDom();
+    if (mutation) {
+      element.appendChild(mutation);
+    }
+  }
+  function titleToDom(title) {
+    if (title.name && title.EDITABLE) {
+      var container = goog.dom.createDom('title', null, title.getValue());
+      container.setAttribute('name', title.name);
+      element.appendChild(container);
+    }
+  }
+  for (var x = 0, input; input = block.inputList[x]; x++) {
+    for (var y = 0, title; title = input.titleRow[y]; y++) {
+      titleToDom(title);
+    }
+  }
+
+  if (block.comment) {
+    var commentElement = goog.dom.createDom('comment', null,
+        block.comment.getText());
+    commentElement.setAttribute('pinned', block.comment.isVisible());
+    var hw = block.comment.getBubbleSize();
+    commentElement.setAttribute('h', hw.height);
+    commentElement.setAttribute('w', hw.width);
+    element.appendChild(commentElement);
+  }
+
+  var hasValues = false;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   for (var i = 0, input; input = block.inputList[i]; i++) {
     var container;
     var empty = true;
@@ -209,6 +281,7 @@ Blockly.Xml.blockToDom = function(block, opt_noId) {
       var childBlock = input.connection.targetBlock();
       if (input.type == Blockly.INPUT_VALUE) {
         container = goog.dom.createDom('value');
+<<<<<<< HEAD
       } else if (input.type == Blockly.NEXT_STATEMENT) {
         container = goog.dom.createDom('statement');
       }
@@ -224,6 +297,14 @@ Blockly.Xml.blockToDom = function(block, opt_noId) {
       }
       if (childBlock) {
         container.appendChild(Blockly.Xml.blockToDom(childBlock, opt_noId));
+=======
+        hasValues = true;
+      } else if (input.type == Blockly.NEXT_STATEMENT) {
+        container = goog.dom.createDom('statement');
+      }
+      if (childBlock) {
+        container.appendChild(Blockly.Xml.blockToDom_(childBlock));
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
         empty = false;
       }
     }
@@ -232,7 +313,11 @@ Blockly.Xml.blockToDom = function(block, opt_noId) {
       element.appendChild(container);
     }
   }
+<<<<<<< HEAD
   if (block.inputsInlineDefault != block.inputsInline) {
+=======
+  if (hasValues) {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     element.setAttribute('inline', block.inputsInline);
   }
   if (block.isCollapsed()) {
@@ -241,16 +326,24 @@ Blockly.Xml.blockToDom = function(block, opt_noId) {
   if (block.disabled) {
     element.setAttribute('disabled', true);
   }
+<<<<<<< HEAD
   if (!block.isDeletable() && !block.isShadow()) {
     element.setAttribute('deletable', false);
   }
   if (!block.isMovable() && !block.isShadow()) {
+=======
+  if (!block.isDeletable()) {
+    element.setAttribute('deletable', false);
+  }
+  if (!block.isMovable()) {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     element.setAttribute('movable', false);
   }
   if (!block.isEditable()) {
     element.setAttribute('editable', false);
   }
 
+<<<<<<< HEAD
   var nextBlock = block.getNextBlock();
   if (nextBlock) {
     var container = goog.dom.createDom('next', null,
@@ -260,12 +353,22 @@ Blockly.Xml.blockToDom = function(block, opt_noId) {
   var shadow = block.nextConnection && block.nextConnection.getShadowDom();
   if (shadow && (!nextBlock || !nextBlock.isShadow())) {
     container.appendChild(Blockly.Xml.cloneShadow_(shadow));
+=======
+  if (block.nextConnection) {
+    var nextBlock = block.nextConnection.targetBlock();
+    if (nextBlock) {
+      var container = goog.dom.createDom('next', null,
+          Blockly.Xml.blockToDom_(nextBlock));
+      element.appendChild(container);
+    }
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
 
   return element;
 };
 
 /**
+<<<<<<< HEAD
  * Encode a ScratchBlockComment as XML.
  * @param {!Blockly.ScratchBlockComment} block The block possibly containing
  *     a comment to encode.
@@ -338,6 +441,8 @@ Blockly.Xml.cloneShadow_ = function(shadow) {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Converts a DOM structure into plain text.
  * Currently the text format is fairly ugly: all one line with no whitespace.
  * @param {!Element} dom A tree of XML elements.
@@ -361,12 +466,21 @@ Blockly.Xml.domToPrettyText = function(dom) {
   var lines = blob.split('<');
   // Indent every line.
   var indent = '';
+<<<<<<< HEAD
   for (var i = 1; i < lines.length; i++) {
     var line = lines[i];
     if (line[0] == '/') {
       indent = indent.substring(2);
     }
     lines[i] = indent + '<' + line;
+=======
+  for (var x = 1; x < lines.length; x++) {
+    var line = lines[x];
+    if (line[0] == '/') {
+      indent = indent.substring(2);
+    }
+    lines[x] = indent + '<' + line;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     if (line[0] != '/' && line.slice(-2) != '/>') {
       indent += '  ';
     }
@@ -393,12 +507,17 @@ Blockly.Xml.textToDom = function(text) {
       dom.firstChild.nodeName.toLowerCase() != 'xml' ||
       dom.firstChild !== dom.lastChild) {
     // Whatever we got back from the parser is not XML.
+<<<<<<< HEAD
     goog.asserts.fail('Blockly.Xml.textToDom did not obtain a valid XML tree.');
+=======
+    throw 'Blockly.Xml.textToDom did not obtain a valid XML tree.';
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   return dom.firstChild;
 };
 
 /**
+<<<<<<< HEAD
  * Clear the given workspace then decode an XML DOM and
  * create blocks on the workspace.
  * @param {!Element} xml XML DOM.
@@ -646,12 +765,30 @@ Blockly.Xml.domToVariables = function(xmlVariables, workspace) {
       throw Error('Variable with id, ' + id + ' is without a type');
     }
     workspace.createVariable(name, type, id, isLocal, isCloud);
+=======
+ * Decode an XML DOM and create blocks on the workspace.
+ * @param {!Blockly.Workspace} workspace The SVG workspace.
+ * @param {!Element} xml XML DOM.
+ */
+Blockly.Xml.domToWorkspace = function(workspace, xml) {
+  var width = Blockly.svgSize().width;
+  for (var x = 0, xmlChild; xmlChild = xml.childNodes[x]; x++) {
+    if (xmlChild.nodeName.toLowerCase() == 'block') {
+      var block = Blockly.Xml.domToBlock_(workspace, xmlChild);
+      var blockX = parseInt(xmlChild.getAttribute('x'), 10);
+      var blockY = parseInt(xmlChild.getAttribute('y'), 10);
+      if (!isNaN(blockX) && !isNaN(blockY)) {
+        block.moveBy(Blockly.RTL ? width - blockX : blockX, blockY);
+      }
+    }
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
 };
 
 /**
  * Decode an XML block tag and create a block (and possibly sub blocks) on the
  * workspace.
+<<<<<<< HEAD
  * @param {!Element} xmlBlock XML block element.
  * @param {!Blockly.Workspace} workspace The workspace.
  * @return {!Blockly.Block} The root block created.
@@ -789,14 +926,35 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
         console.warn('Ignoring unknown tag: ' + xmlChild.nodeName);
     }
   }
+=======
+ * @param {!Blockly.Workspace} workspace The workspace.
+ * @param {!Element} xmlBlock XML block element.
+ * @return {!Blockly.Block} The root block created.
+ * @private
+ */
+Blockly.Xml.domToBlock_ = function(workspace, xmlBlock) {
+  var prototypeName = xmlBlock.getAttribute('type');
+  var block = new Blockly.Block(workspace, prototypeName);
+  block.initSvg();
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
   var inline = xmlBlock.getAttribute('inline');
   if (inline) {
     block.setInputsInline(inline == 'true');
   }
+<<<<<<< HEAD
   var disabled = xmlBlock.getAttribute('disabled');
   if (disabled) {
     block.setDisabled(disabled == 'true' || disabled == 'disabled');
+=======
+  var collapsed = xmlBlock.getAttribute('collapsed');
+  if (collapsed) {
+    block.setCollapsed(collapsed == 'true');
+  }
+  var disabled = xmlBlock.getAttribute('disabled');
+  if (disabled) {
+    block.setDisabled(disabled == 'true');
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   var deletable = xmlBlock.getAttribute('deletable');
   if (deletable) {
@@ -810,6 +968,7 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
   if (editable) {
     block.setEditable(editable == 'true');
   }
+<<<<<<< HEAD
   var collapsed = xmlBlock.getAttribute('collapsed');
   if (collapsed) {
     block.setCollapsed(collapsed == 'true');
@@ -822,11 +981,101 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
           child.isShadow(), 'Shadow block not allowed non-shadow child.');
     }
     block.setShadow(true);
+=======
+
+  var blockChild = null;
+  for (var x = 0, xmlChild; xmlChild = xmlBlock.childNodes[x]; x++) {
+    if (xmlChild.nodeType == 3 && xmlChild.data.match(/^\s*$/)) {
+      // Extra whitespace between tags does not concern us.
+      continue;
+    }
+    var input;
+
+    // Find the first 'real' grandchild node (that isn't whitespace).
+    var firstRealGrandchild = null;
+    for (var y = 0, grandchildNode; grandchildNode = xmlChild.childNodes[y];
+         y++) {
+      if (grandchildNode.nodeType != 3 || !grandchildNode.data.match(/^\s*$/)) {
+        firstRealGrandchild = grandchildNode;
+      }
+    }
+
+    var name = xmlChild.getAttribute('name');
+    switch (xmlChild.nodeName.toLowerCase()) {
+      case 'mutation':
+        // Custom data for an advanced block.
+        if (block.domToMutation) {
+          block.domToMutation(xmlChild);
+        }
+        break;
+      case 'comment':
+        block.setCommentText(xmlChild.textContent);
+        var visible = xmlChild.getAttribute('pinned');
+        if (visible) {
+          block.comment.setVisible(visible == 'true');
+        }
+        var bubbleW = parseInt(xmlChild.getAttribute('w'), 10);
+        var bubbleH = parseInt(xmlChild.getAttribute('h'), 10);
+        if (!isNaN(bubbleW) && !isNaN(bubbleH)) {
+          block.comment.setBubbleSize(bubbleW, bubbleH);
+        }
+        break;
+      case 'title':
+        block.setTitleValue(xmlChild.textContent, name);
+        break;
+      case 'value':
+      case 'statement':
+        input = block.getInput(name);
+        if (!input) {
+          throw 'Input does not exist: ' + name;
+        }
+        if (firstRealGrandchild &&
+            firstRealGrandchild.nodeName.toLowerCase() == 'block') {
+          blockChild = Blockly.Xml.domToBlock_(workspace, firstRealGrandchild);
+          if (blockChild.outputConnection) {
+            input.connection.connect(blockChild.outputConnection);
+          } else if (blockChild.previousConnection) {
+            input.connection.connect(blockChild.previousConnection);
+          } else {
+            throw 'Child block does not have output or previous statement.';
+          }
+        }
+        break;
+      case 'next':
+        if (firstRealGrandchild &&
+            firstRealGrandchild.nodeName.toLowerCase() == 'block') {
+          if (!block.nextConnection) {
+            throw 'Next statement does not exist.';
+          } else if (block.nextConnection.targetConnection) {
+            // This could happen if there is more than one XML 'next' tag.
+            throw 'Next statement is already connected.';
+          }
+          blockChild = Blockly.Xml.domToBlock_(workspace, firstRealGrandchild);
+          if (!blockChild.previousConnection) {
+            throw 'Next block does not have previous statement.';
+          }
+          block.nextConnection.connect(blockChild.previousConnection);
+        }
+        break;
+      default:
+        // Unknown tag; ignore.  Same principle as HTML parsers.
+    }
+  }
+
+  var next = block.nextConnection && block.nextConnection.targetBlock();
+  if (next) {
+    // Next block in a stack needs to square off its corners.
+    // Rendering a child will render its parent.
+    next.render();
+  } else {
+    block.render();
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   return block;
 };
 
 /**
+<<<<<<< HEAD
  * Decode an XML variable field tag and set the value of that field.
  * @param {!Blockly.Workspace} workspace The workspace that is currently being
  *     deserialized.
@@ -892,11 +1141,17 @@ Blockly.Xml.domToField_ = function(block, fieldName, xml) {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Remove any 'next' block (statements in a stack).
  * @param {!Element} xmlBlock XML block element.
  */
 Blockly.Xml.deleteNext = function(xmlBlock) {
+<<<<<<< HEAD
   for (var i = 0, child; child = xmlBlock.childNodes[i]; i++) {
+=======
+  for (var x = 0, child; child = xmlBlock.childNodes[x]; x++) {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     if (child.nodeName.toLowerCase() == 'next') {
       xmlBlock.removeChild(child);
       break;
@@ -905,6 +1160,7 @@ Blockly.Xml.deleteNext = function(xmlBlock) {
 };
 
 // Export symbols that would otherwise be renamed by Closure compiler.
+<<<<<<< HEAD
 if (!goog.global['Blockly']) {
   goog.global['Blockly'] = {};
 }
@@ -917,3 +1173,10 @@ goog.global['Blockly']['Xml']['textToDom'] = Blockly.Xml.textToDom;
 goog.global['Blockly']['Xml']['workspaceToDom'] = Blockly.Xml.workspaceToDom;
 goog.global['Blockly']['Xml']['clearWorkspaceAndLoadFromXml'] =
   Blockly.Xml.clearWorkspaceAndLoadFromXml;
+=======
+Blockly['Xml'] = Blockly.Xml;
+Blockly.Xml['domToText'] = Blockly.Xml.domToText;
+Blockly.Xml['domToWorkspace'] = Blockly.Xml.domToWorkspace;
+Blockly.Xml['textToDom'] = Blockly.Xml.textToDom;
+Blockly.Xml['workspaceToDom'] = Blockly.Xml.workspaceToDom;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

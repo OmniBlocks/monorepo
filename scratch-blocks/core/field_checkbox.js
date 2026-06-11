@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +39,7 @@ goog.require('Blockly.Field');
 /**
  * Class for a checkbox field.
  * @param {string} state The initial state of the field ('TRUE' or 'FALSE').
+<<<<<<< HEAD
  * @param {Function=} opt_validator A function that is executed when a new
  *     option is selected.  Its sole argument is the new checkbox state.  If
  *     it returns a value, this becomes the new checkbox state, unless the
@@ -44,10 +52,30 @@ Blockly.FieldCheckbox = function(state, opt_validator) {
   // Set the initial state.
   this.setValue(state);
   this.addArgType('checkbox');
+=======
+ * @param {Function} opt_changeHandler A function that is executed when a new
+ *     option is selected.
+ * @extends {Blockly.Field}
+ * @constructor
+ */
+Blockly.FieldCheckbox = function(state, opt_changeHandler) {
+  Blockly.FieldCheckbox.superClass_.constructor.call(this, '');
+
+  this.changeHandler_ = opt_changeHandler;
+  // The checkbox doesn't use the inherited text element.
+  // Instead it uses a custom checkmark element that is either visible or not.
+  this.checkElement_ = Blockly.createSvgElement('text',
+      {'class': 'blocklyText', 'x': -3}, this.fieldGroup_);
+  var textNode = document.createTextNode('\u2713');
+  this.checkElement_.appendChild(textNode);
+  // Set the initial state.
+  this.setValue(state);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 goog.inherits(Blockly.FieldCheckbox, Blockly.Field);
 
 /**
+<<<<<<< HEAD
  * Construct a FieldCheckbox from a JSON arg object.
  * @param {!Object} options A JSON object with options (checked).
  * @returns {!Blockly.FieldCheckbox} The new field instance.
@@ -64,11 +92,14 @@ Blockly.FieldCheckbox.fromJson = function(options) {
 Blockly.FieldCheckbox.CHECK_CHAR = '\u2713';
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Mouse cursor style when over the hotspot that initiates editability.
  */
 Blockly.FieldCheckbox.prototype.CURSOR = 'default';
 
 /**
+<<<<<<< HEAD
  * Install this checkbox on a block.
  */
 Blockly.FieldCheckbox.prototype.init = function() {
@@ -88,6 +119,8 @@ Blockly.FieldCheckbox.prototype.init = function() {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Return 'TRUE' if the checkbox is checked, 'FALSE' otherwise.
  * @return {string} Current state.
  */
@@ -96,6 +129,7 @@ Blockly.FieldCheckbox.prototype.getValue = function() {
 };
 
 /**
+<<<<<<< HEAD
  * Set the checkbox to be checked if newBool is 'TRUE' or true,
  * unchecks otherwise.
  * @param {string|boolean} newBool New state.
@@ -111,6 +145,18 @@ Blockly.FieldCheckbox.prototype.setValue = function(newBool) {
     this.state_ = newState;
     if (this.checkElement_) {
       this.checkElement_.style.display = newState ? 'block' : 'none';
+=======
+ * Set the checkbox to be checked if strBool is 'TRUE', unchecks otherwise.
+ * @param {string} strBool New state.
+ */
+Blockly.FieldCheckbox.prototype.setValue = function(strBool) {
+  var newState = (strBool == 'TRUE');
+  if (this.state_ !== newState) {
+    this.state_ = newState;
+    this.checkElement_.style.display = newState ? 'block' : 'none';
+    if (this.sourceBlock_ && this.sourceBlock_.rendered) {
+      this.sourceBlock_.workspace.fireChangeEvent();
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     }
   }
 };
@@ -121,13 +167,25 @@ Blockly.FieldCheckbox.prototype.setValue = function(newBool) {
  */
 Blockly.FieldCheckbox.prototype.showEditor_ = function() {
   var newState = !this.state_;
+<<<<<<< HEAD
   if (this.sourceBlock_) {
     // Call any validation function, and allow it to override.
     newState = this.callValidator(newState);
+=======
+  if (this.changeHandler_) {
+    // Call any change handler, and allow it to override.
+    var override = this.changeHandler_(newState);
+    if (override !== undefined) {
+      newState = override;
+    }
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   if (newState !== null) {
     this.setValue(String(newState).toUpperCase());
   }
 };
+<<<<<<< HEAD
 
 Blockly.Field.register('field_checkbox', Blockly.FieldCheckbox);
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

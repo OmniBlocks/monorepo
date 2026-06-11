@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +31,7 @@
  */
 'use strict';
 
+<<<<<<< HEAD
 /**
  * @name Blockly.Procedures
  * @namespace
@@ -34,11 +42,19 @@ goog.require('Blockly.Blocks');
 goog.require('Blockly.constants');
 goog.require('Blockly.Events.BlockChange');
 goog.require('Blockly.Field');
+=======
+goog.provide('Blockly.Procedures');
+
+// TODO(scr): Fix circular dependencies
+// goog.require('Blockly.Block');
+goog.require('Blockly.FieldVariable');
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 goog.require('Blockly.Names');
 goog.require('Blockly.Workspace');
 
 
 /**
+<<<<<<< HEAD
  * Constant to separate procedure names from variables and generated functions
  * when running generators.
  * @deprecated Use Blockly.PROCEDURE_CATEGORY_NAME
@@ -48,11 +64,20 @@ Blockly.Procedures.NAME_TYPE = Blockly.PROCEDURE_CATEGORY_NAME;
 /**
  * Find all user-created procedure definitions in a workspace.
  * @param {!Blockly.Workspace} root Root workspace.
+=======
+ * Category to separate procedure names from variables and generated functions.
+ */
+Blockly.Procedures.NAME_TYPE = 'PROCEDURE';
+
+/**
+ * Find all user-created procedure definitions.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * @return {!Array.<!Array.<!Array>>} Pair of arrays, the
  *     first contains procedures without return variables, the second with.
  *     Each procedure is defined by a three-element list of name, parameter
  *     list, and return value boolean.
  */
+<<<<<<< HEAD
 Blockly.Procedures.allProcedures = function(root) {
   var blocks = root.getAllBlocks();
   var proceduresReturn = [];
@@ -60,6 +85,16 @@ Blockly.Procedures.allProcedures = function(root) {
   for (var i = 0; i < blocks.length; i++) {
     if (blocks[i].getProcedureDef) {
       var tuple = blocks[i].getProcedureDef();
+=======
+Blockly.Procedures.allProcedures = function() {
+  var blocks = Blockly.mainWorkspace.getAllBlocks();
+  var proceduresReturn = [];
+  var proceduresNoReturn = [];
+  for (var x = 0; x < blocks.length; x++) {
+    var func = blocks[x].getProcedureDef;
+    if (func) {
+      var tuple = func.call(blocks[x]);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       if (tuple) {
         if (tuple[2]) {
           proceduresReturn.push(tuple);
@@ -69,12 +104,17 @@ Blockly.Procedures.allProcedures = function(root) {
       }
     }
   }
+<<<<<<< HEAD
+=======
+
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   proceduresNoReturn.sort(Blockly.Procedures.procTupleComparator_);
   proceduresReturn.sort(Blockly.Procedures.procTupleComparator_);
   return [proceduresNoReturn, proceduresReturn];
 };
 
 /**
+<<<<<<< HEAD
  * Find all user-created procedure definition mutations in a workspace.
  * @param {!Blockly.Workspace} root Root workspace.
  * @return {!Array.<Element>} Array of mutation xml elements.
@@ -115,6 +155,8 @@ Blockly.Procedures.sortProcedureMutations_ = function(mutations) {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Comparison function for case-insensitive sorting of the first element of
  * a tuple.
  * @param {!Array} ta First tuple.
@@ -123,7 +165,19 @@ Blockly.Procedures.sortProcedureMutations_ = function(mutations) {
  * @private
  */
 Blockly.Procedures.procTupleComparator_ = function(ta, tb) {
+<<<<<<< HEAD
   return Blockly.scratchBlocksUtils.compareStrings(ta[0], tb[0]);
+=======
+  var a = ta[0].toLowerCase();
+  var b = tb[0].toLowerCase();
+  if (a > b) {
+    return 1;
+  }
+  if (a < b) {
+    return -1;
+  }
+  return 0;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -134,10 +188,17 @@ Blockly.Procedures.procTupleComparator_ = function(ta, tb) {
  */
 Blockly.Procedures.findLegalName = function(name, block) {
   if (block.isInFlyout) {
+<<<<<<< HEAD
     // Flyouts can have multiple procedures called 'do something'.
     return name;
   }
   while (!Blockly.Procedures.isLegalName_(name, block.workspace, block)) {
+=======
+    // Flyouts can have multiple procedures called 'procedure'.
+    return name;
+  }
+  while (!Blockly.Procedures.isLegalName(name, block.workspace, block)) {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     // Collision with another procedure.
     var r = name.match(/^(.*?)(\d+)$/);
     if (!r) {
@@ -154,6 +215,7 @@ Blockly.Procedures.findLegalName = function(name, block) {
  * procedures already defined.
  * @param {string} name The questionable name.
  * @param {!Blockly.Workspace} workspace The workspace to scan for collisions.
+<<<<<<< HEAD
  * @param {Blockly.Block=} opt_exclude Optional block to exclude from
  *     comparisons (one doesn't want to collide with oneself).
  * @return {boolean} True if the name is legal.
@@ -180,6 +242,22 @@ Blockly.Procedures.isNameUsed = function(name, workspace, opt_exclude) {
     }
     if (blocks[i].getProcedureDef) {
       var procName = blocks[i].getProcedureDef();
+=======
+ * @param {Blockly.Block} opt_exclude Optional block to exclude from
+ *     comparisons (one doesn't want to collide with oneself).
+ * @return {boolean} True if the name is legal.
+ */
+Blockly.Procedures.isLegalName = function(name, workspace, opt_exclude) {
+  var blocks = workspace.getAllBlocks();
+  // Iterate through every block and check the name.
+  for (var x = 0; x < blocks.length; x++) {
+    if (blocks[x] == opt_exclude) {
+      continue;
+    }
+    var func = blocks[x].getProcedureDef;
+    if (func) {
+      var procName = func.call(blocks[x]);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       if (Blockly.Names.equals(procName[0], name)) {
         return false;
       }
@@ -190,6 +268,7 @@ Blockly.Procedures.isNameUsed = function(name, workspace, opt_exclude) {
 
 /**
  * Rename a procedure.  Called by the editable field.
+<<<<<<< HEAD
  * @param {string} name The proposed new name.
  * @return {string} The accepted name.
  * @this {Blockly.Field}
@@ -211,10 +290,32 @@ Blockly.Procedures.rename = function(name) {
     }
   }
   return legalName;
+=======
+ * @param {string} text The proposed new name.
+ * @return {string} The accepted name.
+ * @this {!Blockly.FieldVariable}
+ */
+Blockly.Procedures.rename = function(text) {
+  // Strip leading and trailing whitespace.  Beyond this, all names are legal.
+  text = text.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
+
+  // Ensure two identically-named procedures don't exist.
+  text = Blockly.Procedures.findLegalName(text, this.sourceBlock_);
+  // Rename any callers.
+  var blocks = this.sourceBlock_.workspace.getAllBlocks();
+  for (var x = 0; x < blocks.length; x++) {
+    var func = blocks[x].renameProcedure;
+    if (func) {
+      func.call(blocks[x], this.text_, text);
+    }
+  }
+  return text;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
  * Construct the blocks required by the flyout for the procedure category.
+<<<<<<< HEAD
  * @param {!Blockly.Workspace} workspace The workspace contianing procedures.
  * @return {!Array.<!Element>} Array of XML block elements.
  */
@@ -324,6 +425,74 @@ Blockly.Procedures.getCallers = function(name, ws, definitionRoot,
       var procCode = block.getProcCode();
       if (procCode && procCode == name) {
         callers.push(block);
+=======
+ * @param {!Array.<!Blockly.Block>} blocks List of blocks to show.
+ * @param {!Array.<number>} gaps List of widths between blocks.
+ * @param {number} margin Standard margin width for calculating gaps.
+ * @param {!Blockly.Workspace} workspace The flyout's workspace.
+ */
+Blockly.Procedures.flyoutCategory = function(blocks, gaps, margin, workspace) {
+  if (Blockly.Blocks['procedures_defnoreturn']) {
+    var block = new Blockly.Block(workspace, 'procedures_defnoreturn');
+    block.initSvg();
+    blocks.push(block);
+    gaps.push(margin * 2);
+  }
+  if (Blockly.Blocks['procedures_defreturn']) {
+    var block = new Blockly.Block(workspace, 'procedures_defreturn');
+    block.initSvg();
+    blocks.push(block);
+    gaps.push(margin * 2);
+  }
+  if (Blockly.Blocks['procedures_ifreturn']) {
+    var block = new Blockly.Block(workspace, 'procedures_ifreturn');
+    block.initSvg();
+    blocks.push(block);
+    gaps.push(margin * 2);
+  }
+  if (gaps.length) {
+    // Add slightly larger gap between system blocks and user calls.
+    gaps[gaps.length - 1] = margin * 3;
+  }
+
+  function populateProcedures(procedureList, templateName) {
+    for (var x = 0; x < procedureList.length; x++) {
+      var block = new Blockly.Block(workspace, templateName);
+      block.setTitleValue(procedureList[x][0], 'NAME');
+      var tempIds = [];
+      for (var t = 0; t < procedureList[x][1].length; t++) {
+        tempIds[t] = 'ARG' + t;
+      }
+      block.setProcedureParameters(procedureList[x][1], tempIds);
+      block.initSvg();
+      blocks.push(block);
+      gaps.push(margin * 2);
+    }
+  }
+
+  var tuple = Blockly.Procedures.allProcedures();
+  populateProcedures(tuple[0], 'procedures_callnoreturn');
+  populateProcedures(tuple[1], 'procedures_callreturn');
+};
+
+/**
+ * Find all the callers of a named procedure.
+ * @param {string} name Name of procedure.
+ * @param {!Blockly.Workspace} workspace The workspace to find callers in.
+ * @return {!Array.<!Blockly.Block>} Array of caller blocks.
+ */
+Blockly.Procedures.getCallers = function(name, workspace) {
+  var callers = [];
+  var blocks = workspace.getAllBlocks();
+  // Iterate through every block and check the name.
+  for (var x = 0; x < blocks.length; x++) {
+    var func = blocks[x].getProcedureCall;
+    if (func) {
+      var procName = func.call(blocks[x]);
+      // Procedure name may be null if the block is only half-built.
+      if (procName && Blockly.Names.equals(procName, name)) {
+        callers.push(blocks[x]);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       }
     }
   }
@@ -331,6 +500,7 @@ Blockly.Procedures.getCallers = function(name, ws, definitionRoot,
 };
 
 /**
+<<<<<<< HEAD
  * Find and edit all callers with a procCode using a new mutation.
  * @param {string} name Name of procedure (procCode in scratch-blocks).
  * @param {!Blockly.Workspace} ws The workspace to find callers in.
@@ -364,11 +534,39 @@ Blockly.Procedures.mutateCallersAndPrototype = function(name, ws, mutation) {
     Blockly.Events.setGroup(false);
   } else {
     alert('No define block on workspace'); // TODO decide what to do about this.
+=======
+ * When a procedure definition is disposed of, find and dispose of all its
+ *     callers.
+ * @param {string} name Name of deleted procedure definition.
+ * @param {!Blockly.Workspace} workspace The workspace to delete callers from.
+ */
+Blockly.Procedures.disposeCallers = function(name, workspace) {
+  var callers = Blockly.Procedures.getCallers(name, workspace);
+  for (var x = 0; x < callers.length; x++) {
+    callers[x].dispose(true, false);
+  }
+};
+
+/**
+ * When a procedure definition changes its parameters, find and edit all its
+ * callers.
+ * @param {string} name Name of edited procedure definition.
+ * @param {!Blockly.Workspace} workspace The workspace to delete callers from.
+ * @param {!Array.<string>} paramNames Array of new parameter names.
+ * @param {!Array.<string>} paramIds Array of unique parameter IDs.
+ */
+Blockly.Procedures.mutateCallers = function(name, workspace,
+                                            paramNames, paramIds) {
+  var callers = Blockly.Procedures.getCallers(name, workspace);
+  for (var x = 0; x < callers.length; x++) {
+    callers[x].setProcedureParameters(paramNames, paramIds);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
 };
 
 /**
  * Find the definition block for the named procedure.
+<<<<<<< HEAD
  * @param {string} procCode The identifier of the procedure.
  * @param {!Blockly.Workspace} workspace The workspace to search.
  * @return {Blockly.Block} The procedure definition block, or null not found.
@@ -382,11 +580,26 @@ Blockly.Procedures.getDefineBlock = function(procCode, workspace) {
       var prototypeBlock = blocks[i].getInput('custom_block').connection.targetBlock();
       if (prototypeBlock.getProcCode && prototypeBlock.getProcCode() == procCode) {
         return blocks[i];
+=======
+ * @param {string} name Name of procedure.
+ * @param {!Blockly.Workspace} workspace The workspace to search.
+ * @return {Blockly.Block} The procedure definition block, or null not found.
+ */
+Blockly.Procedures.getDefinition = function(name, workspace) {
+  var blocks = workspace.getAllBlocks();
+  for (var x = 0; x < blocks.length; x++) {
+    var func = blocks[x].getProcedureDef;
+    if (func) {
+      var tuple = func.call(blocks[x]);
+      if (tuple && Blockly.Names.equals(tuple[0], name)) {
+        return blocks[x];
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       }
     }
   }
   return null;
 };
+<<<<<<< HEAD
 
 /**
  * Find the prototype block for the named procedure.
@@ -737,3 +950,5 @@ Blockly.Procedures.getBlockReturnType = function(block) {
     return Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
   }
 };
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

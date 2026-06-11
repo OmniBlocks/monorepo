@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,25 +33,39 @@
 
 goog.provide('Blockly.Bubble');
 
+<<<<<<< HEAD
 goog.require('Blockly.Touch');
 goog.require('Blockly.Workspace');
 goog.require('goog.dom');
 goog.require('goog.math.Coordinate');
 goog.require('goog.userAgent');
+=======
+goog.require('Blockly.Workspace');
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 
 /**
  * Class for UI bubble.
+<<<<<<< HEAD
  * @param {!Blockly.WorkspaceSvg} workspace The workspace on which to draw the
  *     bubble.
  * @param {!Element} content SVG content for the bubble.
  * @param {Element} shape SVG element to avoid eclipsing.
  * @param {!goog.math.Coordinate} anchorXY Absolute position of bubble's anchor
  *     point.
+=======
+ * @param {!Blockly.Workspace} workspace The workspace on which to draw the
+ *     bubble.
+ * @param {!Element} content SVG content for the bubble.
+ * @param {Element} shape SVG element to avoid eclipsing.
+ * @param {number} anchorX Absolute horizontal position of bubbles anchor point.
+ * @param {number} anchorY Absolute vertical position of bubbles anchor point.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * @param {?number} bubbleWidth Width of bubble, or null if not resizable.
  * @param {?number} bubbleHeight Height of bubble, or null if not resizable.
  * @constructor
  */
+<<<<<<< HEAD
 Blockly.Bubble = function(workspace, content, shape, anchorXY,
     bubbleWidth, bubbleHeight) {
   this.workspace_ = workspace;
@@ -61,6 +82,24 @@ Blockly.Bubble = function(workspace, content, shape, anchorXY,
   canvas.appendChild(this.createDom_(content, !!(bubbleWidth && bubbleHeight)));
 
   this.setAnchorLocation(anchorXY);
+=======
+Blockly.Bubble = function(workspace, content, shape,
+                          anchorX, anchorY,
+                          bubbleWidth, bubbleHeight) {
+  var angle = Blockly.Bubble.ARROW_ANGLE;
+  if (Blockly.RTL) {
+    angle = -angle;
+  }
+  this.arrow_radians_ = angle / 360 * Math.PI * 2;
+
+  this.workspace_ = workspace;
+  this.content_ = content;
+  this.shape_ = shape;
+  var canvas = workspace.getBubbleCanvas();
+  canvas.appendChild(this.createDom_(content, !!(bubbleWidth && bubbleHeight)));
+
+  this.setAnchorLocation(anchorX, anchorY);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   if (!bubbleWidth || !bubbleHeight) {
     var bBox = /** @type {SVGLocatable} */ (this.content_).getBBox();
     bubbleWidth = bBox.width + 2 * Blockly.Bubble.BORDER_WIDTH;
@@ -73,12 +112,21 @@ Blockly.Bubble = function(workspace, content, shape, anchorXY,
   this.renderArrow_();
   this.rendered_ = true;
 
+<<<<<<< HEAD
   if (!workspace.options.readOnly) {
     Blockly.bindEventWithChecks_(
         this.bubbleBack_, 'mousedown', this, this.bubbleMouseDown_);
     if (this.resizeGroup_) {
       Blockly.bindEventWithChecks_(
           this.resizeGroup_, 'mousedown', this, this.resizeMouseDown_);
+=======
+  if (!Blockly.readOnly) {
+    Blockly.bindEvent_(this.bubbleBack_, 'mousedown', this,
+                       this.bubbleMouseDown_);
+    if (this.resizeGroup_) {
+      Blockly.bindEvent_(this.resizeGroup_, 'mousedown', this,
+                         this.resizeMouseDown_);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     }
   }
 };
@@ -92,7 +140,11 @@ Blockly.Bubble.BORDER_WIDTH = 6;
  * Determines the thickness of the base of the arrow in relation to the size
  * of the bubble.  Higher numbers result in thinner arrows.
  */
+<<<<<<< HEAD
 Blockly.Bubble.ARROW_THICKNESS = 5;
+=======
+Blockly.Bubble.ARROW_THICKNESS = 10;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 /**
  * The number of degrees that the arrow bends counter-clockwise.
@@ -124,12 +176,15 @@ Blockly.Bubble.onMouseUpWrapper_ = null;
 Blockly.Bubble.onMouseMoveWrapper_ = null;
 
 /**
+<<<<<<< HEAD
  * Function to call on resize of bubble.
  * @type {Function}
  */
 Blockly.Bubble.prototype.resizeCallback_ = null;
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Stop binding to the global mouseup and mousemove events.
  * @private
  */
@@ -144,6 +199,7 @@ Blockly.Bubble.unbindDragEvents_ = function() {
   }
 };
 
+<<<<<<< HEAD
 /*
  * Handle a mouse-up event while dragging a bubble's border or resize handle.
  * @param {!Event} e Mouse up event.
@@ -154,6 +210,8 @@ Blockly.Bubble.bubbleMouseUp_ = function(/*e*/) {
   Blockly.Bubble.unbindDragEvents_();
 };
 
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 /**
  * Flag to stop incremental rendering during construction.
  * @private
@@ -161,6 +219,7 @@ Blockly.Bubble.bubbleMouseUp_ = function(/*e*/) {
 Blockly.Bubble.prototype.rendered_ = false;
 
 /**
+<<<<<<< HEAD
  * Absolute coordinate of anchor point, in workspace coordinates.
  * @type {goog.math.Coordinate}
  * @private
@@ -170,6 +229,21 @@ Blockly.Bubble.prototype.anchorXY_ = null;
 /**
  * Relative X coordinate of bubble with respect to the anchor's centre,
  * in workspace units.
+=======
+ * Absolute X coordinate of anchor point.
+ * @private
+ */
+Blockly.Bubble.prototype.anchorX_ = 0;
+
+/**
+ * Absolute Y coordinate of anchor point.
+ * @private
+ */
+Blockly.Bubble.prototype.anchorY_ = 0;
+
+/**
+ * Relative X coordinate of bubble with respect to the anchor's centre.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * In RTL mode the initial value is negated.
  * @private
  */
@@ -209,7 +283,11 @@ Blockly.Bubble.prototype.autoLayout_ = true;
 Blockly.Bubble.prototype.createDom_ = function(content, hasResize) {
   /* Create the bubble.  Here's the markup that will be generated:
   <g>
+<<<<<<< HEAD
     <g filter="url(#blocklyEmbossFilter837493)">
+=======
+    <g filter="url(#blocklyEmboss)">
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       <path d="... Z" />
       <rect class="blocklyDraggable" rx="8" ry="8" width="180" height="180"/>
     </g>
@@ -221,6 +299,7 @@ Blockly.Bubble.prototype.createDom_ = function(content, hasResize) {
     [...content goes here...]
   </g>
   */
+<<<<<<< HEAD
   this.bubbleGroup_ = Blockly.utils.createSvgElement('g', {}, null);
   var filter =
       {'filter': 'url(#' + this.workspace_.options.embossFilterId + ')'};
@@ -266,6 +345,32 @@ Blockly.Bubble.prototype.createDom_ = function(content, hasResize) {
           'x2': resizeSize - 1,
           'y2': resizeSize * 2 / 3
         }, this.resizeGroup_);
+=======
+  this.bubbleGroup_ = Blockly.createSvgElement('g', {}, null);
+  var bubbleEmboss = Blockly.createSvgElement('g',
+      {'filter': 'url(#blocklyEmboss)'}, this.bubbleGroup_);
+  this.bubbleArrow_ = Blockly.createSvgElement('path', {}, bubbleEmboss);
+  this.bubbleBack_ = Blockly.createSvgElement('rect',
+      {'class': 'blocklyDraggable', 'x': 0, 'y': 0,
+      'rx': Blockly.Bubble.BORDER_WIDTH, 'ry': Blockly.Bubble.BORDER_WIDTH},
+      bubbleEmboss);
+  if (hasResize) {
+    this.resizeGroup_ = Blockly.createSvgElement('g',
+        {'class': Blockly.RTL ? 'blocklyResizeSW' : 'blocklyResizeSE'},
+        this.bubbleGroup_);
+    var resizeSize = 2 * Blockly.Bubble.BORDER_WIDTH;
+    Blockly.createSvgElement('polygon',
+        {'points': '0,x x,x x,0'.replace(/x/g, resizeSize.toString())},
+        this.resizeGroup_);
+    Blockly.createSvgElement('line',
+        {'class': 'blocklyResizeLine',
+        'x1': resizeSize / 3, 'y1': resizeSize - 1,
+        'x2': resizeSize - 1, 'y2': resizeSize / 3}, this.resizeGroup_);
+    Blockly.createSvgElement('line',
+        {'class': 'blocklyResizeLine',
+        'x1': resizeSize * 2 / 3, 'y1': resizeSize - 1,
+        'x2': resizeSize - 1, 'y2': resizeSize * 2 / 3}, this.resizeGroup_);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   } else {
     this.resizeGroup_ = null;
   }
@@ -274,6 +379,7 @@ Blockly.Bubble.prototype.createDom_ = function(content, hasResize) {
 };
 
 /**
+<<<<<<< HEAD
  * Return the root node of the bubble's SVG group.
  * @return {Element} The root SVG node of the bubble's group.
  */
@@ -292,11 +398,14 @@ Blockly.Bubble.prototype.setSvgId = function(id) {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Handle a mouse-down on bubble's border.
  * @param {!Event} e Mouse down event.
  * @private
  */
 Blockly.Bubble.prototype.bubbleMouseDown_ = function(e) {
+<<<<<<< HEAD
   var gesture = this.workspace_.getGesture(e);
   if (gesture) {
     gesture.handleBubbleStart(e, this);
@@ -320,6 +429,51 @@ Blockly.Bubble.prototype.showContextMenu_ = function(_e) {
  */
 Blockly.Bubble.prototype.isDeletable = function() {
   return false;
+=======
+  this.promote_();
+  Blockly.Bubble.unbindDragEvents_();
+  if (Blockly.isRightButton(e)) {
+    // Right-click.
+    return;
+  } else if (Blockly.isTargetInput_(e)) {
+    // When focused on an HTML text input widget, don't trap any events.
+    return;
+  }
+  // Left-click (or middle click)
+  Blockly.setCursorHand_(true);
+  // Record the starting offset between the current location and the mouse.
+  if (Blockly.RTL) {
+    this.dragDeltaX = this.relativeLeft_ + e.clientX;
+  } else {
+    this.dragDeltaX = this.relativeLeft_ - e.clientX;
+  }
+  this.dragDeltaY = this.relativeTop_ - e.clientY;
+
+  Blockly.Bubble.onMouseUpWrapper_ = Blockly.bindEvent_(document,
+      'mouseup', this, Blockly.Bubble.unbindDragEvents_);
+  Blockly.Bubble.onMouseMoveWrapper_ = Blockly.bindEvent_(document,
+      'mousemove', this, this.bubbleMouseMove_);
+  Blockly.hideChaff();
+  // This event has been handled.  No need to bubble up to the document.
+  e.stopPropagation();
+};
+
+/**
+ * Drag this bubble to follow the mouse.
+ * @param {!Event} e Mouse move event.
+ * @private
+ */
+Blockly.Bubble.prototype.bubbleMouseMove_ = function(e) {
+  this.autoLayout_ = false;
+  if (Blockly.RTL) {
+    this.relativeLeft_ = this.dragDeltaX - e.clientX;
+  } else {
+    this.relativeLeft_ = this.dragDeltaX + e.clientX;
+  }
+  this.relativeTop_ = this.dragDeltaY + e.clientY;
+  this.positionBubble_();
+  this.renderArrow_();
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -330,6 +484,7 @@ Blockly.Bubble.prototype.isDeletable = function() {
 Blockly.Bubble.prototype.resizeMouseDown_ = function(e) {
   this.promote_();
   Blockly.Bubble.unbindDragEvents_();
+<<<<<<< HEAD
   if (Blockly.utils.isRightButton(e)) {
     // No right-click.
     e.stopPropagation();
@@ -342,6 +497,25 @@ Blockly.Bubble.prototype.resizeMouseDown_ = function(e) {
   Blockly.Bubble.onMouseUpWrapper_ = Blockly.bindEventWithChecks_(document,
       'mouseup', this, Blockly.Bubble.bubbleMouseUp_);
   Blockly.Bubble.onMouseMoveWrapper_ = Blockly.bindEventWithChecks_(document,
+=======
+  if (Blockly.isRightButton(e)) {
+    // Right-click.
+    return;
+  }
+  // Left-click (or middle click)
+  Blockly.setCursorHand_(true);
+  // Record the starting offset between the current location and the mouse.
+  if (Blockly.RTL) {
+    this.resizeDeltaWidth = this.width_ + e.clientX;
+  } else {
+    this.resizeDeltaWidth = this.width_ - e.clientX;
+  }
+  this.resizeDeltaHeight = this.height_ - e.clientY;
+
+  Blockly.Bubble.onMouseUpWrapper_ = Blockly.bindEvent_(document,
+      'mouseup', this, Blockly.Bubble.unbindDragEvents_);
+  Blockly.Bubble.onMouseMoveWrapper_ = Blockly.bindEvent_(document,
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       'mousemove', this, this.resizeMouseMove_);
   Blockly.hideChaff();
   // This event has been handled.  No need to bubble up to the document.
@@ -355,9 +529,23 @@ Blockly.Bubble.prototype.resizeMouseDown_ = function(e) {
  */
 Blockly.Bubble.prototype.resizeMouseMove_ = function(e) {
   this.autoLayout_ = false;
+<<<<<<< HEAD
   var newXY = this.workspace_.moveDrag(e);
   this.setBubbleSize(this.workspace_.RTL ? -newXY.x : newXY.x, newXY.y);
   if (this.workspace_.RTL) {
+=======
+  var w = this.resizeDeltaWidth;
+  var h = this.resizeDeltaHeight + e.clientY;
+  if (Blockly.RTL) {
+    // RTL drags the bottom-left corner.
+    w -= e.clientX;
+  } else {
+    // LTR drags the bottom-right corner.
+    w += e.clientX;
+  }
+  this.setBubbleSize(w, h);
+  if (Blockly.RTL) {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     // RTL requires the bubble to move its left edge.
     this.positionBubble_();
   }
@@ -365,46 +553,75 @@ Blockly.Bubble.prototype.resizeMouseMove_ = function(e) {
 
 /**
  * Register a function as a callback event for when the bubble is resized.
+<<<<<<< HEAD
  * @param {!Function} callback The function to call on resize.
  */
 Blockly.Bubble.prototype.registerResizeEvent = function(callback) {
   this.resizeCallback_ = callback;
+=======
+ * @param {Object} thisObject The value of 'this' in the callback.
+ * @param {!Function} callback The function to call on resize.
+ */
+Blockly.Bubble.prototype.registerResizeEvent = function(thisObject, callback) {
+  Blockly.bindEvent_(this.bubbleGroup_, 'resize', thisObject, callback);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
  * Move this bubble to the top of the stack.
+<<<<<<< HEAD
  * @return {!boolean} Whether or not the bubble has been moved.
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * @private
  */
 Blockly.Bubble.prototype.promote_ = function() {
   var svgGroup = this.bubbleGroup_.parentNode;
+<<<<<<< HEAD
   if (svgGroup.lastChild !== this.bubbleGroup_) {
     svgGroup.appendChild(this.bubbleGroup_);
     return true;
   }
   return false;
+=======
+  svgGroup.appendChild(this.bubbleGroup_);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
  * Notification that the anchor has moved.
  * Update the arrow and bubble accordingly.
+<<<<<<< HEAD
  * @param {!goog.math.Coordinate} xy Absolute location.
  */
 Blockly.Bubble.prototype.setAnchorLocation = function(xy) {
   this.anchorXY_ = xy;
+=======
+ * @param {number} x Absolute horizontal location.
+ * @param {number} y Absolute vertical location.
+ */
+Blockly.Bubble.prototype.setAnchorLocation = function(x, y) {
+  this.anchorX_ = x;
+  this.anchorY_ = y;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   if (this.rendered_) {
     this.positionBubble_();
   }
 };
 
 /**
+<<<<<<< HEAD
  * Position the bubble so that it does not fall off-screen.
+=======
+ * Position the bubble so that it does not fall offscreen.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * @private
  */
 Blockly.Bubble.prototype.layoutBubble_ = function() {
   // Compute the preferred bubble location.
   var relativeLeft = -this.width_ / 4;
   var relativeTop = -this.height_ - Blockly.BlockSvg.MIN_BLOCK_Y;
+<<<<<<< HEAD
   // Prevent the bubble from being off-screen.
   var metrics = this.workspace_.getMetrics();
   metrics.viewWidth /= this.workspace_.scale;
@@ -438,6 +655,32 @@ Blockly.Bubble.prototype.layoutBubble_ = function() {
     // Slide the bubble below the block.
     var bBox = /** @type {SVGLocatable} */ (this.shape_).getBBox();
     relativeTop = bBox.height;
+=======
+  // Prevent the bubble from being offscreen.
+  if (this.workspace_.scrollbar) {
+    // Fetch the workspace's metrics, if they exist.
+    var metrics = this.workspace_.getMetrics();
+    if (this.anchorX_ + relativeLeft <
+        Blockly.BlockSvg.SEP_SPACE_X + metrics.viewLeft) {
+      // Slide the bubble right until it is onscreen.
+      relativeLeft = Blockly.BlockSvg.SEP_SPACE_X + metrics.viewLeft -
+          this.anchorX_;
+    } else if (metrics.viewLeft + metrics.viewWidth <
+        this.anchorX_ + relativeLeft + this.width_ +
+        Blockly.BlockSvg.SEP_SPACE_X +
+        Blockly.Scrollbar.scrollbarThickness) {
+      // Slide the bubble left until it is onscreen.
+      relativeLeft = metrics.viewLeft + metrics.viewWidth - this.anchorX_ -
+          this.width_ - Blockly.BlockSvg.SEP_SPACE_X -
+          Blockly.Scrollbar.scrollbarThickness;
+    }
+    if (this.anchorY_ + relativeTop <
+        Blockly.BlockSvg.SEP_SPACE_Y + metrics.viewTop) {
+      // Slide the bubble below the block.
+      var bBox = /** @type {SVGLocatable} */ (this.shape_).getBBox();
+      relativeTop = bBox.height;
+    }
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   this.relativeLeft_ = relativeLeft;
   this.relativeTop_ = relativeTop;
@@ -448,6 +691,7 @@ Blockly.Bubble.prototype.layoutBubble_ = function() {
  * @private
  */
 Blockly.Bubble.prototype.positionBubble_ = function() {
+<<<<<<< HEAD
   var left = this.anchorXY_.x;
   if (this.workspace_.RTL) {
     left -= this.relativeLeft_ ;
@@ -466,6 +710,17 @@ Blockly.Bubble.prototype.positionBubble_ = function() {
  */
 Blockly.Bubble.prototype.moveTo = function(x, y) {
   this.bubbleGroup_.setAttribute('transform', 'translate(' + x + ',' + y + ')');
+=======
+  var left;
+  if (Blockly.RTL) {
+    left = this.anchorX_ - this.relativeLeft_ - this.width_;
+  } else {
+    left = this.anchorX_ + this.relativeLeft_;
+  }
+  var top = this.relativeTop_ + this.anchorY_;
+  this.bubbleGroup_.setAttribute('transform',
+      'translate(' + left + ', ' + top + ')');
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -485,12 +740,17 @@ Blockly.Bubble.prototype.setBubbleSize = function(width, height) {
   var doubleBorderWidth = 2 * Blockly.Bubble.BORDER_WIDTH;
   // Minimum size of a bubble.
   width = Math.max(width, doubleBorderWidth + 45);
+<<<<<<< HEAD
   height = Math.max(height, doubleBorderWidth + 20);
+=======
+  height = Math.max(height, doubleBorderWidth + Blockly.BlockSvg.TITLE_HEIGHT);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   this.width_ = width;
   this.height_ = height;
   this.bubbleBack_.setAttribute('width', width);
   this.bubbleBack_.setAttribute('height', height);
   if (this.resizeGroup_) {
+<<<<<<< HEAD
     if (this.workspace_.RTL) {
       // Mirror the resize group.
       var resizeSize = 2 * Blockly.Bubble.BORDER_WIDTH;
@@ -499,6 +759,17 @@ Blockly.Bubble.prototype.setBubbleSize = function(width, height) {
     } else {
       this.resizeGroup_.setAttribute('transform', 'translate(' +
           (width - doubleBorderWidth) + ',' +
+=======
+    if (Blockly.RTL) {
+      // Mirror the resize group.
+      var resizeSize = 2 * Blockly.Bubble.BORDER_WIDTH;
+      this.resizeGroup_.setAttribute('transform', 'translate(' +
+          resizeSize + ', ' +
+          (height - doubleBorderWidth) + ') scale(-1 1)');
+    } else {
+      this.resizeGroup_.setAttribute('transform', 'translate(' +
+          (width - doubleBorderWidth) + ', ' +
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
           (height - doubleBorderWidth) + ')');
     }
   }
@@ -509,10 +780,15 @@ Blockly.Bubble.prototype.setBubbleSize = function(width, height) {
     this.positionBubble_();
     this.renderArrow_();
   }
+<<<<<<< HEAD
   // Allow the contents to resize.
   if (this.resizeCallback_) {
     this.resizeCallback_();
   }
+=======
+  // Fire an event to allow the contents to resize.
+  Blockly.fireUiEvent(this.bubbleGroup_, 'resize');
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -535,7 +811,11 @@ Blockly.Bubble.prototype.renderArrow_ = function() {
     // Compute the angle of the arrow's line.
     var rise = relAnchorY - relBubbleY;
     var run = relAnchorX - relBubbleX;
+<<<<<<< HEAD
     if (this.workspace_.RTL) {
+=======
+    if (Blockly.RTL) {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       run *= -1;
     }
     var hypotenuse = Math.sqrt(rise * rise + run * run);
@@ -555,7 +835,11 @@ Blockly.Bubble.prototype.renderArrow_ = function() {
     var bubbleSize = this.getBubbleSize();
     var thickness = (bubbleSize.width + bubbleSize.height) /
                     Blockly.Bubble.ARROW_THICKNESS;
+<<<<<<< HEAD
     thickness = Math.min(thickness, bubbleSize.width, bubbleSize.height) / 4;
+=======
+    thickness = Math.min(thickness, bubbleSize.width, bubbleSize.height) / 2;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
     // Back the tip of the arrow off of the anchor.
     var backoffRatio = 1 - Blockly.Bubble.ANCHOR_RADIUS / hypotenuse;
@@ -607,13 +891,17 @@ Blockly.Bubble.prototype.dispose = function() {
   // Dispose of and unlink the bubble.
   goog.dom.removeNode(this.bubbleGroup_);
   this.bubbleGroup_ = null;
+<<<<<<< HEAD
   this.bubbleArrow_ = null;
   this.bubbleBack_ = null;
   this.resizeGroup_ = null;
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   this.workspace_ = null;
   this.content_ = null;
   this.shape_ = null;
 };
+<<<<<<< HEAD
 
 /**
  * Move this bubble during a drag, taking into account whether or not there is
@@ -662,3 +950,5 @@ Blockly.Bubble.prototype.getRelativeToSurfaceXY = function() {
 Blockly.Bubble.prototype.setAutoLayout = function(enable) {
   this.autoLayout_ = enable;
 };
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

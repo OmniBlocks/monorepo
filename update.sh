@@ -51,7 +51,7 @@ git log upstream/develop --no-merges -p | git patch-id --stable > /tmp/upstream-
 git log --no-merges -p | git patch-id --stable > /tmp/ours-pids.txt
 
 # Match: upstream patch-id that also appears in our history → that commit's upstream hash
-SYNC_POINT=$(awk 'NR==FNR{seen[$1]=1; next} seen[$1]{print $2; exit}' \
+SYNC_POINT=$(awk 'NR==FNR{seen[$1]=1; next} seen[$1]{last=$2} END{print last}' \
     /tmp/ours-pids.txt /tmp/upstream-pids.txt)
 echo "🔍 SYNC_POINT: $SYNC_POINT"
 

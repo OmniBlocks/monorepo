@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2013 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2013 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +26,11 @@
  */
 
 /**
+<<<<<<< HEAD
  * @fileoverview Empty name space for the Message singleton.
+=======
+ * @fileoverview Core JavaScript library for Blockly.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * @author scr@google.com (Sheridan Rawlins)
  */
 'use strict';
@@ -29,6 +40,7 @@
  * Msg gets populated in the message files.
  */
 goog.provide('Blockly.Msg');
+<<<<<<< HEAD
 
 
 /**
@@ -60,3 +72,5 @@ goog.getMsg = function(str, opt_values) {
 goog.getMsg.blocklyMsgMap = {
   'Today': 'TODAY'
 };
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

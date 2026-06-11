@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +34,21 @@
 goog.provide('Blockly.FieldColour');
 
 goog.require('Blockly.Field');
+<<<<<<< HEAD
 goog.require('Blockly.utils');
 
 goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.style');
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 goog.require('goog.ui.ColorPicker');
 
 
 /**
  * Class for a colour input field.
  * @param {string} colour The initial colour in '#rrggbb' format.
+<<<<<<< HEAD
  * @param {Function=} opt_validator A function that is executed when a new
  *     colour is selected.  Its sole argument is the new colour value.  Its
  *     return value becomes the selected colour, unless it is undefined, in
@@ -49,10 +60,25 @@ goog.require('goog.ui.ColorPicker');
 Blockly.FieldColour = function(colour, opt_validator) {
   Blockly.FieldColour.superClass_.constructor.call(this, colour, opt_validator);
   this.addArgType('colour');
+=======
+ * @param {Function} opt_changeHandler A function that is executed when a new
+ *     option is selected.
+ * @extends {Blockly.Field}
+ * @constructor
+ */
+Blockly.FieldColour = function(colour, opt_changeHandler) {
+  Blockly.FieldColour.superClass_.constructor.call(this, '\u00A0\u00A0\u00A0');
+
+  this.changeHandler_ = opt_changeHandler;
+  this.borderRect_.style.fillOpacity = 1;
+  // Set the initial state.
+  this.setValue(colour);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 goog.inherits(Blockly.FieldColour, Blockly.Field);
 
 /**
+<<<<<<< HEAD
  * Construct a FieldColour from a JSON arg object.
  * @param {!Object} options A JSON object with options (colour).
  * @returns {!Blockly.FieldColour} The new field instance.
@@ -91,15 +117,24 @@ Blockly.FieldColour.prototype.init = function(block) {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Mouse cursor style when over the hotspot that initiates the editor.
  */
 Blockly.FieldColour.prototype.CURSOR = 'default';
 
 /**
+<<<<<<< HEAD
  * Close the colour picker if this input is being deleted.
  */
 Blockly.FieldColour.prototype.dispose = function() {
   Blockly.WidgetDiv.hideIfOwner(this);
+=======
+ * Dispose of all DOM objects belonging to this editable field.
+ */
+Blockly.FieldColour.prototype.dispose = function() {
+  Blockly.WidgetDiv.hideIfField(this);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   Blockly.FieldColour.superClass_.dispose.call(this);
 };
 
@@ -116,6 +151,7 @@ Blockly.FieldColour.prototype.getValue = function() {
  * @param {string} colour The new colour in '#rrggbb' format.
  */
 Blockly.FieldColour.prototype.setValue = function(colour) {
+<<<<<<< HEAD
   if (this.sourceBlock_ && Blockly.Events.isEnabled() &&
       this.colour_ != colour) {
     Blockly.Events.fire(new Blockly.Events.BlockChange(
@@ -126,10 +162,17 @@ Blockly.FieldColour.prototype.setValue = function(colour) {
     // Set the primary, secondary, tertiary, and quaternary colour to this value.
     // The renderer expects to be able to use the secondary color as the fill for a shadow.
     this.sourceBlock_.setColour(colour, colour, colour, colour);
+=======
+  this.colour_ = colour;
+  this.borderRect_.style.fill = colour;
+  if (this.sourceBlock_ && this.sourceBlock_.rendered) {
+    this.sourceBlock_.workspace.fireChangeEvent();
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
 };
 
 /**
+<<<<<<< HEAD
  * Get the text from this field.  Used when the block is collapsed.
  * @return {string} Current text.
  */
@@ -152,6 +195,8 @@ Blockly.FieldColour.prototype.getSize = function() {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * An array of colour strings for the palette.
  * See bottom of this page for the default:
  * http://docs.closure-library.googlecode.com/git/closure_goog_ui_colorpicker.js.source.html
@@ -165,6 +210,7 @@ Blockly.FieldColour.COLOURS = goog.ui.ColorPicker.SIMPLE_GRID_COLORS;
 Blockly.FieldColour.COLUMNS = 7;
 
 /**
+<<<<<<< HEAD
  * Set a custom colour grid for this field.
  * @param {Array.<string>} colours Array of colours for this block,
  *     or null to use default (Blockly.FieldColour.COLOURS).
@@ -187,10 +233,13 @@ Blockly.FieldColour.prototype.setColumns = function(columns) {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Create a palette under the colour field.
  * @private
  */
 Blockly.FieldColour.prototype.showEditor_ = function() {
+<<<<<<< HEAD
   Blockly.WidgetDiv.show(this, this.sourceBlock_.RTL,
       Blockly.FieldColour.widgetDispose_);
 
@@ -208,22 +257,61 @@ Blockly.FieldColour.prototype.showEditor_ = function() {
 
   // Configure event handler.
   var thisField = this;
+=======
+  Blockly.WidgetDiv.show(this, Blockly.FieldColour.dispose_);
+  var div = Blockly.WidgetDiv.DIV;
+  // Create the palette using Closure.
+  var picker = new goog.ui.ColorPicker();
+  picker.setSize(Blockly.FieldColour.COLUMNS);
+  picker.setColors(Blockly.FieldColour.COLOURS);
+  picker.render(div);
+  picker.setSelectedColor(this.getValue());
+
+  // Position the palette to line up with the field.
+  var xy = Blockly.getAbsoluteXY_(/** @type {!Element} */ (this.borderRect_));
+  var borderBBox = this.borderRect_.getBBox();
+  if (Blockly.RTL) {
+    xy.x += borderBBox.width;
+  }
+  xy.y += borderBBox.height - 1;
+  if (Blockly.RTL) {
+    xy.x -= div.offsetWidth;
+  }
+  div.style.left = xy.x + 'px';
+  div.style.top = xy.y + 'px';
+
+  // Configure event handler.
+  var thisObj = this;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   Blockly.FieldColour.changeEventKey_ = goog.events.listen(picker,
       goog.ui.ColorPicker.EventType.CHANGE,
       function(event) {
         var colour = event.target.getSelectedColor() || '#000000';
         Blockly.WidgetDiv.hide();
+<<<<<<< HEAD
         if (thisField.sourceBlock_) {
           // Call any validation function, and allow it to override.
           colour = thisField.callValidator(colour);
         }
         if (colour !== null) {
           thisField.setValue(colour);
+=======
+        if (thisObj.changeHandler_) {
+          // Call any change handler, and allow it to override.
+          var override = thisObj.changeHandler_(colour);
+          if (override !== undefined) {
+            colour = override;
+          }
+        }
+        if (colour !== null) {
+          thisObj.setValue(colour);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
         }
       });
 };
 
 /**
+<<<<<<< HEAD
  * Create a color picker widget and render it inside the widget div.
  * @return {!goog.ui.ColorPicker} The newly created color picker.
  * @private
@@ -251,3 +339,13 @@ Blockly.FieldColour.widgetDispose_ = function() {
 };
 
 Blockly.Field.register('field_colour', Blockly.FieldColour);
+=======
+ * Hide the colour palette.
+ * @private
+ */
+Blockly.FieldColour.dispose_ = function() {
+  if (Blockly.FieldColour.changeEventKey_) {
+    goog.events.unlistenByKey(Blockly.FieldColour.changeEventKey_);
+  }
+};
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

@@ -3,7 +3,11 @@
 # Code shared by translation conversion scripts.
 #
 # Copyright 2013 Google Inc.
+<<<<<<< HEAD
 # https://developers.google.com/blockly/
+=======
+# http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,9 +63,15 @@ def read_json_file(filename):
     if '@metadata' in defs:
       del defs['@metadata']
     return defs
+<<<<<<< HEAD
   except ValueError as e:
     print('Error reading ' + filename)
     raise InputError(filename, str(e))
+=======
+  except ValueError, e:
+    print('Error reading ' + filename)
+    raise InputError(file, str(e))
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 
 def _create_qqq_file(output_dir):
@@ -85,7 +95,11 @@ def _create_qqq_file(output_dir):
     """
     qqq_file_name = os.path.join(os.curdir, output_dir, 'qqq.json')
     qqq_file = codecs.open(qqq_file_name, 'w', 'utf-8')
+<<<<<<< HEAD
     print('Created file: ' + qqq_file_name)
+=======
+    print 'Created file: ' + qqq_file_name
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     qqq_file.write('{\n')
     return qqq_file
 
@@ -126,6 +140,7 @@ def _create_lang_file(author, lang, output_dir):
     """
     lang_file_name = os.path.join(os.curdir, output_dir, lang + '.json')
     lang_file = codecs.open(lang_file_name, 'w', 'utf-8')
+<<<<<<< HEAD
     print('Created file: ' + lang_file_name)
     # string.format doesn't like printing braces, so break up our writes.
     lang_file.write('{\n\t"@metadata": {')
@@ -136,6 +151,18 @@ def _create_lang_file(author, lang, output_dir):
 \t\t"messagedocumentation" : "qqq"
 """.format(author, str(datetime.now()), lang))
     lang_file.write('\t},\n')
+=======
+    print 'Created file: ' + lang_file_name
+    # string.format doesn't like printing braces, so break up our writes.
+    lang_file.write('{\n    "@metadata": {')
+    lang_file.write("""
+        "author": "{0}",
+        "lastupdated": "{1}",
+        "locale": "{2}",
+        "messagedocumentation" : "qqq"
+""".format(author, str(datetime.now()), lang))
+    lang_file.write('    },\n')
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     return lang_file
 
 
@@ -166,7 +193,11 @@ def _create_key_file(output_dir):
     key_file_name = os.path.join(os.curdir, output_dir, 'keys.json')
     key_file = open(key_file_name, 'w')
     key_file.write('{\n')
+<<<<<<< HEAD
     print('Created file: ' + key_file_name)
+=======
+    print 'Created file: ' + key_file_name
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     return key_file
 
 
@@ -218,12 +249,20 @@ def write_files(author, lang, output_dir, units, write_key_file):
             if write_key_file:
               key_file.write(',\n')
             qqq_file.write(',\n')
+<<<<<<< HEAD
         lang_file.write(u'\t"{0}": "{1}"'.format(
+=======
+        lang_file.write(u'    "{0}": "{1}"'.format(
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
             unit['meaning'],
             unit['source'].replace('"', "'")))
         if write_key_file:
           key_file.write('"{0}": "{1}"'.format(unit['meaning'], unit['key']))
+<<<<<<< HEAD
         qqq_file.write(u'\t"{0}": "{1}"'.format(
+=======
+        qqq_file.write(u'    "{0}": "{1}"'.format(
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
             unit['meaning'],
             unit['description'].replace('"', "'").replace(
                 '{lb}', '{').replace('{rb}', '}')))
@@ -232,3 +271,63 @@ def write_files(author, lang, output_dir, units, write_key_file):
     if write_key_file:
       _close_key_file(key_file)
     _close_qqq_file(qqq_file)
+<<<<<<< HEAD
+=======
+
+
+def insert_breaks(s, min_length, max_length):
+  """Inserts line breaks to try to get line lengths within the given range.
+
+  This tries to minimize raggedness and to break lines at punctuation
+  (periods and commas).  It never splits words or numbers.  Multiple spaces
+  may be converted into single spaces.
+
+  Args:
+      s: The string to split.
+      min_length: The requested minimum number of characters per line.
+      max_length: The requested minimum number of characters per line.
+
+  Returns:
+      A copy of the original string with zero or more line breaks inserted.
+  """
+  newline = '\\n'
+  if len(s) < min_length:
+      return s
+  # Try splitting by sentences.  This assumes sentences end with periods.
+  sentences = s.split('.')
+  # Remove empty sentences.
+  sentences = [sen for sen in sentences if sen]
+
+  # If all sentences are at least min_length and at most max_length,
+  # then return one per line.
+  if not [sen for sen in sentences if
+          len(sen) > max_length or len(sen) < min_length]:
+      return newline.join([sen.strip() + '.' for sen in sentences])
+
+  # Otherwise, divide into words, and use a greedy algorithm for the first
+  # line, and try to get later lines as close as possible in length.
+  words = [word for word in s.split(' ') if word]
+  line1 = ''
+  while (len(line1) + 1 + len(words[0]) < max_length and
+         # Preferentially split on periods and commas.
+         (not ((line1.endswith('. ') or line1.endswith(', ')) and
+               len(line1) > min_length))):
+    line1 += words.pop(0) + ' '
+    # If it all fits on one line, return that line.
+    if not words:
+      return line1
+  ideal_length = len(line1)
+  output = line1
+  line = ''
+  while words:
+    line += words.pop(0) + ' '
+    if words:
+      potential_len = len(line) + len(words[0])
+      if (potential_len > max_length or
+          potential_len - ideal_length > ideal_length - len(line) or
+          (line.endswith('. ') and len(line) > min_length)):
+        output += newline + line
+        line = ''
+  output += newline + line
+  return output
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

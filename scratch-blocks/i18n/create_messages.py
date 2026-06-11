@@ -3,7 +3,11 @@
 # Generate .js files defining Blockly core and language messages.
 #
 # Copyright 2013 Google Inc.
+<<<<<<< HEAD
 # https://developers.google.com/blockly/
+=======
+# http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +24,7 @@
 import argparse
 import codecs
 import os
+<<<<<<< HEAD
 import re
 import sys
 from common import read_json_file
@@ -42,6 +47,12 @@ def load_constants(filename):
     constants_text += '\nBlockly.Msg["{0}"] = "{1}";'.format(key, value)
   return constants_text
 
+=======
+from common import InputError
+from common import read_json_file
+
+
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 def main():
   """Generate .js files defining Blockly core and language messages."""
 
@@ -55,13 +66,23 @@ def main():
   parser.add_argument('--source_synonym_file',
                       default=os.path.join('json', 'synonyms.json'),
                       help='Path to .json file with synonym definitions')
+<<<<<<< HEAD
   parser.add_argument('--source_constants_file',
                       default=os.path.join('json', 'constants.json'),
                       help='Path to .json file with constant definitions')
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   parser.add_argument('--output_dir', default='js/',
                       help='relative directory for output files')
   parser.add_argument('--key_file', default='keys.json',
                       help='relative path to input keys file')
+<<<<<<< HEAD
+=======
+  parser.add_argument('--min_length', default=30,
+                      help='minimum line length (not counting last line)')
+  parser.add_argument('--max_length', default=50,
+                      help='maximum line length (not guaranteed)')
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   parser.add_argument('--quiet', action='store_true', default=False,
                       help='do not write anything to standard output')
   parser.add_argument('files', nargs='+', help='input files')
@@ -72,6 +93,7 @@ def main():
   # Read in source language .json file, which provides any values missing
   # in target languages' .json files.
   source_defs = read_json_file(os.path.join(os.curdir, args.source_lang_file))
+<<<<<<< HEAD
   # Make sure the source file doesn't contain a newline or carriage return.
   for key, value in source_defs.items():
     if _NEWLINE_PATTERN.search(value):
@@ -79,21 +101,31 @@ def main():
             format(key, args.source_lang_file))
       sys.exit(1)
   sorted_keys = sorted(source_defs.keys())
+=======
+  sorted_keys = source_defs.keys()
+  sorted_keys.sort()
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
   # Read in synonyms file, which must be output in every language.
   synonym_defs = read_json_file(os.path.join(
       os.curdir, args.source_synonym_file))
+<<<<<<< HEAD
   # synonym_defs is also being sorted to ensure the same order is kept
   synonym_text = '\n'.join(['Blockly.Msg.{0} = Blockly.Msg.{1};'.format(
       key, synonym_defs[key]) for key in sorted(synonym_defs)])
 
   # Read in constants file, which must be output in every language.
   constants_text = load_constants(os.path.join(os.curdir, args.source_constants_file))
+=======
+  synonym_text = '\n'.join(['Blockly.Msg.{0} = Blockly.Msg.{1};'.format(
+      key, synonym_defs[key]) for key in synonym_defs])
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
   # Create each output file.
   for arg_file in args.files:
     (_, filename) = os.path.split(arg_file)
     target_lang = filename[:filename.index('.')]
+<<<<<<< HEAD
     if target_lang not in ('qqq', 'keys', 'synonyms', 'constants'):
       target_defs = read_json_file(os.path.join(os.curdir, arg_file))
 
@@ -111,6 +143,11 @@ def main():
                 format(key, arg_file))
           target_defs[key] = _NEWLINE_PATTERN.sub(' ', value)
 
+=======
+    if target_lang not in ('qqq', 'keys', 'synonyms'):
+      target_defs = read_json_file(os.path.join(os.curdir, arg_file))
+
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       # Output file.
       outname = os.path.join(os.curdir, args.output_dir, target_lang + '.js')
       with codecs.open(outname, 'w', 'utf-8') as outfile:
@@ -123,7 +160,11 @@ goog.provide('Blockly.Msg.{0}');
 
 goog.require('Blockly.Msg');
 
+<<<<<<< HEAD
 """.format(target_lang.replace('-', '.')))
+=======
+""".format(target_lang))
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
         # For each key in the source language file, output the target value
         # if present; otherwise, output the source language value with a
         # warning comment.
@@ -136,7 +177,11 @@ goog.require('Blockly.Msg');
             value = source_defs[key]
             comment = '  // untranslated'
           value = value.replace('"', '\\"')
+<<<<<<< HEAD
           outfile.write(u'Blockly.Msg["{0}"] = "{1}";{2}\n'.format(
+=======
+          outfile.write(u'Blockly.Msg.{0} = "{1}";{2}\n'.format(
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
               key, value, comment))
 
         # Announce any keys defined only for target language.
@@ -145,6 +190,7 @@ goog.require('Blockly.Msg');
           synonym_keys = [key for key in target_defs if key in synonym_defs]
           if not args.quiet:
             if extra_keys:
+<<<<<<< HEAD
               print(u'These extra keys appeared in {0}: {1}'.format(
                   filename, ', '.join(extra_keys)))
             if synonym_keys:
@@ -153,6 +199,15 @@ goog.require('Blockly.Msg');
 
         outfile.write(synonym_text)
         outfile.write(constants_text)
+=======
+              print('These extra keys appeared in {0}: {1}'.format(
+                  filename, ', '.join(extra_keys)))
+            if synonym_keys:
+              print('These synonym keys appeared in {0}: {1}'.format(
+                  filename, ', '.join(synonym_keys)))
+
+        outfile.write(synonym_text)
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
       if not args.quiet:
         print('Created {0}.'.format(outname))

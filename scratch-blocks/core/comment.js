@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2011 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2011 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +34,14 @@
 goog.provide('Blockly.Comment');
 
 goog.require('Blockly.Bubble');
+<<<<<<< HEAD
 goog.require('Blockly.Events.BlockChange');
 goog.require('Blockly.Events.Ui');
 goog.require('Blockly.Icon');
 goog.require('goog.userAgent');
+=======
+goog.require('Blockly.Icon');
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 
 /**
@@ -41,7 +52,11 @@ goog.require('goog.userAgent');
  */
 Blockly.Comment = function(block) {
   Blockly.Comment.superClass_.constructor.call(this, block);
+<<<<<<< HEAD
   this.createIcon();
+=======
+  this.createIcon_();
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 goog.inherits(Blockly.Comment, Blockly.Icon);
 
@@ -64,6 +79,7 @@ Blockly.Comment.prototype.width_ = 160;
 Blockly.Comment.prototype.height_ = 80;
 
 /**
+<<<<<<< HEAD
  * Draw the comment icon.
  * @param {!Element} group The icon group.
  * @private
@@ -94,6 +110,27 @@ Blockly.Comment.prototype.drawIcon_ = function(group) {
         'width': '2'
       },
       group);
+=======
+ * Create the icon on the block.
+ * @private
+ */
+Blockly.Comment.prototype.createIcon_ = function() {
+  Blockly.Icon.prototype.createIcon_.call(this);
+  /* Here's the markup that will be generated:
+  <circle class="blocklyIconShield" r="8" cx="8" cy="8"/>
+  <text class="blocklyIconMark" x="8" y="13">?</text>
+  */
+  var iconShield = Blockly.createSvgElement('circle',
+      {'class': 'blocklyIconShield',
+       'r': Blockly.Icon.RADIUS,
+       'cx': Blockly.Icon.RADIUS,
+       'cy': Blockly.Icon.RADIUS}, this.iconGroup_);
+  this.iconMark_ = Blockly.createSvgElement('text',
+      {'class': 'blocklyIconMark',
+       'x': Blockly.Icon.RADIUS,
+       'y': 2 * Blockly.Icon.RADIUS - 3}, this.iconGroup_);
+  this.iconMark_.appendChild(document.createTextNode('?'));
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -111,12 +148,17 @@ Blockly.Comment.prototype.createEditor_ = function() {
       </body>
     </foreignObject>
   */
+<<<<<<< HEAD
   this.foreignObject_ = Blockly.utils.createSvgElement('foreignObject',
+=======
+  this.foreignObject_ = Blockly.createSvgElement('foreignObject',
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       {'x': Blockly.Bubble.BORDER_WIDTH, 'y': Blockly.Bubble.BORDER_WIDTH},
       null);
   var body = document.createElementNS(Blockly.HTML_NS, 'body');
   body.setAttribute('xmlns', Blockly.HTML_NS);
   body.className = 'blocklyMinimalBody';
+<<<<<<< HEAD
   var textarea = document.createElementNS(Blockly.HTML_NS, 'textarea');
   textarea.className = 'blocklyCommentTextarea';
   textarea.setAttribute('dir', this.block_.RTL ? 'RTL' : 'LTR');
@@ -138,10 +180,19 @@ Blockly.Comment.prototype.createEditor_ = function() {
   setTimeout(function() {
     textarea.focus();
   }, 0);
+=======
+  this.textarea_ = document.createElementNS(Blockly.HTML_NS, 'textarea');
+  this.textarea_.className = 'blocklyCommentTextarea';
+  this.textarea_.setAttribute('dir', Blockly.RTL ? 'RTL' : 'LTR');
+  body.appendChild(this.textarea_);
+  this.foreignObject_.appendChild(body);
+  Blockly.bindEvent_(this.textarea_, 'mouseup', this, this.textareaFocus_);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   return this.foreignObject_;
 };
 
 /**
+<<<<<<< HEAD
  * Add or remove editability of the comment.
  * @override
  */
@@ -156,11 +207,14 @@ Blockly.Comment.prototype.updateEditable = function() {
 };
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Callback function triggered when the bubble has resized.
  * Resize the text area accordingly.
  * @private
  */
 Blockly.Comment.prototype.resizeBubble_ = function() {
+<<<<<<< HEAD
   if (this.isVisible()) {
     var size = this.bubble_.getBubbleSize();
     var doubleBorderWidth = 2 * Blockly.Bubble.BORDER_WIDTH;
@@ -169,6 +223,14 @@ Blockly.Comment.prototype.resizeBubble_ = function() {
     this.textarea_.style.width = (size.width - doubleBorderWidth - 4) + 'px';
     this.textarea_.style.height = (size.height - doubleBorderWidth - 4) + 'px';
   }
+=======
+  var size = this.bubble_.getBubbleSize();
+  var doubleBorderWidth = 2 * Blockly.Bubble.BORDER_WIDTH;
+  this.foreignObject_.setAttribute('width', size.width - doubleBorderWidth);
+  this.foreignObject_.setAttribute('height', size.height - doubleBorderWidth);
+  this.textarea_.style.width = (size.width - doubleBorderWidth - 4) + 'px';
+  this.textarea_.style.height = (size.height - doubleBorderWidth - 4) + 'px';
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -180,6 +242,7 @@ Blockly.Comment.prototype.setVisible = function(visible) {
     // No change.
     return;
   }
+<<<<<<< HEAD
   Blockly.Events.fire(
       new Blockly.Events.Ui(this.block_, 'commentOpen', !visible, visible));
   if ((!this.block_.isEditable() && !this.textarea_) || goog.userAgent.IE) {
@@ -190,12 +253,15 @@ Blockly.Comment.prototype.setVisible = function(visible) {
     Blockly.Warning.prototype.setVisible.call(this, visible);
     return;
   }
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   // Save the bubble stats before the visibility switch.
   var text = this.getText();
   var size = this.getBubbleSize();
   if (visible) {
     // Create the bubble.
     this.bubble_ = new Blockly.Bubble(
+<<<<<<< HEAD
         /** @type {!Blockly.WorkspaceSvg} */ (this.block_.workspace),
         this.createEditor_(), this.block_.svgPath_,
         this.iconXY_, this.width_, this.height_);
@@ -203,6 +269,15 @@ Blockly.Comment.prototype.setVisible = function(visible) {
     this.bubble_.setSvgId(this.block_.id);
     this.bubble_.registerResizeEvent(this.resizeBubble_.bind(this));
     this.updateColour();
+=======
+        /** @type {!Blockly.Workspace} */ (this.block_.workspace),
+        this.createEditor_(), this.block_.svg_.svgGroup_,
+        this.iconX_, this.iconY_,
+        this.width_, this.height_);
+    this.bubble_.registerResizeEvent(this, this.resizeBubble_);
+    this.updateColour();
+    this.text_ = null;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   } else {
     // Dispose of the bubble.
     this.bubble_.dispose();
@@ -217,6 +292,7 @@ Blockly.Comment.prototype.setVisible = function(visible) {
 
 /**
  * Bring the comment to the top of the stack when clicked on.
+<<<<<<< HEAD
  * @param {!Event} _e Mouse up event.
  * @private
  */
@@ -230,6 +306,19 @@ Blockly.Comment.prototype.textareaFocus_ = function(_e) {
     // we need to reapply the focus.
     this.textarea_.focus();
   }
+=======
+ * @param {!Event} e Mouse up event.
+ * @private
+ */
+Blockly.Comment.prototype.textareaFocus_ = function(e) {
+  // Ideally this would be hooked to the focus event for the comment.
+  // However doing so in Firefox swallows the cursor for unknown reasons.
+  // So this is hooked to mouseup instead.  No big deal.
+  this.bubble_.promote_();
+  // Since the act of moving this node within the DOM causes a loss of focus,
+  // we need to reapply the focus.
+  this.textarea_.focus();
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -250,7 +339,11 @@ Blockly.Comment.prototype.getBubbleSize = function() {
  * @param {number} height Height of the bubble.
  */
 Blockly.Comment.prototype.setBubbleSize = function(width, height) {
+<<<<<<< HEAD
   if (this.textarea_) {
+=======
+  if (this.isVisible()) {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     this.bubble_.setBubbleSize(width, height);
   } else {
     this.width_ = width;
@@ -263,7 +356,11 @@ Blockly.Comment.prototype.setBubbleSize = function(width, height) {
  * @return {string} Comment text.
  */
 Blockly.Comment.prototype.getText = function() {
+<<<<<<< HEAD
   return this.textarea_ ? this.textarea_.value : this.text_;
+=======
+  return this.isVisible() ? this.textarea_.value : this.text_;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -271,6 +368,7 @@ Blockly.Comment.prototype.getText = function() {
  * @param {string} text Comment text.
  */
 Blockly.Comment.prototype.setText = function(text) {
+<<<<<<< HEAD
   if (this.text_ != text) {
     Blockly.Events.fire(new Blockly.Events.BlockChange(
         this.block_, 'comment', null, this.text_, text));
@@ -278,6 +376,12 @@ Blockly.Comment.prototype.setText = function(text) {
   }
   if (this.textarea_) {
     this.textarea_.value = text;
+=======
+  if (this.isVisible()) {
+    this.textarea_.value = text;
+  } else {
+    this.text_ = text;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
 };
 
@@ -285,9 +389,16 @@ Blockly.Comment.prototype.setText = function(text) {
  * Dispose of this comment.
  */
 Blockly.Comment.prototype.dispose = function() {
+<<<<<<< HEAD
   if (Blockly.Events.isEnabled()) {
     this.setText('');  // Fire event to delete comment.
   }
   this.block_.comment = null;
   Blockly.Icon.prototype.dispose.call(this);
 };
+=======
+  this.block_.comment = null;
+  Blockly.Icon.prototype.dispose.call(this);
+};
+
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

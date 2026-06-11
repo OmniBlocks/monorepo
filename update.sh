@@ -83,6 +83,7 @@ else
         git add "$file"
     done
     rm -f .git/MERGE_HEAD
+    git add .
     git commit -m "chore: upstream update $(date) — took upstream on conflicts"
     git push origin upstream-update-$(date +%Y-%m-%d) --force
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨⚠️🚨⚠️⚠️⚠️⚠️⚠️⚠️🚨🚨🚨🚨🚨🚨"

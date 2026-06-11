@@ -52,14 +52,51 @@ git remote add upstream ../temp-monorepo
 git fetch upstream
 
 git checkout -fB upstream-update-$(date +%Y-%m-%d) upstream/develop
-
-# TODO: parse it to look good in the PR description 
-
-# apparently you need to set this because STUPID GITHUB ACTIONS WILL EXPLODE VIOLENTLY AND DIE if you don't
+ 
 set +e
-PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
-CONFLICTS=$(git merge-tree $(git merge-base HEAD main) upstream/develop main 2>/dev/null | grep -c "<<<<<<")
+git merge main --no-commit --no-edit
+MERGE_STATUS=$?
 set -e
-git push origin upstream-update-$(date +%Y-%m-%d) --force
 
-gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't  very nice" 
+if [ $MERGE_STATUS -eq 0 ]; then 
+    git commit -m "chore: upstream update $(date)"
+    git push origin upstream-update-$(date +%Y-%m-%d) --force
+    gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment --body "I have updated the branch. pls review, procrastinating on upstream changes isn't very nice"
+else 
+    CONFLICTED_FILES=$(git diff --name-only --diff-filter=U)
+    CONFLICT_TMP=$(mktemp -d)
+    
+    for file in $CONFLICTED_FILES; do
+        if [ -f "$file" ]; then
+            mkdir -p "$CONFLICT_TMP/$(dirname "$file")"
+            python3 - "$file" "$CONFLICT_TMP/$file" <<'PYEOF'
+import sys, pathlib
+def take_theirs(text):
+    out, in_ours, in_theirs = [], False, False
+    for line in text.splitlines(keepends=True):
+        if line.startswith('<<<<<<<'):
+            in_ours, in_theirs = True, False
+        elif line.startswith('=======') and in_ours:
+            in_ours, in_theirs = False, True
+        elif line.startswith('>>>>>>>') and in_theirs:
+            in_theirs = False
+        elif not in_ours:
+            out.append(line)
+    return ''.join(out)
+src, dst = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+dst.write_text(take_theirs(src.read_text(encoding='utf-8', errors='replace')), encoding='utf-8')
+PYEOF
+        fi
+    done
+     
+    git merge --abort
+    for file in $CONFLICTED_FILES; do
+        if [ -f "$CONFLICT_TMP/$file" ]; then
+            cp "$CONFLICT_TMP/$file" "$file"
+        fi
+    done
+    rm -rf "$CONFLICT_TMP"
+    
+    git add .
+    git commit -m "chore: upstream update $(date) — took upstream on conflicts"
+    git push origin upstream-update-$(date +%Y-%m-%d) --force

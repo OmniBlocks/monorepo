@@ -51,21 +51,22 @@ cd ../monorepo
 git remote add upstream ../temp-monorepo
 git fetch upstream
 
-git checkout -fB upstream-update-$(date +%Y-%m-%d) upstream/develop
- 
+git checkout -B upstream-update-$(date +%Y-%m-%d)
+
 set +e
-git merge main --no-commit --no-edit
+PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
+git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
 MERGE_STATUS=$?
 set -e
 
-if [ $MERGE_STATUS -eq 0 ]; then 
+if [ $MERGE_STATUS -eq 0 ]; then
     git commit -m "chore: upstream update $(date)"
     git push origin upstream-update-$(date +%Y-%m-%d) --force
-    gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment --body "I have updated the branch. pls review, procrastinating on upstream changes isn't very nice"
-else 
+    gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "I have updated the branch. pls review, procrastinating on upstream changes isn't very nice"
+else
     CONFLICTED_FILES=$(git diff --name-only --diff-filter=U)
     CONFLICT_TMP=$(mktemp -d)
-    
+
     for file in $CONFLICTED_FILES; do
         if [ -f "$file" ]; then
             mkdir -p "$CONFLICT_TMP/$(dirname "$file")"
@@ -88,7 +89,7 @@ dst.write_text(take_theirs(src.read_text(encoding='utf-8', errors='replace')), e
 PYEOF
         fi
     done
-     
+
     git merge --abort
     for file in $CONFLICTED_FILES; do
         if [ -f "$CONFLICT_TMP/$file" ]; then
@@ -96,9 +97,9 @@ PYEOF
         fi
     done
     rm -rf "$CONFLICT_TMP"
-    
+
     git add .
     git commit -m "chore: upstream update $(date) — took upstream on conflicts"
     git push origin upstream-update-$(date +%Y-%m-%d) --force
-
+    gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨⚠️🚨⚠️⚠️⚠️⚠️⚠️⚠️🚨🚨🚨🚨🚨🚨"
 fi

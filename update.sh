@@ -67,29 +67,38 @@ SYNC_POINT=$(awk 'NR==FNR{seen[$1]=1; next} seen[$1]{print $2; exit}' \
 git checkout -B upstream-update-$(date +%Y-%m-%d)
 
 set +e
-PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
 if [ -n "$SYNC_POINT" ]; then
-    git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
+    echo "Sync point found at $SYNC_POINT. Applying new upstream commits..."
+    # Cherry-pick the exact range of new TurboWarp commits
+    git cherry-pick ${SYNC_POINT}..upstream/develop --no-commit
 else
+    echo "No sync point found. Falling back to standard merge..."
     git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
 fi
 MERGE_STATUS=$?
 set -e
 
+# If the new commits apply perfectly cleanly
 if [ $MERGE_STATUS -eq 0 ]; then
-    rm -f .git/MERGE_HEAD
-    git commit -m "chore: upstream update $(date)"
+    rm -f .git/CHERRY_PICK_HEAD .git/MERGE_HEAD
+    git commit -m "chore: upstream update $(date)" --allow-empty
     git push origin upstream-update-$(date +%Y-%m-%d) --force
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice"
 else
-    CONFLICTED_FILES=$(git diff --name-only --diff-filter=U)
-    for file in $CONFLICTED_FILES; do
-        git checkout --theirs "$file"
-        git add "$file"
-    done
-    rm -f .git/MERGE_HEAD
-    git add .
-    git commit -m "chore: upstream update $(date) — took upstream on conflicts"
+    # IF THERE ARE CONFLICTS:
+    # Do NOT run a loop that over-writes files. 
+    # Just leave the raw conflicts exactly as they are so GitHub detects them!
+    
+    echo "Conflicts detected in the new upstream commits. Pushing to PR for review."
+    
+    # Stage the conflicted states so git allows us to commit the branch
+    git add . 
+    
+    # Commit it as a conflict-warning state
+    git commit -m "chore: upstream update $(date) — needs manual conflict resolution" --allow-empty
     git push origin upstream-update-$(date +%Y-%m-%d) --force
+    
+    # Create the draft PR so you can review the conflicts on GitHub
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨⚠️🚨⚠️⚠️⚠️⚠️⚠️⚠️🚨🚨🚨🚨🚨🚨"
 fi
+ 

@@ -38,12 +38,17 @@ git fetch upstream-render develop
 git checkout -b scratch-render upstream-render/develop
 git-filter-repo --to-subdirectory-filter scratch-render --refs scratch-render --force
 
+git remote add upstream-paint https://github.com/TurboWarp/scratch-paint.git
+git fetch upstream-paint develop
+git checkout -b scratch-paint upstream-paint/develop
+git-filter-repo --to-subdirectory-filter scratch-paint --refs scratch-paint --force
+
 git checkout -b develop scratch-gui
 git merge scratch-blocks --allow-unrelated-histories --no-edit
 git merge scratch-vm --allow-unrelated-histories --no-edit
 git merge scratch-render --allow-unrelated-histories --no-edit
- 
-#TODO: ADD SCRATCH-PAINT IF NECESSARYRRYY @ampelc
+git merge scratch-paint --allow-unrelated-histories --no-edit
+
 
 
 cd ../monorepo
@@ -64,8 +69,7 @@ git checkout -B upstream-update-$(date +%Y-%m-%d)
 set +e
 PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
 if [ -n "$SYNC_POINT" ]; then
-    # Take the changes from SYNC_POINT to upstream/develop and replay them onto current branch
-    git rebase --onto HEAD ${SYNC_POINT} upstream/develop
+    git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
 else
     git merge upstream/develop --allow-unrelated-histories --no-commit --no-edit
 fi

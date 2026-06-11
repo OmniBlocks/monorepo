@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +33,7 @@
 
 goog.provide('Blockly.Input');
 
+<<<<<<< HEAD
 goog.require('Blockly.Connection');
 goog.require('Blockly.FieldLabel');
 goog.require('goog.asserts');
@@ -33,6 +41,16 @@ goog.require('goog.asserts');
 
 /**
  * Class for an input with an optional field.
+=======
+// TODO(scr): Fix circular dependencies
+// goog.require('Blockly.Block');
+goog.require('Blockly.Connection');
+goog.require('Blockly.FieldLabel');
+
+
+/**
+ * Class for an input with an optional title.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * @param {number} type The type of the input.
  * @param {string} name Language-neutral identifier which may used to find this
  *     input again.
@@ -41,6 +59,7 @@ goog.require('goog.asserts');
  * @constructor
  */
 Blockly.Input = function(type, name, block, connection) {
+<<<<<<< HEAD
   if (type != Blockly.DUMMY_INPUT && !name) {
     throw 'Value inputs and statement inputs must have non-empty name.';
   }
@@ -130,10 +149,53 @@ Blockly.Input.prototype.insertFieldAt = function(index, field, opt_name) {
   if (field.suffixField) {
     // Add any suffix.
     index = this.insertFieldAt(index, field.suffixField);
+=======
+  this.type = type;
+  this.name = name;
+  this.sourceBlock_ = block;
+  this.connection = connection;
+  this.titleRow = [];
+  this.align = Blockly.ALIGN_LEFT;
+
+  this.visible_ = true;
+};
+
+/**
+ * Add an item to the end of the input's title row.
+ * @param {*} title Something to add as a title.
+ * @param {string} opt_name Language-neutral identifier which may used to find
+ *     this title again.  Should be unique to the host block.
+ * @return {!Blockly.Input} The input being append to (to allow chaining).
+ */
+Blockly.Input.prototype.appendTitle = function(title, opt_name) {
+  // Empty string, Null or undefined generates no title, unless title is named.
+  if (!title && !opt_name) {
+    return this;
+  }
+  // Generate a FieldLabel when given a plain text title.
+  if (goog.isString(title)) {
+    title = new Blockly.FieldLabel(/** @type {string} */ (title));
+  }
+  if (this.sourceBlock_.svg_) {
+    title.init(this.sourceBlock_);
+  }
+  title.name = opt_name;
+
+  if (title.prefixTitle) {
+    // Add any prefix.
+    this.appendTitle(title.prefixTitle);
+  }
+  // Add the title to the title row.
+  this.titleRow.push(title);
+  if (title.suffixTitle) {
+    // Add any suffix.
+    this.appendTitle(title.suffixTitle);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
 
   if (this.sourceBlock_.rendered) {
     this.sourceBlock_.render();
+<<<<<<< HEAD
     // Adding a field will cause the block to change shape.
     this.sourceBlock_.bumpNeighbours_();
   }
@@ -159,6 +221,12 @@ Blockly.Input.prototype.removeField = function(name) {
     }
   }
   goog.asserts.fail('Field "%s" not found.', name);
+=======
+    // Adding a title will cause the block to change shape.
+    this.sourceBlock_.bumpNeighbours_();
+  }
+  return this;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -171,7 +239,10 @@ Blockly.Input.prototype.isVisible = function() {
 
 /**
  * Sets whether this input is visible or not.
+<<<<<<< HEAD
  * Used to collapse/uncollapse a block.
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * @param {boolean} visible True if visible.
  * @return {!Array.<!Blockly.Block>} List of blocks to render.
  */
@@ -183,19 +254,32 @@ Blockly.Input.prototype.setVisible = function(visible) {
   this.visible_ = visible;
 
   var display = visible ? 'block' : 'none';
+<<<<<<< HEAD
   for (var y = 0, field; field = this.fieldRow[y]; y++) {
     field.setVisible(visible);
+=======
+  for (var y = 0, title; title = this.titleRow[y]; y++) {
+    title.setVisible(visible);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   if (this.connection) {
     // Has a connection.
     if (visible) {
       renderList = this.connection.unhideAll();
     } else {
+<<<<<<< HEAD
       this.connection.hideAll();
     }
     var child = this.connection.targetBlock();
     if (child) {
       child.getSvgRoot().style.display = display;
+=======
+      renderList = this.connection.hideAll();
+    }
+    var child = this.connection.targetBlock();
+    if (child) {
+      child.svg_.getRootElement().style.display = display;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       if (!visible) {
         child.rendered = false;
       }
@@ -219,7 +303,11 @@ Blockly.Input.prototype.setCheck = function(check) {
 };
 
 /**
+<<<<<<< HEAD
  * Change the alignment of the connection's field(s).
+=======
+ * Change the alignment of the connection's title(s).
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * @param {number} align One of Blockly.ALIGN_LEFT, ALIGN_CENTRE, ALIGN_RIGHT.
  *   In RTL mode directions are reversed, and ALIGN_RIGHT aligns to the left.
  * @return {!Blockly.Input} The input being modified (to allow chaining).
@@ -233,6 +321,7 @@ Blockly.Input.prototype.setAlign = function(align) {
 };
 
 /**
+<<<<<<< HEAD
  * Initialize the fields on this input.
  */
 Blockly.Input.prototype.init = function() {
@@ -241,6 +330,13 @@ Blockly.Input.prototype.init = function() {
   }
   for (var i = 0; i < this.fieldRow.length; i++) {
     this.fieldRow[i].init(this.sourceBlock_);
+=======
+ * Initialize the titles on this input.
+ */
+Blockly.Input.prototype.init = function() {
+  for (var x = 0; x < this.titleRow.length; x++) {
+    this.titleRow[x].init(this.sourceBlock_);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
 };
 
@@ -248,17 +344,23 @@ Blockly.Input.prototype.init = function() {
  * Sever all links to this input.
  */
 Blockly.Input.prototype.dispose = function() {
+<<<<<<< HEAD
   if (this.outlinePath) {
     goog.dom.removeNode(this.outlinePath);
   }
   for (var i = 0, field; field = this.fieldRow[i]; i++) {
     field.dispose();
+=======
+  for (var i = 0, title; title = this.titleRow[i]; i++) {
+    title.dispose();
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   if (this.connection) {
     this.connection.dispose();
   }
   this.sourceBlock_ = null;
 };
+<<<<<<< HEAD
 
 /**
  * Create the input shape path element and attach it to the given SVG element.
@@ -283,3 +385,5 @@ Blockly.Input.prototype.initOutlinePath = function(svgRoot) {
         svgRoot);
   }
 };
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

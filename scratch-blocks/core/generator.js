@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +35,10 @@
 goog.provide('Blockly.Generator');
 
 goog.require('Blockly.Block');
+<<<<<<< HEAD
 goog.require('goog.asserts');
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 
 /**
@@ -38,8 +48,12 @@ goog.require('goog.asserts');
  */
 Blockly.Generator = function(name) {
   this.name_ = name;
+<<<<<<< HEAD
   this.FUNCTION_NAME_PLACEHOLDER_REGEXP_ =
       new RegExp(this.FUNCTION_NAME_PLACEHOLDER_, 'g');
+=======
+  this.RESERVED_WORDS_ = '';
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -48,6 +62,7 @@ Blockly.Generator = function(name) {
 Blockly.Generator.NAME_TYPE = 'generated_function';
 
 /**
+<<<<<<< HEAD
  * Arbitrary code to inject into locations that risk causing infinite loops.
  * Any instances of '%1' will be replaced by the block ID that failed.
  * E.g. '  checkTimeout(%1);\n'
@@ -100,6 +115,18 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
   for (var x = 0, block; block = blocks[x]; x++) {
     var line = this.blockToCode(block);
     if (goog.isArray(line)) {
+=======
+ * Generate code for all blocks in the workspace to the specified language.
+ * @return {string} Generated code.
+ */
+Blockly.Generator.prototype.workspaceToCode = function() {
+  var code = [];
+  this.init();
+  var blocks = Blockly.mainWorkspace.getTopBlocks(true);
+  for (var x = 0, block; block = blocks[x]; x++) {
+    var line = this.blockToCode(block);
+    if (line instanceof Array) {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
       // Value blocks return tuples of code and operator order.
       // Top-level blocks don't care about operator order.
       line = line[0];
@@ -132,7 +159,11 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
  * @return {string} The prefixed lines of code.
  */
 Blockly.Generator.prototype.prefixLines = function(text, prefix) {
+<<<<<<< HEAD
   return prefix + text.replace(/(?!\n$)\n/g, '\n' + prefix);
+=======
+  return prefix + text.replace(/\n(.)/g, '\n' + prefix + '$1');
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -142,9 +173,15 @@ Blockly.Generator.prototype.prefixLines = function(text, prefix) {
  */
 Blockly.Generator.prototype.allNestedComments = function(block) {
   var comments = [];
+<<<<<<< HEAD
   var blocks = block.getDescendants(true);
   for (var i = 0; i < blocks.length; i++) {
     var comment = blocks[i].getCommentText();
+=======
+  var blocks = block.getDescendants();
+  for (var x = 0; x < blocks.length; x++) {
+    var comment = blocks[x].getCommentText();
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     if (comment) {
       comments.push(comment);
     }
@@ -169,6 +206,7 @@ Blockly.Generator.prototype.blockToCode = function(block) {
   }
   if (block.disabled) {
     // Skip past this block if it is disabled.
+<<<<<<< HEAD
     return this.blockToCode(block.getNextBlock());
   }
 
@@ -176,11 +214,23 @@ Blockly.Generator.prototype.blockToCode = function(block) {
   goog.asserts.assertFunction(func,
       'Language "%s" does not know how to generate code for block type "%s".',
       this.name_, block.type);
+=======
+    var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+    return this.blockToCode(nextBlock);
+  }
+
+  var func = this[block.type];
+  if (!func) {
+    throw 'Language "' + this.name_ + '" does not know how to generate code ' +
+        'for block type "' + block.type + '".';
+  }
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   // First argument to func.call is the value of 'this' in the generator.
   // Prior to 24 September 2013 'this' was the only way to access the block.
   // The current prefered method of accessing the block is through the second
   // argument to func.call, which becomes the first parameter to the generator.
   var code = func.call(block, block);
+<<<<<<< HEAD
   if (goog.isArray(code)) {
     // Value blocks return tuples of code and operator order.
     goog.asserts.assert(block.outputConnection,
@@ -198,6 +248,13 @@ Blockly.Generator.prototype.blockToCode = function(block) {
     return '';
   } else {
     goog.asserts.fail('Invalid code generated: %s', code);
+=======
+  if (code instanceof Array) {
+    // Value blocks return tuples of code and operator order.
+    return [this.scrub_(block, code[0]), code[1]];
+  } else {
+    return this.scrub_(block, code);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
 };
 
@@ -205,14 +262,24 @@ Blockly.Generator.prototype.blockToCode = function(block) {
  * Generate code representing the specified value input.
  * @param {!Blockly.Block} block The block containing the input.
  * @param {string} name The name of the input.
+<<<<<<< HEAD
  * @param {number} outerOrder The maximum binding strength (minimum order value)
+=======
+ * @param {number} order The maximum binding strength (minimum order value)
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *     of any operators adjacent to "block".
  * @return {string} Generated code or '' if no blocks are connected or the
  *     specified input does not exist.
  */
+<<<<<<< HEAD
 Blockly.Generator.prototype.valueToCode = function(block, name, outerOrder) {
   if (isNaN(outerOrder)) {
     goog.asserts.fail('Expecting valid order from block "%s".', block.type);
+=======
+Blockly.Generator.prototype.valueToCode = function(block, name, order) {
+  if (isNaN(order)) {
+    throw 'Expecting valid order from block "' + block.type + '".';
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   var targetBlock = block.getInputTargetBlock(name);
   if (!targetBlock) {
@@ -223,6 +290,7 @@ Blockly.Generator.prototype.valueToCode = function(block, name, outerOrder) {
     // Disabled block.
     return '';
   }
+<<<<<<< HEAD
   // Value blocks must return code and order of operations info.
   // Statement blocks must only return code.
   goog.asserts.assertArray(tuple, 'Expecting tuple from value block "%s".',
@@ -264,6 +332,22 @@ Blockly.Generator.prototype.valueToCode = function(block, name, outerOrder) {
     }
   }
   if (parensNeeded) {
+=======
+  if (!(tuple instanceof Array)) {
+    // Value blocks must return code and order of operations info.
+    // Statement blocks must only return code.
+    throw 'Expecting tuple from value block "' + targetBlock.type + '".';
+  }
+  var code = tuple[0];
+  var innerOrder = tuple[1];
+  if (isNaN(innerOrder)) {
+    throw 'Expecting valid order from value block "' + targetBlock.type + '".';
+  }
+  if (code && order <= innerOrder) {
+    // The operators outside this code are stonger than the operators
+    // inside this code.  To prevent the code from being pulled apart,
+    // wrap the code in parentheses.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     // Technically, this should be handled on a language-by-language basis.
     // However all known (sane) languages use parentheses for grouping.
     code = '(' + code + ')';
@@ -280,17 +364,28 @@ Blockly.Generator.prototype.valueToCode = function(block, name, outerOrder) {
 Blockly.Generator.prototype.statementToCode = function(block, name) {
   var targetBlock = block.getInputTargetBlock(name);
   var code = this.blockToCode(targetBlock);
+<<<<<<< HEAD
   // Value blocks must return code and order of operations info.
   // Statement blocks must only return code.
   goog.asserts.assertString(code, 'Expecting code from statement block "%s".',
       targetBlock && targetBlock.type);
   if (code) {
     code = this.prefixLines(/** @type {string} */ (code), this.INDENT);
+=======
+  if (!goog.isString(code)) {
+    // Value blocks must return code and order of operations info.
+    // Statement blocks must only return code.
+    throw 'Expecting code from statement block "' + targetBlock.type + '".';
+  }
+  if (code) {
+    code = this.prefixLines(/** @type {string} */ (code), '  ');
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   }
   return code;
 };
 
 /**
+<<<<<<< HEAD
  * Add an infinite loop trap to the contents of a loop.
  * If loop is empty, add a statment prefix for the loop block.
  * @param {string} branch Code for loop contents.
@@ -317,6 +412,8 @@ Blockly.Generator.prototype.addLoopTrap = function(branch, id) {
 Blockly.Generator.prototype.RESERVED_WORDS_ = '';
 
 /**
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * Add one or more words to the list of reserved words for this language.
  * @param {string} words Comma-separated list of words to add to the list.
  *     No spaces.  Duplicates are ok.
@@ -324,6 +421,7 @@ Blockly.Generator.prototype.RESERVED_WORDS_ = '';
 Blockly.Generator.prototype.addReservedWords = function(words) {
   this.RESERVED_WORDS_ += words + ',';
 };
+<<<<<<< HEAD
 
 /**
  * This is used as a placeholder in functions defined using
@@ -424,3 +522,5 @@ Blockly.Generator.prototype.scrubNakedValue = function(line) {
   // Optionally override
   return line;
 };
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

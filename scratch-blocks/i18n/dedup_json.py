@@ -7,7 +7,11 @@
 # output.
 #
 # Copyright 2013 Google Inc.
+<<<<<<< HEAD
 # https://developers.google.com/blockly/
+=======
+# http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,9 +55,15 @@ def main():
     try:
       with codecs.open(filename, 'r', 'utf-8') as infile:
         j = json.load(infile)
+<<<<<<< HEAD
     except ValueError as e:
       print('Error reading ' + filename)
       raise InputError(filename, str(e))
+=======
+    except ValueError, e:
+      print('Error reading ' + filename)
+      raise InputError(file, str(e))
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
     # Built up output strings as an array to make output of delimiters easier.
     output = []

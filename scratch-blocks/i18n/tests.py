@@ -4,7 +4,11 @@
 # Tests of i18n scripts.
 #
 # Copyright 2013 Google Inc.
+<<<<<<< HEAD
 # https://developers.google.com/blockly/
+=======
+# http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +41,11 @@ class TestSequenceFunctions(unittest.TestCase):
                  u'block of actions.']
     for sentence in sentences:
       output = common.insert_breaks(sentence, 30, 50)
+<<<<<<< HEAD
       self.assertTrue(contains_all_chars(sentence, output),
+=======
+      self.assert_(contains_all_chars(sentence, output),
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
                    u'Mismatch between:\n{0}\n{1}'.format(
                        re.sub(spaces, '', sentence),
                        re.sub(spaces, '', output)))

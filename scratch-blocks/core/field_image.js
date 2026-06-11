@@ -1,9 +1,16 @@
 /**
+<<<<<<< HEAD
  * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
  * https://developers.google.com/blockly/
+=======
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +26,11 @@
  */
 
 /**
+<<<<<<< HEAD
  * @fileoverview Image field.  Used for pictures, icons, etc.
+=======
+ * @fileoverview Image field.  Used for titles, labels, etc.
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
  * @author fraser@google.com (Neil Fraser)
  */
 'use strict';
@@ -27,12 +38,16 @@
 goog.provide('Blockly.FieldImage');
 
 goog.require('Blockly.Field');
+<<<<<<< HEAD
 goog.require('goog.dom');
 goog.require('goog.math.Size');
+=======
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 goog.require('goog.userAgent');
 
 
 /**
+<<<<<<< HEAD
  * Class for an image on a block.
  * @param {string} src The URL of the image.
  * @param {number} width Width of the image.
@@ -52,10 +67,43 @@ Blockly.FieldImage = function(src, width, height, opt_alt, flip_rtl) {
   this.text_ = opt_alt || '';
   this.flipRTL_ = flip_rtl;
   this.setValue(src);
+=======
+ * Class for an image.
+ * @param {string} src The URL of the image.
+ * @param {number} width Width of the image.
+ * @param {number} height Height of the image.
+ * @extends {Blockly.Field}
+ * @constructor
+ */
+Blockly.FieldImage = function(src, width, height) {
+  this.sourceBlock_ = null;
+  // Ensure height and width are numbers.  Strings are bad at math.
+  height = Number(height);
+  width = Number(width);
+  this.size_ = {height: height + 10, width: width};
+  // Build the DOM.
+  var offsetY = 6 - Blockly.BlockSvg.TITLE_HEIGHT;
+  this.fieldGroup_ = Blockly.createSvgElement('g', {}, null);
+  this.imageElement_ = Blockly.createSvgElement('image',
+      {'height': height + 'px',
+       'width': width + 'px',
+       'y': offsetY}, this.fieldGroup_);
+  this.setText(src);
+  if (goog.userAgent.GECKO) {
+    // Due to a Firefox bug which eats mouse events on image elements,
+    // a transparent rectangle needs to be placed on top of the image.
+    this.rectElement_ = Blockly.createSvgElement('rect',
+        {'height': height + 'px',
+         'width': width + 'px',
+         'y': offsetY,
+         'fill-opacity': 0}, this.fieldGroup_);
+  }
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 goog.inherits(Blockly.FieldImage, Blockly.Field);
 
 /**
+<<<<<<< HEAD
  * Construct a FieldImage from a JSON arg object,
  * dereferencing any string table references.
  * @param {!Object} options A JSON object with options (src, width, height, alt,
@@ -73,6 +121,13 @@ Blockly.FieldImage.fromJson = function(options) {
   var flip_rtl = !!options['flip_rtl'] || !!options['flipRtl'];
   return new Blockly.FieldImage(src, width, height, alt, flip_rtl);
 };
+=======
+ * Rectangular mask used by Firefox.
+ * @type {Element}
+ * @private
+ */
+Blockly.FieldImage.prototype.rectElement_ = null;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 /**
  * Editable fields are saved by the XML renderer, non-editable fields are not.
@@ -80,6 +135,7 @@ Blockly.FieldImage.fromJson = function(options) {
 Blockly.FieldImage.prototype.EDITABLE = false;
 
 /**
+<<<<<<< HEAD
  * Install this image on a block.
  */
 Blockly.FieldImage.prototype.init = function() {
@@ -107,6 +163,22 @@ Blockly.FieldImage.prototype.init = function() {
   // Configure the field to be transparent with respect to tooltips.
   this.setTooltip(this.sourceBlock_);
   Blockly.Tooltip.bindMouseEvents(this.imageElement_);
+=======
+ * Install this text on a block.
+ * @param {!Blockly.Block} block The block containing this text.
+ */
+Blockly.FieldImage.prototype.init = function(block) {
+  if (this.sourceBlock_) {
+    throw 'Image has already been initialized once.';
+  }
+  this.sourceBlock_ = block;
+  block.getSvgRoot().appendChild(this.fieldGroup_);
+
+  // Configure the field to be transparent with respect to tooltips.
+  var topElement = this.rectElement_ || this.imageElement_;
+  topElement.tooltip = this.sourceBlock_;
+  Blockly.Tooltip && Blockly.Tooltip.bindMouseEvents(topElement);
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -116,6 +188,10 @@ Blockly.FieldImage.prototype.dispose = function() {
   goog.dom.removeNode(this.fieldGroup_);
   this.fieldGroup_ = null;
   this.imageElement_ = null;
+<<<<<<< HEAD
+=======
+  this.rectElement_ = null;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -124,7 +200,12 @@ Blockly.FieldImage.prototype.dispose = function() {
  *     link to for its tooltip.
  */
 Blockly.FieldImage.prototype.setTooltip = function(newTip) {
+<<<<<<< HEAD
   this.imageElement_.tooltip = newTip;
+=======
+  var topElement = this.rectElement_ || this.imageElement_;
+  topElement.tooltip = newTip;
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 };
 
 /**
@@ -132,7 +213,11 @@ Blockly.FieldImage.prototype.setTooltip = function(newTip) {
  * @return {string} Current text.
  * @override
  */
+<<<<<<< HEAD
 Blockly.FieldImage.prototype.getValue = function() {
+=======
+Blockly.FieldImage.prototype.getText = function() {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   return this.src_;
 };
 
@@ -141,12 +226,17 @@ Blockly.FieldImage.prototype.getValue = function() {
  * @param {?string} src New source.
  * @override
  */
+<<<<<<< HEAD
 Blockly.FieldImage.prototype.setValue = function(src) {
+=======
+Blockly.FieldImage.prototype.setText = function(src) {
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
   if (src === null) {
     // No change if null.
     return;
   }
   this.src_ = src;
+<<<<<<< HEAD
   if (this.imageElement_) {
     // Extension blocks can't rely on having access to pathToMedia, so we allow this fake URL
     // protocol instead.
@@ -198,3 +288,8 @@ Blockly.FieldImage.prototype.updateWidth = function() {
 };
 
 Blockly.Field.register('field_image', Blockly.FieldImage);
+=======
+  this.imageElement_.setAttributeNS('http://www.w3.org/1999/xlink',
+      'xlink:href', goog.isString(src) ? src : '');
+};
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)

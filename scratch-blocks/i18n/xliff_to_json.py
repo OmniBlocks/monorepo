@@ -3,7 +3,11 @@
 # Converts .xlf files into .json files for use at http://translatewiki.net.
 #
 # Copyright 2013 Google Inc.
+<<<<<<< HEAD
 # https://developers.google.com/blockly/
+=======
+# http://blockly.googlecode.com/
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +31,11 @@ from common import InputError
 from common import write_files
 
 # Global variables
+<<<<<<< HEAD
 args = None  # Parsed command-line arguments.
+=======
+args = None      # parsed command-line arguments
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
 
 
 def _parse_trans_unit(trans_unit):
@@ -65,7 +73,11 @@ def _parse_trans_unit(trans_unit):
     try:
         result['source'] = get_value('source')
         result['target'] = get_value('target')
+<<<<<<< HEAD
     except InputError as e:
+=======
+    except InputError, e:
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
         raise InputError(key, e.msg)
 
     # Get notes, using the from value as key and the data as value.
@@ -112,8 +124,13 @@ def _process_file(filename):
         except IOError:
             # Don't get caught by below handler
             raise
+<<<<<<< HEAD
         except Exception as e:
             print()
+=======
+        except Exception, e:
+            print
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
             raise InputError(filename, str(e))
 
         # Make sure needed fields are present and non-empty.
@@ -146,8 +163,13 @@ def _process_file(filename):
               results.append(unit)
 
         return results
+<<<<<<< HEAD
     except IOError as e:
         print('Error with file {0}: {1}'.format(filename, e.strerror))
+=======
+    except IOError, e:
+        print 'Error with file {0}: {1}'.format(filename, e.strerror)
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
         sys.exit(1)
 
 
@@ -200,8 +222,13 @@ def main():
                         help='relative directory for output files')
     parser.add_argument('--xlf', help='file containing xlf definitions')
     parser.add_argument('--templates', default=['template.soy'], nargs='+',
+<<<<<<< HEAD
                         help='relative path to Soy templates, comma or space '
                         'separated (used for ordering messages)')
+=======
+                        help='relative path to Soy templates '
+                        '(used for ordering messages)')
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     global args
     args = parser.parse_args()
 
@@ -212,19 +239,30 @@ def main():
     # Process the input file, and sort the entries.
     units = _process_file(args.xlf)
     files = []
+<<<<<<< HEAD
     for arg in args.templates:
       for filename in arg.split(','):
         filename = filename.strip();
         if filename:
           with open(filename) as myfile:
             files.append(' '.join(line.strip() for line in myfile))
+=======
+    for filename in args.templates:
+      with open(filename) as myfile:
+        files.append(' '.join(line.strip() for line in myfile))
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     sorted_units = sort_units(units, ' '.join(files))
 
     # Write the output files.
     write_files(args.author, args.lang, args.output_dir, sorted_units, True)
 
     # Delete the input .xlf file.
+<<<<<<< HEAD
     os.remove(args.xlf)
+=======
+    command = ['rm', args.xlf]
+    subprocess.check_call(command)
+>>>>>>> cc1af68cb3 (New initial commit with .svn directories and their contents ignored.)
     print('Removed ' + args.xlf)
 
 

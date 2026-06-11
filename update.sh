@@ -51,28 +51,20 @@ cd ../monorepo
 git remote add upstream ../temp-monorepo
 git fetch upstream
 
-git checkout -B upstream-update-$(date +%Y-%m-%d)
+git checkout -B upstream-update-$(date +%Y-%m-%d) upstream/develop
 
 # TODO: parse it to look good in the PR description 
 
 # apparently you need to set this because STUPID GITHUB ACTIONS WILL EXPLODE VIOLENTLY AND DIE if you don't
 set +e
 PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
+CONFLICTS=$(git merge-tree $(git merge-base HEAD main) upstream/develop main 2>/dev/null | grep -c "<<<<<<")
 set -e
 git push origin upstream-update-$(date +%Y-%m-%d) --force
-if git merge upstream/develop --allow-unrelated-histories --no-edit; then
-    git push origin upstream-update-$(date +%Y-%m-%d) --force
+if [ $CONFLICTS -eq 0 ]; then   
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't  very nice" 
 else
-    CONFLICTED_FILES=$(git diff --name-only --diff-filter=U) 
-    for file in $CONFLICTED_FILES; do
-        if [ -f "$file" ]; then 
-            sed -i '/<<<<<<< HEAD/d; /=======/,/>>>>>>>/d' "$file"
-        fi
-    done 
-    git add . 
-    git commit --no-edit 
-    git push origin upstream-update-$(date +%Y-%m-%d) --force
+ 
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't  very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨⚠️🚨⚠️⚠️⚠️⚠️⚠️⚠️🚨🚨🚨🚨🚨🚨" 
 fi
 

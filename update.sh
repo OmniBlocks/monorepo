@@ -46,11 +46,11 @@ cd ../monorepo
 git remote add upstream ../temp-monorepo
 git fetch upstream
 
-# Find the most recent upstream commit already present in our history via patch-id
-git log upstream/develop --no-merges -p | git patch-id --stable > /tmp/upstream-pids.txt
-git log --no-merges -p | git patch-id --stable > /tmp/ours-pids.txt
+# Add --reverse so the oldest commits are at the top, and the newest matches are at the bottom
+git log upstream/develop --reverse --no-merges -p | git patch-id --stable > /tmp/upstream-pids.txt
+git log --reverse --no-merges -p | git patch-id --stable > /tmp/ours-pids.txt
 
-# Match: upstream patch-id that also appears in our history → that commit's upstream hash
+# Keep the exact same awk matching logic, but update it to track the last match found
 SYNC_POINT=$(awk 'NR==FNR{seen[$1]=1; next} seen[$1]{last=$2} END{print last}' \
     /tmp/ours-pids.txt /tmp/upstream-pids.txt)
 echo "🔍 SYNC_POINT: $SYNC_POINT"

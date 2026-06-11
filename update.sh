@@ -60,45 +60,17 @@ MERGE_STATUS=$?
 set -e
 
 if [ $MERGE_STATUS -eq 0 ]; then
+    rm -f .git/MERGE_HEAD
     git commit -m "chore: upstream update $(date)"
     git push origin upstream-update-$(date +%Y-%m-%d) --force
-    gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "I have updated the branch. pls review, procrastinating on upstream changes isn't very nice"
+    gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice"
 else
     CONFLICTED_FILES=$(git diff --name-only --diff-filter=U)
-    CONFLICT_TMP=$(mktemp -d)
-
     for file in $CONFLICTED_FILES; do
-        if [ -f "$file" ]; then
-            mkdir -p "$CONFLICT_TMP/$(dirname "$file")"
-            python3 - "$file" "$CONFLICT_TMP/$file" <<'PYEOF'
-import sys, pathlib
-def take_theirs(text):
-    out, in_ours, in_theirs = [], False, False
-    for line in text.splitlines(keepends=True):
-        if line.startswith('<<<<<<<'):
-            in_ours, in_theirs = True, False
-        elif line.startswith('=======') and in_ours:
-            in_ours, in_theirs = False, True
-        elif line.startswith('>>>>>>>') and in_theirs:
-            in_theirs = False
-        elif not in_ours:
-            out.append(line)
-    return ''.join(out)
-src, dst = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
-dst.write_text(take_theirs(src.read_text(encoding='utf-8', errors='replace')), encoding='utf-8')
-PYEOF
-        fi
+        git checkout --theirs "$file"
+        git add "$file"
     done
-
-    git merge --abort
-    for file in $CONFLICTED_FILES; do
-        if [ -f "$CONFLICT_TMP/$file" ]; then
-            cp "$CONFLICT_TMP/$file" "$file"
-        fi
-    done
-    rm -rf "$CONFLICT_TMP"
-
-    git add .
+    rm -f .git/MERGE_HEAD
     git commit -m "chore: upstream update $(date) — took upstream on conflicts"
     git push origin upstream-update-$(date +%Y-%m-%d) --force
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨⚠️🚨⚠️⚠️⚠️⚠️⚠️⚠️🚨🚨🚨🚨🚨🚨"

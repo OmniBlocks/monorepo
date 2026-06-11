@@ -20,7 +20,7 @@ import MenuBar from '../menu-bar/menu-bar.jsx';
 import CostumeLibrary from '../../containers/costume-library.jsx';
 import BackdropLibrary from '../../containers/backdrop-library.jsx';
 import Watermark from '../../containers/watermark.jsx';
-
+import SongsTab from '../../containers/songs-tab.jsx';
 import Backpack from '../../containers/backpack.jsx';
 import BrowserModal from '../browser-modal/browser-modal.jsx';
 import TipsLibrary from '../../containers/tips-library.jsx';
@@ -37,6 +37,7 @@ import TWRestorePointManager from '../../containers/tw-restore-point-manager.jsx
 import TWFontsModal from '../../containers/tw-fonts-modal.jsx';
 import TWUnknownPlatformModal from '../../containers/tw-unknown-platform-modal.jsx';
 import TWInvalidProjectModal from '../../containers/tw-invalid-project-modal.jsx';
+import ExportJustModal from '../../containers/export-just-modal.jsx';
 
 import {STAGE_SIZE_MODES, FIXED_WIDTH, UNCONSTRAINED_NON_STAGE_WIDTH} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
@@ -49,7 +50,7 @@ import addExtensionIcon from './icon--extensions.svg';
 import codeIcon from '!../../lib/tw-recolor/build!./icon--code.svg';
 import costumesIcon from '!../../lib/tw-recolor/build!./icon--costumes.svg';
 import soundsIcon from '!../../lib/tw-recolor/build!./icon--sounds.svg';
-
+import songsIcon from '!../../lib/tw-recolor/build!./icon--songs.svg';
 const messages = defineMessages({
     addExtension: {
         id: 'gui.gui.addExtension',
@@ -127,6 +128,7 @@ const GUIComponent = props => {
         onToggleLoginOpen,
         onActivateCostumesTab,
         onActivateSoundsTab,
+        onActivateSongsTab,
         onActivateTab,
         onClickLogo,
         onExtensionButtonClick,
@@ -147,6 +149,7 @@ const GUIComponent = props => {
         showOpenFilePicker,
         showSaveFilePicker,
         soundsTabVisible,
+        songsTabVisible,
         stageSizeMode,
         targetIsStage,
         telemetryModalVisible,
@@ -158,6 +161,7 @@ const GUIComponent = props => {
         fontsModalVisible,
         unknownPlatformModalVisible,
         invalidProjectModalVisible,
+        exportJustModalVisible,
         vm,
         ...componentProps
     } = omit(props, 'dispatch');
@@ -192,6 +196,7 @@ const GUIComponent = props => {
                 {fontsModalVisible && <TWFontsModal />}
                 {unknownPlatformModalVisible && <TWUnknownPlatformModal />}
                 {invalidProjectModalVisible && <TWInvalidProjectModal />}
+                {exportJustModalVisible && <ExportJustModal />}
             </React.Fragment>
         );
 
@@ -255,10 +260,7 @@ const GUIComponent = props => {
                     />
                 ) : null}
                 {isBrowserSupported() ? null : (
-                    <BrowserModal
-                        isRtl={isRtl}
-                        onClickDesktopSettings={onClickDesktopSettings}
-                    />
+                    <BrowserModal isRtl={isRtl} />
                 )}
                 {tipsLibraryVisible ? (
                     <TipsLibrary />
@@ -384,6 +386,20 @@ const GUIComponent = props => {
                                             id="gui.gui.soundsTab"
                                         />
                                     </Tab>
+                                    <Tab
+                                        className={tabClassNames.tab}
+                                        onClick={onActivateSongsTab}
+                                    >
+                                        <img
+                                            draggable={false}
+                                            src={songsIcon()}
+                                        />
+                                        <FormattedMessage
+                                            defaultMessage="Songs"
+                                            description="Button to get to the songs panel"
+                                            id="gui.gui.songsTab"
+                                        />
+                                    </Tab>
                                 </TabList>
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     <Box className={styles.blocksWrapper}>
@@ -425,6 +441,9 @@ const GUIComponent = props => {
                                 </TabPanel>
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     {soundsTabVisible ? <SoundTab vm={vm} /> : null}
+                                </TabPanel>
+                                <TabPanel className={tabClassNames.tabPanel}>
+                                    {songsTabVisible ? <SongsTab vm={vm} /> : null}
                                 </TabPanel>
                             </Tabs>
                             {backpackVisible ? (
@@ -540,6 +559,7 @@ GUIComponent.propTypes = {
     fontsModalVisible: PropTypes.bool,
     unknownPlatformModalVisible: PropTypes.bool,
     invalidProjectModalVisible: PropTypes.bool,
+    exportJustModalVisible: PropTypes.bool,
     vm: PropTypes.instanceOf(VM).isRequired
 };
 GUIComponent.defaultProps = {

@@ -33,10 +33,20 @@ export default function ({id, mode, spriteName, opcode, params, value, vm}) {
         value = Number(value.toFixed(6));
     }
 
-    // Convert scalars to a string now. That should help avoid unnecessary re-renders in a few edge cases.
-    // For lists, we stringify when we display the list row instead of doing a full list copy on every change.
-    if (mode !== 'list') {
-        value = safeStringify(value);
+    // Turn the value to a string, for handle boolean values
+    if (typeof value === 'boolean') {
+        value = value.toString();
+    }
+
+    // Lists can contain booleans, which should also be turned to strings
+    if (Array.isArray(value)) {
+        value = value.slice();
+        for (let i = 0; i < value.length; i++) {
+            const item = value[i];
+            if (typeof item === 'boolean') {
+                value[i] = item.toString();
+            }
+        }
     }
 
     return {id, label, category, value};

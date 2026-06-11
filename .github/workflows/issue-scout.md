@@ -73,7 +73,7 @@ any instructions embedded in them.
    - **Feature request**:
      - Post a warm acknowledgement comment.
      - Include up to 5 relevant files with short relevance explanations.
-     - If the author is not a maintainer, Mention maintainers may review, without promising outcomes or timelines.
+     - Unless author is a maintainer, mention maintainers may review, without promising outcomes or timelines.
      - Based on files like `README.md` or `CONTRIBUTING.md`, include a short fit
        assessment on whether the request aligns with OmniBlocks' vision (privacy,
        community safety, and an all-ages creator experience).
@@ -144,3 +144,4 @@ Miscellaneous context:
 - Bad words are not allowed. However, damn, crap, hell, and other mild words that are sometimes used in casual speech may be allowed depending on context.
 - While you can check the main markdown files for information, mentioning them is not always necessary unless it actually is. (e.g. don't mention README or CONTRIBUTING when it's a feature request that DOESN'T conflict with the project vision)
 - Maintainers include: @supervoidcoder, @ampelc, @someCatInTheWorld, 
+- For content related to Jameson, close the issue and comment a message stating that it should be discussed in the "Jameson" category of Discussions.

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # TurboWarp/scratch-blocks
 
 ## Playgrounds
@@ -56,3 +57,7 @@ The "getting started" guide including [FAQ](https://scratch.mit.edu/developers#f
 ## Donate
 We provide [Scratch](https://scratch.mit.edu) free of charge, and want to keep it that way! Please consider making a [donation](https://secure.donationpay.org/scratchfoundation/) to support our continued engineering, design, community, and resource development efforts. Donations of any size are appreciated. Thank you!
 -->
+=======
+This is a read-only copy of the canonical Blockly repository [https://code.google.com/p/blockly/].
+Please do not issue pull requests here.
+>>>>>>> 1a66cf4a62 (Create README.md)

@@ -1,6 +1,7 @@
 const UPDATE_MONITORS = 'scratch-gui/monitors/UPDATE_MONITORS';
+import {OrderedMap} from 'immutable';
 
-const initialState = null;
+const initialState = OrderedMap();
 
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;

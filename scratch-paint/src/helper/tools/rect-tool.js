@@ -46,6 +46,8 @@ class RectTool extends paper.Tool {
         this.colorState = null;
         this.isBoundingBoxMode = null;
         this.active = false;
+
+        this.roundedCornerSize = 0;
     }
     getHitOptions () {
         return {
@@ -69,6 +71,20 @@ class RectTool extends paper.Tool {
     }
     setColorState (colorState) {
         this.colorState = colorState;
+    }
+    setRoundedCornerSize (newCornerSize) {
+        this.roundedCornerSize = newCornerSize;
+
+        // if editing a rect, update the curves
+        const oldRect = paper.project.selectedItems[0];
+        if (oldRect) {
+            const rounded = new paper.Path.Rectangle(oldRect.bounds, newCornerSize);
+            oldRect.segments = rounded.segments;
+            oldRect.closed = true;
+            rounded.remove();
+            this.setSelectedItems();
+            this.onUpdateImage();
+        }
     }
     handleMouseDown (event) {
         if (event.event.button > 0) return; // only first mouse button
@@ -100,7 +116,7 @@ class RectTool extends paper.Tool {
             rect.size = squareDimensions.size.abs();
         }
 
-        this.rect = new paper.Path.Rectangle(rect);
+        this.rect = new paper.Path.Rectangle(rect, this.roundedCornerSize === 0 ? null : this.roundedCornerSize);
         if (event.modifiers.alt) {
             this.rect.position = event.downPoint;
         } else if (event.modifiers.shift) {

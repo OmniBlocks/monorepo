@@ -37,6 +37,9 @@ class ScaleTool {
      */
     onMouseDown (hitResult, boundsPath, selectedItems) {
         if (this.active) return;
+
+        this.index = hitResult.item.data.index;
+        
         this.active = true;
 
         const index = hitResult.item.data.index;
@@ -72,25 +75,67 @@ class ScaleTool {
         this.itemGroup.addChild(boundsPath);
         this.itemGroup.insertBelow(this.itemToInsertBelow);
         this.itemGroup.data.isHelperItem = true;
+
+        this.isSkew = false;
+        this.skewCenter = false;
+        this.lastSkx = 0;
+        this.lastSky = 0;
+        this.skewBounds = this.itemGroup.bounds.clone();
     }
     onMouseDrag (event) {
         if (!this.active) return;
-        const point = event.point;
-        const bounds = getActionBounds(this.isBitmap);
-        point.x = Math.max(bounds.left, Math.min(point.x, bounds.right));
-        point.y = Math.max(bounds.top, Math.min(point.y, bounds.bottom));
 
-        if (!this.lastPoint) this.lastPoint = event.lastPoint;
-        const delta = point.subtract(this.lastPoint);
-        this.lastPoint = point;
+        const skewBounds = this.skewBounds;
+        const doShear = (skx, sky) => {
+            if (skx === 0 && sky === 0) return;
 
-        if (event.modifiers.alt) {
-            this.centered = true;
-            this.itemGroup.position = this.origCenter;
-            this.pivot = this.origCenter;
-        } else {
-            if (this.centered) {
-                // Reset position if we were just in alt
+            let offcenterPosition;
+            if (!this.skewCenter) {
+                switch (this._getRectCornerNameByIndex(this.index)) {
+                case 'topCenter':
+                case 'leftCenter':
+                    offcenterPosition = this.itemGroup.position.add(
+                        new paper.Point(skewBounds.width / 2, skewBounds.height / 2)
+                    );
+                    break;
+                case 'bottomCenter':
+                case 'rightCenter':
+                    offcenterPosition = this.itemGroup.position.subtract(
+                        new paper.Point(skewBounds.width / 2, skewBounds.height / 2)
+                    );
+                    break;
+                }
+            }
+
+            const position = this.skewCenter ? this.itemGroup.position : offcenterPosition;
+
+            const shearMult = this.skewCenter ? 2 : 1;
+            // swap width and height because apparently
+            // shearing is based on the dimension perpendicular
+            // to the one that is being skewed
+            const shearX = (skx / skewBounds.height) * shearMult;
+            const shearY = (sky / skewBounds.width) * shearMult;
+
+            this.itemGroup.shear(shearX, shearY, position);
+            if (this.selectionAnchor) {
+                this.selectionAnchor.shear(-shearX, -shearY);
+            }
+        };
+
+        // Revert skew
+        doShear(-this.lastSkx, -this.lastSky);
+
+        this.skewCenter = event.modifiers.alt;
+
+        let skx = 0;
+        let sky = 0;
+        this.lastSkx = 0;
+        this.lastSky = 0;
+
+        if (event.modifiers.control && !this.isCorner) {
+            // Skew
+            if (this.isSkew === false) {
+                // Reset position
                 this.centered = false;
                 this.itemGroup.scale(1 / this.lastSx, 1 / this.lastSy, this.pivot);
                 if (this.selectionAnchor) {
@@ -99,38 +144,92 @@ class ScaleTool {
                 this.lastSx = 1;
                 this.lastSy = 1;
             }
-            this.pivot = this.origPivot;
-        }
 
-        this.corner = this.corner.add(delta);
-        let size = this.corner.subtract(this.pivot);
-        if (event.modifiers.alt) {
-            size = size.multiply(2);
-        }
-        let sx = 1.0;
-        let sy = 1.0;
-        if (Math.abs(this.origSize.x) > 0.0000001) {
-            sx = size.x / this.origSize.x;
-        }
-        if (Math.abs(this.origSize.y) > 0.0000001) {
-            sy = size.y / this.origSize.y;
-        }
+            const delta = event.point.subtract(this.pivot);
+            switch (this._getRectCornerNameByIndex(this.index)) {
+            case 'topCenter':
+                delta.x *= -1;
+                delta.y = 0;
+                break;
+            case 'bottomCenter':
+                delta.y = 0;
+                break;
+            case 'leftCenter':
+                delta.y *= -1;
+                delta.x = 0;
+                break;
+            case 'rightCenter':
+                delta.x = 0;
+                break;
+            default:
+                delta.x = 0;
+                delta.y = 0;
+            }
+            skx = delta.x;
+            sky = delta.y;
 
-        const signx = sx > 0 ? 1 : -1;
-        const signy = sy > 0 ? 1 : -1;
-        if (this.isCorner && !event.modifiers.shift) {
-            sx = sy = Math.max(Math.abs(sx), Math.abs(sy));
-            sx *= signx;
-            sy *= signy;
+            doShear(skx, sky);
+        } else {
+            // Scale
+            const point = event.point;
+            const bounds = getActionBounds(this.isBitmap);
+            point.x = Math.max(bounds.left, Math.min(point.x, bounds.right));
+            point.y = Math.max(bounds.top, Math.min(point.y, bounds.bottom));
+
+            if (!this.lastPoint) this.lastPoint = event.lastPoint;
+            const delta = point.subtract(this.lastPoint);
+            this.lastPoint = point;
+
+            if (event.modifiers.alt) {
+                this.centered = true;
+                this.itemGroup.position = this.origCenter;
+                this.pivot = this.origCenter;
+            } else {
+                if (this.centered) {
+                    // Reset position if we were just in alt
+                    this.centered = false;
+                    this.itemGroup.scale(1 / this.lastSx, 1 / this.lastSy, this.pivot);
+                    if (this.selectionAnchor) {
+                        this.selectionAnchor.scale(this.lastSx, this.lastSy);
+                    }
+                    this.lastSx = 1;
+                    this.lastSy = 1;
+                }
+                this.pivot = this.origPivot;
+            }
+
+            this.corner = this.corner.add(delta);
+            let size = this.corner.subtract(this.pivot);
+            if (event.modifiers.alt) {
+                size = size.multiply(2);
+            }
+            let sx = 1.0;
+            let sy = 1.0;
+            if (Math.abs(this.origSize.x) > 0.0000001) {
+                sx = size.x / this.origSize.x;
+            }
+            if (Math.abs(this.origSize.y) > 0.0000001) {
+                sy = size.y / this.origSize.y;
+            }
+
+            const signx = sx > 0 ? 1 : -1;
+            const signy = sy > 0 ? 1 : -1;
+            if (this.isCorner && !event.modifiers.shift) {
+                sx = sy = Math.max(Math.abs(sx), Math.abs(sy));
+                sx *= signx;
+                sy *= signy;
+            }
+            sx = signx * Math.max(Math.abs(sx), MIN_SCALE_FACTOR);
+            sy = signy * Math.max(Math.abs(sy), MIN_SCALE_FACTOR);
+            this.itemGroup.scale(sx / this.lastSx, sy / this.lastSy, this.pivot);
+            if (this.selectionAnchor) {
+                this.selectionAnchor.scale(this.lastSx / sx, this.lastSy / sy);
+            }
+            this.lastSx = sx;
+            this.lastSy = sy;
         }
-        sx = signx * Math.max(Math.abs(sx), MIN_SCALE_FACTOR);
-        sy = signy * Math.max(Math.abs(sy), MIN_SCALE_FACTOR);
-        this.itemGroup.scale(sx / this.lastSx, sy / this.lastSy, this.pivot);
-        if (this.selectionAnchor) {
-            this.selectionAnchor.scale(this.lastSx / sx, this.lastSy / sy);
-        }
-        this.lastSx = sx;
-        this.lastSy = sy;
+        this.lastSkx = skx;
+        this.lastSky = sky;
     }
     onMouseUp () {
         if (!this.active) return;

@@ -338,6 +338,17 @@ class ScriptTreeGenerator {
                 left: this.descendInputOfBlock(block, 'OPERAND1'),
                 right: this.descendInputOfBlock(block, 'OPERAND2')
             });
+        case 'operator_gtoreq':
+            return new IntermediateInput(InputOpcode.OP_GTOREQ, InputType.BOOLEAN, {
+                left: this.descendInputOfBlock(block, 'OPERAND1'),
+                right: this.descendInputOfBlock(block, 'OPERAND2')
+            });
+        case 'operator_ltoreq':
+            return new IntermediateInput(InputOpcode.OP_LTOREQ, InputType.BOOLEAN, {
+                left: this.descendInputOfBlock(block, 'OPERAND1'),
+                right: this.descendInputOfBlock(block, 'OPERAND2')
+            });
+        
         case 'operator_join':
             return new IntermediateInput(InputOpcode.OP_JOIN, InputType.STRING, {
                 left: this.descendInputOfBlock(block, 'STRING1').toType(InputType.STRING),
@@ -377,6 +388,12 @@ class ScriptTreeGenerator {
             case '10 ^': return new IntermediateInput(InputOpcode.OP_POW_10, InputType.NUMBER, {value});
             default: return this.createConstantInput(0);
             }
+        }
+        case 'operator_atan2': {
+            return new IntermediateInput(InputOpcode.OP_ATAN2, InputType.NUMBER, {
+                left: this.descendInputOfBlock(block, 'NUM1').toType(InputType.NUMBER),
+                right: this.descendInputOfBlock(block, 'NUM2').toType(InputType.NUMBER)
+            });
         }
         case 'operator_mod':
             return new IntermediateInput(InputOpcode.OP_MOD, InputType.NUMBER_OR_NAN, {
@@ -1459,7 +1476,7 @@ class IRGenerator {
         /** @type {Object.<string, IntermediateScript>} */
         this.procedures = {};
 
-        this.analyzedProcedures = new Set();
+        this.analyzedProcedures = [];
     }
 
     addProcedureDependencies (dependencies) {
@@ -1500,11 +1517,12 @@ class IRGenerator {
             const procedureData = this.procedures[procedureCode];
 
             // Analyze newly found procedures.
-            if (!this.analyzedProcedures.has(procedureCode)) {
-                this.analyzedProcedures.add(procedureCode);
+            if (!this.analyzedProcedures.includes(procedureCode)) {
+                this.analyzedProcedures.push(procedureCode);
                 if (this.analyzeScript(procedureData)) {
                     madeChanges = true;
                 }
+                this.analyzedProcedures.pop();
             }
 
             // If a procedure used by a script may yield, the script itself may yield.
@@ -1547,10 +1565,7 @@ class IRGenerator {
         }
 
         // Analyze scripts until no changes are made.
-        while (this.analyzeScript(entry)) {
-            // Reset so all procedures get re-examined each pass.
-            this.analyzedProcedures = new Set();
-        }
+        while (this.analyzeScript(entry));
 
         return new IntermediateRepresentation(entry, this.procedures);
     }

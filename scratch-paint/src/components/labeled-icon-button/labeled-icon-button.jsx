@@ -7,7 +7,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Button from '../button/button.jsx';
-import TWRenderRecoloredImage from '../../tw-recolor/render.jsx';
 
 import styles from './labeled-icon-button.css';
 
@@ -18,7 +17,6 @@ const LabeledIconButton = ({
     imgSrc,
     onClick,
     title,
-    gray,
     ...props
 }) => (
     <Button
@@ -26,9 +24,9 @@ const LabeledIconButton = ({
         onClick={onClick}
         {...props}
     >
-        <TWRenderRecoloredImage
+        <img
             alt={imgAlt || title}
-            className={classNames(styles.editFieldIcon, {[styles.gray]: gray})}
+            className={styles.editFieldIcon}
             draggable={false}
             src={imgSrc}
             title={title}
@@ -42,10 +40,9 @@ LabeledIconButton.propTypes = {
     hideLabel: PropTypes.bool,
     highlighted: PropTypes.bool,
     imgAlt: PropTypes.string,
-    imgSrc: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+    imgSrc: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
-    gray: PropTypes.bool
+    title: PropTypes.string.isRequired
 };
 
 export default LabeledIconButton;

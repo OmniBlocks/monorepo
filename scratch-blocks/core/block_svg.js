@@ -244,6 +244,22 @@ Blockly.BlockSvg.prototype.setGlowStack = function(isGlowingStack) {
 };
 
 /**
+ * Glow the stack starting with this block, to highlight it visually as if it's errored.
+ * @param {boolean} isGlowingStack Whether the stack starting with this block should glow.
+ */
+Blockly.BlockSvg.prototype.setErrorStack = function(isGlowingStack) {
+  this.isGlowingStack_ = isGlowingStack;
+  // Update the applied SVG filter if the property has changed
+  var svg = this.getSvgRoot();
+  if (this.isGlowingStack_ && !svg.hasAttribute('filter')) {
+    var stackGlowFilterId = this.workspace.options.stackGlowFilterErrorId || 'blocklyStackGlowFilterError';
+    svg.setAttribute('filter', 'url(#' + stackGlowFilterId + ')');
+  } else if (!this.isGlowingStack_ && svg.hasAttribute('filter')) {
+    svg.removeAttribute('filter');
+  }
+};
+
+/**
  * Block's mutator icon (if any).
  * @type {Blockly.Mutator}
  */
@@ -342,7 +358,7 @@ Blockly.BlockSvg.prototype.setParent = function(newParent) {
     // If we are a shadow block, inherit tertiary colour.
     if (this.isShadow()) {
       this.setColour(this.getColour(), this.getColourSecondary(),
-          newParent.getColourTertiary(), this.getColourQuaternary());
+          newParent.getColourTertiary());
     }
   }
   // If we are losing a parent, we want to move our DOM element to the
@@ -710,13 +726,13 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
   var block = this;
   var menuOptions = [];
   if (this.isDeletable() && this.isMovable() && !block.isInFlyout) {
-    menuOptions.push(
-        Blockly.ContextMenu.blockDuplicateOption(block, e));
+    menuOptions.push(Blockly.ContextMenu.blockDuplicateOption(block, e));
     if (this.isEditable() && this.workspace.options.comments) {
       menuOptions.push(Blockly.ContextMenu.blockCommentOption(block));
     }
+    //menuOptions.push(Blockly.ContextMenu.blockCollapseOption(block));
     menuOptions.push(Blockly.ContextMenu.blockDeleteOption(block));
-  } else if (this.parentBlock_ && this.isShadow_) {
+  } else if (this.parentBlock_ && this.isShadow_ && this.type !== 'polygon') {
     this.parentBlock_.showContextMenu_(e);
     return;
   }
@@ -1029,15 +1045,16 @@ Blockly.BlockSvg.prototype.setWarningText = function(text, opt_id) {
 /**
  * Give this block a mutator dialog.
  * @param {Blockly.Mutator} mutator A mutator dialog instance or null to remove.
+ * @param {Boolean} forceCreate Boolean for wether or not we should create the icon for the mutator
  */
-Blockly.BlockSvg.prototype.setMutator = function(mutator) {
+Blockly.BlockSvg.prototype.setMutator = function(mutator, forceCreate) {
   if (this.mutator && this.mutator !== mutator) {
     this.mutator.dispose();
   }
   if (mutator) {
     mutator.block_ = this;
     this.mutator = mutator;
-    mutator.createIcon();
+    if (forceCreate) mutator.createIcon();
   }
 };
 
@@ -1099,13 +1116,11 @@ Blockly.BlockSvg.prototype.setDeleteStyle = function(enable) {
  *    string.
  * @param {number|string} colourTertiary Tertiary HSV hue value, or #RRGGBB
  *    string.
- * @param {number|string} colourQuaternary Quaternary HSV hue value, or #RRGGBB
- *    string.
  */
 Blockly.BlockSvg.prototype.setColour = function(colour, colourSecondary,
-    colourTertiary, colourQuaternary) {
+    colourTertiary) {
   Blockly.BlockSvg.superClass_.setColour.call(this, colour, colourSecondary,
-      colourTertiary, colourQuaternary);
+      colourTertiary);
 
   if (this.rendered) {
     this.updateColour();

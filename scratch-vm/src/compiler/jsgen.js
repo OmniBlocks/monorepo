@@ -285,6 +285,9 @@ class JSGenerator {
             return `((Math.asin(${this.descendInput(node.value)}) * 180) / Math.PI)`;
         case InputOpcode.OP_ATAN:
             return `((Math.atan(${this.descendInput(node.value)}) * 180) / Math.PI)`;
+
+        case InputOpcode.OP_ATAN2:
+            return `((Math.atan2(${this.descendInput(node.right)}, ${this.descendInput(node.left)}) * 180) / Math.PI)`;
         case InputOpcode.OP_CEILING:
             return `Math.ceil(${this.descendInput(node.value)})`;
         case InputOpcode.OP_CONTAINS:
@@ -334,6 +337,40 @@ class JSGenerator {
             // No compile-time optimizations possible - use fallback method.
             return `compareGreaterThan(${this.descendInput(left)}, ${this.descendInput(right)})`;
         }
+        case InputOpcode.OP_GTOREQ: {
+    const left = node.left;
+    const right = node.right;
+    // When both are numbers or NaN, we can use >= directly
+    if (left.isAlwaysType(InputType.NUMBER_INTERPRETABLE) && right.isAlwaysType(InputType.NUMBER_INTERPRETABLE | InputType.NUMBER_NAN)) {
+        return `(${this.descendInput(left.toType(InputType.NUMBER))} >= ${this.descendInput(right.toType(InputType.NUMBER_OR_NAN))})`;
+    }
+    if (left.isAlwaysType(InputType.NUMBER_INTERPRETABLE | InputType.NUMBER_NAN) && right.isAlwaysType(InputType.NUMBER_INTERPRETABLE)) {
+        return `(${this.descendInput(left.toType(InputType.NUMBER_OR_NAN))} >= ${this.descendInput(right.toType(InputType.NUMBER))})`;
+    }
+    // Fallback to string comparison if not number-interpretable
+    if (!left.isSometimesType(InputType.NUMBER_INTERPRETABLE) || !right.isSometimesType(InputType.NUMBER_INTERPRETABLE)) {
+        return `(${this.descendInput(left.toType(InputType.STRING))}.toLowerCase() >= ${this.descendInput(right.toType(InputType.STRING))}.toLowerCase())`;
+    }
+    return `compareGreaterThanOrEqual(${this.descendInput(left)}, ${this.descendInput(right)})`;
+}
+
+case InputOpcode.OP_LTOREQ: {
+    const left = node.left;
+    const right = node.right;
+    // When both are numbers or NaN, we can use <= directly
+    if (left.isAlwaysType(InputType.NUMBER_INTERPRETABLE | InputType.NUMBER_NAN) && right.isAlwaysType(InputType.NUMBER_INTERPRETABLE)) {
+        return `(${this.descendInput(left.toType(InputType.NUMBER_OR_NAN))} <= ${this.descendInput(right.toType(InputType.NUMBER))})`;
+    }
+    if (left.isAlwaysType(InputType.NUMBER_INTERPRETABLE) && right.isAlwaysType(InputType.NUMBER_INTERPRETABLE | InputType.NUMBER_NAN)) {
+        return `(${this.descendInput(left.toType(InputType.NUMBER))} <= ${this.descendInput(right.toType(InputType.NUMBER_OR_NAN))})`;
+    }
+    // String fallback
+    if (!left.isSometimesType(InputType.NUMBER_INTERPRETABLE) || !right.isSometimesType(InputType.NUMBER_INTERPRETABLE)) {
+        return `(${this.descendInput(left.toType(InputType.STRING))}.toLowerCase() <= ${this.descendInput(right.toType(InputType.STRING))}.toLowerCase())`;
+    }
+    return `compareLessThanOrEqual(${this.descendInput(left)}, ${this.descendInput(right)})`;
+}
+
         case InputOpcode.OP_JOIN:
             return `(${this.descendInput(node.left)} + ${this.descendInput(node.right)})`;
         case InputOpcode.OP_LENGTH:

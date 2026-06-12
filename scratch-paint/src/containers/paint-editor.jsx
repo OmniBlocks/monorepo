@@ -192,12 +192,18 @@ class PaintEditor extends React.Component {
             case Modes.BRUSH:
                 this.props.changeMode(Modes.BIT_BRUSH);
                 break;
+            case Modes.ARROW:
+                /* falls through */
             case Modes.LINE:
                 this.props.changeMode(Modes.BIT_LINE);
                 break;
             case Modes.OVAL:
                 this.props.changeMode(Modes.BIT_OVAL);
                 break;
+            case Modes.ROUNDED_RECT:
+                /* falls through */
+            case Modes.SUSSY:
+                /* falls through */
             case Modes.RECT:
                 this.props.changeMode(Modes.BIT_RECT);
                 break;
@@ -346,6 +352,7 @@ class PaintEditor extends React.Component {
                 textArea={this.state.textArea}
                 theme={this.getEffectiveTheme()}
                 width={this.props.width}
+                height={this.props.height}
                 zoomLevelId={this.props.zoomLevelId}
                 onChangeTheme={this.handleChangeTheme}
                 onManageFonts={this.props.onManageFonts}

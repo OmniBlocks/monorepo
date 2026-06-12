@@ -30,6 +30,7 @@ class EraserMode extends React.Component {
         } else if (!nextProps.isEraserModeActive && this.props.isEraserModeActive) {
             this.deactivateTool();
         } else if (nextProps.isEraserModeActive && this.props.isEraserModeActive) {
+            this.props.eraserModeState.brushType = this.props.brushModeState ? this.props.brushModeState.brushType : undefined;
             this.blob.setOptions({
                 isEraser: true,
                 ...nextProps.eraserModeState
@@ -45,6 +46,7 @@ class EraserMode extends React.Component {
         }
     }
     activateTool () {
+        this.props.eraserModeState.brushType = this.props.brushModeState ? this.props.brushModeState.brushType : undefined;
         this.blob.activateTool({isEraser: true, ...this.props.eraserModeState});
     }
     deactivateTool () {
@@ -63,7 +65,15 @@ class EraserMode extends React.Component {
 EraserMode.propTypes = {
     clearSelectedItems: PropTypes.func.isRequired,
     eraserModeState: PropTypes.shape({
-        brushSize: PropTypes.number.isRequired
+        brushSize: PropTypes.number.isRequired,
+        simplifySize: PropTypes.number,
+        brushType: "CIRCLE"
+    }),
+    /* used to extract brush type */
+    brushModeState: PropTypes.shape({
+        brushSize: PropTypes.number.isRequired,
+        simplifySize: PropTypes.number,
+        brushType: "CIRCLE"
     }),
     handleMouseDown: PropTypes.func.isRequired,
     isEraserModeActive: PropTypes.bool.isRequired,
@@ -72,6 +82,7 @@ EraserMode.propTypes = {
 
 const mapStateToProps = state => ({
     eraserModeState: state.scratchPaint.eraserMode,
+    brushModeState: state.scratchPaint.brushMode,
     isEraserModeActive: state.scratchPaint.mode === Modes.ERASER
 });
 const mapDispatchToProps = dispatch => ({

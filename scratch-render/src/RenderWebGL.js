@@ -322,9 +322,7 @@ class RenderWebGL extends EventEmitter {
             PenSkin,
             SVGSkin,
             CanvasMeasurementProvider,
-            Rectangle,
-            EffectTransform,
-            ShaderManager
+            Rectangle
         };
     }
 
@@ -394,8 +392,8 @@ class RenderWebGL extends EventEmitter {
     resize (pixelsWide, pixelsTall) {
         const {canvas} = this._gl;
         const pixelRatio = window.devicePixelRatio || 1;
-        const newWidth = Math.round(pixelsWide * pixelRatio);
-        const newHeight = Math.round(pixelsTall * pixelRatio);
+        const newWidth = pixelsWide * pixelRatio;
+        const newHeight = pixelsTall * pixelRatio;
 
         // Certain operations, such as moving the color picker, call `resize` once per frame, even though the canvas
         // size doesn't change. To avoid unnecessary canvas updates, check that we *really* need to resize the canvas.

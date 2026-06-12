@@ -14,10 +14,6 @@
     flex-grow: 1;
     color: white;
     text-align: center;
-
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
 }
 
 .text a {

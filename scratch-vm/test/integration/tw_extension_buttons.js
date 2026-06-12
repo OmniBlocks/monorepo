@@ -3,6 +3,52 @@ const htmlparser = require('htmlparser2');
 const VM = require('../../src/virtual-machine');
 const BlockType = require('../../src/extension-support/block-type');
 
+test('buttons with opcode', t => {
+    const vm = new VM();
+    let buttonRunCount = 0;
+    vm.extensionManager._registerInternalExtension({
+        'getInfo': () => ({
+            id: 'test_opcode',
+            name: 'Test Opcode',
+            blocks: [
+                {
+                    blockType: BlockType.BUTTON,
+                    text: 'button with opcode',
+                    opcode: 'buttonCallback'
+                }
+            ]
+        }),
+        'buttonCallback': () => {
+            buttonRunCount++;
+        }
+    });
+
+    const xml = vm.runtime.getBlocksXML();
+    t.equal(xml.length, 1);
+
+    const parsed = htmlparser.parseDOM(xml[0].xml, {
+        decodeEntities: true
+    });
+    t.equal(parsed.length, 1);
+
+    const category = parsed[0];
+    t.equal(category.children.length, 1);
+
+    const button = category.children[0];
+    t.equal(button.name, 'button');
+    t.equal(button.attribs.text, 'button with opcode');
+    t.equal(button.attribs.callbackkey, 'EXTENSION_CALLBACK');
+    t.equal(button.attribs.callbackdata, 'test_opcode_buttonCallback');
+
+    t.equal(buttonRunCount, 0);
+    vm.handleExtensionButtonPress(button.attribs.callbackdata);
+    t.equal(buttonRunCount, 1);
+    vm.handleExtensionButtonPress(button.attribs.callbackdata);
+    t.equal(buttonRunCount, 2);
+
+    t.end();
+});
+
 test('buttons', t => {
     const vm = new VM();
     let buttonRunCount = 0;

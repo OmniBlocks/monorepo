@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import Box from '../box/box.jsx';
 import Monitor from '../../containers/monitor.jsx';
 import PropTypes from 'prop-types';
+import {OrderedMap} from 'immutable';
 import {stageSizeToTransform} from '../../lib/screen-utils';
 
 import styles from './monitor-list.css';
@@ -20,7 +21,7 @@ const MonitorList = props => (
             className={styles.monitorListScaler}
             style={stageSizeToTransform(props.stageSize)}
         >
-            {props.monitors && props.monitors.valueSeq().filter(m => m.visible)
+            {props.monitors.valueSeq().filter(m => m.visible)
                 .map(monitorData => (
                     <Monitor
                         draggable={props.draggable}
@@ -48,9 +49,7 @@ const MonitorList = props => (
 
 MonitorList.propTypes = {
     draggable: PropTypes.bool.isRequired,
-    monitors: PropTypes.shape({
-        valueSeq: PropTypes.func
-    }),
+    monitors: PropTypes.instanceOf(OrderedMap),
     onMonitorChange: PropTypes.func.isRequired,
     stageSize: PropTypes.shape({
         width: PropTypes.number,

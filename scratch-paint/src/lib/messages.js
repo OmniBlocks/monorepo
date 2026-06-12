@@ -50,6 +50,26 @@ const messages = defineMessages({
         defaultMessage: 'Text',
         description: 'Label for the text tool',
         id: 'paint.textMode.text'
+    },
+    sussy: {
+        defaultMessage: 'Shapes',
+        description: 'Label for the shape tool',
+        id: 'paint.shapeMode.shape'
+    },
+    dragon: {
+        defaultMessage: 'Dragon',
+        description: 'Label for the totally a normal dragon head drawer dragon drawing tool',
+        id: 'paint.dragonMode.dragon'
+    },
+    triangle: {
+        defaultMessage: 'Triangle',
+        description: 'Label for the triangle tool',
+        id: 'paint.triangleMode.triangle'
+    },
+    arrow: {
+        defaultMessage: 'Arrow',
+        description: 'Label for the arrow tool',
+        id: 'paint.arrowMode.arrow'
     }
 });
 

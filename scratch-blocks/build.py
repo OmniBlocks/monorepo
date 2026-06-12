@@ -583,6 +583,9 @@ if __name__ == "__main__":
     closure_library = CLOSURE_LIBRARY_NPM
     closure_compiler = CLOSURE_COMPILER_NPM
 
+    if not os.path.exists(os.path.join(closure_root, closure_library)):
+      closure_root = os.path.join(os.path.pardir, "node_modules")
+
     # Load calcdeps from the local library
     calcdeps = import_path(os.path.join(
         closure_root, closure_library, "closure", "bin", "calcdeps.py"))

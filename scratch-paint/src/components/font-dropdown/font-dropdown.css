@@ -35,6 +35,11 @@
     white-space: nowrap;
 }
 
+.font-context-menu {
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
+
 .font-dropdown {
     align-items: center;
     color: $text-primary;

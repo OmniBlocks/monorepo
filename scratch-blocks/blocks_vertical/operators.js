@@ -171,7 +171,45 @@ Blockly.Blocks['operator_lt'] = {
     });
   }
 };
+Blockly.Blocks['operator_gtoreq'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 ≥ %2",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "OPERAND1"
+        },
+        {
+          "type": "input_value",
+          "name": "OPERAND2"
+        }
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_boolean"]
+    });
+  }
+};
 
+Blockly.Blocks['operator_ltoreq'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 ≤ %2",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "OPERAND1"
+        },
+        {
+          "type": "input_value",
+          "name": "OPERAND2"
+        }
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_boolean"]
+    });
+  }
+};
 Blockly.Blocks['operator_equals'] = {
   /**
    * Block for equals comparator.
@@ -461,6 +499,29 @@ Blockly.Blocks['operator_mathop'] = {
         {
           "type": "input_value",
           "name": "NUM"
+        }
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_number"]
+    });
+  }
+};
+Blockly.Blocks['operator_atan2'] = {
+  /**
+   * Block for atan2 of x and y.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.OPERATORS_ATAN2,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "NUM1"
+        },
+        {
+          "type": "input_value",
+          "name": "NUM2"
         }
       ],
       "category": Blockly.Categories.operators,

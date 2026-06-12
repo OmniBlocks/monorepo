@@ -1,4 +1,4 @@
-import nanolog from '@turbowarp/nanolog';
-nanolog.enable();
+import minilog from 'minilog';
+minilog.enable();
 
-export default nanolog('scratch-paint');
+export default minilog('scratch-paint');

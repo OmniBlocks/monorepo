@@ -13,7 +13,10 @@
     flex-basis: 2rem;
     flex-shrink: 0;
     height: 100%;
-    border: 1px solid $ui-pane-border;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+}
+[theme="dark"] .color-button-swatch {
+    border-color: rgba(255, 255, 255, 0.25);
 }
 
 [dir="ltr"] .color-button-swatch {

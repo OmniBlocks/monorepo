@@ -113,7 +113,7 @@ class CloudProvider {
             log.info('Cloud variables are disabled for this project. Not reconnecting.');
             return;
         }
-        log.info(`WebSocket connection closed with code ${e && e.code}`);
+        log.info(`Closed connection to websocket`);
         const randomizedTimeout = this.randomizeDuration(this.exponentialTimeout());
         this.setTimeout(this.openConnection.bind(this), randomizedTimeout);
     }

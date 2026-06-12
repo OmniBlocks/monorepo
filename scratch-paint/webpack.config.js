@@ -20,10 +20,7 @@ const base = {
             include: path.resolve(__dirname, 'src'),
             options: {
                 plugins: ['transform-object-rest-spread'],
-                presets: [
-                    ['@babel/preset-env', {
-                        targets: ['last 3 versions', 'Safari >= 8', 'iOS >= 8']}],
-                    '@babel/preset-react']
+                presets: [['env', {browsers: ['last 3 versions', 'Safari >= 8', 'iOS >= 8']}], 'react']
             }
         },
         {
@@ -97,6 +94,7 @@ module.exports = [
     // For use as a library
     defaultsDeep({}, base, {
         externals: {
+            'minilog': 'minilog',
             'prop-types': 'prop-types',
             'react': 'react',
             'react-dom': 'react-dom',

@@ -230,6 +230,8 @@ const InputOpcode = {
     OP_DIVIDE: 'op.divide',
     OP_EQUALS: 'op.equals',
     OP_GREATER: 'op.greater',
+    OP_GTOREQ: 'op.gtoreq', // unconventional name I know but would you really want the full name to be OP_GREATERTHANOREQUALTO
+    OP_LTOREQ: 'op.ltoreq',
     OP_LESS: 'op.less',
     OP_JOIN: 'op.join',
     OP_LENGTH: 'op.length',
@@ -244,6 +246,7 @@ const InputOpcode = {
     OP_ASIN: 'op.asin',
     OP_ACOS: 'op.acos',
     OP_ATAN: 'op.atan',
+    OP_ATAN2: 'op.atan2',
     OP_LOG_E: 'op.ln',
     OP_LOG_10: 'op.log',
     OP_POW_E: 'op.e^',

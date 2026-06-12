@@ -24,7 +24,7 @@ const FillColorIndicator = makeColorIndicator(messages.label, false);
 
 const mapStateToProps = state => ({
     colorIndex: state.scratchPaint.fillMode.colorIndex,
-    disabled: state.scratchPaint.mode === Modes.LINE,
+    disabled: state.scratchPaint.mode === Modes.PEN || state.scratchPaint.mode === Modes.LINE,
     color: state.scratchPaint.color.fillColor.primary,
     color2: state.scratchPaint.color.fillColor.secondary,
     colorModalVisible: state.scratchPaint.modals.fillColor,

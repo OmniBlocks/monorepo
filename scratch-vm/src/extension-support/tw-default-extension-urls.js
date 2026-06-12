@@ -11,11 +11,8 @@ const defaults = {
     // Turboloader's AudioStream
     audiostr: 'https://extensions.turbowarp.org/turboloader/audiostream.js',
 
-    // Face Sensing - https://lab.scratch.mit.edu/face/ - https://scratch.mit.edu/discuss/topic/842592/
-    faceSensing: 'https://extensions.turbowarp.org/lab/face-sensing.js',
-
-    // Video Sprites - https://lab.scratch.mit.edu/videosprites/
-    videoSprites: 'https://extensions.turbowarp.org/lab/video-sprites.js'
+    // https://scratch.mit.edu/discuss/topic/842592/
+    faceSensing: 'https://extensions.turbowarp.org/lab/face-sensing.js'
 };
 
 module.exports = defaults;

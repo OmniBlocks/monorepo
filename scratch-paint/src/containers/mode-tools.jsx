@@ -8,6 +8,7 @@ import CopyPasteHOC from '../hocs/copy-paste-hoc.jsx';
 import ModeToolsComponent from '../components/mode-tools/mode-tools.jsx';
 import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
 import {
+    setItemSelection,
     deleteSelection,
     getSelectedLeafItems,
     getSelectedRootItems,
@@ -16,10 +17,12 @@ import {
     selectAllSegments
 } from '../helper/selection';
 import {HANDLE_RATIO, ensureClockwise} from '../helper/math';
+import {groupItems, ungroupItems} from '../helper/group';
 import {getRaster} from '../helper/layer';
 import {flipBitmapHorizontal, flipBitmapVertical, selectAllBitmap} from '../helper/bitmap';
 import Formats, {isBitmap} from '../lib/format';
 import Modes from '../lib/modes';
+import opentype from 'opentype.js';
 
 class ModeTools extends React.Component {
     constructor (props) {
@@ -32,10 +35,24 @@ class ModeTools extends React.Component {
             'handleCurvePoints',
             'handleFlipHorizontal',
             'handleFlipVertical',
+            'handleCenterSelection',
             'handleDelete',
             'handlePasteFromClipboard',
-            'handlePointPoints'
+            'handlePointPoints',
+            'handleMergeShape',
+            'handleMaskShape',
+            'handleSubtractShape',
+            'handleExcludeShape',
+            'handleRoundEnds',
+            'handleSquareEnds',
+            'handleMiterLineJoin',
+            'handleRoundLineJoin',
+            'handleBevelLineJoin'
         ]);
+
+        // defined when merging shapes
+        // stores urls for default fonts
+        this._defaultCache = undefined;
     }
     _getSelectedUncurvedPoints () {
         const items = [];
@@ -147,6 +164,233 @@ class ModeTools extends React.Component {
             this.props.onUpdateImage();
         }
     }
+    hasSelectedRoundEnds () {
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const style = item.getStyle().getStrokeCap();
+            if (style === 'round') {
+                return true;
+            }
+        }
+        return false;
+    }
+    hasSelectedSquareEnds () {
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const style = item.getStyle().getStrokeCap();
+            if (style !== 'round') {
+                return true;
+            }
+        }
+        return false;
+    }
+    handleRoundEnds () {
+        let changed;
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const styles = item.getStyle();
+            if (styles.getStrokeCap() !== 'round') {
+                styles.setStrokeCap('round');
+                changed = true;
+            }
+        }
+        if (changed) {
+            this.props.setSelectedItems(this.props.format);
+            this.props.onUpdateImage();
+        }
+    }
+    handleSquareEnds () {
+        let changed;
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const styles = item.getStyle();
+            console.log(styles.getStrokeCap())
+            if (styles.getStrokeCap() === 'round') {
+                styles.setStrokeCap('butt');
+                changed = true;
+            }
+        }
+        if (changed) {
+            this.props.setSelectedItems(this.props.format);
+            this.props.onUpdateImage();
+        }
+    }
+    hasSelectedMiterLineJoins () {
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const style = item.getStyle().getStrokeJoin();
+            if (style === 'miter') {
+                return true;
+            }
+        }
+        return false;
+    }
+    hasSelectedRoundLineJoins () {
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const style = item.getStyle().getStrokeJoin();
+            if (style === 'round') {
+                return true;
+            }
+        }
+        return false;
+    }
+    hasSelectedBevelLineJoins () {
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const style = item.getStyle().getStrokeJoin();
+            if (style === 'bevel') {
+                return true;
+            }
+        }
+        return false;
+    }
+    handleMiterLineJoin () {
+        let changed;
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const styles = item.getStyle();
+            if (styles.getStrokeJoin() !== 'miter') {
+                styles.setStrokeJoin('miter');
+                changed = true;
+            }
+        }
+        if (changed) {
+            this.props.setSelectedItems(this.props.format);
+            this.props.onUpdateImage();
+        }
+    }
+    handleRoundLineJoin () {
+        let changed;
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const styles = item.getStyle();
+            if (styles.getStrokeJoin() !== 'round') {
+                styles.setStrokeJoin('round');
+                changed = true;
+            }
+        }
+        if (changed) {
+            this.props.setSelectedItems(this.props.format);
+            this.props.onUpdateImage();
+        }
+    }
+    handleBevelLineJoin () {
+        let changed;
+        const selectedItems = getSelectedLeafItems();
+        for (const item of selectedItems) {
+            const styles = item.getStyle();
+            if (styles.getStrokeJoin() !== 'bevel') {
+                styles.setStrokeJoin('bevel');
+                changed = true;
+            }
+        }
+        if (changed) {
+            this.props.setSelectedItems(this.props.format);
+            this.props.onUpdateImage();
+        }
+    }
+
+    /*
+        utility funcs for 'handleMergeShape'
+        convert text nodes to paths to allow merging
+    */
+    extractFontURL(fontName) {
+        const manager = window.vm ? window.vm.runtime.fontManager : undefined;
+        if (!manager) return undefined;
+
+        const customCheck = manager.fonts.find(f => !f.system && fontName.includes(f.family));
+        if (customCheck) return customCheck.asset.encodeDataURI();
+        else {
+            // could be a default font
+            if (!this._defaultCache) {
+                const defaultFontsCss = document.querySelector(`style[id="scratch-font-styles"]`).sheet;
+                this._defaultCache = {};
+                for (const rule of defaultFontsCss.cssRules) {
+                    if (rule.type === CSSRule.FONT_FACE_RULE) {
+                        const name = rule.style.getPropertyValue("font-family").replace(/["']/g, "").trim();
+                        this._defaultCache[name] = rule.style.getPropertyValue("src")
+                            .replace("url(\"", "").replace("\")", "");
+                    }
+                }
+            }
+
+            if (this._defaultCache[fontName]) return this._defaultCache[fontName];
+            else return undefined;
+        }
+    }
+
+    convertText2Path (textNode) {
+        const fontURL = this.extractFontURL(textNode.font);
+        return new Promise((resolve) => {
+            opentype.load(fontURL, (err, font) => {
+                if (err) {
+                    console.warn("Font merge load error:", err);
+                    resolve(undefined);
+                    return;
+                }
+
+                const pathData = font.getPath(
+                    textNode.content, 0, 0,
+                    textNode.fontSize || 16
+                ).toPathData();
+
+                const compound = new paper.CompoundPath(pathData);
+                compound.fillColor = this.fillColor || "black";
+                compound.matrix = textNode.matrix.clone();
+                resolve(compound);
+            });
+        });
+    }
+
+    async handleMergeShape (specificOperation) {
+        const selectedItems = getSelectedRootItems();
+        if (selectedItems.length < 2) {
+            // If nothing or not enough items are selected,
+            // we probably shouldnt select and merge everything
+            return;
+        }
+
+        // Convert text items to paths
+        for (let i = 0; i < selectedItems.length; i++) {
+            if (selectedItems[i].className === "PointText") {
+                const path = await this.convertText2Path(selectedItems[i]);
+                if (path) selectedItems[i] = path;
+            }
+        }
+
+        const topItem = selectedItems[0];
+        if (topItem.className !== "PointText" && !topItem.unite) {
+            // we cant unite this item, cancel
+            return;
+        }
+
+        if (typeof specificOperation !== "string") specificOperation = "unite";
+        // unite the shapes together, creating a clone on top of the original
+        const results = [];
+        for (let i = 1; i < selectedItems.length; i++) {
+            const result = topItem[specificOperation](selectedItems[i]);
+            results.push(result);
+        }
+
+        if (results.length <= 1) {
+            setItemSelection(results[0], true);
+            this.props.onUpdateImage();
+        } else {
+            groupItems(results, this.props.clearSelectedItems, this.props.setSelectedItems, this.props.onUpdateImage);
+        }
+    }
+
+    handleMaskShape () {
+        this.handleMergeShape("intersect");
+    }
+    handleSubtractShape () {
+        this.handleMergeShape("subtract");
+    }
+    handleExcludeShape () {
+        this.handleMergeShape("exclude");
+    }
+
     _handleFlip (horizontalScale, verticalScale, selectedItems) {
         if (selectedItems.length === 0) {
             // If nothing is selected, select everything
@@ -190,6 +434,32 @@ class ModeTools extends React.Component {
             this._handleFlip(1, -1, selectedItems);
         }
     }
+    handleCenterSelection () {
+        // https://github.com/Nitro-Bolt/scratch-paint/blob/develop/src/containers/mode-tools.jsx#L203-L216
+        let selectedItems = getSelectedRootItems();
+        if (selectedItems.length === 0) {
+            if (isBitmap(this.props.format)) {
+                return;
+            }
+            selectedItems = getAllRootItems();
+        }
+
+        for (const item of selectedItems) {
+            item.data.originalIndex = item.index;
+        }
+
+        const group = new paper.Group(selectedItems);
+        group.position = new paper.Point(this.props.width, this.props.height);
+        for (let i = 0; i < selectedItems.length; i++) {
+            const item = selectedItems[i];
+            group.layer.insertChild(item.data.originalIndex, item);
+            delete item.data.originalIndex;
+        }
+        group.remove();
+
+        this.props.setSelectedItems(this.props.format);
+        this.props.onUpdateImage();
+    }
     handlePasteFromClipboard () {
         if (this.props.onPasteFromClipboard()) {
             this.props.onUpdateImage();
@@ -215,14 +485,32 @@ class ModeTools extends React.Component {
                 hasSelectedUncurvedPoints={this.hasSelectedUncurvedPoints()}
                 hasSelectedUnpointedPoints={this.hasSelectedUnpointedPoints()}
                 onCopyToClipboard={this.props.onCopyToClipboard}
+                onCutToClipboard={this.props.onCutToClipboard}
                 onCurvePoints={this.handleCurvePoints}
                 onDelete={this.handleDelete}
                 onFlipHorizontal={this.handleFlipHorizontal}
                 onFlipVertical={this.handleFlipVertical}
+                onCenterSelection={this.handleCenterSelection}
                 onManageFonts={this.props.onManageFonts}
                 onPasteFromClipboard={this.handlePasteFromClipboard}
                 onPointPoints={this.handlePointPoints}
                 onUpdateImage={this.props.onUpdateImage}
+
+                hasSelectedRoundEnds={this.hasSelectedRoundEnds()}
+                hasSelectedSquareEnds={this.hasSelectedSquareEnds()}
+                onRoundEnds={this.handleRoundEnds}
+                onSquareEnds={this.handleSquareEnds}
+                hasSelectedMiterLineJoin={this.hasSelectedMiterLineJoins()}
+                hasSelectedRoundLineJoin={this.hasSelectedRoundLineJoins()}
+                hasSelectedBevelLineJoin={this.hasSelectedBevelLineJoins()}
+                onMiterLineJoin={this.handleMiterLineJoin}
+                onRoundLineJoin={this.handleRoundLineJoin}
+                onBevelLineJoin={this.handleBevelLineJoin}
+
+                onMergeShape={this.handleMergeShape}
+                onMaskShape={this.handleMaskShape}
+                onSubtractShape={this.handleSubtractShape}
+                onExcludeShape={this.handleExcludeShape}
             />
         );
     }
@@ -233,9 +521,12 @@ ModeTools.propTypes = {
     format: PropTypes.oneOf(Object.keys(Formats)),
     mode: PropTypes.oneOf(Object.keys(Modes)),
     onCopyToClipboard: PropTypes.func.isRequired,
+    onCutToClipboard: PropTypes.func.isRequired,
     onManageFonts: PropTypes.func,
     onPasteFromClipboard: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     // Listen on selected items to update hasSelectedPoints
     selectedItems:
         PropTypes.arrayOf(PropTypes.instanceOf(paper.Item)), // eslint-disable-line react/no-unused-prop-types

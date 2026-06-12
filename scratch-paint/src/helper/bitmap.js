@@ -23,7 +23,7 @@ const createMaskingCanvas = (originalContext, fillStyle) => {
     }
     if (doesColorRequireMask(fillStyle)) {
         const tempCanvas = createCanvas(originalCanvas.width, originalCanvas.height);
-        const tempContext = tempCanvas.getContext('2d');
+        const tempContext = tempCanvas.getContext('2d', { willReadFrequently: true });
         return {
             context: tempContext,
             unmask: () => {
@@ -242,7 +242,7 @@ const getBrushMark = function (size, color, isEraser) {
     const roundedUpRadius = Math.ceil(size / 2);
     canvas.width = roundedUpRadius * 2;
     canvas.height = roundedUpRadius * 2;
-    const {context, unmask} = createMaskingCanvas(canvas.getContext('2d'), isEraser ? 'white' : color);
+    const {context, unmask} = createMaskingCanvas(canvas.getContext('2d', { willReadFrequently: true }), isEraser ? 'white' : color);
     context.imageSmoothingEnabled = false;
     // Small squares for pixel artists
     if (size <= 5) {
@@ -440,6 +440,46 @@ const getTrimmedRaster = function (shouldInsert) {
     return trimmedRaster;
 };
 
+/**
+ * @param {uint8array} uint8 uint8array
+ * @returns {string} base64 data
+ */
+const uint8ToBase64 = function(uint8) {
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let i = 0; i < uint8.length; i += chunkSize) {
+        const chunk = uint8.subarray(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, chunk);
+    }
+    return btoa(binary);
+}
+
+/**
+ * @returns {string} css for directions to custom fonts, used by <style> in 'convertToBitmap'
+ */
+const generateCustomFontsCSS = function() {
+    if (!ReduxStore) return '';
+    const fonts = ReduxStore.getState().scratchPaint.customFonts.filter(f => !f.system);
+
+    let fontCSS = '';
+    for (const font of fonts) {
+        const base64 = uint8ToBase64(font.data);
+
+        // normalize format for browser compatibility
+        let format = font.format.toLowerCase();
+        if (format === 'otf') format = 'opentype';
+        if (format === 'ttf') format = 'truetype';
+
+        fontCSS += "@font-face {\n";
+        fontCSS += `font-family: "${font.name}";\n`;
+        fontCSS += `src: url('data:font/${format};base64,${base64}') format('${format}');\n`;
+        fontCSS += `font-display: block;\n`;
+        fontCSS += "}\n";
+    }
+
+    return fontCSS;
+};
+
 const convertToBitmap = function (clearSelectedItems, onUpdateImage, optFontInlineFn) {
     // @todo if the active layer contains only rasters, drawing them directly to the raster layer
     // would be more efficient.
@@ -455,9 +495,26 @@ const convertToBitmap = function (clearSelectedItems, onUpdateImage, optFontInli
     });
     showGuideLayers(guideLayers);
 
+    svg.setAttribute('shape-rendering', 'crispEdges');
+
     // Get rid of anti-aliasing
     // @todo get crisp text https://github.com/LLK/scratch-paint/issues/508
-    svg.setAttribute('shape-rendering', 'crispEdges');
+    // sharkpool here -- this might fix/help it, not 100%
+    svg.setAttribute('text-rendering', 'geometricPrecision');
+
+    const customFontCSS = generateCustomFontsCSS();
+    if (customFontCSS) {
+        let defs = svg.querySelector('defs');
+        if (!defs) {
+            defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            svg.insertBefore(defs, svg.firstChild);
+        }
+
+        const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+        style.setAttribute('type', 'text/css');
+        style.innerHTML = customFontCSS;
+        defs.appendChild(style);
+    }
 
     let svgString = (new XMLSerializer()).serializeToString(svg);
     if (optFontInlineFn) {
@@ -476,7 +533,7 @@ const convertToBitmap = function (clearSelectedItems, onUpdateImage, optFontInli
         }
         for (let i = paper.project.activeLayer.children.length - 1; i >= 0; i--) {
             const item = paper.project.activeLayer.children[i];
-            if (item.clipMask === false || !item.guide) {
+            if (item.clipMask === false) {
                 item.remove();
             } else {
                 // Resize mask for bitmap bounds
@@ -506,7 +563,7 @@ const convertToBitmap = function (clearSelectedItems, onUpdateImage, optFontInli
 const convertToVector = function (clearSelectedItems, onUpdateImage) {
     clearSelection(clearSelectedItems);
     for (const item of paper.project.activeLayer.children) {
-        if (item.clipMask === true && item.guide) {
+        if (item.clipMask === true) {
             // Resize mask for vector bounds
             item.size.height = MAX_WORKSPACE_BOUNDS.height;
             item.size.width = MAX_WORKSPACE_BOUNDS.width;
@@ -529,7 +586,7 @@ const matchesColor_ = function (x, y, imageData, oldColor) {
         imageData.data[index + 0] === oldColor[0] &&
         imageData.data[index + 1] === oldColor[1] &&
         imageData.data[index + 2] === oldColor[2] &&
-        imageData.data[index + 3 ] === oldColor[3]
+        imageData.data[index + 3] === oldColor[3]
     );
 };
 
@@ -597,7 +654,7 @@ const fillStyleToColor_ = function (fillStyleString) {
     const tmpCanvas = document.createElement('canvas');
     tmpCanvas.width = 1;
     tmpCanvas.height = 1;
-    const context = tmpCanvas.getContext('2d');
+    const context = tmpCanvas.getContext('2d', { willReadFrequently: true });
     context.fillStyle = fillStyleString;
     context.fillRect(0, 0, 1, 1);
     return context.getImageData(0, 0, 1, 1).data;

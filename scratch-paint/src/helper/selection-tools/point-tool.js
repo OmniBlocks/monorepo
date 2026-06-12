@@ -127,11 +127,19 @@ class PointTool {
                 seg.origPoint = seg.point.clone();
             }
 
+            let constrainedDelta = delta;
             if (event.modifiers.shift) {
                 seg.point = seg.origPoint.add(snapDeltaToAngle(dragVector, Math.PI / 4));
-            } else {
-                seg.point = seg.point.add(delta);
+                continue;
             }
+            if (event.modifiers.alt) {
+                // vertical movement only
+                constrainedDelta = new paper.Point(0, delta.y);
+            } else if (event.modifiers.control || event.modifiers.meta) {
+                // horizontal movement only
+                constrainedDelta = new paper.Point(delta.x, 0);
+            }
+            seg.point = seg.point.add(constrainedDelta);
         }
     }
     onMouseUp () {

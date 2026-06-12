@@ -28,7 +28,8 @@ class SpriteSelectorItem extends React.PureComponent {
             'handleMouseDown',
             'handleDragEnd',
             'handleDrag',
-            'handleTouchEnd'
+            'handleTouchEnd',
+            'handleExportJust'
         ]);
 
         this.dragRecognizer = new DragRecognizer({
@@ -106,6 +107,17 @@ class SpriteSelectorItem extends React.PureComponent {
         e.stopPropagation();
         this.props.onRenameButtonClick(this.props.id);
     }
+    async handleExportJust (e) {
+        e.stopPropagation();
+        console.log('Export just button clicked for sprite id:', this.props.id);
+        if (this.props.onExportJustButtonClick) {
+            try {
+                await this.props.onExportJustButtonClick(this.props.id);
+            } catch (err) {
+                console.error('Error opening export modal:', err);
+            }
+        }
+    }
     handleMouseLeave () {
         this.props.dispatchSetHoveredSprite(null);
     }
@@ -126,6 +138,7 @@ class SpriteSelectorItem extends React.PureComponent {
             onDeleteButtonClick,
             onDuplicateButtonClick,
             onExportButtonClick,
+            onExportJustButtonClick,
             onRenameButtonClick,
             dragPayload,
             receivedBlocks,
@@ -142,6 +155,7 @@ class SpriteSelectorItem extends React.PureComponent {
                 onClick={this.handleClick}
                 onDeleteButtonClick={onDeleteButtonClick ? this.handleDelete : null}
                 onDuplicateButtonClick={onDuplicateButtonClick ? this.handleDuplicate : null}
+                onExportJustButtonClick={onExportJustButtonClick ? this.handleExportJust : null}
                 onExportButtonClick={onExportButtonClick ? this.handleExport : null}
                 onRenameButtonClick={onRenameButtonClick ? this.handleRename : null}
                 onMouseDown={this.handleMouseDown}
@@ -169,6 +183,7 @@ SpriteSelectorItem.propTypes = {
     name: PropTypes.any,
     onClick: PropTypes.func,
     onDeleteButtonClick: PropTypes.func,
+    onExportJustButtonClick: PropTypes.func,
     onRenameButtonClick: PropTypes.func,
     onDrag: PropTypes.func.isRequired,
     onDuplicateButtonClick: PropTypes.func,

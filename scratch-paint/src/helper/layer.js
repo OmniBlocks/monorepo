@@ -30,7 +30,7 @@ const createCanvas = function (width, height) {
     const canvas = document.createElement('canvas');
     canvas.width = width ? width : ART_BOARD_WIDTH;
     canvas.height = height ? height : ART_BOARD_HEIGHT;
-    canvas.getContext('2d').imageSmoothingEnabled = false;
+    canvas.getContext('2d', { willReadFrequently: true }).imageSmoothingEnabled = false;
     return canvas;
 };
 
@@ -40,7 +40,7 @@ const clearRaster = function () {
     
     // Generate blank raster
     const raster = new paper.Raster(createCanvas());
-    raster.canvas.getContext('2d').imageSmoothingEnabled = false;
+    raster.canvas.getContext('2d', { willReadFrequently: true }).imageSmoothingEnabled = false;
     raster.parent = layer;
     raster.guide = true;
     raster.locked = true;

@@ -39,7 +39,37 @@ cd ../monorepo
 git remote add upstream ../temp-monorepo
 git fetch upstream
 
+# --- BOOTSTRAP UPSTREAM-BRANCH ---
+git fetch origin || true
+if ! git show-ref --verify --quiet refs/remotes/origin/upstream-branch; then
+    echo "Initializing upstream-branch for the first time..."
+    git checkout --orphan upstream-branch
+    git rm -rf .
+    git merge upstream/scratch-gui --allow-unrelated-histories --no-edit --quiet
+    git merge upstream/scratch-blocks --allow-unrelated-histories --no-edit --quiet
+    git merge upstream/scratch-vm --allow-unrelated-histories --no-edit --quiet
+    git merge upstream/scratch-render --allow-unrelated-histories --no-edit --quiet
+    git merge upstream/scratch-paint --allow-unrelated-histories --no-edit --quiet
+    git push origin upstream-branch
+    
+    git checkout main
+    if git merge -s ours upstream-branch --allow-unrelated-histories -m "chore: link upstream-branch history" && git push origin main; then
+        echo "Successfully linked upstream-branch to main!"
+    else
+        git checkout -b link-upstream-branch
+        git merge -s ours upstream-branch --allow-unrelated-histories -m "chore: link upstream-branch history"
+        git push origin link-upstream-branch --force
+        gh pr create --head link-upstream-branch --base main --title "Bootstrap: Link Upstream History" --body "Please merge this PR to link the histories."
+        echo "Bootstrap PR created. Please merge it, then run the action again!"
+        exit 0
+    fi
+fi
+
+git fetch origin upstream-branch
+git checkout -B upstream-branch origin/upstream-branch
 git checkout -B upstream-update-$(date +%Y-%m-%d)
+# ---------------------------------
+
 PR_NUMBER=$(gh pr list --head upstream-update-$(date +%Y-%m-%d) --json number --jq '.[0].number')
 echo "🔍 PR_NUMBER: $PR_NUMBER"
 
@@ -101,16 +131,32 @@ if [ -n "$SYNC_POINT_PAINT" ]; then
         git commit -m "chore: upstream conflicts in scratch-paint" --allow-empty
     fi
 fi
+
+# --- LOCAL MERGE TEST TO DETECT CONFLICTS ---
+git checkout -b test-merge-branch upstream-update-$(date +%Y-%m-%d)
+set +e
+git merge origin/main --no-commit --no-edit
+if [ $? -ne 0 ]; then
+    CONFLICT_FOUND=1
+    git merge --abort
+fi
+set -e
+git checkout upstream-update-$(date +%Y-%m-%d)
+git branch -D test-merge-branch
+# --------------------------------------------
+
 set -e
 
 if [ $CONFLICT_FOUND -eq 0 ]; then
     rm -f .git/CHERRY_PICK_HEAD .git/MERGE_HEAD
     git commit -m "chore: upstream update $(date)" --allow-empty
     git push origin upstream-update-$(date +%Y-%m-%d) --force
+    git push origin upstream-update-$(date +%Y-%m-%d):upstream-branch --force
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date)" --body "Updated packages from upstream. pls review" -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice"
 else
     git add . 
     git commit -m "chore: upstream update $(date) — needs manual conflict resolution" --allow-empty
     git push origin upstream-update-$(date +%Y-%m-%d) --force
+    git push origin upstream-update-$(date +%Y-%m-%d):upstream-branch --force
     gh pr create --head upstream-update-$(date +%Y-%m-%d) --base main --title "Upstream update $(date) (has conflicts)" --body "# THERE ARE CONFLICTS IN THIS AUTOMATIC PR. PLEASE DO NOT MERGE UNTIL THEY ARE RESOLVED. ⚠️🚨⚠️🚨⚠️🚨" --draft -r supervoidcoder,ampelc,someCatinTheWorld || gh pr comment "$PR_NUMBER" --body "It seems there's already an opened PR for this update. I have updated the branch. pls review, procrastinating on upstream changes isn't very nice. **ALSO, THERE ARE CONFLICTS**⚠️🚨"
 fi

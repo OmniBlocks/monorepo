@@ -25,7 +25,7 @@ jobs:
             
             # --- Configuration Timelines ---
             # Number of days of inactivity before an issue or PR becomes stale
-            days-before-stale: 14
+            days-before-stale: 30
             # Number of days of inactivity after being marked stale before closing
             days-before-close: 7
             

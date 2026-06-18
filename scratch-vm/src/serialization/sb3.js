@@ -1189,9 +1189,10 @@ const convertAmpModBlocks = function (blocks, runtime) {
  * @param {JSZip} zip Sb3 file describing this project (to load assets from)
  * @param {object} assets - Promises for assets of this scratch object grouped
  *   into costumes and sounds
+ * @param {!object} platform - The platform metadata of the project.
  * @return {!Promise.<Target>} Promise for the target created (stage or sprite), or null for unsupported objects.
  */
-const parseScratchObject = function (object, runtime, extensions, zip, assets) {
+const parseScratchObject = function (object, runtime, extensions, zip, assets, platform) {
     if (!Object.prototype.hasOwnProperty.call(object, 'name')) {
         // Watcher/monitor - skip this object until those are implemented in VM.
         // @todo
@@ -1209,7 +1210,7 @@ const parseScratchObject = function (object, runtime, extensions, zip, assets) {
     }
     if (Object.prototype.hasOwnProperty.call(object, 'blocks')) {
         deserializeBlocks(object.blocks);
-        convertAmpModBlocks(object.blocks, runtime);
+        if (platform?.name === 'AmpMod') convertAmpModBlocks(object.blocks, runtime);
         // Take a second pass to create objects and add extensions
         for (const blockId in object.blocks) {
             if (!Object.prototype.hasOwnProperty.call(object.blocks, blockId)) continue;
@@ -1593,7 +1594,7 @@ const deserialize = async function (json, runtime, zip, isSingleSprite) {
         .then(assets => Promise.resolve(assets))
         .then(assets => Promise.all(targetObjects
             .map((target, index) =>
-                parseScratchObject(target, runtime, extensions, zip, assets[index]))))
+                parseScratchObject(target, runtime, extensions, zip, assets[index], json.meta?.platform))))
         .then(targets => targets // Re-sort targets back into original sprite-pane ordering
             .map((t, i) => {
                 // Add layer order property to deserialized targets.

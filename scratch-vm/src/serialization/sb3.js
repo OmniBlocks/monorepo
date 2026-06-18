@@ -1130,12 +1130,12 @@ const convertAmpModBlocks = function (blocks, runtime) {
                 lastBlock = blocks[block.inputs.SUBSTACK.block];
             }
             // Synthesise a break block. Should synthesising eventually become a function to avoid boilerplate?
-            let newId;
+            let breakId;
             do {
-                newId = uid();
-            } while (Object.hasOwn(blocks, newId));
+                breakId = uid();
+            } while (Object.hasOwn(blocks, breakId));
             const breakBlock = {
-                id: uid(),
+                id: breakId,
                 opcode: 'control_break',
                 next: null, // Break blocks are the end of a substack.
                 parent: null, // May be filled by code below.
@@ -1145,14 +1145,14 @@ const convertAmpModBlocks = function (blocks, runtime) {
                 topLevel: false
             };
             if (lastBlock) {
+                // Walking the tree, yippee...
+                while (lastBlock.next !== null) lastBlock = blocks[lastBlock.next];
+
                 // Try to make sure we aren't mindlessly appending break blocks to capped blocks. If there is no GUI, we
                 // will just append to everything anyway. Horrid, I know: but there is no Blockly to whine about, it and
                 // this whole generated opcode metadata thing is a horrid hack in itself because the VM doesn't know
                 // about the shapes of primitive blocks due to them being defined in Blockly.
                 if (Object.keys(runtime.blockMetadata).length) {
-                    // Walking the tree, yippee...
-                    while (lastBlock.next !== null) lastBlock = blocks[lastBlock.next];
-
                     const metadata = runtime.getTypeMetadataOfBlock(lastBlock);
                     if (!metadata) continue;
                     // Make sure we aren't connecting a break to a cap block.

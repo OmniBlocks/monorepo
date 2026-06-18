@@ -191,7 +191,11 @@ class Blocks {
 
         // If it was cached, just return that.
         const blockIdParents = this._cache.blockIdParents;
-        if (blockIdParents[childId]?._direct_) return blockIdParents[childId]._direct_;
+        if (blockIdParents[childId] && Object.hasOwn(blockIdParents[childId], '_direct_')) {
+            return blockIdParents[childId]._direct_;
+        }
+
+        if (!Object.hasOwn(blockIdParents, childId)) blockIdParents[childId] = {};
 
         let currentId = childId;
         while (block.parent !== null) {
@@ -237,9 +241,11 @@ class Blocks {
 
         // If it was cached, just return that.
         const blockIdParents = this._cache.blockIdParents;
-        if (blockIdParents[childId]?.[opcode]) return blockIdParents[childId][opcode];
+        if (blockIdParents[childId] && Object.hasOwn(blockIdParents[childId], opcode)) {
+            return blockIdParents[childId][opcode];
+        }
 
-        blockIdParents[childId] = blockIdParents[childId] ?? {};
+        if (!Object.hasOwn(blockIdParents, childId)) blockIdParents[childId] = {};
 
         let currentId = childId;
         while (block.parent !== null) {
@@ -298,7 +304,9 @@ class Blocks {
         // If it was cached, just return that.
         const validatedSubstacks = this._cache.validatedSubstacks;
         const cached = validatedSubstacks[blockId]?.[input];
-        if (cached && cached.result && cached.validator === validator) return validatedSubstacks[blockId][input];
+        if (cached && cached.result && cached.validator === validator) {
+            return validatedSubstacks[blockId][input].result;
+        }
 
         validatedSubstacks[blockId] = validatedSubstacks[blockId] ?? {};
 

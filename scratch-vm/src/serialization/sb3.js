@@ -1124,6 +1124,7 @@ const parseScratchAssets = function (object, runtime, zip) {
 const convertAmpModBlocks = function (blocks, runtime) {
     for (const block of Object.values(blocks)) {
         switch (block.opcode) {
+        // Append break blocks at the end of AmpMod switch cases, due to them auto-breaking in AmpMod.
         case 'control_case': {
             let lastBlock = null;
             if (block.inputs.SUBSTACK?.block) {
@@ -1149,7 +1150,7 @@ const convertAmpModBlocks = function (blocks, runtime) {
                 while (lastBlock.next !== null) lastBlock = blocks[lastBlock.next];
 
                 // Try to make sure we aren't mindlessly appending break blocks to capped blocks. If there is no GUI, we
-                // will just append to everything anyway. Horrid, I know: but there is no Blockly to whine about, it and
+                // will just append to everything anyway. Horrid, I know: but there is no Blockly to whine about it, and
                 // this whole generated opcode metadata thing is a horrid hack in itself because the VM doesn't know
                 // about the shapes of primitive blocks due to them being defined in Blockly.
                 if (Object.keys(runtime.blockMetadata).length) {

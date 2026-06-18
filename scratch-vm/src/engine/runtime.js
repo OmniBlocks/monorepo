@@ -471,6 +471,14 @@ class Runtime extends EventEmitter {
 
         this.addonBlocks = {};
 
+        /**
+         * ob: A list of the metadata of blocks found in the flyout. This data may be somewhat
+         * inaccurate due to shapeshifting blocks, so please use the data with a grain of salt.
+         * @type {object.<string, object.<string, object>>}
+         * @private
+         */
+        this.blockMetadata = Object.create(null);
+
         this.stageWidth = Runtime.STAGE_WIDTH;
         this.stageHeight = Runtime.STAGE_HEIGHT;
 
@@ -3003,6 +3011,43 @@ class Runtime extends EventEmitter {
             return this.addonBlocks[procedureCode];
         }
         return null;
+    }
+
+    /**
+     * ob: Generates opcode metadata from an array of Blockly block instances.
+     * @param {Array<Blockly.Block>} blocks An array of Blockly blocks.
+     */
+    genBlockMetadata (blocks) {
+        for (const block of blocks) {
+            if (!block.type || Object.hasOwn(this.blockMetadata, block.type)) continue;
+            const draftMetadata = {
+                hasNext: false
+            };
+            if (block.nextConnection) draftMetadata.hasNext = true;
+            this.blockMetadata[block.type] = draftMetadata;
+        }
+    }
+
+    /**
+     * ob: Gets the opcode metadata of a block.
+     * @param {object} blocks A VM representation of a block.
+     * @returns {?object} Returns the opcode metadata of the block.
+     * @throws {TypeError} Throws if no block was properly specified.
+     */
+    getTypeMetadataOfBlock (block) {
+        if (!block || typeof block !== 'object') {
+            throw new TypeError('Cannot get metadata about the type of the block: Argument "block" is not an object.');
+        }
+        // Special case "stop other scripts in sprite", due to it shapeshifting.
+        if (
+            block.opcode === 'control_stop' &&
+            block.fields?.STOP_OPTION?.value === 'other scripts in sprite'
+        ) {
+            return {
+                hasNext: true
+            };
+        }
+        return this.blockMetadata[block.opcode] ?? null;
     }
 
     findProjectOptionsComment () {

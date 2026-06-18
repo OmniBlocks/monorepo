@@ -1538,6 +1538,14 @@ class VirtualMachine extends EventEmitter {
     }
 
     /**
+     * ob: Generates block type metadata from an array of Blockly block instances.
+     * @param {Array<Blockly.Block>} blocks An array of Blockly blocks.
+     */
+    genBlockMetadata (blocks) {
+        this.runtime.genBlockMetadata(blocks);
+    }
+
+    /**
      * Set an editing target. An editor UI can use this function to switch
      * between editing different targets, sprites, etc.
      * After switching the editing target, the VM may emit updates

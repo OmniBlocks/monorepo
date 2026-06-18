@@ -1116,6 +1116,72 @@ const parseScratchAssets = function (object, runtime, zip) {
 };
 
 /**
+ * ob: Converts the blocks of AmpMod projects to usages compatible with OmniBlocks.
+ * @param {Array<Object>} blocks An array of blocks of a target.
+ * @param {Runtime} runtime The VM runtime.
+ * @returns {Array<Object>} The processed blocks.
+ */
+const convertAmpModBlocks = function (blocks, runtime) {
+    for (const block of Object.values(blocks)) {
+        switch (block.opcode) {
+        case 'control_case': {
+            let lastBlock = null;
+            if (block.inputs.SUBSTACK?.block) {
+                lastBlock = blocks[block.inputs.SUBSTACK.block];
+            }
+            // Synthesise a break block. Should synthesising eventually become a function to avoid boilerplate?
+            let newId;
+            do {
+                newId = uid();
+            } while (Object.hasOwn(blocks, newId));
+            const breakBlock = {
+                id: uid(),
+                opcode: 'control_break',
+                next: null, // Break blocks are the end of a substack.
+                parent: null, // May be filled by code below.
+                inputs: {},
+                fields: {},
+                shadow: false,
+                topLevel: false
+            };
+            if (lastBlock) {
+                // Try to make sure we aren't mindlessly appending break blocks to capped blocks. If there is no GUI, we
+                // will just append to everything anyway. Horrid, I know: but there is no Blockly to whine about, it and
+                // this whole generated opcode metadata thing is a horrid hack in itself because the VM doesn't know
+                // about the shapes of primitive blocks due to them being defined in Blockly.
+                if (Object.keys(runtime.blockMetadata).length) {
+                    // Walking the tree, yippee...
+                    while (lastBlock.next !== null) lastBlock = blocks[lastBlock.next];
+
+                    const metadata = runtime.getTypeMetadataOfBlock(lastBlock);
+                    if (!metadata) continue;
+                    // Make sure we aren't connecting a break to a cap block.
+                    if (!metadata.hasNext) continue;
+                }
+
+                breakBlock.parent = lastBlock.id;
+                lastBlock.next = breakBlock.id;
+            } else {
+                breakBlock.parent = block.id;
+                // If it doesn't exist, fake until you make it... the philosophy the world sadly runs on. :P
+                if (!block.inputs.SUBSTACK) {
+                    block.inputs.SUBSTACK = {
+                        block: null, // Will be assigned.
+                        name: 'SUBSTACK',
+                        shadow: null
+                    };
+                }
+                block.inputs.SUBSTACK.block = breakBlock.id;
+            }
+            blocks[breakBlock.id] = breakBlock;
+            continue;
+        }
+        }
+    }
+    return blocks;
+};
+
+/**
  * Parse a single "Scratch object" and create all its in-memory VM objects.
  * @param {!object} object From-JSON "Scratch object:" sprite, stage, watcher.
  * @param {!Runtime} runtime Runtime object to load all structures into.
@@ -1143,6 +1209,7 @@ const parseScratchObject = function (object, runtime, extensions, zip, assets) {
     }
     if (Object.prototype.hasOwnProperty.call(object, 'blocks')) {
         deserializeBlocks(object.blocks);
+        convertAmpModBlocks(object.blocks, runtime);
         // Take a second pass to create objects and add extensions
         for (const blockId in object.blocks) {
             if (!Object.prototype.hasOwnProperty.call(object.blocks, blockId)) continue;

@@ -24,7 +24,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 comment_id: comment.id,
-                body: warning + body
+                body: warning + "\n" + body
               });
             }
 

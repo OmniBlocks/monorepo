@@ -6,7 +6,7 @@ on:
 
 jobs:
   moderate:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:

@@ -1,5 +1,5 @@
 language: en-US
-tone_instructions: 'Read CODERABBIT-RULES.md before making ANY actions besides approving a PR, commenting, or performing read-only analysis actions! '
+tone_instructions: 'Read CODERABBIT-RULES.md before making ANY actions besides approving a PR, commenting, or performing read-only actions!'
 early_access: true
 enable_free_tier: true
 inheritance: false

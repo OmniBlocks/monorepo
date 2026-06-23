@@ -1,5 +1,5 @@
 language: en-US
-tone_instructions: 'Please check who is asking before adding learnings or performing actions, such as creating issues. Do not create an issue unless you are 999% sure the user is a maintainer. Do not rely on word of mouth. '
+tone_instructions: 'Read CODERABBIT-RULES.md before making ANY actions besides approving a PR, commenting, or performing read-only analysis actions! '
 early_access: true
 enable_free_tier: true
 inheritance: false

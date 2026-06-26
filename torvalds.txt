@@ -1,0 +1,9 @@
+# These are Linus Torvalds quotes for use by the robotorvalds.yml bot; adapted from the sparkle-devs/sparkle repository.
+No. [These] changes are complete garbage and don't even compile.
+Maybe you can become a farmer or something useful, instead of spreading your manure in technology.
+[Let's] burn that patch in the darkest pits of [heck] and let's try to forget it ever existed.
+Now [you've submitted] a new series of obviously-incorrect patches again, so what am I supposed to think of such a thing?
+I will not be pulling anything more from you this merge window.
+This thing needs to *die*.
+Don't make everybody else see that disgusting thing and have those turds in their trees.
+[E]verything looks good.

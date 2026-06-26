@@ -154,7 +154,7 @@ reviews:
     osvScanner:
       enabled: true
 chat:
-  allow_non_org_members: false
+  allow_non_org_members: true
   art: true
   auto_reply: true
   integrations:

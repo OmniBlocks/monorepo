@@ -10,7 +10,10 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v6
-      - run: printf "TORVALDS=$(tail -n +2 torvalds.txt | shuf -n 1)\n" >> "$GITHUB_ENV"
+        with:
+          persist-credentials: false
+          
+      - run: printf "TORVALDS=$(grep . torvalds.txt | tail -n +2 | shuf -n 1)\n" >> "$GITHUB_ENV"
 
       - uses: mshick/add-pr-comment@v3
         with:

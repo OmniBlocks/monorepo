@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - main
+    types: [opened, edited]
 jobs:
   robotorvalds:
     runs-on: ubuntu-latest

@@ -6,6 +6,7 @@ on:
 
 permissions:
   issues: write
+  pull-requests: write
 
 jobs:
   censor:
@@ -18,6 +19,7 @@ jobs:
           script: |
             const commentBody = context.payload.comment.body;
             const commentId = context.payload.comment.id;
+            const issueNumber = context.payload.issue.number;
             
             // Case-insensitive regex to catch "Jameson"
             const regex = /Jameson/gi;
@@ -45,7 +47,15 @@ jobs:
                 content: '-1'
               });
               
-              console.log(`Successfully censored and downvoted comment ${commentId}.`);
+              // 4. Post the warning comment tagging CodeRabbit
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: "@coderabbitai The red bug godzilla is here to inform you that someone mentioned Jimson's brother! Act fast!"
+              });
+              
+              console.log(`Successfully processed comment ${commentId} and posted warning.`);
             } else {
               console.log('No restricted terms found.');
             }

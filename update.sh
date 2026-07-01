@@ -3,7 +3,7 @@ set -e
 
 git config --global user.name "github-actions[bot]"
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-pip install git-filter-repo
+pipx install git-filter-repo
  
 PACKAGES=("scratch-gui" "scratch-blocks" "scratch-vm" "scratch-render") 
 REPOS=("TurboWarp" "TurboWarp" "TurboWarp" "TurboWarp")
@@ -11,7 +11,7 @@ REPOS=("TurboWarp" "TurboWarp" "TurboWarp" "TurboWarp")
 MONOREPO_DIR=$(pwd)
 DATE_SUFFIX=$(date +%Y-%m-%d)
 
-for i in "${PACKAGES[@]}"; do 
+for i in "${!PACKAGES[@]}"; do 
     PKG="${PACKAGES[$i]}"
     REPO="${REPOS[$i]}"
     cd ../
@@ -24,6 +24,7 @@ for i in "${PACKAGES[@]}"; do
     BRANCH_NAME="upstream-sync-$PKG-$DATE_SUFFIX"
     git push -f monorepo HEAD:refs/heads/"$BRANCH_NAME" 
     cd "$MONOREPO_DIR"
+    git push -f origin "$BRANCH_NAME"
     
     set +e
     PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number')

@@ -24,8 +24,15 @@ for i in "${!PACKAGES[@]}"; do
     BRANCH_NAME="upstream-sync-$PKG-$DATE_SUFFIX"
     git push -f monorepo HEAD:refs/heads/"$BRANCH_NAME" 
     cd "$MONOREPO_DIR"
-    git push -f origin "$BRANCH_NAME"
+    git push -f origin "$BRANCH_NAME" 
+    TREE_MAIN=$(git rev-parse "origin/main:$PKG" 2>/dev/null || git rev-parse "main:$PKG" 2>/dev/null || echo "none-main")
+    TREE_BRANCH=$(git rev-parse "$BRANCH_NAME:$PKG" 2>/dev/null || echo "none-branch")
     
+    if [ "$TREE_MAIN" = "$TREE_BRANCH" ]; then 
+        git push origin --delete "$BRANCH_NAME" || true
+        rm -rf "../temp-$PKG"
+        continue
+    fi 
     set +e
     PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number')
     set -e
@@ -43,4 +50,3 @@ for i in "${!PACKAGES[@]}"; do
      
     rm -rf "../temp-$PKG"
 done
- 

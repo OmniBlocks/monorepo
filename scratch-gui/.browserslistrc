@@ -1,4 +1,4 @@
-chrome >= 70
+chrome >= 102
 chromeandroid >= 70
 ios >= 12
 safari >= 12

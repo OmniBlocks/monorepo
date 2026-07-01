@@ -1,0 +1,47 @@
+# This workflow warns and then closes issues and PRs that have had no activity for a specified amount of time.
+#
+# You can adjust the behavior by modifying this file.
+# For more information, see:
+# https://github.com/actions/stale
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+  - cron: '26 20 * * *'
+  workflow_dispatch: 
+
+jobs:
+  stale:
+
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+        - uses: actions/stale@v5
+          with:
+            repo-token: ${{ secrets.GITHUB_TOKEN }}
+            
+            # --- Configuration Timelines ---
+            # Number of days of inactivity before an issue or PR becomes stale
+            days-before-stale: 30
+            # Number of days of inactivity after being marked stale before closing
+            days-before-close: 7
+            
+            # --- Stale Messages ---
+            stale-issue-message: 'This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions.'
+            stale-pr-message: 'This pull request has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions.'
+            
+            # --- Close Messages ---
+            close-issue-message: 'This issue has been automatically closed due to inactivity. If you feel this is still relevant, please feel free to reopen it or file a new issue.'
+            close-pr-message: 'This pull request has been automatically closed due to inactivity. If you would like to resume work on this, please leave a comment to let us know.'
+            
+            # --- Labels ---
+            stale-issue-label: 'stale'
+            stale-pr-label: 'stale'
+            
+            # --- Auto-Close Toggle ---
+            # Explicitly ensure the action is permitted to close stale issues/PRs
+            days-before-issue-close: 7
+            days-before-pr-close: 7

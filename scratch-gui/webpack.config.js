@@ -13,6 +13,7 @@ const postcssImport = require('postcss-import');
 
 const STATIC_PATH = process.env.STATIC_PATH || '/static';
 const {APP_NAME} = require('./src/lib/brand');
+const {version} = require('./package.json');
 
 const root = process.env.ROOT || '';
 if (root.length > 0 && !root.endsWith('/')) {
@@ -37,6 +38,10 @@ const base = {
         disableHostCheck: true,
         compress: true,
         port: process.env.PORT || 8601,
+        headers: {
+            "Cross-Origin-Embedder-Policy": "require-corp",
+            "Cross-Origin-Opener-Policy": "same-origin"
+        },
         // allows ROUTING_STYLE=wildcard to work properly
         historyApiFallback: {
             rewrites: [
@@ -46,7 +51,8 @@ const base = {
                 {from: /^\/\d+\/embed\/?$/, to: '/embed.html'},
                 {from: /^\/addons\/?$/, to: '/addons.html'}
             ]
-        }
+        },
+            hot: true
     },
     output: {
         library: 'GUI',
@@ -136,6 +142,7 @@ const base = {
 
 if (!process.env.CI) {
     base.plugins.push(new webpack.ProgressPlugin());
+        base.plugins.push(new webpack.HotModuleReplacementPlugin());
 }
 
 module.exports = [
@@ -180,13 +187,13 @@ module.exports = [
                 'process.env.ENABLE_SERVICE_WORKER': JSON.stringify(process.env.ENABLE_SERVICE_WORKER || ''),
                 'process.env.ROOT': JSON.stringify(root),
                 'process.env.ROUTING_STYLE': JSON.stringify(process.env.ROUTING_STYLE || 'filehash'),
-                'process.env.ENABLE_WINDCHIMES': JSON.stringify(process.env.ENABLE_WINDCHIMES || '')
+                'process.env.APP_VERSION': JSON.stringify(version || '') 
             }),
             new HtmlWebpackPlugin({
                 chunks: ['editor'],
                 template: 'src/playground/index.ejs',
                 filename: 'editor.html',
-                title: `${APP_NAME} - Run Scratch projects faster`,
+                title: `${APP_NAME} - The Ultimate MultiLanguage IDE | Editor`,
                 isEditor: true,
                 ...htmlWebpackPluginCommon
             }),
@@ -194,14 +201,14 @@ module.exports = [
                 chunks: ['player'],
                 template: 'src/playground/index.ejs',
                 filename: 'index.html',
-                title: `${APP_NAME} - Run Scratch projects faster`,
+                title: `${APP_NAME} - The Ultimate MultiLanguage IDE`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['fullscreen'],
                 template: 'src/playground/index.ejs',
                 filename: 'fullscreen.html',
-                title: `${APP_NAME} - Run Scratch projects faster`,
+                title: `${APP_NAME} - The Ultimate MultiLanguage IDE`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
@@ -222,7 +229,7 @@ module.exports = [
                 chunks: ['credits'],
                 template: 'src/playground/simple.ejs',
                 filename: 'credits.html',
-                title: `${APP_NAME} Credits`,
+                title: `${APP_NAME} - Credits`,
                 ...htmlWebpackPluginCommon
             }),
             new CopyWebpackPlugin({

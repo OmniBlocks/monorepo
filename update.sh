@@ -25,10 +25,16 @@ for i in "${!PACKAGES[@]}"; do
     git push -f monorepo HEAD:refs/heads/"$BRANCH_NAME" 
     cd "$MONOREPO_DIR"
     git push -f origin "$BRANCH_NAME" 
-    TREE_MAIN=$(git rev-parse "origin/main:$PKG" 2>/dev/null || git rev-parse "main:$PKG" 2>/dev/null || echo "none-main")
-    TREE_BRANCH=$(git rev-parse "$BRANCH_NAME:$PKG" 2>/dev/null || echo "none-branch")
+    git fetch origin main || true
     
-    if [ "$TREE_MAIN" = "$TREE_BRANCH" ]; then 
+    set +e
+    git merge-base --is-ancestor "$BRANCH_NAME" "origin/main" 2>/dev/null
+    IS_ANCESTOR_REMOTE=$?
+    git merge-base --is-ancestor "$BRANCH_NAME" "main" 2>/dev/null
+    IS_ANCESTOR_LOCAL=$?
+    set -e
+    
+    if [ $IS_ANCESTOR_REMOTE -eq 0 ] || [ $IS_ANCESTOR_LOCAL -eq 0 ]; then 
         git push origin --delete "$BRANCH_NAME" || true
         rm -rf "../temp-$PKG"
         continue

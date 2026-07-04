@@ -25,9 +25,9 @@ jobs:
             
             # --- Configuration Timelines ---
             # Number of days of inactivity before an issue or PR becomes stale
-            days-before-stale: 30
+            days-before-stale: 60
             # Number of days of inactivity after being marked stale before closing
-            days-before-close: 7
+            days-before-close: 30
             
             # --- Stale Messages ---
             stale-issue-message: 'This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions.'

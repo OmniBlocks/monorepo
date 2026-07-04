@@ -24,18 +24,28 @@ const animationFrameWrapper = callback => {
 
 /**
  * We've found that having an empty requestAnimationFrame loop running in the background improves frame
- * pacing in many situations. See https://github.com/TurboWarp/scratch-vm/issues/257.
+ * pacing in many situations.
  *
  * Having an extra loop running increases CPU usage and battery usage even if it's not doing anything.
  * So, we only do this when the intended framerate is high enough that the user clearly wants smooth
  * motion, and only if the user is on a platform where we have evidence that this helps:
- *  - Chrome, Edge, and other Chromium on Windows
+ *
+ * Chrome on Windows: We think this is related to timer precision, where using rAF might be making Chrome
+ * give us a more precise timer.
+ * See https://github.com/TurboWarp/scratch-vm/issues/257.
+ *
+ * Chrome on Android. Chrome throttles frame production when it does not believe there is an animation
+ * happening. setInterval does not count as an animation, but rAF does.
+ * See https://github.com/TurboWarp/scratch-vm/issues/343.
  *
  * @param {number} framerate Intended framerate
  * @returns {boolean} true if no-op animation frame loop should be used
  */
 const shouldUseNoopAnimationFrame = framerate =>
-    framerate >= 30 && navigator.userAgent.includes('Chrome') && navigator.userAgent.includes('Windows');
+    framerate >= 30 && navigator.userAgent.includes('Chrome') && (
+        navigator.userAgent.includes('Windows') ||
+        navigator.userAgent.includes('Android')
+    );
 
 class FrameLoop {
     constructor (runtime) {

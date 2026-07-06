@@ -410,6 +410,8 @@
         // Randomize display of header
         
         const plants = [
+        /*
+
         // jummbox/goldbox plants    
         "🍂", "🌿", "🌺", "🍃", "🍄", "🍀🌷", "🌈🍂🍁🍀🌷🍄🐲🌈🍃🌺🍄", " 1️⃣3️⃣1️⃣2️⃣",
         //blubox plants
@@ -431,16 +433,23 @@
 		"🍋",
         // Slarmoo's Box plants
         "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫","🌵","and Bobby","🥚",
+        
+        */
+
         //Current version
         "1.0.0", // I wonder how many times I'll forget about this
         //JukeBox
         "(did someone say presets?)", //0.2.1
-        "Since 1889", "Since 7/30/2010", /**"and not ShoeBox", **/ "No Escape", "and C A G F motif",//0.2.2
-        "[insert funny joke]", "at least 3 presets", "neoff orange", "WOWZERS", "46% serious" //0.2.3
+        "Since 1889", "Since 7/30/2010", /**"and not ShoeBox", **/ "No Escape", "and C A G F motif", //0.2.2
+        "[insert funny joke]", "at least 3 presets", "Neoff Orange", "WOWZERS", "46% serious", //0.2.3
+        "NOW IN 2D!!!", ":3", "eeheehee", "99.98% Survival Rate!", "extra sodium!", ":3 (but louder)", "explodes" //1.0.0
         ];
         const date = new Date();
         if (Math.floor(Math.random() * 0) == 0) { // plants always show up now
             document.getElementById("goldboxPlant").innerHTML = "  " + plants[(Math.floor(Math.random() * plants.length))];
+
+            /*
+
             //Slarmoo's Box holiday plants
             const winterPlants = ["🎄", "🍪", "☃️", "🎁", "❄️"];
             if ((date.getDate() >= 22 && date.getDate() <= 26) && date.getMonth() == 11) {
@@ -461,14 +470,18 @@
                 const piePlants = ["π", "🥧", "🍏", "🍋", "3.14"];
                 document.getElementById("goldboxPlant").innerHTML = "  " + piePlants[(Math.floor(Math.random() * piePlants.length))];
             }
+
+            */
         }
+        /*
         if ((date.getDate() == 1) && date.getMonth() == 3) {
             const foolishPlants = ["Censorship Update", "19.8.4", "👁️", "🐍", "🚫"];
             document.getElementById("goldboxPlant").innerHTML = "  " + foolishPlants[(Math.floor(Math.random() * foolishPlants.length))];
         }
-        if ((date.getDate() == 21) && date.getMonth() == 6) { // updated to JukeBox
+        */
+        if ((date.getDate() == 21) && date.getMonth() == 7) { // updated to JukeBox
             const years = date.getFullYear() - 2025;
-            const birthdayPlants = [years + " year" + (years != 1 ? "s" : "") + "!", "🎂", "🎉", "Happy Birthday!", "Anniversary"];
+            const birthdayPlants = [years + " year" + (years != 1 ? "s" : "") + "!", /* "🎂", "🎉", "Happy Birthday!", */ "Anniversary"];
             document.getElementById("goldboxPlant").innerHTML = "  " + birthdayPlants[(Math.floor(Math.random() * birthdayPlants.length))];
         }
 
@@ -481,11 +494,13 @@
             document.getElementById("goldboxPlant").style.color = "#bb8822";
         }
 
+        /*
         if(document.getElementById("goldboxPlant").innerText.includes("🐲")) {
             document.getElementById("goldboxPlant").addEventListener("mouseover", function (event) {
                 document.getElementById("goldboxPlant").innerText = " 🌈🍂🍁🍀🌷🍄🐍🌈🍃🌺🍄";
             }, { once: true })
         } 
+        */
 
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent)) {
             document.getElementById("introduction").innerHTML = "JukeBox is an online tool for sketching and sharing chiptune melodies. Make sure that your volume is turned up, then press the play button!";

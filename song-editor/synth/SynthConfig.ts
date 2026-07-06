@@ -917,8 +917,9 @@ export class Config {
         // todbox
         { name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
         { name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
+        // abyssbox
+        //{ name: "Die (AB)", realName: "die", flags: [true, false, false, false, false, false, false, false, true, false, false, false] },
         // JukeBox
-        { name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
         
         // crashes, but not because of the lack of a root note
         // { name: "Empty", realName: "empty", flags: [false, false, false, false, false, false, false, false, false, false, false, false] }, // Custom? considering allowing this one to be be completely configurable

@@ -763,7 +763,7 @@ export class SongEditor {
         option({ selected: true, disabled: true, hidden: false }, "File"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
         option({ value: "new" }, "+ New Blank Song (⇧`)"),
         option({ value: "import" }, "↑ Import Song... (" + EditorConfig.ctrlSymbol + "O)"), 
-        option({ value: "export" }, "↓ Export Song... (" + EditorConfig.ctrlSymbol + "S)"), //*comment for testing
+        option({ value: "export" }, "↓ Export Song... (" + EditorConfig.ctrlSymbol + "S)"), /*comment for testing
         option({ value: "copyUrl" }, "⎘ Copy Song URL"), 
         option({ value: "configureShortener" }, "🛠 Customize Url Shortener..."),
         option({ value: "shortenUrl" }, "… Shorten Song URL (⇧U)"),
@@ -808,7 +808,7 @@ export class SongEditor {
             option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"),
             option({ value: "enableTagSearch" }, "Enable Tag Search"),
             option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"),
-            option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), //comment for testing
+            //option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), //comment for testing
             option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
             option({ value: "rollNoveltyPresets" }, "Can Randomly Select Novelty Presets"),
             option({ value: "recordingSetup" }, "Note Recording..."),
@@ -2460,7 +2460,7 @@ export class SongEditor {
             (prefs.instrumentCopyPaste ? textOnIcon : textOffIcon) + "Enable Copy/Paste Buttons",
             (prefs.enableTagSearch ? textOnIcon : textOffIcon) + "Enable Tag Search",
             (prefs.instrumentImportExport ? textOnIcon : textOffIcon) + "Enable Import/Export Buttons",
-            (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL", //comment for testing
+            //(prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL", //comment for testing
             (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
             (prefs.rollNoveltyPresets ? textOnIcon : textOffIcon) + "Can Randomly Select Novelty Presets",
             textSpacingIcon + "Note Recording...",
@@ -5035,8 +5035,11 @@ export class SongEditor {
                 break;
             
             case 191: // ? DEBUG KEYBIND
-                for(let i: number = 0; i < 2401; i++){
-                    console.log(EditorConfig.valueToPreset(i)?.name)
+                for (let channelIndex: number = 0; channelIndex < 20; channelIndex++) {
+                    for (let i: number = 0; i < this.doc.song.channels[channelIndex].instruments.length; i++) {
+                        console.log(channelIndex, this.doc.song.channels[channelIndex].instruments[i].preset);
+                        
+                    }
                 }
                 
                 break;

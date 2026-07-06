@@ -8,9 +8,11 @@ import { SongDocument } from "./SongDocument";
 import { ColorConfig } from "./ColorConfig";
 import { Slider } from "./HTMLWrapper";
 
+/*
 function setModified(instrument: any) {
     return instrument
 }
+*/
 
 export function patternsContainSameInstruments(pattern1Instruments: number[], pattern2Instruments: number[]): boolean {
     const pattern2Has1Instruments: boolean = pattern1Instruments.every(instrument => pattern2Instruments.indexOf(instrument) != -1);
@@ -4384,7 +4386,7 @@ export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boole
 
     if (!ignoreTags) {
         _presetTagsInputBox = document.getElementById("presetTagsInputBox") as HTMLInputElement;
-        tagList = _presetTagsInputBox.value.toLowerCase().split(/\s+/);
+        tagList = _presetTagsInputBox.value.toLowerCase().trimEnd().split(/\s+/);
     }
     
     
@@ -4430,7 +4432,7 @@ export function pickNextPresetValue(isNoise: boolean,rollNoveltyPresets: boolean
     if (isNoise) { currentPresetValue = _drumPresetSelect.value; } 
     else { currentPresetValue = _pitchedPresetSelect.value; }  
 
-    let tagList: any = _presetTagsInputBox.value.toLowerCase().split(/\s+/);
+    let tagList: any = _presetTagsInputBox.value.toLowerCase().trimEnd().split(/\s+/);
 
     //checking for valid tags
     if (!(tagList == "") && !(tagList.every((tag: any) => (fullTagList.includes(tag)) || (tag.startsWith("!") && fullTagList.includes(tag.slice(1)))))) {

@@ -7,7 +7,7 @@ import { Deque } from "./Deque";
 import { events } from "../global/Events";
 import { FilterCoefficients, FrequencyResponse, DynamicBiquadFilter, warpInfinityToNyquist } from "./filtering";
 import { xxHash32 } from "js-xxhash";
-import { updateFromJukeBox3, updateFromJukeBox4, updateFromUltraBox } from "./PresetUpdates";
+import { updateFromJukeBox1, updateFromJukeBox2, updateFromJukeBox3, updateFromJukeBox4, updateFromSlarmoosBox } from "./PresetUpdates";
 
 declare global {
     interface Window {
@@ -4832,8 +4832,12 @@ export class Song {
                     presetValue = updateFromJukeBox4((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
                 } else if (fromJukeBox && version == 3) { 
                     presetValue = updateFromJukeBox3((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
-                } else if (fromUltraBox || fromGoldBox || fromJummBox || fromBeepBox) {
-                    presetValue = updateFromUltraBox((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
+                } else if (fromJukeBox && version == 2) { 
+                    presetValue = updateFromJukeBox2((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
+                } else if (fromJukeBox && version == 1) { 
+                    presetValue = updateFromJukeBox1((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
+                } else {
+                    presetValue = updateFromSlarmoosBox((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]));
                 } 
                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = presetValue;
             } break;

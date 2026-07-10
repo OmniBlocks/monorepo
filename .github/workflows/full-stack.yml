@@ -99,7 +99,7 @@ jobs:
           name: full-build-dist
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Install Playwright Browser
         run: pnpm exec playwright install ${{ matrix.browser }} --with-deps

@@ -35,8 +35,8 @@ importers:
         specifier: ^118.0.1
         version: 118.0.1
       copy-webpack-plugin:
-        specifier: 4.6.0
-        version: 4.6.0
+        specifier: ^6.4.1
+        version: 6.4.1(webpack@4.47.0)
       eslint:
         specifier: 4.19.1
         version: 4.19.1
@@ -70,12 +70,12 @@ importers:
       selenium-webdriver:
         specifier: 4.14.0
         version: 4.14.0
+      terser-webpack-plugin:
+        specifier: ^4.2.3
+        version: 4.2.3(webpack@4.47.0)
       transifex:
         specifier: 1.6.6
         version: 1.6.6
-      uglifyjs-webpack-plugin:
-        specifier: 1.3.0
-        version: 1.3.0(webpack@4.47.0)
       webpack:
         specifier: 4.47.0
         version: 4.47.0(webpack-cli@3.3.12)
@@ -1681,6 +1681,9 @@ packages:
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
     engines: {node: '>=6.0.0'}
+
+  '@jridgewell/source-map@0.3.11':
+    resolution: {integrity: sha512-ZMp1V8ZFcPG5dIWnQLr3NSI1MiCU7UETdS/A0G8V/XWHvJv3ZsFqutJn1Y5RPmAPX6F3BiE397OqveU/9NCuIA==}
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
@@ -5980,6 +5983,10 @@ packages:
   jest-worker@22.4.3:
     resolution: {integrity: sha512-B1ucW4fI8qVAuZmicFxI1R3kr2fNeYJyvIQ1rKcuLYnenFV5K5aMbxFj6J0i00Ju83S8jP2d7Dz14+AvbIHRYQ==}
 
+  jest-worker@26.6.2:
+    resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
+    engines: {node: '>= 10.13.0'}
+
   jest-worker@29.7.0:
     resolution: {integrity: sha512-eIz2msL/EzL9UFTFFx7jBTkeZfku0yUAyZZZmJ93H2TYEiroIx2PQjEXcwYtYl8zXCxb+PAmA2hLIt/6ZEkPHw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
@@ -8808,9 +8815,20 @@ packages:
     peerDependencies:
       webpack: 4.47.0
 
+  terser-webpack-plugin@4.2.3:
+    resolution: {integrity: sha512-jTgXh40RnvOrLQNgIkwEKnQ8rmHjHK4u+6UBEi+W+FPmvb+uo+chJXntKe7/3lW5mNysgSWD60KyesnhW8D6MQ==}
+    engines: {node: '>= 10.13.0'}
+    peerDependencies:
+      webpack: 4.47.0
+
   terser@4.8.1:
     resolution: {integrity: sha512-4GnLC0x667eJG0ewJTa6z/yXrbLGv80D9Ru6HIpCQmO+Q4PfEtBFi0ObSckqwL6VyQv/7ENJieXHo2ANmdQwgw==}
     engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  terser@5.49.0:
+    resolution: {integrity: sha512-SNiDnXyHSrxVcIOtVbULzcTmniUiwcV7Nwdyj1twVubeTmbjoa8p69KKDpfkdoOavuM4/GRm1+ykI8qqnavHoA==}
+    engines: {node: '>=10'}
     hasBin: true
 
   test-exclude@4.2.3:
@@ -11356,6 +11374,11 @@ snapshots:
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/resolve-uri@3.1.2': {}
+
+  '@jridgewell/source-map@0.3.11':
+    dependencies:
+      '@jridgewell/gen-mapping': 0.3.13
+      '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
@@ -17447,6 +17470,12 @@ snapshots:
     dependencies:
       merge-stream: 1.0.1
 
+  jest-worker@26.6.2:
+    dependencies:
+      '@types/node': 26.1.0
+      merge-stream: 2.0.0
+      supports-color: 7.2.0
+
   jest-worker@29.7.0:
     dependencies:
       '@types/node': 26.1.0
@@ -20918,11 +20947,33 @@ snapshots:
       webpack-sources: 1.4.3
       worker-farm: 1.7.0
 
+  terser-webpack-plugin@4.2.3(webpack@4.47.0):
+    dependencies:
+      cacache: 15.3.0
+      find-cache-dir: 3.3.2
+      jest-worker: 26.6.2
+      p-limit: 3.1.0
+      schema-utils: 3.3.0
+      serialize-javascript: 5.0.1
+      source-map: 0.6.1
+      terser: 5.49.0
+      webpack: 4.47.0(webpack-cli@3.3.12)
+      webpack-sources: 1.4.3
+    transitivePeerDependencies:
+      - bluebird
+
   terser@4.8.1:
     dependencies:
       acorn: 8.16.0
       commander: 2.20.3
       source-map: 0.6.1
+      source-map-support: 0.5.21
+
+  terser@5.49.0:
+    dependencies:
+      '@jridgewell/source-map': 0.3.11
+      acorn: 8.16.0
+      commander: 2.20.3
       source-map-support: 0.5.21
 
   test-exclude@4.2.3:

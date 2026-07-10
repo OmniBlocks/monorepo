@@ -38,6 +38,13 @@ module.exports = [
       path: path.resolve(__dirname, "dist", "web"),
       filename: "[name].js",
     },
+    optimization: {
+      minimizer: [
+        new rspack.SwcJsMinimizerRspackPlugin({
+          minimizerOptions: { mangle: false },
+        }),
+      ],
+    },
     plugins: [],
   },
   {
@@ -93,6 +100,11 @@ module.exports = [
           {
             from: "*.js",
             to: "playgrounds",
+          },
+          {
+            from: "*.js",
+            to: "playgrounds",
+            globOptions: { ignore: ["**/rspack.config.js"] },
           },
         ],
       }),

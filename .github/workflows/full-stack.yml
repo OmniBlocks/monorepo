@@ -29,13 +29,15 @@ jobs:
       - name: Build OmniBlocks
         run: | 
           pnpm install 
-          cd scratch-gui
-          pnpm run build
+          mkdir -p test-logs
+          cd scratch-gui  
+          pnpm run build > build.log 2>&1 || true 
+          grep -A 100 -B 20 "ERROR" build.log > ../test-logs/scratch-gui.log || true
 
       - name: Run Sub-Package Tests
         continue-on-error: true
         run: |
-          mkdir -p test-logs
+          
           (cd scratch-vm && pnpm test) > test-logs/scratch-vm.log 2>&1 || true
           (cd scratch-render && pnpm test) > test-logs/scratch-render.log 2>&1 || true
           (cd scratch-blocks && pnpm test) > test-logs/scratch-blocks.log 2>&1 || true

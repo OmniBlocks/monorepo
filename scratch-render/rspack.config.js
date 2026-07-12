@@ -35,7 +35,11 @@ const base = {
         ],
     },
     optimization: {
-        minimizer: [],
+        minimizer: [
+            new rspack.SwcJsMinimizerRspackPlugin({
+                minimizerOptions: { mangle: false },
+            }),
+        ],
     },
     plugins: [],
 };
@@ -89,12 +93,13 @@ module.exports = [
             filename: "[name].js",
         },
         externals: {
-            "!ify-loader!grapheme-breaker": "grapheme-breaker",
-            "!ify-loader!linebreak": "linebreak",
-            "hull.js": true,
-            "@turbowarp/scratch-svg-renderer": true,
-            "twgl.js": true,
-            "xml-escape": true,
+            "!ify-loader!grapheme-breaker": "commonjs grapheme-breaker",
+            "!ify-loader!linebreak": "commonjs linebreak",
+            "hull.js": "commonjs hull.js",
+            "@turbowarp/scratch-svg-renderer":
+                "commonjs @turbowarp/scratch-svg-renderer",
+            "twgl.js": "commonjs twgl.js",
+            "xml-escape": "commonjs xml-escape",
         },
     }),
 ];

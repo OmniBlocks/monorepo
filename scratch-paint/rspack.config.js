@@ -82,9 +82,7 @@ const base = {
         ],
     },
     optimization: {
-        minimizer: [
-            new rspack.SwcJsMinimizerRspackPlugin({ test: /\.min\.js$/ }),
-        ],
+        minimizer: [new rspack.SwcJsMinimizerRspackPlugin()],
     },
     plugins: [],
 };

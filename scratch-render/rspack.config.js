@@ -1,5 +1,5 @@
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
+const { rspack } = require("@rspack/core");
 
 const base = {
     mode: process.env.NODE_ENV === "production" ? "production" : "development",
@@ -54,7 +54,7 @@ module.exports = [
             filename: "[name].js",
         },
         plugins: base.plugins.concat([
-            new CopyWebpackPlugin([
+            new rspack.CopyRspackPlugin([
                 {
                     context: "src/playground",
                     from: "*.+(html|css)",

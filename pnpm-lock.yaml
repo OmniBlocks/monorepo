@@ -606,9 +606,6 @@ importers:
       tap:
         specifier: 14.11.0
         version: 14.11.0
-      uglifyjs-webpack-plugin:
-        specifier: 2.2.0
-        version: 2.2.0(webpack@4.47.0)
       url-loader:
         specifier: 2.3.0
         version: 2.3.0(file-loader@6.2.0(webpack@4.47.0))(webpack@4.47.0)
@@ -632,7 +629,7 @@ importers:
         version: 0.2.0
       '@turbowarp/scratch-svg-renderer':
         specifier: ^1.0.0-202312242305-12c360b
-        version: 1.0.202505311824
+        version: 1.0.202505311824(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)
       grapheme-breaker:
         specifier: 0.3.2
         version: 0.3.2
@@ -1788,6 +1785,7 @@ packages:
 
   '@turbowarp/scratch-svg-renderer@1.0.202505311824':
     resolution: {integrity: sha512-EaKVqIuEwrr4SzQGOVyr8GBE+DGzUbbn38qiV6DMWFzb++/HgWl1qdlKA/j+mOK+GDwYydMFP0FuWYvWBkt6sA==}
+    version: 1.0.202505311824
     peerDependencies:
       scratch-render-fonts: github:TurboWarp/scratch-render-fonts#master
 
@@ -9166,12 +9164,6 @@ packages:
     peerDependencies:
       webpack: 4.47.0
 
-  uglifyjs-webpack-plugin@2.2.0:
-    resolution: {integrity: sha512-mHSkufBmBuJ+KHQhv5H0MXijtsoA1lynJt1lXOaotja8/I0pR4L9oGaPIZw+bQBOFittXZg9OC1sXSGO9D9ZYg==}
-    engines: {node: '>= 6.9.0'}
-    peerDependencies:
-      webpack: 4.47.0
-
   unbox-primitive@1.1.0:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
     engines: {node: '>= 0.4'}
@@ -11561,14 +11553,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - webpack
-
-  '@turbowarp/scratch-svg-renderer@1.0.202505311824':
-    dependencies:
-      '@turbowarp/nanolog': 0.2.0
-      base64-js: 1.2.1
-      base64-loader: 1.0.0
-      dompurify: 2.5.9
-      transformation-matrix: 1.15.0
 
   '@turbowarp/scratch-svg-renderer@1.0.202505311824(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)':
     dependencies:
@@ -21371,7 +21355,8 @@ snapshots:
       commander: 2.13.0
       source-map: 0.6.1
 
-  uglify-js@3.19.3: {}
+  uglify-js@3.19.3:
+    optional: true
 
   uglify-js@3.4.10:
     dependencies:
@@ -21398,19 +21383,6 @@ snapshots:
       serialize-javascript: 1.9.1
       source-map: 0.6.1
       uglify-es: 3.3.9
-      webpack: 4.47.0(webpack-cli@3.3.12)
-      webpack-sources: 1.4.3
-      worker-farm: 1.7.0
-
-  uglifyjs-webpack-plugin@2.2.0(webpack@4.47.0):
-    dependencies:
-      cacache: 12.0.4
-      find-cache-dir: 2.1.0
-      is-wsl: 1.1.0
-      schema-utils: 1.0.0
-      serialize-javascript: 1.9.1
-      source-map: 0.6.1
-      uglify-js: 3.19.3
       webpack: 4.47.0(webpack-cli@3.3.12)
       webpack-sources: 1.4.3
       worker-farm: 1.7.0

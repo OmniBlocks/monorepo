@@ -304,7 +304,7 @@ class Blocks {
         // If it was cached, just return that.
         const validatedSubstacks = this._cache.validatedSubstacks;
         const cached = validatedSubstacks[blockId]?.[input];
-        if (cached && cached.result && cached.validator === validator) {
+        if (cached && Object.hasOwn(cached, 'result') && cached.validator === validator) {
             return validatedSubstacks[blockId][input].result;
         }
 

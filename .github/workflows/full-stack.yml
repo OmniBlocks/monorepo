@@ -206,7 +206,7 @@ jobs:
       - name: Analyze Results (Stitching & Speed Diff)
         shell: bash
         run: |
-          npm i --no-save pngjs pixelmatch
+          pnpm add pngjs pixelmatch
           mkdir -p matrix-results
           
           BASE_SEC=$(cat base_duration.txt)

@@ -62,7 +62,7 @@ const funFacts = [
     'Fun fact: six seven',
     'how to 101: todo',
     'I JUST ATE A HAM SANDWICH FOR BRUNDINNER',
-    'Fun? fact: OmniBlocks is not loading. Oops :(',
+    'Fun fact: OmniBlocks is loading. Yay! :)',
     "Did you know? OmniBlocks isn't complete yet. Yup, we're still in alpha!",
     "Fun fact: I'm running out of fun facts.",
     "My jokes are funny, right?",
@@ -92,7 +92,14 @@ const funFacts = [
     'Constructing Boxys...',
     'Breathing air...',
     'Contemplating life choices...',
-    'Contemplating caffeine intake...'
+    'Contemplating caffeine intake...',
+    'Contemplating if writing this tip is a waste of time...',
+    'Programming Boxys...',
+    'Attempting to run Java in Node.JS...',
+    'Boxroy was here!',
+    'Did you know??? Err, I forgot...',
+    'Tip: You can export and import projects as a folder. This isn\'t supported on non-Chromium browsers due to technical reasons.',
+    'Tip: You can right-click a sprite in the sprite pane and then click “Export just...” to export all the costumes or sounds of that sprite.'
 ];
 
 class LoaderComponent extends React.Component {

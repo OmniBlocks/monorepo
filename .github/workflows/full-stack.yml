@@ -1,0 +1,426 @@
+name: Full Build Run
+on: 
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to run the build for'
+        required: true
+        type: string
+
+run-name: 'Full Build Run on PR #${{ inputs.pr_number }}'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      base_ref: ${{ steps.get-pr.outputs.base_ref }}
+    steps:
+      - name: Get PR Info
+        id: get-pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BASE_REF=$(gh api repos/${{ github.repository }}/pulls/${{ inputs.pr_number }} --jq .base.ref)
+          echo "base_ref=$BASE_REF" >> $GITHUB_OUTPUT
+
+  build-base:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.base_ref }}
+      
+      - name: Set up Node.js & pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Build OmniBlocks (Base)
+        run: | 
+          pnpm install --no-frozen-lockfile
+          cd scratch-gui  
+          
+          START_TIME=$(date +%s)
+          pnpm run build || true
+          END_TIME=$(date +%s)
+          
+          echo "$((END_TIME - START_TIME))" > ../base-build-time.txt
+
+      - name: Upload Base Build Time
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-build-time
+          path: base-build-time.txt
+
+      - name: Upload Base Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-build-dist
+          path: scratch-gui/build/
+          if-no-files-found: ignore
+
+  build-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ inputs.pr_number }}/head
+          fetch-depth: 0
+
+      - name: Set up Node.js & pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Build OmniBlocks (PR)
+        run: | 
+          pnpm install --no-frozen-lockfile
+          mkdir -p test-logs
+          cd scratch-gui  
+          
+          START_TIME=$(date +%s)
+          pnpm run build > build.log 2>&1 || true 
+          END_TIME=$(date +%s)
+          
+          echo "$((END_TIME - START_TIME))" > ../test-logs/pr-build-time.txt
+          grep -A 100 -B 20 "ERROR" build.log > ../test-logs/scratch-gui.log || true
+
+      - name: Run Sub-Package Tests
+        continue-on-error: true
+        run: |
+          (cd scratch-vm && pnpm test) > test-logs/scratch-vm.log 2>&1 || true
+          (cd scratch-render && pnpm test) > test-logs/scratch-render.log 2>&1 || true
+          (cd scratch-blocks && pnpm test) > test-logs/scratch-blocks.log 2>&1 || true
+
+      - name: Upload Build Test Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-test-logs
+          path: test-logs/
+
+      - name: Upload PR Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-build-dist
+          path: scratch-gui/build/
+          if-no-files-found: ignore
+
+  test-matrix:
+    needs: [build-base, build-pr]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: 
+        include: 
+          - os: windows-latest
+            browser: chromium
+          - os: windows-latest
+            browser: firefox
+          - os: ubuntu-latest
+            browser: chromium
+          - os: ubuntu-latest
+            browser: firefox
+          - os: macos-latest
+            browser: chromium
+          - os: macos-latest
+            browser: firefox
+          - os: macos-latest
+            browser: webkit
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ inputs.pr_number }}/head
+
+      - name: Set up Node.js & pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Download Base Build
+        uses: actions/download-artifact@v4
+        with:
+          name: base-build-dist
+          path: scratch-gui/build-base
+
+      - name: Download PR Build
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-build-dist
+          path: scratch-gui/build-pr
+
+      - name: Install Dependencies & Browsers
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm exec playwright install ${{ matrix.browser }} --with-deps
+
+      - name: Run Base Tests (Time & VRT)
+        shell: bash
+        run: |
+          rm -rf scratch-gui/build || true
+          cp -r scratch-gui/build-base scratch-gui/build
+          
+          pnpm dlx http-server scratch-gui/build/ -p 8601 &
+          SERVER_PID=$!
+          sleep 3
+          
+          START_TIME=$(date +%s)
+          pnpm exec playwright test tests/example.spec.ts --project=${{ matrix.browser }} || true
+          END_TIME=$(date +%s)
+          
+          echo "$((END_TIME - START_TIME))" > base_duration.txt
+          kill $SERVER_PID || true
+          
+          mkdir -p screenshots-base
+          mv screenshots/* screenshots-base/ 2>/dev/null || true
+
+      - name: Run PR Tests (Time & VRT)
+        shell: bash
+        run: |
+          rm -rf scratch-gui/build || true
+          cp -r scratch-gui/build-pr scratch-gui/build
+          
+          pnpm dlx http-server scratch-gui/build/ -p 8601 &
+          SERVER_PID=$!
+          sleep 3
+          
+          START_TIME=$(date +%s)
+          pnpm exec playwright test tests/example.spec.ts --project=${{ matrix.browser }} || true
+          END_TIME=$(date +%s)
+          
+          echo "$((END_TIME - START_TIME))" > pr_duration.txt
+          kill $SERVER_PID || true
+          
+          mkdir -p screenshots-pr
+          mv screenshots/* screenshots-pr/ 2>/dev/null || true
+
+      - name: Analyze Results (Stitching & Speed Diff)
+        shell: bash
+        run: |
+          pnpm add pngjs pixelmatch
+          mkdir -p matrix-results
+          
+          BASE_SEC=$(cat base_duration.txt)
+          PR_SEC=$(cat pr_duration.txt)
+          DIFF_SEC=$((PR_SEC - BASE_SEC))
+          
+          LOG_FILE="matrix-results/performance-${{ matrix.os }}-${{ matrix.browser }}.log"
+          echo "=== Speed Comparison (${{ matrix.os }} / ${{ matrix.browser }}) ===" > $LOG_FILE
+          echo "Base Branch Time: ${BASE_SEC}s" >> $LOG_FILE
+          echo "PR Branch Time:   ${PR_SEC}s" >> $LOG_FILE
+          if [ $DIFF_SEC -gt 0 ]; then
+            echo "Difference:       +${DIFF_SEC}s (Slower 🐢)" >> $LOG_FILE
+          else
+            echo "Difference:       ${DIFF_SEC}s (Faster 🚀)" >> $LOG_FILE
+          fi
+
+          cat > compare.js << 'EOF'
+          const fs = require('fs');
+          const { PNG } = require('pngjs');
+          const pixelmatch = require('pixelmatch');
+
+          const baseDir = 'screenshots-base';
+          const prDir = 'screenshots-pr';
+          const outDir = 'matrix-results';
+          
+          let vrtLog = "=== Visual Regression Report (${{ matrix.os }} / ${{ matrix.browser }}) ===\n";
+          const files = fs.existsSync(prDir) ? fs.readdirSync(prDir).filter(f => f.endsWith('.png')) : [];
+          
+          if (files.length === 0) vrtLog += "No screenshots found in PR.\n";
+
+          for (const file of files) {
+            if (!fs.existsSync(`${baseDir}/${file}`)) {
+               vrtLog += `[NEW] ${file}\n`;
+               fs.copyFileSync(`${prDir}/${file}`, `${outDir}/${file}`);
+               continue;
+            }
+            
+            const base = PNG.sync.read(fs.readFileSync(`${baseDir}/${file}`));
+            const pr = PNG.sync.read(fs.readFileSync(`${prDir}/${file}`));
+            const { width, height } = base;
+
+            if (width !== pr.width || height !== pr.height) {
+               vrtLog += `[SIZE MISMATCH] ${file} (Base: ${width}x${height}, PR: ${pr.width}x${pr.height})\n`;
+               continue;
+            }
+
+            const diff = new PNG({ width, height });
+            const numDiffPixels = pixelmatch(base.data, pr.data, diff.data, width, height, { threshold: 0.1 });
+            const diffPercentage = ((numDiffPixels / (width * height)) * 100).toFixed(2);
+
+            if (numDiffPixels > 0) {
+              vrtLog += `[DIFF DETECTED] ${file} - ${numDiffPixels} pixels (${diffPercentage}%)\n`;
+              
+              const stitched = new PNG({ width: width * 3, height });
+              for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                  const idxSrc = (width * y + x) << 2;
+                  const idxDstBase = ((width * 3) * y + x) << 2;
+                  const idxDstPR = ((width * 3) * y + (x + width)) << 2;
+                  const idxDstDiff = ((width * 3) * y + (x + width * 2)) << 2;
+
+                  for (let i = 0; i < 4; i++) {
+                    stitched.data[idxDstBase + i] = base.data[idxSrc + i];
+                    stitched.data[idxDstPR + i] = pr.data[idxSrc + i];
+                    stitched.data[idxDstDiff + i] = diff.data[idxSrc + i];
+                  }
+                }
+              }
+              const prefix = "${{ matrix.os }}-${{ matrix.browser }}";
+              fs.writeFileSync(`${outDir}/${prefix}-DIFF-${file}`, PNG.sync.write(stitched));
+            } else {
+              vrtLog += `[MATCH] ${file} - 0 pixels diff\n`;
+            }
+          }
+          fs.writeFileSync(`${outDir}/vrt-${{ matrix.os }}-${{ matrix.browser }}.log`, vrtLog);
+          EOF
+
+          node compare.js
+
+      - name: Upload Step Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.os }}-${{ matrix.browser }}
+          path: matrix-results/
+          if-no-files-found: ignore
+
+  merge-artifacts:
+    runs-on: ubuntu-latest
+    needs: [build-base, build-pr, test-matrix]
+    if: always()
+    steps:
+      - name: Download Base Build Time
+        uses: actions/download-artifact@v4
+        with:
+          name: base-build-time
+          path: .
+        continue-on-error: true
+
+      - name: Download Build Logs
+        uses: actions/download-artifact@v4
+        with:
+          name: build-test-logs
+          path: merged-artifacts
+        continue-on-error: true
+
+      - name: Download Matrix Results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: results-*
+          path: merged-artifacts
+          merge-multiple: true
+        continue-on-error: true
+
+      - name: Analyze Build Speeds
+        run: |
+          BASE_BUILD_SEC=$(cat base-build-time.txt 2>/dev/null || echo "0")
+          PR_BUILD_SEC=$(cat merged-artifacts/pr-build-time.txt 2>/dev/null || echo "0")
+          
+          if [ "$BASE_BUILD_SEC" -ne 0 ] && [ "$PR_BUILD_SEC" -ne 0 ]; then
+            DIFF_BUILD_SEC=$((PR_BUILD_SEC - BASE_BUILD_SEC))
+            
+            BUILD_LOG="merged-artifacts/build-performance.log"
+            echo "=== Build Speed Comparison (pnpm run build) ===" > $BUILD_LOG
+            echo "Base Branch Build Time: ${BASE_BUILD_SEC}s" >> $BUILD_LOG
+            echo "PR Branch Build Time:   ${PR_BUILD_SEC}s" >> $BUILD_LOG
+            if [ $DIFF_BUILD_SEC -gt 0 ]; then
+              echo "Difference:             +${DIFF_BUILD_SEC}s (Slower compile time 🐢)" >> $BUILD_LOG
+            else
+              echo "Difference:             ${DIFF_BUILD_SEC}s (Faster compile time 🚀)" >> $BUILD_LOG
+            fi
+            
+            rm -f merged-artifacts/pr-build-time.txt
+          fi
+
+      - name: Generate Master VRT Markdown Table
+        shell: bash
+        run: |
+          cat > generate-master-table.js << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+
+          const dir = 'merged-artifacts';
+          if (!fs.existsSync(dir)) {
+            console.log("No artifacts directory found.");
+            process.exit(0);
+          }
+
+          const files = fs.readdirSync(dir).filter(f => f.startsWith('vrt-') && f.endsWith('.log'));
+          
+          let markdown = "=== VRT_MASTER_TABLE_DO_NOT_EDIT ===\n";
+          markdown += "### Visual Regression Test Matrix Summary\n\n";
+          markdown += "| Platform | Browser | Status | Changes Detected |\n";
+          markdown += "|----------|---------|--------|------------------|\n";
+
+          const platformNames = {
+            'ubuntu-latest': '<img width="16" height="16" alt="Ubuntu Logo" src="https://github.com/user-attachments/assets/f61ac63e-1fc8-4577-9fb1-736d921b81a2" /> Ubuntu',
+            'windows-latest': '<img width="16" height="16" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows',
+            'macos-latest': '<img width="16" height="16" alt="Apple Logo" src="https://github.com/user-attachments/assets/636ee068-b7a7-489d-a545-a616534900ed"/> macOS'
+          };
+
+          const browserNames = {
+            'chromium': 'Chromium',
+            'firefox': 'Firefox',
+            'webkit': 'WebKit'
+          };
+
+          let totalChanges = 0;
+
+          for (const file of files) {
+            const cleanName = file.replace('vrt-', '').replace('.log', '');
+            const parts = cleanName.split('-');
+            const browser = parts.pop();
+            const platform = parts.join('-');
+
+            const pName = platformNames[platform] || platform;
+            const bName = browserNames[browser] || browser;
+
+            const content = fs.readFileSync(path.join(dir, file), 'utf8');
+            const lines = content.split('\n');
+            
+            let changes = [];
+            for (const line of lines) {
+              if (line.includes('[DIFF DETECTED]') || line.includes('[NEW]')) {
+                changes.push(line.replace('[DIFF DETECTED] ', '').replace('[NEW] ', 'New: '));
+              }
+            }
+
+            let status = "✅ Pass";
+            let details = "No changes";
+            if (changes.length > 0) {
+              status = `⚠️ ${changes.length} Change(s)`;
+              details = changes.map(c => `\`${c.trim()}\``).join('<br>');
+              totalChanges += changes.length;
+            }
+
+            markdown += `| ${pName} | ${bName} | ${status} | ${details} |\n`;
+          }
+
+          markdown += "\n";
+          if (totalChanges === 0) {
+            markdown += "No visual changes detected across any platform/browser combinations\n";
+          }
+          markdown += "====================================\n";
+
+          fs.writeFileSync(path.join(dir, 'vrt-master-table.log'), markdown);
+          console.log("done");
+          EOF
+          node generate-master-table.js
+
+      - name: Upload Final Combined Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-test-results
+          path: merged-artifacts/
+          if-no-files-found: error

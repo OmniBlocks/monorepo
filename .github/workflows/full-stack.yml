@@ -343,8 +343,9 @@ jobs:
           fi
 
       - name: Generate Master VRT Markdown Table
-        shell: node
+        shell: bash
         run: |
+          cat > generate-master-table.js << 'EOF'
           const fs = require('fs');
           const path = require('path');
 
@@ -413,6 +414,8 @@ jobs:
 
           fs.writeFileSync(path.join(dir, 'vrt-master-table.log'), markdown);
           console.log("done");
+          EOF
+          node generate-master-table.js
 
       - name: Upload Final Combined Results
         uses: actions/upload-artifact@v4

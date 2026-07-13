@@ -1,5 +1,4 @@
 name: Full Build Run
-run-name: Full Build Run on PR #${{ github.event.inputs.pr_number }}
 on: 
   workflow_dispatch:
     inputs:
@@ -7,6 +6,8 @@ on:
         description: 'PR number to run the build for'
         required: true
         type: string
+
+run-name: Full Build Run on PR #${{ github.event.inputs.pr_number }}
 
 jobs:
   prepare:

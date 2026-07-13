@@ -1,5 +1,5 @@
 name: Full Build Run
-
+run-name: Full Build Run on PR #${{ inputs.pr_number }}
 on: 
   workflow_dispatch:
     inputs:

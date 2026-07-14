@@ -320,9 +320,8 @@ Q: But aren't you busy?
 A: True. I, supervoidcoder, the lead maintainer and creator of OmniBlocks, am very busy as I have to do school and other things too. But I'm not one of those people who is "onLy HeRe foR SeRiOuS sTuFF" or "iM a VeRy ImpOrtanT person With PrioRities, not your FrienD". I genuinely care about anyone that wants to reach out to me.
 Most of the maintainers and contributors have our own personal Scratch Account too. Here are some:
 - @supervoidcoder: [scratchcode1_2_3](https://scratch.mit.edu/users/scratchcode1_2_3/)
-- @8to16: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
-- @Graison-P: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
-- @NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
+- @ampelc: unfortunately banned
+- @someCatInTheWorld: [someCatInTheWorld](https://scratch.mit.edu/users/o97doge/)
 
 **Q: I tried submitting a pull request for OmniBlocks, but I got tons of lint errors.**
 A: Ignore lint. It's only there because it is from upstream, but we don't actually use it. As long as the code itself compiles and runs and is, well, functional, I could literally NOT care LESS if you're indenting with tabs, spaces, or you put 6 or 7 indents instead of 4. Just make sure your code works 😎

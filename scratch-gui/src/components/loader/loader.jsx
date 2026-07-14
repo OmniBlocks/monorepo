@@ -49,7 +49,6 @@ const funFacts = [
     'Fun fact: OmniBlocks is currently loading.',
     'Fun fact: OmniBlocks is very cool!',
     'Actual Fun fact: NPM stands for Node Package Manager. It is very painful to use.',
-    'OmniBlocks is great, but Scratch was the foundation of it all. Please try it out!',
     'Fun fact: Funding for OmniBlocks is provided by Boxys like you! ',
     'Fun fa-Sadly, this fact was eaten by an evil kumquat.',
     'rt89qeywybprqwbyrpecrq;wr qwr;fq fwwf.wf.e3333332 sorry my cat ate my keyboard',
@@ -58,8 +57,6 @@ const funFacts = [
     "Your cue light is broken.",
     "You're not a wizard, Harry.",
     'Fun fact: The person who typed this fact had too much caffeine!',
-    'SIX SEEVEN',
-    'Fun fact: six seven',
     'how to 101: todo',
     'I JUST ATE A HAM SANDWICH FOR BRUNDINNER',
     'Fun fact: OmniBlocks is loading. Yay! :)',
@@ -79,7 +76,6 @@ const funFacts = [
     "Fun fact:",
     "What did the fish say when it hit the wall? Dam.",
     "I'm reading a book about anti-gravity. It's impossible to put down!",
-    "OmniBlocks is an alpha male sigma project.",
     "Are you liking the corny generic jokes yet?",
     "Did you know??? Boxy is a CLANKER.",
     'Preparing emojis...',
@@ -99,7 +95,12 @@ const funFacts = [
     'Boxroy was here!',
     'Did you know??? Err, I forgot...',
     'Tip: You can export and import projects as a folder. This isn\'t supported on non-Chromium browsers due to technical reasons.',
-    'Tip: You can right-click a sprite in the sprite pane and then click “Export just...” to export all the costumes or sounds of that sprite.'
+    'Tip: You can right-click a sprite in the sprite pane and then click “Export just...” to export all the costumes or sounds of that sprite.',
+    'Tip: You can record your projects as GIFs, as well as a variety of video and audio formats by clicking the record button!',
+    'Fun Fact: OmniBlocks is NOT Loading.  :(',
+    'Did you know? Boxy is in your walls.',
+    'I am not in your walls. Sincerely, Boxy.'
+    
 ];
 
 class LoaderComponent extends React.Component {

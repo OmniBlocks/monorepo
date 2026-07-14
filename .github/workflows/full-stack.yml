@@ -175,7 +175,7 @@ jobs:
           sleep 3
           
           START_TIME=$(date +%s)
-          pnpm exec playwright test tests/example.spec.ts --project=${{ matrix.browser }} || true
+          pnpm exec playwright test tests/example.spec.ts --browser=${{ matrix.browser }} || true
           END_TIME=$(date +%s)
           
           echo "$((END_TIME - START_TIME))" > base_duration.txt
@@ -194,8 +194,8 @@ jobs:
           SERVER_PID=$!
           sleep 3
           
-          START_TIME=$(date +%s)
-          pnpm exec playwright test tests/example.spec.ts --project=${{ matrix.browser }} || true
+          START_TIME=$(date +%s) 
+          pnpm exec playwright test tests/example.spec.ts --browser=${{ matrix.browser }} || true
           END_TIME=$(date +%s)
           
           echo "$((END_TIME - START_TIME))" > pr_duration.txt

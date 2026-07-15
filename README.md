@@ -1,5 +1,7 @@
 # OmniBlocks
 
+![OmniBlocks Logo](OmniBlocksLogo.png)
+
 **OmniBlocks** is a modular, high-performance AI orchestrator designed to make building, deploying, and scaling multi-agent AI workflows incredibly simple. Think of it as "LEGO for AI"—allowing you to snap together LLMs, vector databases, API connectors, and custom logic blocks into cohesive, production-ready pipelines.
 
 ---

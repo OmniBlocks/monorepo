@@ -98,6 +98,7 @@ jobs:
           (cd scratch-vm && pnpm test) > test-logs/scratch-vm.log 2>&1 || true
           (cd scratch-render && pnpm test) > test-logs/scratch-render.log 2>&1 || true
           (cd scratch-blocks && pnpm test) > test-logs/scratch-blocks.log 2>&1 || true
+          (cd scratch-paint && pnpm test) > test-logs/scratch-paint.log 2>&1 || true
 
       - name: Upload Build Test Logs
         uses: actions/upload-artifact@v4

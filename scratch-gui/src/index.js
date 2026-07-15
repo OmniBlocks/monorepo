@@ -1,31 +1,33 @@
-import GUI from './containers/gui.jsx';
-import AppStateHOC from './lib/app-state-hoc.jsx';
-import GuiReducer, {guiInitialState, guiMiddleware, initEmbedded, initFullScreen, initPlayer} from './reducers/gui';
-import LocalesReducer, {localesInitialState, initLocale} from './reducers/locales';
-import {ScratchPaintReducer} from 'scratch-paint';
-import {setFullScreen, setPlayer} from './reducers/mode';
-import {remixProject} from './reducers/project-state';
-import {setAppElement} from 'react-modal';
+/**
+ * @file index.js
+ * @description Entry point for the OmniBlocks GUI.
+ * This file initializes the React application and connects the core workflow
+ * orchestration logic to the visual drag-and-drop interface.
+ */
 
-const guiReducers = {
-    locales: LocalesReducer,
-    scratchGui: GuiReducer,
-    scratchPaint: ScratchPaintReducer
-};
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import { WorkflowProvider } from './context/WorkflowContext';
+import './styles/global.css';
 
-export {
-    GUI as default,
-    AppStateHOC,
-    setAppElement,
-    guiReducers,
-    guiInitialState,
-    guiMiddleware,
-    initEmbedded,
-    initPlayer,
-    initFullScreen,
-    initLocale,
-    localesInitialState,
-    remixProject,
-    setFullScreen,
-    setPlayer
-};
+// Initialize the root component
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+/**
+ * The WorkflowProvider wraps the entire application to ensure that 
+ * the state of the AI blocks (LLM nodes, Prompt nodes, etc.) is 
+ * accessible throughout the drag-and-drop canvas.
+ */
+root.render(
+  <React.StrictMode>
+    <WorkflowProvider>
+      <App />
+    </WorkflowProvider>
+  </React.StrictMode>
+);
+
+// Performance monitoring for production builds
+if (process.env.NODE_ENV === 'production') {
+  console.log('OmniBlocks GUI initialized in production mode.');
+}

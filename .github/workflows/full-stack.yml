@@ -1,5 +1,4 @@
 name: Full Build Run
-
 on: 
   workflow_dispatch:
     inputs:
@@ -7,6 +6,8 @@ on:
         description: 'PR number to run the build for'
         required: true
         type: string
+
+run-name: 'Full Build Run on PR #${{ inputs.pr_number }}'
 
 jobs:
   prepare:
@@ -97,6 +98,7 @@ jobs:
           (cd scratch-vm && pnpm test) > test-logs/scratch-vm.log 2>&1 || true
           (cd scratch-render && pnpm test) > test-logs/scratch-render.log 2>&1 || true
           (cd scratch-blocks && pnpm test) > test-logs/scratch-blocks.log 2>&1 || true
+          (cd scratch-paint && pnpm test) > test-logs/scratch-paint.log 2>&1 || true
 
       - name: Upload Build Test Logs
         uses: actions/upload-artifact@v4
@@ -174,7 +176,7 @@ jobs:
           sleep 3
           
           START_TIME=$(date +%s)
-          pnpm exec playwright test tests/example.spec.ts --project=${{ matrix.browser }} || true
+          pnpm exec playwright test tests/example.spec.ts --browser=${{ matrix.browser }} || true
           END_TIME=$(date +%s)
           
           echo "$((END_TIME - START_TIME))" > base_duration.txt
@@ -193,8 +195,8 @@ jobs:
           SERVER_PID=$!
           sleep 3
           
-          START_TIME=$(date +%s)
-          pnpm exec playwright test tests/example.spec.ts --project=${{ matrix.browser }} || true
+          START_TIME=$(date +%s) 
+          pnpm exec playwright test tests/example.spec.ts --browser=${{ matrix.browser }} || true
           END_TIME=$(date +%s)
           
           echo "$((END_TIME - START_TIME))" > pr_duration.txt
@@ -206,7 +208,7 @@ jobs:
       - name: Analyze Results (Stitching & Speed Diff)
         shell: bash
         run: |
-          npm i --no-save pngjs pixelmatch
+          pnpm add pngjs pixelmatch
           mkdir -p matrix-results
           
           BASE_SEC=$(cat base_duration.txt)
@@ -343,8 +345,9 @@ jobs:
           fi
 
       - name: Generate Master VRT Markdown Table
-        shell: node
+        shell: bash
         run: |
+          cat > generate-master-table.js << 'EOF'
           const fs = require('fs');
           const path = require('path');
 
@@ -413,6 +416,8 @@ jobs:
 
           fs.writeFileSync(path.join(dir, 'vrt-master-table.log'), markdown);
           console.log("done");
+          EOF
+          node generate-master-table.js
 
       - name: Upload Final Combined Results
         uses: actions/upload-artifact@v4

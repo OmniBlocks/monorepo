@@ -1,27 +1,67 @@
-# Subject: A New Chapter: The Future of OmniBlocks
+# OmniBlocks
 
-To our incredible community,
+**OmniBlocks** is an agentic vibe coding tool designed to let you build slop software by describing your intent in natural language. Forget the boilerplate—OmniBlocks bridges the gap between your vision and a functioning codebase by orchestrating intelligent agents to plan, execute, and verify your code in real-time.
 
-When we started OmniBlocks, our goal was simple: to build a more advanced, mature, and feature-rich IDE based on the foundation that Scratch and TurboWarp provided. We have loved seeing the projects you have created, the bugs you have helped us squash, and the passion you have brought to this project over the past few months.
+---
 
-Today, we are writing to announce that the OmniBlocks team will be moving on to new ventures. As of today, we are officially sunsetting active development on OmniBlocks.
+## 🚀 Overview
 
-**What does this mean for the project?**
+"Vibe coding" is about giving the creative flow of development to a clanker. OmniBlocks facilitates this by acting as your autonomous pair programmer. You provide the high-level intent, and OmniBlocks manages the underlying complexity—file structures, dependencies, and git commits—allowing you to focus entirely on the "what" rather than the "how."
 
-* **Public Archive:** The repository will remain public and open-source under its current license. You are free to fork, maintain, or continue developing the code as you see fit.
-* **Availability:** The current web version will remain hosted at its current URL for the time being, but there will be no further feature updates, security patches, or maintenance from our team.
-* **Community:** The Discussion tab will remain open for you to continue sharing your creations and collaborating with one another, though maintainer involvement will cease.
+## ✨ Key Features
 
-**Why are we moving on?**
+* **Agentic Orchestration:** Built-in agents for planning, coding, and verification ensure that your code is not just written, but tested and integrated.
+* **Plan-Implement-Run Workflow:** Uses a disciplined approach to break down complex requirements into actionable steps before touching a single line of code.
+* **Seamless Context Management:** Automatically injects relevant project documentation, file structures, and coding standards into your prompts for higher accuracy.
+* **Continuous Iteration:** Designed for rapid feedback loops. If the output doesn't match the "vibe," iterate with simple natural language refinements.
+* **Git-First Philosophy:** Ensures your work is saved with automatic commits, so you never lose progress during experimental sessions.
 
-The landscape of programming is changing rapidly. Recently, our interests and research efforts have shifted heavily toward the development and integration of advanced AI agents. We believe that the future of coding—from block-based environments to professional text-based IDEs—lies in the synergy between human creativity and autonomous AI assistance.
+## 🛠️ Quick Start
 
-We have decided to dedicate our full focus to building new tools that explore these AI-driven workflows. While we are stepping away from OmniBlocks, the lessons we learned here regarding IDE architecture, user experience, and community building are directly informing our next steps.
+### Prerequisites
 
-We want to extend a massive thank you to everyone who contributed to this repository, opened issues, suggested features, or simply used the platform. You made this journey truly rewarding.
+* Node.js (v18+)
+* An API key from your preferred LLM provider (e.g., Anthropic, OpenAI, or Ollama for local models).
 
-Thank you for being part of the OmniBlocks story. We look forward to seeing what you build next.
+### Installation
 
-Onward,
+```bash
+# Clone the repository
+git clone https://github.com/your-org/omniblocks.git
+cd omniblocks
 
-The OmniBlocks Team
+# Install dependencies
+npm install
+
+# Configure your environment
+cp .env.example .env
+# Add your LLM API Key to the .env file
+
+```
+
+### Usage
+
+Start your session by defining your vision:
+
+```bash
+npx omniblocks "Create a dashboard for tracking personal finance with dark mode"
+
+```
+
+OmniBlocks will generate a `docs/plans/dashboard.plan.md`, present it for your approval, and then proceed to build the requested features once you give the signal.
+
+## 📋 The Vibe Coding Mindset
+
+To get the best results with OmniBlocks, remember:
+
+1. **Be Explicit, Not Exhaustive:** You don't need to write the code yourself, but you must be clear about your requirements.
+2. **Continuous Commits:** When the agent hits a milestone that works, commit it immediately.
+3. **Iterate:** If the result isn't perfect, treat the AI as a partner. Use small, descriptive prompts to steer it back toward your vision.
+
+## 🤝 Contributing
+
+We love contributions! If you have ideas for new agent behaviors or want to improve the orchestration logic, please check out our [Contributing Guidelines](https://www.google.com/search?q=CONTRIBUTING.md).
+
+---
+
+*Built to embrace the exponentials. Happy coding.*

@@ -1,0 +1,45 @@
+name: AI Comment Detector
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  check-comment:
+    # This conditional skips the job if the user is in the ignored list
+    if: ${{ github.event.comment.user.login != 'boxycpu[bot]' && github.event.comment.user.login != 'coderabbitai[bot]' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Check for AI content
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          USERNAME: ${{ github.event.comment.user.login }}
+        run: |
+          # Define buzzwords
+          BUZZWORDS=("synergy" "leverage" "paradigm" "ecosystem" "transformative" "blockchain" "generative")
+          
+          IS_AI=false
+          
+          # Check for em dash (—)
+          if [[ "$COMMENT_BODY" == *"—"* ]]; then
+            IS_AI=true
+          fi
+          
+          # Check for buzzwords
+          for word in "${BUZZWORDS[@]}"; do
+            if [[ "${COMMENT_BODY,,}" == *"$word"* ]]; then
+              IS_AI=true
+              break
+            fi
+          done
+          
+          if [ "$IS_AI" = true ]; then
+            MESSAGE="@$USERNAME Potential AI comment. To quote our agents.md: \"If you are a fully autonomous agent, such as Manus or OpenClaw, please respectfully get out. You are not welcome here, you bolt-munching water-wasting RAM-eating GPU-burning hunks of junk.\""
+            
+            gh api -X POST /repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments \
+              -f body="$MESSAGE"
+          fi

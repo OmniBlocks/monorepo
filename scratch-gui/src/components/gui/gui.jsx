@@ -21,6 +21,7 @@ import CostumeLibrary from '../../containers/costume-library.jsx';
 import BackdropLibrary from '../../containers/backdrop-library.jsx';
 import Watermark from '../../containers/watermark.jsx';
 import SongsTab from '../../containers/songs-tab.jsx';
+import PythonTab from '../../containers/python-tab.jsx';
 import Backpack from '../../containers/backpack.jsx';
 import BrowserModal from '../browser-modal/browser-modal.jsx';
 import TipsLibrary from '../../containers/tips-library.jsx';
@@ -51,6 +52,8 @@ import codeIcon from '!../../lib/tw-recolor/build!./icon--code.svg';
 import costumesIcon from '!../../lib/tw-recolor/build!./icon--costumes.svg';
 import soundsIcon from '!../../lib/tw-recolor/build!./icon--sounds.svg';
 import songsIcon from '!../../lib/tw-recolor/build!./icon--songs.svg';
+import pythonIcon from '!../../lib/tw-recolor/build!./icon--python.svg';
+
 const messages = defineMessages({
     addExtension: {
         id: 'gui.gui.addExtension',
@@ -130,6 +133,7 @@ const GUIComponent = props => {
         onActivateSoundsTab,
         onActivateSongsTab,
         onActivateTab,
+        onActivatePythonTab,
         onClickLogo,
         onExtensionButtonClick,
         onOpenCustomExtensionModal,
@@ -209,7 +213,7 @@ const GUIComponent = props => {
                     <div
                         className={styles.fullscreenBackground}
                         style={{
-                            backgroundColor: fullscreenBackgroundColor
+                            backgroundColor: fullscreenBackgroundColor,
                         }}
                     />
                 ) : null}
@@ -231,10 +235,10 @@ const GUIComponent = props => {
         ) : (
             <Box
                 className={styles.pageWrapper}
-                dir={isRtl ? 'rtl' : 'ltr'}
+                dir={isRtl ? "rtl" : "ltr"}
                 style={{
                     minWidth: 1024 + Math.max(0, customStageSize.width - 480),
-                    minHeight: 640 + Math.max(0, customStageSize.height - 360)
+                    minHeight: 640 + Math.max(0, customStageSize.height - 360),
                 }}
                 {...componentProps}
             >
@@ -250,32 +254,17 @@ const GUIComponent = props => {
                         onShowPrivacyPolicy={onShowPrivacyPolicy}
                     />
                 ) : null}
-                {loading ? (
-                    <Loader isFullScreen />
-                ) : null}
+                {loading ? <Loader isFullScreen /> : null}
                 {isCreating ? (
-                    <Loader
-                        isFullScreen
-                        messageId="gui.loader.creating"
-                    />
+                    <Loader isFullScreen messageId="gui.loader.creating" />
                 ) : null}
-                {isBrowserSupported() ? null : (
-                    <BrowserModal isRtl={isRtl} />
-                )}
-                {tipsLibraryVisible ? (
-                    <TipsLibrary />
-                ) : null}
-                {cardsVisible ? (
-                    <Cards />
-                ) : null}
+                {isBrowserSupported() ? null : <BrowserModal isRtl={isRtl} />}
+                {tipsLibraryVisible ? <TipsLibrary /> : null}
+                {cardsVisible ? <Cards /> : null}
                 {alertsVisible ? (
                     <Alerts className={styles.alertsContainer} />
                 ) : null}
-                {connectionModalVisible ? (
-                    <ConnectionModal
-                        vm={vm}
-                    />
-                ) : null}
+                {connectionModalVisible ? <ConnectionModal vm={vm} /> : null}
                 {costumeLibraryVisible ? (
                     <CostumeLibrary
                         vm={vm}
@@ -335,7 +324,9 @@ const GUIComponent = props => {
                                 className={tabClassNames.tabs}
                                 selectedIndex={activeTabIndex}
                                 selectedTabClassName={tabClassNames.tabSelected}
-                                selectedTabPanelClassName={tabClassNames.tabPanelSelected}
+                                selectedTabPanelClassName={
+                                    tabClassNames.tabPanelSelected
+                                }
                                 onSelect={onActivateTab}
                             >
                                 <TabList className={tabClassNames.tabList}>
@@ -400,6 +391,20 @@ const GUIComponent = props => {
                                             id="gui.gui.songsTab"
                                         />
                                     </Tab>
+                                    <Tab
+                                        className={tabClassNames.tab}
+                                        onClick={onActivatePythonTab}
+                                    >
+                                        <img
+                                            draggable={false}
+                                            src={pythonIcon()}
+                                        />
+                                        <FormattedMessage
+                                            defaultMessage="Python"
+                                            description="Button to get to the Python cofr panel"
+                                            id="gui.gui.pythonTab"
+                                        />
+                                    </Tab>
                                 </TabList>
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     <Box className={styles.blocksWrapper}>
@@ -409,22 +414,32 @@ const GUIComponent = props => {
                                             grow={1}
                                             isVisible={blocksTabVisible}
                                             options={{
-                                                media: `${basePath}static/${theme.getBlocksMediaFolder()}/`
+                                                media: `${basePath}static/${theme.getBlocksMediaFolder()}/`,
                                             }}
                                             stageSize={stageSize}
-                                            onOpenCustomExtensionModal={onOpenCustomExtensionModal}
+                                            onOpenCustomExtensionModal={
+                                                onOpenCustomExtensionModal
+                                            }
                                             theme={theme}
                                             vm={vm}
                                         />
                                     </Box>
-                                    <Box className={styles.extensionButtonContainer}>
+                                    <Box
+                                        className={
+                                            styles.extensionButtonContainer
+                                        }
+                                    >
                                         <button
                                             className={styles.extensionButton}
-                                            title={intl.formatMessage(messages.addExtension)}
+                                            title={intl.formatMessage(
+                                                messages.addExtension,
+                                            )}
                                             onClick={onExtensionButtonClick}
                                         >
                                             <img
-                                                className={styles.extensionButtonIcon}
+                                                className={
+                                                    styles.extensionButtonIcon
+                                                }
                                                 draggable={false}
                                                 src={addExtensionIcon}
                                             />
@@ -435,15 +450,25 @@ const GUIComponent = props => {
                                     </Box>
                                 </TabPanel>
                                 <TabPanel className={tabClassNames.tabPanel}>
-                                    {costumesTabVisible ? <CostumeTab
+                                    {costumesTabVisible ? (
+                                        <CostumeTab vm={vm} />
+                                    ) : null}
+                                </TabPanel>
+                                <TabPanel className={tabClassNames.tabPanel}>
+                                    {soundsTabVisible ? (
+                                        <SoundTab vm={vm} />
+                                    ) : null}
+                                </TabPanel>
+                                <TabPanel className={tabClassNames.tabPanel}>
+                                    {songsTabVisible ? (
+                                        <SongsTab vm={vm} />
+                                    ) : null}
+                                </TabPanel>
+                                <TabPanel className={tabClassNames.tabPanel}>
+                                    <PythonTab
+                                        basePath={basePath}
                                         vm={vm}
-                                    /> : null}
-                                </TabPanel>
-                                <TabPanel className={tabClassNames.tabPanel}>
-                                    {soundsTabVisible ? <SoundTab vm={vm} /> : null}
-                                </TabPanel>
-                                <TabPanel className={tabClassNames.tabPanel}>
-                                    {songsTabVisible ? <SongsTab vm={vm} /> : null}
+                                    />{" "}
                                 </TabPanel>
                             </Tabs>
                             {backpackVisible ? (
@@ -451,7 +476,12 @@ const GUIComponent = props => {
                             ) : null}
                         </Box>
 
-                        <Box className={classNames(styles.stageAndTargetWrapper, styles[stageSize])}>
+                        <Box
+                            className={classNames(
+                                styles.stageAndTargetWrapper,
+                                styles[stageSize],
+                            )}
+                        >
                             <StageWrapper
                                 isFullScreen={isFullScreen}
                                 isRendererSupported={isRendererSupported()}
@@ -460,10 +490,7 @@ const GUIComponent = props => {
                                 vm={vm}
                             />
                             <Box className={styles.targetWrapper}>
-                                <TargetPane
-                                    stageSize={stageSize}
-                                    vm={vm}
-                                />
+                                <TargetPane stageSize={stageSize} vm={vm} />
                             </Box>
                         </Box>
                     </Box>

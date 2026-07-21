@@ -113,6 +113,10 @@ const StackOpcode = {
     HAT_PREDICATE: 'hat.predicate',
 
     CONTROL_IF_ELSE: 'control.if',
+    CONTROL_SWITCH: 'control.switch',
+    CONTROL_CASE: 'control.case',
+    CONTROL_DEFAULT: 'control.default',
+    CONTROL_BREAK: 'control.break',
     CONTROL_CLONE_CREATE: 'control.createClone',
     CONTROL_CLONE_DELETE: 'control.deleteClone',
     CONTROL_WHILE: 'control.while',
@@ -125,10 +129,6 @@ const StackOpcode = {
     CONTROL_WAIT_UNTIL: 'control.waitUntil',
     CONTROL_CLEAR_COUNTER: 'control.counterClear',
     CONTORL_INCR_COUNTER: 'control.counterIncr',
-    CONTROL_SWITCH: 'control.switch',
-    CONTROL_CASE: 'control.case',
-    CONTROL_DEFAULT: 'control.default',
-    CONTROL_BREAK: 'control.break',
 
     LIST_ADD: 'list.add',
     LIST_INSERT: 'list.instert',

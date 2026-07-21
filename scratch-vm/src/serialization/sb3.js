@@ -1116,6 +1116,73 @@ const parseScratchAssets = function (object, runtime, zip) {
 };
 
 /**
+ * ob: Converts the blocks of AmpMod projects to usages compatible with OmniBlocks.
+ * @param {Array<Object>} blocks An array of blocks of a target.
+ * @param {Runtime} runtime The VM runtime.
+ * @returns {Array<Object>} The processed blocks.
+ */
+const convertAmpModBlocks = function (blocks, runtime) {
+    for (const block of Object.values(blocks)) {
+        switch (block.opcode) {
+        // Append break blocks at the end of AmpMod switch cases, due to them auto-breaking in AmpMod.
+        case 'control_case': {
+            let lastBlock = null;
+            if (block.inputs.SUBSTACK?.block) {
+                lastBlock = blocks[block.inputs.SUBSTACK.block];
+            }
+            // Synthesise a break block. Should synthesising eventually become a function to avoid boilerplate?
+            let breakId;
+            do {
+                breakId = uid();
+            } while (Object.hasOwn(blocks, breakId));
+            const breakBlock = {
+                id: breakId,
+                opcode: 'control_break',
+                next: null, // Break blocks are the end of a substack.
+                parent: null, // May be filled by code below.
+                inputs: {},
+                fields: {},
+                shadow: false,
+                topLevel: false
+            };
+            if (lastBlock) {
+                // Walking the tree, yippee...
+                while (lastBlock.next !== null) lastBlock = blocks[lastBlock.next];
+
+                // Try to make sure we aren't mindlessly appending break blocks to capped blocks. If there is no GUI, we
+                // will just append to everything anyway. Horrid, I know: but there is no Blockly to whine about it, and
+                // this whole generated opcode metadata thing is a horrid hack in itself because the VM doesn't know
+                // about the shapes of primitive blocks due to them being defined in Blockly.
+                if (Object.keys(runtime.blockMetadata).length) {
+                    const metadata = runtime.getTypeMetadataOfBlock(lastBlock);
+                    if (!metadata) continue;
+                    // Make sure we aren't connecting a break to a cap block.
+                    if (!metadata.hasNext) continue;
+                }
+
+                breakBlock.parent = lastBlock.id;
+                lastBlock.next = breakBlock.id;
+            } else {
+                breakBlock.parent = block.id;
+                // If it doesn't exist, fake until you make it... the philosophy the world sadly runs on. :P
+                if (!block.inputs.SUBSTACK) {
+                    block.inputs.SUBSTACK = {
+                        block: null, // Will be assigned.
+                        name: 'SUBSTACK',
+                        shadow: null
+                    };
+                }
+                block.inputs.SUBSTACK.block = breakBlock.id;
+            }
+            blocks[breakBlock.id] = breakBlock;
+            continue;
+        }
+        }
+    }
+    return blocks;
+};
+
+/**
  * Parse a single "Scratch object" and create all its in-memory VM objects.
  * @param {!object} object From-JSON "Scratch object:" sprite, stage, watcher.
  * @param {!Runtime} runtime Runtime object to load all structures into.
@@ -1123,9 +1190,10 @@ const parseScratchAssets = function (object, runtime, zip) {
  * @param {JSZip} zip Sb3 file describing this project (to load assets from)
  * @param {object} assets - Promises for assets of this scratch object grouped
  *   into costumes and sounds
+ * @param {!object} platform - The platform metadata of the project.
  * @return {!Promise.<Target>} Promise for the target created (stage or sprite), or null for unsupported objects.
  */
-const parseScratchObject = function (object, runtime, extensions, zip, assets) {
+const parseScratchObject = function (object, runtime, extensions, zip, assets, platform) {
     if (!Object.prototype.hasOwnProperty.call(object, 'name')) {
         // Watcher/monitor - skip this object until those are implemented in VM.
         // @todo
@@ -1143,6 +1211,7 @@ const parseScratchObject = function (object, runtime, extensions, zip, assets) {
     }
     if (Object.prototype.hasOwnProperty.call(object, 'blocks')) {
         deserializeBlocks(object.blocks);
+        if (platform?.name === 'AmpMod') convertAmpModBlocks(object.blocks, runtime);
         // Take a second pass to create objects and add extensions
         for (const blockId in object.blocks) {
             if (!Object.prototype.hasOwnProperty.call(object.blocks, blockId)) continue;
@@ -1526,7 +1595,7 @@ const deserialize = async function (json, runtime, zip, isSingleSprite) {
         .then(assets => Promise.resolve(assets))
         .then(assets => Promise.all(targetObjects
             .map((target, index) =>
-                parseScratchObject(target, runtime, extensions, zip, assets[index]))))
+                parseScratchObject(target, runtime, extensions, zip, assets[index], json.meta?.platform))))
         .then(targets => targets // Re-sort targets back into original sprite-pane ordering
             .map((t, i) => {
                 // Add layer order property to deserialized targets.

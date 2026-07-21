@@ -24,6 +24,7 @@ const fetchWithTimeout = require('../util/fetch-with-timeout');
 const platform = require('./tw-platform.js');
 const safeStringify = require('../util/tw-safe-stringify.js');
 const MonitorState = require('./tw-monitor-state.js');
+const escapeRegExp = require('../util/ob-regex-escape.js');
 
 // Virtual I/O devices.
 const Clock = require('../io/clock');
@@ -470,6 +471,14 @@ class Runtime extends EventEmitter {
 
         this.addonBlocks = {};
 
+        /**
+         * ob: A list of the metadata of blocks found in the flyout. This data may be somewhat
+         * inaccurate due to shapeshifting blocks, so please use the data with a grain of salt.
+         * @type {object.<string, object.<string, object>>}
+         * @private
+         */
+        this.blockMetadata = Object.create(null);
+
         this.stageWidth = Runtime.STAGE_WIDTH;
         this.stageHeight = Runtime.STAGE_HEIGHT;
 
@@ -573,6 +582,18 @@ class Runtime extends EventEmitter {
          * Total number of finished or errored scratch-storage load() requests since the runtime was created or cleared.
          */
         this.finishedAssetRequests = 0;
+
+        // ob: added breakable blocks
+        this._breakableBlocksArray = [];
+        this._breakableBlocksRegExp = new RegExp('()');
+        // Control
+        this.addBreakableBlock('control_repeat', false);
+        this.addBreakableBlock('control_repeat_until', false);
+        this.addBreakableBlock('control_while', false);
+        this.addBreakableBlock('control_for_each', false);
+        this.addBreakableBlock('control_forever', false);
+        this.addBreakableBlock('control_switch', false);
+        this.compileBreakableBlocks();
     }
 
     /**
@@ -2992,6 +3013,43 @@ class Runtime extends EventEmitter {
         return null;
     }
 
+    /**
+     * ob: Generates opcode metadata from an array of Blockly block instances.
+     * @param {Array<Blockly.Block>} blocks An array of Blockly blocks.
+     */
+    genBlockMetadata (blocks) {
+        for (const block of blocks) {
+            if (!block.type || Object.hasOwn(this.blockMetadata, block.type)) continue;
+            const draftMetadata = {
+                hasNext: false
+            };
+            if (block.nextConnection) draftMetadata.hasNext = true;
+            this.blockMetadata[block.type] = draftMetadata;
+        }
+    }
+
+    /**
+     * ob: Gets the opcode metadata of a block.
+     * @param {object} blocks A VM representation of a block.
+     * @returns {?object} Returns the opcode metadata of the block.
+     * @throws {TypeError} Throws if no block was properly specified.
+     */
+    getTypeMetadataOfBlock (block) {
+        if (!block || typeof block !== 'object') {
+            throw new TypeError('Cannot get metadata about the type of the block: Argument "block" is not an object.');
+        }
+        // Special case "stop other scripts in sprite", due to it shapeshifting.
+        if (
+            block.opcode === 'control_stop' &&
+            block.fields?.STOP_OPTION?.value === 'other scripts in sprite'
+        ) {
+            return {
+                hasNext: true
+            };
+        }
+        return this.blockMetadata[block.opcode] ?? null;
+    }
+
     findProjectOptionsComment () {
         const target = this.getTargetForStage();
         const comments = target.comments;
@@ -3652,6 +3710,35 @@ class Runtime extends EventEmitter {
         };
 
         return callback().then(onSuccess, onError);
+    }
+
+    /**
+     * ob: Adds a breakable block.
+     * @param {string} opcode The opcode of the breakable block.
+     * @param {?boolean} opcode Whether to immediately compile or not.
+     */
+    addBreakableBlock (opcode, compile) {
+        this._breakableBlocksArray.push(opcode);
+        if (compile ?? true) this.compileBreakableBlocks();
+    }
+
+    /**
+     * ob: Compiles the breakable blocks array into a RegExp.
+     */
+    compileBreakableBlocks () {
+        let string = '^(?:';
+        for (let i = 0; i < this._breakableBlocksArray.length; i++) {
+            string = string + (i === 0 ? '' : '|') + escapeRegExp(this._breakableBlocksArray[i]);
+        }
+        string = `${string})$`;
+        this._breakableBlocksRegExp = new RegExp(string);
+    }
+
+    /**
+     * ob: Gets the compiled breakable blocks RegExp.
+     */
+    getBreakableBlocksRegExp () {
+        return this._breakableBlocksRegExp;
     }
 }
 

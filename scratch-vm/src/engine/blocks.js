@@ -97,7 +97,19 @@ class Blocks {
             /**
              * tw: Whether populateProcedureCache has been run
              */
-            proceduresPopulated: false
+            proceduresPopulated: false,
+
+            /**
+             * ob: A cache of block IDs and their located parents.
+             * @type {object.<string, object.<string, object>>}
+             */
+            blockIdParents: {},
+
+            /**
+             * ob: A cache of block IDs and their validated (or not) substacks.
+             * @type {object.<string, object.<string, object>>}
+             */
+            validatedSubstacks: {}
         };
 
         /**
@@ -165,6 +177,165 @@ class Blocks {
     getBlock (blockId) {
         return this._blocks[blockId];
     }
+
+    /**
+     * ob: Find the parent block for a child block in an input.
+     * @param {string} childId The ID of the block to move up from.
+     * @return {object | null} The ID of the block we have found, or null if we didn't find anything.
+     */
+    findParentBlock (childId) {
+        let block = this.getBlock(childId);
+        if (!block) return null;
+
+        if (typeof block.parent !== 'string') return null;
+
+        // If it was cached, just return that.
+        const blockIdParents = this._cache.blockIdParents;
+        if (blockIdParents[childId] && Object.hasOwn(blockIdParents[childId], '_direct_')) {
+            return blockIdParents[childId]._direct_;
+        }
+
+        if (!Object.hasOwn(blockIdParents, childId)) blockIdParents[childId] = {};
+
+        let currentId = childId;
+        while (block.parent !== null) {
+            block = this._blocks[block.parent];
+            if (!block) return null;
+            if (typeof block.inputs !== 'object') {
+                currentId = block.id;
+                continue;
+            }
+            for (const key in block.inputs) {
+                const value = block.inputs[key];
+                if (value && value.block === currentId) {
+                    // A block was found. We should cache it.
+                    const data = {
+                        id: block.id,
+                        opcode: block.opcode
+                    };
+
+                    if (blockIdParents[childId]) blockIdParents[childId]._direct_ = data;
+                    return data;
+                }
+            }
+            currentId = block.id;
+        }
+
+        // If we reach here, no block was found. We should cache that.
+        if (blockIdParents[childId]) blockIdParents[childId]._direct_ = null;
+        return null;
+    }
+
+    /**
+     * ob: Find the parent block of a certain type for a child block in an input.
+     * @param {string | RegExp} opcode Opcode of the block that we're looking for.
+     * @param {string} childId The ID of the block to move up from.
+     * @return {object | null} The ID of the block we have found, or null if we didn't find anything.
+     */
+    findParentBlockOfType (opcode, childId) {
+        let block = this.getBlock(childId);
+        if (!block) return null;
+        
+        if (typeof opcode !== 'string' && !(opcode instanceof RegExp)) return null;
+        if (typeof block.parent !== 'string') return null;
+
+        // If it was cached, just return that.
+        const blockIdParents = this._cache.blockIdParents;
+        if (blockIdParents[childId] && Object.hasOwn(blockIdParents[childId], opcode)) {
+            return blockIdParents[childId][opcode];
+        }
+
+        if (!Object.hasOwn(blockIdParents, childId)) blockIdParents[childId] = {};
+
+        let currentId = childId;
+        while (block.parent !== null) {
+            block = this._blocks[block.parent];
+            if (!block) return null;
+            if (typeof block.inputs !== 'object') {
+                currentId = block.id;
+                continue;
+            }
+            if (typeof opcode === 'string' && block.opcode !== opcode) {
+                currentId = block.id;
+                continue;
+            }
+            if (opcode instanceof RegExp && !block.opcode.match(opcode)) {
+                currentId = block.id;
+                continue;
+            }
+            for (const key in block.inputs) {
+                const value = block.inputs[key];
+                if (value && value.block === currentId) {
+                    // A block was found. We should cache it.
+                    const data = {
+                        id: block.id,
+                        opcode: block.opcode
+                    };
+
+                    if (opcode !== '_direct_' && blockIdParents[childId]) blockIdParents[childId][opcode] = data;
+                    return data;
+                }
+            }
+            currentId = block.id;
+        }
+
+        // If we reach here, no block was found. We should cache that.
+        if (opcode !== '_direct_' && blockIdParents[childId]) blockIdParents[childId][opcode] = null;
+        return null;
+    }
+
+    /**
+     * ob: Validates if a substack's inner blocks conform to a certain way.
+     * @param {string} blockId The ID of the block to validate the substack of.
+     * @param {string} input Where the substack is located.
+     * @param {(child) => boolean} childId The function that validates the sub-block.
+     * @return {boolean} Returns if the substack is valid or not.
+     */
+    validateSubstack (blockId, input, validator) {
+        const thisBlock = this.getBlock(blockId);
+
+        if (typeof input !== 'string') throw new TypeError('"input" must be a string.');
+        if (typeof validator !== 'function') throw new TypeError('"validator" must be a function.');
+        if (!(input in thisBlock.inputs)) {
+            log.warn(`block input "${input}" was not found on block "${blockId}"; cannot validate substack.`);
+            return false;
+        }
+
+        // If it was cached, just return that.
+        const validatedSubstacks = this._cache.validatedSubstacks;
+        const cached = validatedSubstacks[blockId]?.[input];
+        if (cached && Object.hasOwn(cached, 'result') && cached.validator === validator) {
+            return validatedSubstacks[blockId][input].result;
+        }
+
+        validatedSubstacks[blockId] = validatedSubstacks[blockId] ?? {};
+
+        let walkedBlock = null;
+        if (thisBlock.inputs[input].block) {
+            walkedBlock = this.getBlock(thisBlock.inputs[input].block);
+        }
+        while (walkedBlock) {
+            if (!validator(walkedBlock)) {
+                if (validatedSubstacks[blockId]) {
+                    validatedSubstacks[blockId][input] = {
+                        result: false,
+                        validator: validator
+                    };
+                }
+                return false;
+            }
+            walkedBlock = this.getBlock(walkedBlock.next);
+        }
+
+        if (validatedSubstacks[blockId]) {
+            validatedSubstacks[blockId][input] = {
+                result: true,
+                validator: validator
+            };
+        }
+        return true;
+    }
+
 
     /**
      * Get all known top-level blocks that start scripts.
@@ -623,6 +794,8 @@ class Blocks {
         this._cache.compiledScripts = {};
         this._cache.compiledProcedures = {};
         this._cache.proceduresPopulated = false;
+        this._cache.blockIdParents = {};
+        this._cache.validatedSubstacks = {};
     }
 
     /**

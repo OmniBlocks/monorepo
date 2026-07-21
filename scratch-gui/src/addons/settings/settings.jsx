@@ -37,7 +37,7 @@ import styles from './settings.css';
 import {detectTheme} from '../../lib/themes/themePersistance.js';
 import {applyGuiColors} from '../../lib/themes/guiHelpers.js';
 import {APP_NAME} from '../../lib/brand.js';
-import '../../lib/normalize.css';
+import 'modern-normalize';
 
 /* eslint-disable no-alert */
 /* eslint-disable no-console */

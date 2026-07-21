@@ -39,7 +39,7 @@ const base = {
         compress: true,
         port: process.env.PORT || 8601,
         headers: {
-            "Cross-Origin-Embedder-Policy": "require-corp",
+            "Cross-Origin-Embedder-Policy": "credentialless",
             "Cross-Origin-Opener-Policy": "same-origin"
         },
         // allows ROUTING_STYLE=wildcard to work properly

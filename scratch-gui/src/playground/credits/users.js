@@ -23,44 +23,17 @@ const fromHardcoded = ({userID = '0', username}) => {
 
 const contributors = [
     {
-        userID: '41219524',
-        username: 'CubesterYT'
+        username: 'scratchcode1_2_3'
     },
     {
-        userID: '64691048',
-        username: 'CST1229'
+        username: 'AmpElectrecuted'
     },
     {
-        userID: '128887584',
-        username: 'FurryR'
+        username: 'o97doge'
     },
-    {
-        userID: '17340565',
-        username: 'GarboMuffin'
+        {
+        username: 'GvYoutube'
     },
-    {
-        userID: '12498592',
-        username: 'LilyMakesThings'
-    },
-    {
-        userID: '105362329',
-        username: 'TrueFantom'
-    },
-    {
-        userID: '9636514',
-        username: 'Tacodiva7729'
-    },
-    {
-        userID: '141930175',
-        username: 'SimonShiki'
-    },
-    {
-        userID: '34824813',
-        username: 'Geotale'
-    },
-    {
-        username: 'Wowfunhappy'
-    }
 ].map(fromHardcoded);
 
 const addonDevelopers = [

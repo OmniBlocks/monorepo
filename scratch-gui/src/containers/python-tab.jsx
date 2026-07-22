@@ -1,72 +1,72 @@
-import React from 'react';
-import bindAll from 'lodash.bindall';
-import debounce from 'lodash.debounce';
+import React from "react";
+import bindAll from "lodash.bindall";
+import debounce from "lodash.debounce";
 
-import pythonWorkerSource from 'raw-loader!../lib/python-worker.js';
-import PyrightClient from '../lib/pyright-client.js';
-import styles from '../components/python-tab/python-tab.css';
+import pythonWorkerSource from "raw-loader!../lib/python-worker.js";
+import PyrightClient from "../lib/pyright-client.js";
+import styles from "../components/python-tab/python-tab.css";
 
-import PropTypes from 'prop-types';
-import VM from 'scratch-vm';
+import PropTypes from "prop-types";
+import VM from "scratch-vm";
 
 let monacoLoadPromise = null;
 
 let pythonProvidersRegistered = false;
 let activePythonTab = null;
 
-const toLspPosition = position => ({
+const toLspPosition = (position) => ({
     line: position.lineNumber - 1,
-    character: position.column - 1
+    character: position.column - 1,
 });
 
-const toMonacoRange = range => ({
+const toMonacoRange = (range) => ({
     startLineNumber: range.start.line + 1,
     startColumn: range.start.character + 1,
     endLineNumber: range.end.line + 1,
-    endColumn: range.end.character + 1
+    endColumn: range.end.character + 1,
 });
 
 const toMonacoSeverity = (monaco, severity) => {
     switch (severity) {
-    case 1:
-        return monaco.MarkerSeverity.Error;
-    case 2:
-        return monaco.MarkerSeverity.Warning;
-    case 3:
-        return monaco.MarkerSeverity.Info;
-    case 4:
-        return monaco.MarkerSeverity.Hint;
-    default:
-        return monaco.MarkerSeverity.Error;
+        case 1:
+            return monaco.MarkerSeverity.Error;
+        case 2:
+            return monaco.MarkerSeverity.Warning;
+        case 3:
+            return monaco.MarkerSeverity.Info;
+        case 4:
+            return monaco.MarkerSeverity.Hint;
+        default:
+            return monaco.MarkerSeverity.Error;
     }
 };
 
 const lspCompletionItemKindNames = {
-    1: 'Text',
-    2: 'Method',
-    3: 'Function',
-    4: 'Constructor',
-    5: 'Field',
-    6: 'Variable',
-    7: 'Class',
-    8: 'Interface',
-    9: 'Module',
-    10: 'Property',
-    11: 'Unit',
-    12: 'Value',
-    13: 'Enum',
-    14: 'Keyword',
-    15: 'Snippet',
-    16: 'Color',
-    17: 'File',
-    18: 'Reference',
-    19: 'Folder',
-    20: 'EnumMember',
-    21: 'Constant',
-    22: 'Struct',
-    23: 'Event',
-    24: 'Operator',
-    25: 'TypeParameter'
+    1: "Text",
+    2: "Method",
+    3: "Function",
+    4: "Constructor",
+    5: "Field",
+    6: "Variable",
+    7: "Class",
+    8: "Interface",
+    9: "Module",
+    10: "Property",
+    11: "Unit",
+    12: "Value",
+    13: "Enum",
+    14: "Keyword",
+    15: "Snippet",
+    16: "Color",
+    17: "File",
+    18: "Reference",
+    19: "Folder",
+    20: "EnumMember",
+    21: "Constant",
+    22: "Struct",
+    23: "Event",
+    24: "Operator",
+    25: "TypeParameter",
 };
 
 const toMonacoCompletionItemKind = (monaco, kind) => {
@@ -77,80 +77,80 @@ const toMonacoCompletionItemKind = (monaco, kind) => {
     );
 };
 
-const registerPythonLanguageProviders = monaco => {
+const registerPythonLanguageProviders = (monaco) => {
     if (pythonProvidersRegistered) {
         return;
     }
     pythonProvidersRegistered = true;
 
-    monaco.languages.registerCompletionItemProvider('python', {
-        triggerCharacters: ['.', '[', '"', "'"],
+    monaco.languages.registerCompletionItemProvider("python", {
+        triggerCharacters: [".", "[", '"', "'"],
         provideCompletionItems: (model, position) =>
-            (activePythonTab ?
-                activePythonTab.handleProvideCompletion(model, position) :
-                {suggestions: []}),
-        resolveCompletionItem: item =>
-            (activePythonTab ?
-                activePythonTab.handleResolveCompletion(item) :
-                item)
+            activePythonTab
+                ? activePythonTab.handleProvideCompletion(model, position)
+                : { suggestions: [] },
+        resolveCompletionItem: (item) =>
+            activePythonTab
+                ? activePythonTab.handleResolveCompletion(item)
+                : item,
     });
 
-    monaco.languages.registerHoverProvider('python', {
+    monaco.languages.registerHoverProvider("python", {
         provideHover: (model, position) =>
-            (activePythonTab ?
-                activePythonTab.handleProvideHover(model, position) :
-                null)
+            activePythonTab
+                ? activePythonTab.handleProvideHover(model, position)
+                : null,
     });
 };
 
 class PythonTab extends React.Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
 
         bindAll(this, [
-            'createWorker',
-            'destroyWorker',
-            'handleCodeChange',
-            'handleRun',
-            'handleStop',
-            'handleWorkerMessage',
-            'handleScratchCommand',
-            'handleProvideCompletion',
-            'handleResolveCompletion',
-            'handleProvideHover'
+            "createWorker",
+            "destroyWorker",
+            "handleCodeChange",
+            "handleRun",
+            "handleStop",
+            "handleWorkerMessage",
+            "handleScratchCommand",
+            "handleProvideCompletion",
+            "handleResolveCompletion",
+            "handleProvideHover",
         ]);
 
         this.state = {
             code: [
-                'print("Hello from OmniBlocks!")',
-                'for number in range(3):',
-                '    print(number)',
-                ''
-            ].join('\n'),
-            output: '',
+                "from omniblocks import sprite",
+                "",
+                "sprite.move(10)",
+                "",
+            ].join("\n"),
+            output: "",
             ready: false,
-            running: false
+            running: false,
         };
 
         this.worker = null;
         this.monaco = null;
         this.pyrightClient = null;
         this.completionRange = null;
-        this.debouncedUpdatePyrightDocument = debounce(code => {
+        this.debouncedUpdatePyrightDocument = debounce((code) => {
             if (this.pyrightClient) {
                 this.pyrightClient.updateTextDocument(code);
             }
         }, 250);
     }
 
-    componentDidMount () {
+    componentDidMount() {
         activePythonTab = this;
         this.loadMonaco();
         this.createWorker();
         this.createPyrightClient();
     }
 
-    componentWillUnmount () {
+    componentWillUnmount() {
         if (activePythonTab === this) {
             activePythonTab = null;
         }
@@ -162,8 +162,8 @@ class PythonTab extends React.Component {
         this.destroyWorker();
     }
 
-    loadMonaco () {
-        const {basePath} = this.props;
+    loadMonaco() {
+        const { basePath } = this.props;
         const vsPath = `${basePath}static/vs`;
 
         if (window.monaco) {
@@ -173,21 +173,21 @@ class PythonTab extends React.Component {
 
         if (!monacoLoadPromise) {
             monacoLoadPromise = new Promise((resolve, reject) => {
-                const script = document.createElement('script');
+                const script = document.createElement("script");
                 script.src = `${vsPath}/loader.js`;
                 script.onload = () => {
                     window.MonacoEnvironment = {
                         getWorkerUrl: () =>
-                            `${vsPath}/base/worker/workerMain.js`
+                            `${vsPath}/base/worker/workerMain.js`,
                     };
-                    window.require.config({paths: {vs: vsPath}});
+                    window.require.config({ paths: { vs: vsPath } });
                     window.require(
-                        ['vs/editor/editor.main'],
-                        monaco => {
+                        ["vs/editor/editor.main"],
+                        (monaco) => {
                             window.monaco = monaco;
                             resolve(monaco);
                         },
-                        reject
+                        reject,
                     );
                 };
                 script.onerror = reject;
@@ -196,64 +196,64 @@ class PythonTab extends React.Component {
         }
 
         monacoLoadPromise.then(
-            monaco => this.createMonacoEditor(monaco),
-            error => console.error('Failed to load Monaco:', error)
+            (monaco) => this.createMonacoEditor(monaco),
+            (error) => console.error("Failed to load Monaco:", error),
         );
     }
 
-    createMonacoEditor (monaco) {
+    createMonacoEditor(monaco) {
         this.monaco = monaco;
         registerPythonLanguageProviders(monaco);
 
         this.editor = monaco.editor.create(this.editorContainer, {
             value: this.state.code,
-            language: 'python',
-            theme: 'vs-dark',
-            automaticLayout: true
+            language: "python",
+            theme: "vs-dark",
+            automaticLayout: true,
         });
 
         this.editor.onDidChangeModelContent(() => {
             const code = this.editor.getValue();
-            this.setState({code});
+            this.setState({ code });
             this.debouncedUpdatePyrightDocument(code);
         });
     }
 
-    createPyrightClient () {
-        const {basePath} = this.props;
+    createPyrightClient() {
+        const { basePath } = this.props;
         const client = new PyrightClient(
-            `${basePath}static/pyright/pyright.worker.js`
+            `${basePath}static/pyright/pyright.worker.js`,
         );
 
-        client.onDiagnostics = diagnostics =>
+        client.onDiagnostics = (diagnostics) =>
             this.applyDiagnostics(diagnostics);
 
         this.pyrightClient = client;
-        client.initialize().catch(error => {
-            console.error('Failed to initialize pyright:', error);
+        client.initialize().catch((error) => {
+            console.error("Failed to initialize pyright:", error);
         });
     }
 
-    applyDiagnostics (diagnostics) {
+    applyDiagnostics(diagnostics) {
         if (!this.monaco || !this.editor) {
             return;
         }
 
-        const markers = diagnostics.map(diagnostic => ({
+        const markers = diagnostics.map((diagnostic) => ({
             ...toMonacoRange(diagnostic.range),
             severity: toMonacoSeverity(this.monaco, diagnostic.severity),
             message: diagnostic.message,
-            tags: diagnostic.tags
+            tags: diagnostic.tags,
         }));
 
         this.monaco.editor.setModelMarkers(
             this.editor.getModel(),
-            'pyright',
-            markers
+            "pyright",
+            markers,
         );
     }
 
-    convertCompletionItem (item, defaultRange) {
+    convertCompletionItem(item, defaultRange) {
         const monaco = this.monaco;
         const converted = {
             label: item.label,
@@ -263,7 +263,7 @@ class PythonTab extends React.Component {
             sortText: item.sortText,
             filterText: item.filterText,
             insertText: item.insertText || item.label,
-            range: defaultRange
+            range: defaultRange,
         };
 
         if (item.textEdit) {
@@ -276,10 +276,10 @@ class PythonTab extends React.Component {
         return converted;
     }
 
-    async handleProvideCompletion (model, position) {
+    async handleProvideCompletion(model, position) {
         const client = this.pyrightClient;
         if (!client) {
-            return {suggestions: []};
+            return { suggestions: [] };
         }
 
         const word = model.getWordUntilPosition(position);
@@ -287,29 +287,29 @@ class PythonTab extends React.Component {
             startLineNumber: position.lineNumber,
             endLineNumber: position.lineNumber,
             startColumn: word.startColumn,
-            endColumn: word.endColumn
+            endColumn: word.endColumn,
         };
 
         const result = await client.getCompletion(
             model.getValue(),
-            toLspPosition(position)
+            toLspPosition(position),
         );
         if (!result) {
-            return {suggestions: []};
+            return { suggestions: [] };
         }
 
         const items = Array.isArray(result) ? result : result.items;
         return {
-            suggestions: items.map(item =>
-                this.convertCompletionItem(item, defaultRange)
+            suggestions: items.map((item) =>
+                this.convertCompletionItem(item, defaultRange),
             ),
-            incomplete: Array.isArray(result) ?
-                false :
-                Boolean(result.isIncomplete)
+            incomplete: Array.isArray(result)
+                ? false
+                : Boolean(result.isIncomplete),
         };
     }
 
-    async handleResolveCompletion (item) {
+    async handleResolveCompletion(item) {
         const client = this.pyrightClient;
         const original = item.__lspItem;
         if (!client || !original) {
@@ -317,12 +317,12 @@ class PythonTab extends React.Component {
         }
 
         const resolved = await client.resolveCompletion(original);
-        return resolved ?
-            this.convertCompletionItem(resolved, item.range) :
-            item;
+        return resolved
+            ? this.convertCompletionItem(resolved, item.range)
+            : item;
     }
 
-    async handleProvideHover (model, position) {
+    async handleProvideHover(model, position) {
         const client = this.pyrightClient;
         if (!client) {
             return null;
@@ -330,27 +330,27 @@ class PythonTab extends React.Component {
 
         const hover = await client.getHoverInfo(
             model.getValue(),
-            toLspPosition(position)
+            toLspPosition(position),
         );
         if (!hover || !hover.contents) {
             return null;
         }
 
         const value =
-            typeof hover.contents === 'string' ?
-                hover.contents :
-                hover.contents.value || '';
+            typeof hover.contents === "string"
+                ? hover.contents
+                : hover.contents.value || "";
 
-        const result = {contents: [{value}]};
+        const result = { contents: [{ value }] };
         if (hover.range) {
             result.range = toMonacoRange(hover.range);
         }
         return result;
     }
 
-    createWorker () {
+    createWorker() {
         const blob = new Blob([pythonWorkerSource], {
-            type: 'text/javascript'
+            type: "text/javascript",
         });
         const workerUrl = URL.createObjectURL(blob);
 
@@ -358,62 +358,67 @@ class PythonTab extends React.Component {
         URL.revokeObjectURL(workerUrl);
 
         this.worker.onmessage = this.handleWorkerMessage;
-        this.worker.postMessage({type: 'initialize'});
+        this.worker.onerror = (event) => {
+            this.setState((state) => ({
+                output: `${state.output}Python worker failed to load: ${event.message}\n`,
+            }));
+        };
+        this.worker.postMessage({ type: "initialize" });
 
         this.setState({
             ready: false,
-            running: false
+            running: false,
         });
     }
 
-    destroyWorker () {
+    destroyWorker() {
         if (this.worker) {
             this.worker.terminate();
             this.worker = null;
         }
     }
 
-    handleWorkerMessage (event) {
-        const {type, text, message} = event.data;
+    handleWorkerMessage(event) {
+        const { type, text, message } = event.data;
 
-        if (type === 'ready') {
-            this.setState({ready: true});
+        if (type === "ready") {
+            this.setState({ ready: true });
             return;
         }
 
-        if (type === 'stdout' || type === 'stderr') {
-            this.setState(state => ({
-                output: `${state.output}${text}\n`
+        if (type === "stdout" || type === "stderr") {
+            this.setState((state) => ({
+                output: `${state.output}${text}\n`,
             }));
             return;
         }
 
-        if (type === 'done') {
-            this.setState({running: false});
+        if (type === "done") {
+            this.setState({ running: false });
             return;
         }
 
-        if (type === 'error') {
-            this.setState(state => ({
+        if (type === "error") {
+            this.setState((state) => ({
                 output: `${state.output}${message}\n`,
-                running: false
+                running: false,
             }));
         }
 
-        if (type === 'scratch-command') {
+        if (type === "scratch-command") {
             this.handleScratchCommand(event.data.command);
             return;
         }
     }
 
-    handleCodeChange (event) {
+    handleCodeChange(event) {
         this.setState({
-            code: event.target.value
+            code: event.target.value,
         });
     }
 
-    handleRun () {
-        const {code, ready, running} = this.state;
+    handleRun() {
+        const { code, ready, running } = this.state;
 
         if (!this.worker || !ready || running) {
             return;
@@ -421,19 +426,19 @@ class PythonTab extends React.Component {
 
         this.setState(
             {
-                output: '',
-                running: true
+                output: "",
+                running: true,
             },
             () => {
                 this.worker.postMessage({
-                    type: 'run',
-                    code
+                    type: "run",
+                    code,
                 });
-            }
+            },
         );
     }
 
-    handleStop () {
+    handleStop() {
         if (!this.state.running) {
             return;
         }
@@ -441,118 +446,118 @@ class PythonTab extends React.Component {
         // A worker termination reliably stops `while True: pass`.
         this.destroyWorker();
 
-        this.setState(state => ({
+        this.setState((state) => ({
             output: `${state.output}\nExecution stopped.\n`,
-            running: false
+            running: false,
         }));
 
         this.createWorker();
     }
 
-    handleScratchCommand (command) {
-        if (!command || typeof command !== 'object') {
+    handleScratchCommand(command) {
+        if (!command || typeof command !== "object") {
             return;
         }
 
-        const {target: targetName, operation, args = {}} = command;
-        const {vm} = this.props;
+        const { target: targetName, operation, args = {} } = command;
+        const { vm } = this.props;
         const runtime = vm.runtime;
 
         const target =
-            targetName === '__stage__' ?
-                runtime.getTargetForStage() :
-                targetName ?
-                    runtime.getSpriteTargetByName(targetName) :
-                    vm.editingTarget;
+            targetName === "__stage__"
+                ? runtime.getTargetForStage()
+                : targetName
+                  ? runtime.getSpriteTargetByName(targetName)
+                  : vm.editingTarget;
 
         if (!target) {
-            this.setState(state => ({
-                output: `${state.output}Scratch target not found: ${targetName || 'selected target'}\n`
+            this.setState((state) => ({
+                output: `${state.output}Scratch target not found: ${targetName || "selected target"}\n`,
             }));
             return;
         }
 
-        const number = value => {
+        const number = (value) => {
             const result = Number(value);
             if (!Number.isFinite(result)) {
-                throw new Error('Expected a finite number');
+                throw new Error("Expected a finite number");
             }
             return result;
         };
 
         try {
             switch (operation) {
-            case 'move': {
-                // Scratch direction: 90 = right, 0 = up.
-                const steps = number(args.steps);
-                const radians = (90 - target.direction) * (Math.PI / 180);
-                target.setXY(
-                    target.x + (steps * Math.cos(radians)),
-                    target.y + (steps * Math.sin(radians))
-                );
-                break;
-            }
-
-            case 'go_to':
-                target.setXY(number(args.x), number(args.y));
-                break;
-
-            case 'turn_right':
-                target.setDirection(
-                    target.direction + number(args.degrees)
-                );
-                break;
-
-            case 'point_in_direction':
-                target.setDirection(number(args.degrees));
-                break;
-
-            case 'set_visible':
-                if (typeof args.visible !== 'boolean') {
-                    throw new Error('visible must be true or false');
+                case "move": {
+                    // Scratch direction: 90 = right, 0 = up.
+                    const steps = number(args.steps);
+                    const radians = (90 - target.direction) * (Math.PI / 180);
+                    target.setXY(
+                        target.x + steps * Math.cos(radians),
+                        target.y + steps * Math.sin(radians),
+                    );
+                    break;
                 }
-                target.setVisible(args.visible);
-                break;
 
-            case 'switch_costume': {
-                const costumeIndex = target.getCostumeIndexByName(
-                    String(args.costume)
-                );
-                if (costumeIndex === -1) {
-                    throw new Error(`Costume not found: ${args.costume}`);
-                }
-                target.setCostume(costumeIndex);
-                break;
-            }
+                case "go_to":
+                    target.setXY(number(args.x), number(args.y));
+                    break;
 
-            case 'switch_backdrop': {
-                if (!target.isStage) {
-                    throw new Error('Only the Stage can switch backdrops');
-                }
-                const backdropIndex = target.getCostumeIndexByName(
-                    String(args.backdrop)
-                );
-                if (backdropIndex === -1) {
-                    throw new Error(`Backdrop not found: ${args.backdrop}`);
-                }
-                target.setCostume(backdropIndex);
-                break;
-            }
+                case "turn_right":
+                    target.setDirection(
+                        target.direction + number(args.degrees),
+                    );
+                    break;
 
-            default:
-                throw new Error(
-                    `Python is not allowed to run "${operation}"`
-                );
+                case "point_in_direction":
+                    target.setDirection(number(args.degrees));
+                    break;
+
+                case "set_visible":
+                    if (typeof args.visible !== "boolean") {
+                        throw new Error("visible must be true or false");
+                    }
+                    target.setVisible(args.visible);
+                    break;
+
+                case "switch_costume": {
+                    const costumeIndex = target.getCostumeIndexByName(
+                        String(args.costume),
+                    );
+                    if (costumeIndex === -1) {
+                        throw new Error(`Costume not found: ${args.costume}`);
+                    }
+                    target.setCostume(costumeIndex);
+                    break;
+                }
+
+                case "switch_backdrop": {
+                    if (!target.isStage) {
+                        throw new Error("Only the Stage can switch backdrops");
+                    }
+                    const backdropIndex = target.getCostumeIndexByName(
+                        String(args.backdrop),
+                    );
+                    if (backdropIndex === -1) {
+                        throw new Error(`Backdrop not found: ${args.backdrop}`);
+                    }
+                    target.setCostume(backdropIndex);
+                    break;
+                }
+
+                default:
+                    throw new Error(
+                        `Python is not allowed to run "${operation}"`,
+                    );
             }
         } catch (error) {
-            this.setState(state => ({
-                output: `${state.output}Scratch command error: ${error.message}\n`
+            this.setState((state) => ({
+                output: `${state.output}Scratch command error: ${error.message}\n`,
             }));
         }
     }
 
-    render () {
-        const {output, ready, running} = this.state;
+    render() {
+        const { output, ready, running } = this.state;
 
         return (
             <div className={styles.wrapper}>
@@ -562,7 +567,7 @@ class PythonTab extends React.Component {
                         disabled={!ready || running}
                         onClick={this.handleRun}
                     >
-                        {ready ? 'Run' : 'Loading Python…'}
+                        {ready ? "Run" : "Loading Python…"}
                     </button>
 
                     <button
@@ -570,19 +575,19 @@ class PythonTab extends React.Component {
                         disabled={!running}
                         onClick={this.handleStop}
                     >
-                        {'Stop'}
+                        {"Stop"}
                     </button>
                 </div>
 
                 <div
-                    ref={el => {
+                    ref={(el) => {
                         this.editorContainer = el;
                     }}
                     className={styles.editor}
                 />
 
                 <pre className={styles.output}>
-                    {output || 'Output appears here.'}
+                    {output || "Output appears here."}
                 </pre>
             </div>
         );
@@ -591,11 +596,11 @@ class PythonTab extends React.Component {
 
 PythonTab.propTypes = {
     basePath: PropTypes.string,
-    vm: PropTypes.instanceOf(VM).isRequired
+    vm: PropTypes.instanceOf(VM).isRequired,
 };
 
 PythonTab.defaultProps = {
-    basePath: './'
+    basePath: "./",
 };
 
 export default PythonTab;

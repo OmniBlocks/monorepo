@@ -3,6 +3,66 @@
 const PYODIDE_INDEX_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
 const PYODIDE_CACHE_NAME = "omniblocks-pyodide-v0.26.4";
 
+const STUB = `import sys
+import types
+import omniblocks_bridge
+
+class Sprite:
+    def __init__(self, name=None):
+        self.name = name
+
+    def _send(self, operation, **args):
+        omniblocks_bridge.sendCommand({
+            "target": self.name,
+            "operation": operation,
+            "args": args
+        })
+
+    def move(self, steps):
+        self._send("move", steps=steps)
+
+    def go_to(self, x, y):
+        self._send("go_to", x=x, y=y)
+
+    def turn_right(self, degrees):
+        self._send("turn_right", degrees=degrees)
+
+    def point_in_direction(self, degrees):
+        self._send("point_in_direction", degrees=degrees)
+
+    def show(self):
+        self._send("set_visible", visible=True)
+
+    def hide(self):
+        self._send("set_visible", visible=False)
+
+    def switch_costume(self, costume):
+        self._send("switch_costume", costume=costume)
+
+# The currently selected sprite in the editor.
+sprite = Sprite()
+
+def get_sprite(name):
+    return Sprite(name)
+
+class Stage:
+    def switch_backdrop(self, backdrop):
+        omniblocks_bridge.sendCommand({
+            "target": "__stage__",
+            "operation": "switch_backdrop",
+            "args": {"backdrop": backdrop}
+        })
+
+stage = Stage()
+
+omniblocks = types.ModuleType("omniblocks")
+omniblocks.Sprite = Sprite
+omniblocks.sprite = sprite
+omniblocks.get_sprite = get_sprite
+omniblocks.Stage = Stage
+omniblocks.stage = stage
+sys.modules["omniblocks"] = omniblocks`;
+
 let pyodidePromise = null;
 
 const send = (message) => self.postMessage(message);
@@ -66,57 +126,7 @@ const getPyodide = () => {
                     }),
             });
 
-            pyodide.runPython(`
-import omniblocks_bridge
-
-class Sprite:
-    def __init__(self, name=None):
-        self.name = name
-
-    def _send(self, operation, **args):
-        omniblocks_bridge.sendCommand({
-            "target": self.name,
-            "operation": operation,
-            "args": args
-        })
-
-    def move(self, steps):
-        self._send("move", steps=steps)
-
-    def go_to(self, x, y):
-        self._send("go_to", x=x, y=y)
-
-    def turn_right(self, degrees):
-        self._send("turn_right", degrees=degrees)
-
-    def point_in_direction(self, degrees):
-        self._send("point_in_direction", degrees=degrees)
-
-    def show(self):
-        self._send("set_visible", visible=True)
-
-    def hide(self):
-        self._send("set_visible", visible=False)
-
-    def switch_costume(self, costume):
-        self._send("switch_costume", costume=costume)
-
-# The currently selected sprite in the editor.
-sprite = Sprite()
-
-def get_sprite(name):
-    return Sprite(name)
-
-class Stage:
-    def switch_backdrop(self, backdrop):
-        omniblocks_bridge.sendCommand({
-            "target": "__stage__",
-            "operation": "switch_backdrop",
-            "args": {"backdrop": backdrop}
-        })
-
-stage = Stage()
-`);
+            pyodide.runPython(STUB);
 
             return pyodide;
         });

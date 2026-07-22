@@ -1,7 +1,7 @@
 import {
     BrowserMessageReader,
-    BrowserMessageWriter
-} from 'vscode-jsonrpc/browser';
+    BrowserMessageWriter,
+} from "vscode-jsonrpc/browser";
 import {
     CompletionRequest,
     CompletionResolveRequest,
@@ -10,59 +10,61 @@ import {
     InitializeRequest,
     NotificationType,
     RequestType,
-    createMessageConnection
-} from 'vscode-languageserver-protocol';
+    createMessageConnection,
+} from "vscode-languageserver-protocol";
 
-const ROOT_PATH = '/src/';
+import { STUB } from "./python-worker";
+
+const ROOT_PATH = "/src/";
 const ROOT_URI = `file://${ROOT_PATH}`;
-const FILE_NAME = 'main.py';
+const FILE_NAME = "main.py";
 const DOCUMENT_URI = ROOT_URI + FILE_NAME;
 
 class PyrightClient {
-    constructor (workerUrl) {
+    constructor(workerUrl) {
         this.workerUrl = workerUrl;
         this.connection = null;
         this.workers = [];
         this.documentVersion = 1;
-        this.documentText = '';
+        this.documentText = "";
         this.onDiagnostics = null;
     }
 
-    async initialize () {
+    async initialize() {
         const foreground = new Worker(this.workerUrl, {
-            name: 'Pyright-foreground',
-            type: 'classic'
+            name: "Pyright-foreground",
+            type: "classic",
         });
-        foreground.postMessage({type: 'browser/boot', mode: 'foreground'});
+        foreground.postMessage({ type: "browser/boot", mode: "foreground" });
 
         this.workers = [foreground];
 
         // spagghetti code
-        foreground.addEventListener('message', event => {
-            if (event.data && event.data.type === 'browser/newWorker') {
-                const {initialData, port} = event.data;
+        foreground.addEventListener("message", (event) => {
+            if (event.data && event.data.type === "browser/newWorker") {
+                const { initialData, port } = event.data;
                 const background = new Worker(this.workerUrl, {
-                    name: `Pyright-background-${this.workers.length}`
+                    name: `Pyright-background-${this.workers.length}`,
                 });
                 this.workers.push(background);
                 background.postMessage(
                     {
-                        type: 'browser/boot',
-                        mode: 'background',
+                        type: "browser/boot",
+                        mode: "background",
                         initialData,
-                        port
+                        port,
                     },
-                    [port]
+                    [port],
                 );
             }
         });
 
         const connection = createMessageConnection(
             new BrowserMessageReader(foreground),
-            new BrowserMessageWriter(foreground)
+            new BrowserMessageWriter(foreground),
         );
         connection.onDispose(() => {
-            this.workers.forEach(worker => worker.terminate());
+            this.workers.forEach((worker) => worker.terminate());
         });
         connection.listen();
         this.connection = connection;
@@ -77,61 +79,62 @@ class PyrightClient {
                         tagSupport: {
                             valueSet: [
                                 DiagnosticTag.Unnecessary,
-                                DiagnosticTag.Deprecated
-                            ]
+                                DiagnosticTag.Deprecated,
+                            ],
                         },
-                        versionSupport: true
+                        versionSupport: true,
                     },
                     hover: {
-                        contentFormat: ['markdown', 'plaintext']
-                    }
-                }
+                        contentFormat: ["markdown", "plaintext"],
+                    },
+                },
             },
             initializationOptions: {
                 files: {
                     [ROOT_PATH + FILE_NAME]: this.documentText,
                     [`${ROOT_PATH}pyrightconfig.json`]: JSON.stringify({
-                        typeshedPath: '/typeshed',
-                        typeCheckingMode: 'basic'
-                    })
-                }
-            }
+                        typeshedPath: "/typeshed",
+                        typeCheckingMode: "basic",
+                    }),
+                    "/src/omniblocks.pyi": STUB,
+                },
+            },
         });
 
         await connection.sendNotification(
-            new NotificationType('workspace/didChangeConfiguration'),
-            {settings: {}}
+            new NotificationType("workspace/didChangeConfiguration"),
+            { settings: {} },
         );
 
         await connection.sendNotification(
-            new NotificationType('textDocument/didOpen'),
+            new NotificationType("textDocument/didOpen"),
             {
                 textDocument: {
                     uri: DOCUMENT_URI,
-                    languageId: 'python',
+                    languageId: "python",
                     version: this.documentVersion,
-                    text: this.documentText
-                }
-            }
+                    text: this.documentText,
+                },
+            },
         );
 
         connection.onNotification(
-            new NotificationType('textDocument/publishDiagnostics'),
-            diagnosticInfo => {
+            new NotificationType("textDocument/publishDiagnostics"),
+            (diagnosticInfo) => {
                 if (this.onDiagnostics) {
                     this.onDiagnostics(diagnosticInfo.diagnostics);
                 }
-            }
+            },
         );
 
         // oopsie poopsie
         connection.onRequest(
-            new RequestType('workspace/configuration'),
-            () => []
+            new RequestType("workspace/configuration"),
+            () => [],
         );
     }
 
-    async updateTextDocument (code) {
+    async updateTextDocument(code) {
         if (!this.connection || this.documentText === code) {
             return this.documentVersion;
         }
@@ -140,17 +143,17 @@ class PyrightClient {
         this.documentText = code;
 
         await this.connection.sendNotification(
-            new NotificationType('textDocument/didChange'),
+            new NotificationType("textDocument/didChange"),
             {
-                textDocument: {uri: DOCUMENT_URI, version},
-                contentChanges: [{text: code}]
-            }
+                textDocument: { uri: DOCUMENT_URI, version },
+                contentChanges: [{ text: code }],
+            },
         );
 
         return version;
     }
 
-    async getCompletion (code, position) {
+    async getCompletion(code, position) {
         if (!this.connection) {
             return null;
         }
@@ -159,15 +162,15 @@ class PyrightClient {
 
         try {
             return await this.connection.sendRequest(CompletionRequest.type, {
-                textDocument: {uri: DOCUMENT_URI},
-                position
+                textDocument: { uri: DOCUMENT_URI },
+                position,
             });
         } catch (error) {
             return null;
         }
     }
 
-    async resolveCompletion (item) {
+    async resolveCompletion(item) {
         if (!this.connection) {
             return null;
         }
@@ -175,14 +178,14 @@ class PyrightClient {
         try {
             return await this.connection.sendRequest(
                 CompletionResolveRequest.type,
-                item
+                item,
             );
         } catch (error) {
             return null;
         }
     }
 
-    async getHoverInfo (code, position) {
+    async getHoverInfo(code, position) {
         if (!this.connection) {
             return null;
         }
@@ -191,15 +194,15 @@ class PyrightClient {
 
         try {
             return await this.connection.sendRequest(HoverRequest.type, {
-                textDocument: {uri: DOCUMENT_URI},
-                position
+                textDocument: { uri: DOCUMENT_URI },
+                position,
             });
         } catch (error) {
             return null;
         }
     }
 
-    dispose () {
+    dispose() {
         if (this.connection) {
             this.connection.dispose();
         }

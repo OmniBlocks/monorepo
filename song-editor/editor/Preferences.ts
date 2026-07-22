@@ -25,8 +25,8 @@ export class Preferences {
 	public enableChannelMuting: boolean = true;
 	public colorTheme: string;
 	public layout: string;
-	//public displayBrowserUrl: boolean; //comment for testing
-	public displayBrowserUrl: boolean = false; //uncomment for testing
+	public displayBrowserUrl: boolean; //comment for testing
+	//public displayBrowserUrl: boolean = false; //uncomment for testing
 	public volume: number = 75;
 	public visibleOctaves: number = Preferences.defaultVisibleOctaves;
 	public pressControlForShortcuts: boolean;
@@ -68,7 +68,7 @@ export class Preferences {
 		this.instrumentImportExport = window.localStorage.getItem("instrumentImportExport") == "true";
 		this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") == "true";
 		this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") != "false";
-		//this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false"; //comment for testing
+		this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false"; //comment for testing
 		this.pressControlForShortcuts = window.localStorage.getItem("pressControlForShortcuts") == "true";
 		this.enableMidi = window.localStorage.getItem("enableMidi") != "false";
 		this.showRecordButton = window.localStorage.getItem("showRecordButton") == "true";
@@ -76,7 +76,7 @@ export class Preferences {
 		this.ignorePerformedNotesNotInScale = window.localStorage.getItem("ignorePerformedNotesNotInScale") == "true";
 		this.metronomeCountIn = window.localStorage.getItem("metronomeCountIn") != "false";
 		this.metronomeWhileRecording = window.localStorage.getItem("metronomeWhileRecording") != "false";
-		this.notesFlashWhenPlayed = window.localStorage.getItem("notesFlashWhenPlayed") != "flase";
+		this.notesFlashWhenPlayed = window.localStorage.getItem("notesFlashWhenPlayed") != "false";
 		this.showOscilloscope = window.localStorage.getItem("showOscilloscope") == "true";
 		this.showSampleLoadingStatus = window.localStorage.getItem("showSampleLoadingStatus") != "false";
 		this.showDescription = window.localStorage.getItem("showDescription") != "false";

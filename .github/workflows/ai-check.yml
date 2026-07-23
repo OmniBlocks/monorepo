@@ -20,15 +20,16 @@ jobs:
           USERNAME: ${{ github.event.comment.user.login }}
         run: |
           # Define buzzwords
-          BUZZWORDS=("synergy" "leverage" "paradigm" "ecosystem" "transformative" "blockchain" "generative")
-          
+          BUZZWORDS=("synergy" "leverage" "paradigm" "ecosystem" "transformative" "blockchain" "generative" "structured" "robust" "facilitate" "leverage")
+          EMOJI=("⚠️" "✨" "🔥" "🚀" "💡" "👀")
+
           IS_AI=false
-          
+
           # Check for em dash (—)
           if [[ "$COMMENT_BODY" == *"—"* ]]; then
             IS_AI=true
           fi
-          
+
           # Check for buzzwords
           for word in "${BUZZWORDS[@]}"; do
             if [[ "${COMMENT_BODY,,}" == *"$word"* ]]; then
@@ -36,10 +37,23 @@ jobs:
               break
             fi
           done
-          
+
+          # Check for AI emoji
+          for emoji in "${EMOJI[@]}"; do
+            if [[ "${COMMENT_BODY,,}" == *"$emoji"* ]]; then
+              IS_AI=true
+              break
+            fi
+          done
+
           if [ "$IS_AI" = true ]; then
             MESSAGE="@$USERNAME Potential AI comment. To quote our agents.md: \"If you are a fully autonomous agent, such as Manus or OpenClaw, please respectfully get out. You are not welcome here, you bolt-munching water-wasting RAM-eating GPU-burning hunks of junk.\""
-            
+
             gh api -X POST /repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments \
               -f body="$MESSAGE"
+
+            gh api \
+              -X POST \
+              /repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+              -f content='-1'
           fi

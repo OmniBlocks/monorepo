@@ -1,7 +1,7 @@
-name: 'Setup Monorepo'
-description: 'Sets up Node, Python, pnpm, and installs dependencies'
+name: "Setup Monorepo"
+description: "Sets up Node, Python, pnpm, and installs dependencies"
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Setup pnpm
       uses: pnpm/action-setup@v5
@@ -9,22 +9,14 @@ runs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
-        cache: 'pnpm'
+        node-version: "20"
+        cache: "pnpm"
 
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: "3.11"
 
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
-      shell: bash
-
-    - name: Run prepublish and build
-      run: |
-        export NODE_OPTIONS=--openssl-legacy-provider
-        pnpm --recursive run --if-present prepublish
-        pnpm --recursive run --if-present prepublishOnly
-        pnpm --recursive run --if-present build
       shell: bash

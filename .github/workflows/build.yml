@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
@@ -18,8 +18,31 @@ jobs:
     concurrency:
       group: ${{ github.ref }}
       cancel-in-progress: true
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Monorepo
         uses: ./.github/actions/setup-monorepo
+
+      - name: Build packages (Node 20)
+        run: |
+          pnpm --recursive run --if-present prepublish
+          pnpm --recursive run --if-present prepublishOnly
+          pnpm --filter "!extensions" --recursive run --if-present build
+        shell: bash
+
+      - name: Setup Node.js 22 for extensions
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Build extensions
+        run: |
+          pnpm --filter extensions run build
+        shell: bash
+
+      - name: Run unit tests
+        run: pnpm --recursive run test
+        shell: bash

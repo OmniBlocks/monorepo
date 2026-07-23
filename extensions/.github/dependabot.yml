@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "GarboMuffin"
+    allow:
+      # Only try to automatically bump first-party dependencies.
+      - dependency-name: "@turbowarp/*"

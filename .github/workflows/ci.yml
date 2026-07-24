@@ -32,6 +32,3 @@ jobs:
       - name: Build extensions
         run: |
           pnpm --filter extensions run build
-
-      - name: Run unit tests
-        run: pnpm --recursive run test

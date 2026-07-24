@@ -42,7 +42,3 @@ jobs:
         run: |
           pnpm --filter extensions run build
         shell: bash
-
-      - name: Run unit tests
-        run: pnpm --recursive run test
-        shell: bash

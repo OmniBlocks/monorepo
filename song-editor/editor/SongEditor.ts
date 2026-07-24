@@ -120,7 +120,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
                 if(preset.id != undefined) { //normal presets
                     group.appendChild(option({ value: preset.id }, preset.name));
                 } else { //sample presets
-                    group.appendChild(option({ value: 8388607 - presetIndex }, preset.name));
+                    group.appendChild(option({ value: 8388608 - presetIndex }, preset.name));
                 }
                 foundAny = true;
             }

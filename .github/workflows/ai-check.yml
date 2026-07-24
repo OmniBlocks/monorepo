@@ -50,7 +50,7 @@ jobs:
           fi
 
           # Check for buzzwords (Requires AT LEAST 2 buzzword matches to add to score)
-          BUZZWORDS=("synergy" "leverage" "paradigm" "ecosystem" "transformative" "blockchain" "generative" "structured" "robust" "facilitate" "pivotal" "delve" "comprehensive" "testament" "dive into")
+          BUZZWORDS=("synergy" "leverage" "paradigm" "ecosystem" "transformative" "blockchain" "generative" "structured" "robust" "facilitate" "pivotal" "delve" "comprehensive" "testament" "dive into" "premium")
           BUZZWORD_COUNT=0
           COMMENT_LOWER="${COMMENT_BODY,,}"
 

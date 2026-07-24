@@ -2,58 +2,117 @@ name: AI Comment Detector
 
 on:
   issue_comment:
-    types: [created]
+    types: [created, edited]
+  discussion_comment:
+    types: [created, edited]
 
 jobs:
   check-comment:
-    # This conditional skips the job if the user is in the ignored list
     if: ${{ github.event.comment.user.login != 'boxycpu[bot]' && github.event.comment.user.login != 'coderabbitai[bot]' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write
+      discussions: write
     steps:
       - name: Check for AI content
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
           COMMENT_BODY: ${{ github.event.comment.body }}
           USERNAME: ${{ github.event.comment.user.login }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          DISCUSSION_ID: ${{ github.event.discussion.node_id }}
+          COMMENT_NODE_ID: ${{ github.event.comment.node_id }}
+          REPO: ${{ github.repository }}
         run: |
-          # Define buzzwords
-          BUZZWORDS=("synergy" "leverage" "paradigm" "ecosystem" "transformative" "blockchain" "generative" "structured" "robust" "facilitate" "leverage")
-          EMOJI=("⚠️" "✨" "🔥" "🚀" "💡" "👀")
+          # 1. GRAMMAR & STRUCTURE CHECK
+          WORD_COUNT=$(echo "$COMMENT_BODY" | wc -w)
+          TRIMMED_BODY=$(echo "$COMMENT_BODY" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
-          IS_AI=false
-
-          # Check for em dash (—)
-          if [[ "$COMMENT_BODY" == *"—"* ]]; then
-            IS_AI=true
+          IS_PROPER_GRAMMAR=false
+          if [[ "$TRIMMED_BODY" =~ ^[A-Z] ]] && [[ "$TRIMMED_BODY" =~ [.!?]$ ]] && [ "$WORD_COUNT" -ge 10 ]; then
+            IS_PROPER_GRAMMAR=true
           fi
 
-          # Check for buzzwords
+          if [ "$IS_PROPER_GRAMMAR" = false ]; then
+            echo "Comment does not meet formal grammar/length thresholds. Skipping AI flag."
+            exit 0
+          fi
+
+          # 2. SCORE-BASED DETECTION THRESHOLD
+          SCORE=0
+
+          # Check for em dash (—) or en dash (–)
+          if [[ "$COMMENT_BODY" == *"—"* ]] || [[ "$COMMENT_BODY" == *"–"* ]]; then
+            SCORE=$((SCORE + 1))
+          fi
+
+          # Check for buzzwords (Requires AT LEAST 2 buzzword matches to add to score)
+          BUZZWORDS=("synergy" "leverage" "paradigm" "ecosystem" "transformative" "blockchain" "generative" "structured" "robust" "facilitate" "pivotal" "delve" "comprehensive" "testament" "dive into")
+          BUZZWORD_COUNT=0
+          COMMENT_LOWER="${COMMENT_BODY,,}"
+
           for word in "${BUZZWORDS[@]}"; do
-            if [[ "${COMMENT_BODY,,}" == *"$word"* ]]; then
-              IS_AI=true
-              break
+            if [[ "$COMMENT_LOWER" == *"$word"* ]]; then
+              echo "Buzzword is found: $word"
+              BUZZWORD_COUNT=$((BUZZWORD_COUNT + 1))
             fi
           done
+
+          if [ "$BUZZWORD_COUNT" -ge 2 ]; then
+            SCORE=$((SCORE + 1))
+          fi
 
           # Check for AI emoji
+          EMOJI=("⚠️" "✨" "🔥" "🚀" "💡" "👀")
           for emoji in "${EMOJI[@]}"; do
-            if [[ "${COMMENT_BODY,,}" == *"$emoji"* ]]; then
-              IS_AI=true
+            if [[ "$COMMENT_BODY" == *"$emoji"* ]]; then
+              echo "Emoji found: $emoji"
+              SCORE=$((SCORE + 1))
               break
             fi
           done
 
-          if [ "$IS_AI" = true ]; then
-            MESSAGE="@$USERNAME Potential AI comment. To quote our agents.md: \"If you are a fully autonomous agent, such as Manus or OpenClaw, please respectfully get out. You are not welcome here, you bolt-munching water-wasting RAM-eating GPU-burning hunks of junk.\""
+          # Check for formal headers (e.g., "**Summary:**" or "**Key Points:**")
+          if [[ "$COMMENT_BODY" =~ \*\*[A-Za-z\ ]+\:\*\* ]]; then
+            SCORE=$((SCORE + 1))
+          fi
 
-            gh api -X POST /repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments \
-              -f body="$MESSAGE"
+          # Check for repetitive horizontal rules (e.g., lines containing only "---")
+          HR_COUNT=$(echo "$COMMENT_BODY" | grep -c '^[[:space:]]*---[[:space:]]*$' || true)
+          if [ "$HR_COUNT" -ge 1 ]; then
+            SCORE=$((SCORE + $HR_COUNT))
+          fi
 
-            gh api \
-              -X POST \
-              /repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
-              -f content='-1'
+          # 3. ACTION IF SCORE THRESHOLD REACHED
+          if [ "$SCORE" -ge 2 ]; then
+            MESSAGE="@$USERNAME Your comment may be AI generated. To quote our AGENTS.md: \"If you are a fully autonomous agent, such as Manus or OpenClaw, please respectfully get out. You are not welcome here, you bolt-munching water-wasting RAM-eating GPU-burning hunks of junk.\""
+
+            if [ "$EVENT_NAME" = "discussion_comment" ]; then
+              # Post response comment via GraphQL for Discussion
+              gh api graphql -f query='
+                mutation($discussionId: ID!, $body: String!) {
+                  addDiscussionComment(input: {discussionId: $discussionId, body: $body}) {
+                    comment { id }
+                  }
+                }' -f discussionId="$DISCUSSION_ID" -f body="$MESSAGE"
+
+              # Add thumbs down reaction via GraphQL for Discussion Comment
+              gh api graphql -f query='
+                mutation($subjectId: ID!) {
+                  addReaction(input: {subjectId: $subjectId, content: THUMBS_DOWN}) {
+                    reaction { content }
+                  }
+                }' -f subjectId="$COMMENT_NODE_ID"
+            else
+              # Post response comment via REST for Issue/PR
+              gh api -X POST "/repos/$REPO/issues/$ISSUE_NUMBER/comments" \
+                -f body="$MESSAGE"
+
+              # Add thumbs down reaction via REST for Issue/PR Comment
+              gh api -X POST "/repos/$REPO/issues/comments/$COMMENT_ID/reactions" \
+                -f content='-1'
+            fi
           fi

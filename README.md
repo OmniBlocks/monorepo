@@ -36,6 +36,7 @@ Try out OmniBlocks: [https://omniblocks.github.io](https://omniblocks.github.io)
 *   **Plenty of Addons:** Dozens of community-built addons for custom blocks, UI tweaks, and new functionality. Many are inherited from TurboWarp and other mods from now, but we will implement some new ones soon.
 *   **OmniBlocks IDE:** OmniBlocks plans to be a full-featured IDE extending beyond blocks. There will be editors for text languages like Python and C in the future!
 *   **Integrated Tools:** Includes a custom music editor and other quality-of-life improvements. Keep in mind that if you're seeing this, it means the music editor is currently not fully implemented. It works, you can go try it out, but it doesn't fully integrate with OmniBlocks just yet.
+*   **First Class Arrays:** OmniBlocks features first class arrays. You can now set variables to arrays just like Snap!.
 *   **Quality of Life**: As said earlier, we add a bunch of subtle, but definitely cool or useful quality-of-life additions, even if they seem niche or workaroundable. Most of these stem from mild annoyances that we ourselves have had, and don't hesitate to report yours too in the issues tab!
 
 ### A great feature inherited from TurboWarp: 
@@ -246,6 +247,9 @@ A: Yes! OmniBlocks is open-source and free forever! Unless you count paying your
 
 **Q: I hate Ommiblocks**  
 A: 67
+
+**Q: What happened to AmpMod and LibreKitten?**
+A: AmpMod and LibreKitten have merged into the OmniBlocks project to create what is arguably one of the most powerful mods of TurboWarp to date
 
 ### Compatibility
 

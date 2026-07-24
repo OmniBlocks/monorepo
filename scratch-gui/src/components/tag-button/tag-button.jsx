@@ -2,40 +2,26 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
-
-import Button from '../button/button.jsx';
-
 import styles from './tag-button.css';
 
 const TagButtonComponent = ({
     active,
-    iconClassName,
     className,
-    tag, // eslint-disable-line no-unused-vars
+    tag,  
     intlLabel,
     ...props
 }) => (
-    <Button
-        className={classNames(
-            styles.tagButton,
-            className, {
-                [styles.active]: active
-            }
-        )}
-        iconClassName={classNames(
-            styles.tagButtonIcon,
-            iconClassName
-        )}
+    <button
+        className={classNames(styles.tagButton, className)}
+        aria-checked={active}
         {...props}
     >
-        {typeof intlLabel === 'string' ? intlLabel : (
-            <FormattedMessage {...intlLabel} />
-        )}
-    </Button>
+        <div className={styles.checkbox}></div>
+        <div>{typeof intlLabel === 'string' ? intlLabel : <FormattedMessage {...intlLabel} />}</div>
+    </button>
 );
 
 TagButtonComponent.propTypes = {
-    ...Button.propTypes,
     active: PropTypes.bool,
     intlLabel: PropTypes.oneOfType([
         PropTypes.shape({

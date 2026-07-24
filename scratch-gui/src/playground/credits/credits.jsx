@@ -9,7 +9,7 @@ import {detectTheme} from '../../lib/themes/themePersistance';
 import UserData from './users';
 
 /* eslint-disable react/jsx-no-literals */
-
+ 
 applyGuiColors(detectTheme());
 document.documentElement.lang = 'en';
 
@@ -64,12 +64,18 @@ const Credits = () => (
                 The {APP_NAME} project is made possible by the work of many volunteers.
             </p>
         </section>
-        {APP_NAME !== 'TurboWarp' && (
+        <section>
+            <h2>TurboWarp</h2>
+            <p>
+                {APP_NAME} is based on <a href="https://turbowarp.org/">TurboWarp</a> but is not endorsed by TurboWarp in any way.
+            </p>
+        </section>
+        {APP_NAME !== 'OmniBlocks' && (
             // Be kind and considerate. Don't remove this :)
             <section>
-                <h2>TurboWarp</h2>
+                <h2>OmniBlocks</h2>
                 <p>
-                    {APP_NAME} is based on <a href="https://turbowarp.org/">TurboWarp</a>.
+                    {APP_NAME} is based on <a href="https://omniblocks.github.io/">OmniBlocks</a> but is not endorsed by OmniBlocks in any way.
                 </p>
             </section>
         )}

@@ -233,8 +233,8 @@ const GUIComponent = props => {
                 className={styles.pageWrapper}
                 dir={isRtl ? 'rtl' : 'ltr'}
                 style={{
-                    minWidth: 1024 + Math.max(0, customStageSize.width - 480),
-                    minHeight: 640 + Math.max(0, customStageSize.height - 360)
+                    '--custom-stage-width': Math.max(0, customStageSize.width - 480),
+                    '--custom-stage-height': Math.max(0, customStageSize.height - 360)
                 }}
                 {...componentProps}
             >

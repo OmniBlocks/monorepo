@@ -125,3 +125,9 @@
     background: black;
     filter: opacity(15%) brightness(0%);
 }
+
+@media only screen and (max-width: 768px) {
+    .scroll-wrapper {
+        height: 5rem;
+    }
+}

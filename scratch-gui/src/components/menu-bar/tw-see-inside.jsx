@@ -22,11 +22,13 @@ const SeeInsideButton = ({
         iconHeight={20}
         onClick={onClick}
     >
-        <FormattedMessage
-            defaultMessage="See inside"
-            description="Label for see inside button"
-            id="tw.menuBar.seeInside"
-        />
+        <span className={styles.collapsibleLabel}>
+            <FormattedMessage
+                defaultMessage="See inside"
+                description="Label for see inside button"
+                id="tw.menuBar.seeInside"
+            />
+        </span>
     </Button>
 );
 

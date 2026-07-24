@@ -22,11 +22,13 @@ const CommunityButton = ({
         iconHeight={20}
         onClick={onClick}
     >
-        <FormattedMessage
-            defaultMessage="See Project Page"
-            description="Label for see project page button"
-            id="gui.menuBar.seeProjectPage"
-        />
+        <span className={styles.collapsibleLabel}>
+            <FormattedMessage
+                defaultMessage="See Project Page"
+                description="Label for see project page button"
+                id="gui.menuBar.seeProjectPage"
+            />
+        </span>
     </Button>
 );
 

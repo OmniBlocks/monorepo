@@ -16,7 +16,8 @@ import {
     BLOCKS_TAB_INDEX,
     COSTUMES_TAB_INDEX,
     SOUNDS_TAB_INDEX,
-    SONGS_TAB_INDEX
+    SONGS_TAB_INDEX,
+    PYTHON_TAB_INDEX
 } from '../reducers/editor-tab';
 
 import {
@@ -170,6 +171,7 @@ const mapStateToProps = state => {
         projectId: state.scratchGui.projectState.projectId,
         soundsTabVisible: state.scratchGui.editorTab.activeTabIndex === SOUNDS_TAB_INDEX,
         songsTabVisible: state.scratchGui.editorTab.activeTabIndex === SONGS_TAB_INDEX,
+        pythonTabVisible: state.scratchGui.editorTab.activeTabIndex === PYTHON_TAB_INDEX,
         targetIsStage: (
             state.scratchGui.targets.stage &&
             state.scratchGui.targets.stage.id === state.scratchGui.targets.editingTarget
@@ -187,15 +189,16 @@ const mapStateToProps = state => {
     };
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
     onExtensionButtonClick: () => dispatch(openExtensionLibrary()),
-    onActivateTab: tab => dispatch(activateTab(tab)),
+    onActivateTab: (tab) => dispatch(activateTab(tab)),
     onActivateCostumesTab: () => dispatch(activateTab(COSTUMES_TAB_INDEX)),
     onActivateSoundsTab: () => dispatch(activateTab(SOUNDS_TAB_INDEX)),
     onActivateSongsTab: () => dispatch(activateTab(SONGS_TAB_INDEX)),
+    onActivatePythonTab: () => dispatch(activateTab(PYTHON_TAB_INDEX)),
     onRequestCloseBackdropLibrary: () => dispatch(closeBackdropLibrary()),
     onRequestCloseCostumeLibrary: () => dispatch(closeCostumeLibrary()),
-    onRequestCloseTelemetryModal: () => dispatch(closeTelemetryModal())
+    onRequestCloseTelemetryModal: () => dispatch(closeTelemetryModal()),
 });
 
 const ConnectedGUI = injectIntl(connect(

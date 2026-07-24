@@ -7,7 +7,7 @@
 
     /* ob: For ease of adding mobile phone support, the mininimum size declaration was moved to CSS instead of hardcoded JS. */
     min-width: calc(1024px + var(--custom-stage-width));
-    min-height: calc(1024px + var(--custom-stage-height));
+    min-height: calc(640px + var(--custom-stage-height));
 }
 
 .body-wrapper {

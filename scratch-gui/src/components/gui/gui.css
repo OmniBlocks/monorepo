@@ -4,6 +4,10 @@
 
 .page-wrapper {
     height: 100%;
+
+    /* ob: For ease of adding mobile phone support, the mininimum size declaration was moved to CSS instead of hardcoded JS. */
+    min-width: calc(1024px + var(--custom-stage-width));
+    min-height: calc(1024px + var(--custom-stage-height));
 }
 
 .body-wrapper {
@@ -343,22 +347,29 @@ $fade-out-distance: 15px;
     background-color: white;
 }
 
-/* Mobile support */
-@media (max-width: 768px) {
+/* ob: Mobile support */
+@media only screen and (max-width: 768px) {
+    .page-wrapper {
+        min-width: var(--custom-stage-width);
+        min-height: var(--custom-stage-height);
+    }
+
     .flex-wrapper {
-        flex-direction: column;
+        flex-direction: column-reverse;
     }
 
     .editor-wrapper {
-        flex-basis: auto;
-        min-height: 50vh;
-        flex-shrink: 1;
+        flex-basis: 0;
     }
 
     .stage-and-target-wrapper {
         flex-basis: auto;
         min-height: 50vh;
         flex-shrink: 1;
+    }
+
+    .target-wrapper {
+        min-height: 5rem;
     }
 
     .tab-list {

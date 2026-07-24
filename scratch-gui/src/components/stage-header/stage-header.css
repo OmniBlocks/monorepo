@@ -93,3 +93,12 @@
     /* relied on by addons */
     display: flex;
 }
+
+@media (max-width: 768px) {
+    [dir="ltr"] .stage-header-wrapper {
+        left: 0;
+    }
+    [dir="rtl"] .stage-header-wrapper {
+        right: 0;
+    }
+}

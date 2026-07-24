@@ -128,6 +128,7 @@ export class TipPrompt implements Prompt {
 					p("Multiple: ashiiware chip"),
 					p("Exclude: !fm"),
 					p("Try checking the \"featured\" tag for the best presets!"),
+					p("The full list of tags can be found in the description."),
 				);
 			} break;
 			case "instrumentType": {

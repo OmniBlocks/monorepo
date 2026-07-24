@@ -31,7 +31,7 @@ interface ParsedEntries {
 // - Use constants or an enum for the key-value pairs.
 
 export class AddSamplesPrompt {
-    private readonly _maxSamples: number = 64;
+    private readonly _maxSamples: number = 8388608/2;
 
     private _doc: SongDocument;
     private readonly _entries: SampleEntry[] = [];
@@ -48,7 +48,7 @@ export class AddSamplesPrompt {
     private readonly _instructionsLink: HTMLAnchorElement = a({ href: "#" }, "Here's more information and some instructions on how to use custom samples in JukeBox.");
     private readonly _description: HTMLDivElement = div(
         div({ style: "margin-bottom: 0.5em; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text;" },
-            "In order to use the old JukeBox samples, you should add ",
+            "In order to use the old Paandora's Box samples, you should add ",
             code("legacySamples"),
             " as an URL. You can also use ",
             code("nintariboxSamples"),

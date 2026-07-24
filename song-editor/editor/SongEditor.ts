@@ -117,7 +117,11 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
             const preset: Preset = category.presets[presetIndex];
             if (((preset.isNoise == true) == isNoise)) {
-                group.appendChild(option({ value: preset.id }, preset.name));
+                if(preset.id != undefined) { //normal presets
+                    group.appendChild(option({ value: preset.id }, preset.name));
+                } else { //sample presets
+                    group.appendChild(option({ value: 8388607 - presetIndex }, preset.name));
+                }
                 foundAny = true;
             }
         }
@@ -5279,7 +5283,7 @@ export class SongEditor {
 
         if (presetValue > 0) {
             this.doc.record(new ChangePreset(this.doc, presetValue));
-        } else if (presetValue == -1) { //no results
+        } else if (presetValue == -1) { //no tag results
             alert("Either you are using incompatible tags, or you are using a tag combination that no preset has. \n\nPlease double check your tag combination.")
         } else if (presetValue == -2) { //incorrect tag
             alert("One or more of the tags you entered doesn't exist. \nPlease double check your spelling. \n\nIf you don't know what tags exist, check the tag list in the description below.")
@@ -5364,6 +5368,7 @@ export class SongEditor {
 
     public _whenSetPitchedPreset = (): void => {
         this._setPreset($('#pitchPresetSelect').val() + "");
+
     }
 
     public _whenSetDrumPreset = (): void => {
@@ -5371,6 +5376,7 @@ export class SongEditor {
     }
 
     private _setPreset(preset: string): void {
+        //console.log(preset);
         if (isNaN(<number><unknown>preset)) {
             switch (preset) {
                 case "copyInstrument":

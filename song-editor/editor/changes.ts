@@ -685,6 +685,8 @@ export class ChangePreset extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldValue: number = instrument.preset;
+        //console.log(newValue);
+
         if (oldValue != newValue) {
             const preset1: Preset | null = EditorConfig.instrumentToPreset(newValue);
             const preset: Preset | null = preset1 ?? EditorConfig.valueToPreset(newValue);
@@ -711,6 +713,7 @@ export class ChangePreset extends Change {
                 }
             }
             instrument.preset = newValue;
+            
             doc.notifier.changed();
             this._didSomething();
         }
@@ -4400,7 +4403,7 @@ export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boole
         if ((category.name.includes("Novelty") && rollNoveltyPresets == false) || category.name == "Unmodified") continue;
         for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
             const preset: Preset = category.presets[presetIndex];
-            if ((preset.settings != undefined && (preset.isNoise == true) == isNoise) && ((tagList == "") || (ignoreTags == true) || (
+            if ((preset.settings != undefined && (preset.isNoise == true) == isNoise) && (preset.id < 4194303) && ((tagList == "") || (ignoreTags == true) || (
                 
                 tagList.every((tag: any) => 
                 (tag.startsWith("!") && !preset.tags.includes(tag.slice(1))) || 
@@ -4408,7 +4411,7 @@ export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boole
 
             )))) {    
                 eligiblePresetValues.push(preset.id);
-                //console.log(preset.name)
+                //console.log(preset.name, preset.id)
             }
         }
     }
@@ -4445,7 +4448,7 @@ export function pickNextPresetValue(isNoise: boolean,rollNoveltyPresets: boolean
         for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
             const preset: Preset = category.presets[presetIndex];
             
-            if ((preset.settings != undefined && (preset.isNoise == true) == isNoise) && ((tagList == "") || (
+            if ((preset.settings != undefined && (preset.isNoise == true) == isNoise) && (preset.id < 4194303) && ((tagList == "") || (
                 
                 tagList.every((tag: any) => 
                 (tag.startsWith("!") && !preset.tags.includes(tag.slice(1))) || 

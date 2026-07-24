@@ -31,16 +31,6 @@ jobs:
           WORD_COUNT=$(echo "$COMMENT_BODY" | wc -w)
           TRIMMED_BODY=$(echo "$COMMENT_BODY" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
-          IS_PROPER_GRAMMAR=false
-          if [[ "$TRIMMED_BODY" =~ ^[A-Z] ]] && [[ "$TRIMMED_BODY" =~ [.!?]$ ]] && [ "$WORD_COUNT" -ge 10 ]; then
-            IS_PROPER_GRAMMAR=true
-          fi
-
-          if [ "$IS_PROPER_GRAMMAR" = false ]; then
-            echo "Comment does not meet formal grammar/length thresholds. Skipping AI flag."
-            exit 0
-          fi
-
           # 2. SCORE-BASED DETECTION THRESHOLD
           SCORE=0
 

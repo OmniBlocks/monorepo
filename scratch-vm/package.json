@@ -52,7 +52,7 @@
         "scratch-translate-extension-languages": "^1.0.7",
         "text-encoding": "0.7.0",
         "uuid": "8.3.2",
-        "worker-loader": "^1.1.1",
+        "worker-loader": "^3.0.8",
         "yargs": "^18.0.0"
     },
     "peerDependencies": {

@@ -332,11 +332,13 @@ class ExtensionManager {
         }
 
         /* eslint-disable max-len */
-        let ExtensionWorker;
+        let createWorker;
         if (sandboxMode === 'worker') {
-            ExtensionWorker = require('worker-loader?name=js/extension-worker/extension-worker.[hash].js!./extension-worker');
+            const ExtensionWorker = require('worker-loader?esModule=false&filename=js/extension-worker/extension-worker.[hash].js!./extension-worker');
+            createWorker = () => Promise.resolve(new ExtensionWorker());
         } else if (sandboxMode === 'iframe') {
-            ExtensionWorker = (await import(/* webpackChunkName: "iframe-extension-worker" */ './tw-iframe-extension-worker')).default;
+            const IframeExtensionWorker = (await import(/* webpackChunkName: "iframe-extension-worker" */ './tw-iframe-extension-worker')).default;
+            createWorker = () => IframeExtensionWorker.create();
         } else {
             throw new Error(`Invalid sandbox mode: ${sandboxMode}`);
         }
@@ -344,7 +346,7 @@ class ExtensionManager {
 
         return new Promise((resolve, reject) => {
            this.pendingExtensions.push({ extensionURL, rewrittenURL: rewritten, resolve, reject });
-            dispatch.addWorker(new ExtensionWorker());
+            createWorker().then(worker => dispatch.addWorker(worker));
         }).catch(error => this._failedLoadingExtensionScript(error));
     }
 

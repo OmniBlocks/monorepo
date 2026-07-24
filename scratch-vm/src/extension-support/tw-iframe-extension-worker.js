@@ -1,5 +1,14 @@
 const uid = require('../util/uid');
-const frameSource = require('./tw-load-script-as-plain-text!./tw-iframe-extension-worker-entry');
+
+// Bob the Builder
+// Can we fix it?
+// Bob the Builder
+// Yes, we can!
+const getFrameSource = () => {
+    const publicPath = typeof __webpack_public_path__ === 'string' ? __webpack_public_path__ : '';
+    return fetch(`${publicPath}js/tw-iframe-extension-worker-entry.js`)
+        .then(response => response.text());
+};
 
 const none = "'none'";
 const featurePolicy = {
@@ -33,7 +42,12 @@ const generateAllow = () => Object.entries(featurePolicy)
     .join('; ');
 
 class IframeExtensionWorker {
-    constructor () {
+    static async create () {
+        const frameSource = await getFrameSource();
+        return new IframeExtensionWorker(frameSource);
+    }
+
+    constructor (frameSource) {
         this.id = uid();
         this.isRemote = true;
         this.ready = false;

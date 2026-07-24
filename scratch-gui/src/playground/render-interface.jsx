@@ -156,13 +156,6 @@ const Footer = () => (
 
             <div className={styles.footerColumns}>
                 <div className={styles.footerSection}>
-                    <a href="credits.html">
-                        <FormattedMessage
-                            defaultMessage="Credits"
-                            description="Credits link in footer"
-                            id="tw.footer.credits"
-                        />
-                    </a>
                     <a href="https://github.com/sponsors/GarboMuffin">
                         <FormattedMessage
                             defaultMessage="Donate"

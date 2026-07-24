@@ -14,7 +14,6 @@ class WebGlModal extends React.Component {
             const funDestinations = [
                 'https://omniblocks.miraheze.org/',
                 'songeditor.html',
-                'credits.html',
                 'faq.html',
                 'patch_notes.html',
                 'sample_extractor.html'

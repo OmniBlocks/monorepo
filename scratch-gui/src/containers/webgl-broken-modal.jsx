@@ -13,8 +13,7 @@ class WebGlBrokenModal extends React.Component {
             // I'm Feeling Lucky! 🎲
             const funDestinations = [
                 'https://omniblocks.miraheze.org/',
-                'songeditor.html',
-                'credits.html'
+                'songeditor.html'
             ];
             const lucky = funDestinations[Math.floor(Math.random() * funDestinations.length)];
             window.location.href = lucky;

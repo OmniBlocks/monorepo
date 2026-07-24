@@ -7,6 +7,7 @@ settings:
 overrides:
   webpack: 4.47.0
   webpack-cli: 3.3.12
+  cheerio: 1.0.0-rc.12
 
 importers:
 
@@ -3156,9 +3157,9 @@ packages:
   cheerio-select@2.1.0:
     resolution: {integrity: sha512-9v9kG0LvzrlcungtnJtpGNxY+fzECQKhK4EGJX2vByejiMX84MFNQw4UxPJl3bFbTMw+Dfs37XaIkCwTZfLh4g==}
 
-  cheerio@1.2.0:
-    resolution: {integrity: sha512-WDrybc/gKFpTYQutKIK6UvfcuxijIZfMfXaYm8NMsPQxSYvf+13fXUJ4rztGGbJcBQ/GF55gvrZ0Bc0bj/mqvg==}
-    engines: {node: '>=20.18.1'}
+  cheerio@1.0.0-rc.12:
+    resolution: {integrity: sha512-VqR8m68vM46BNnuZ5NtnGBKIE/DfN0cRIzg9n40EIq9NOv90ayxLBXA8fXC5gquFRGJSTRqBq25Jt2ECLR431Q==}
+    engines: {node: '>= 6'}
 
   chokidar@1.7.0:
     resolution: {integrity: sha512-mk8fAWcRUOxY7btlLtitj3A45jOwSAxH4tOFOoEGbVsl6cL6pPMWUy7dwZ/canfj3QEdP6FHSnf/l1c6/WkzVg==}
@@ -3994,9 +3995,6 @@ packages:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
     engines: {node: '>= 0.8'}
 
-  encoding-sniffer@0.2.1:
-    resolution: {integrity: sha512-5gvq20T6vfpekVtqrYQsSCFZ1wEg5+wW0/QaZMWkFr6BqD3NfKs0rLCx4rrVlSWJeZb5NBJgVLswK/w2MWU+Gw==}
-
   encoding@0.1.13:
     resolution: {integrity: sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==}
 
@@ -4026,10 +4024,6 @@ packages:
 
   entities@6.0.1:
     resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
-    engines: {node: '>=0.12'}
-
-  entities@7.0.1:
-    resolution: {integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==}
     engines: {node: '>=0.12'}
 
   enzyme-adapter-react-16@1.15.6:
@@ -5349,14 +5343,14 @@ packages:
     peerDependencies:
       webpack: 4.47.0
 
-  htmlparser2@10.1.0:
-    resolution: {integrity: sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==}
-
   htmlparser2@3.10.0:
     resolution: {integrity: sha512-J1nEUGv+MkXS0weHNWVKJJ+UrLfePxRWpN3C9bEi9fLxL2+ggW94DQvgYVXsaT30PGwYRIZKNZXuyMhp3Di4bQ==}
 
   htmlparser2@6.1.0:
     resolution: {integrity: sha512-gyyPk6rgonLFEDGoeRgQNaEUvdJ4ktTmmUh/h2t7s+M8oPpIPxgNACWa+6ESR57kXstwqPiCut0V8NRpcwgU7A==}
+
+  htmlparser2@8.0.2:
+    resolution: {integrity: sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==}
 
   http-cache-semantics@3.8.1:
     resolution: {integrity: sha512-5ai2iksyV8ZXmnZhHH4rWPoxxistEexSi5936zIQ1bnNTW5VnA85B6P/VpXiRM017IgRvb2kKo1a//y+0wSp3w==}
@@ -7454,9 +7448,6 @@ packages:
   parse5-htmlparser2-tree-adapter@7.1.0:
     resolution: {integrity: sha512-ruw5xyKs6lrpo9x9rCZqZZnIUntICjQAd0Wsmp396Ul9lN/h+ifgVV1x1gZHi8euej6wTfpqX8j+BFQxF0NS/g==}
 
-  parse5-parser-stream@7.1.2:
-    resolution: {integrity: sha512-JyeQc9iwFLn5TbvvqACIF/VXG6abODeB3Fwmv/TGdLk2LfbWkaySGY72at4+Ty7EkPZj854u4CrICqNk2qIbow==}
-
   parse5@4.0.0:
     resolution: {integrity: sha512-VrZ7eOd3T1Fk4XWNXMgiGBK/z0MG48BWG2uQNU4I72fkQuKUTZpl+u9k+CxEG0twMVzSmXEEz12z5Fnw1jIQFA==}
 
@@ -9521,10 +9512,6 @@ packages:
 
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
-
-  undici@7.24.7:
-    resolution: {integrity: sha512-H/nlJ/h0ggGC+uRL3ovD+G0i4bqhvsDOpbDv7At5eFLlj2b41L8QliGbnl2H7SnDiYhENphh1tQFJZf+MyfLsQ==}
-    engines: {node: '>=20.18.1'}
 
   unicode-canonical-property-names-ecmascript@2.0.1:
     resolution: {integrity: sha512-dA8WbNeb2a6oQzAQ55YlT5vQAWGV9WXOsi3SskE3bcCdM0P4SDd+24zS/OCacdRq5BkdsRj9q3Pg6YyQoxIGqg==}
@@ -13833,19 +13820,15 @@ snapshots:
       domhandler: 5.0.3
       domutils: 3.2.2
 
-  cheerio@1.2.0:
+  cheerio@1.0.0-rc.12:
     dependencies:
       cheerio-select: 2.1.0
       dom-serializer: 2.0.0
       domhandler: 5.0.3
       domutils: 3.2.2
-      encoding-sniffer: 0.2.1
-      htmlparser2: 10.1.0
+      htmlparser2: 8.0.2
       parse5: 7.3.0
       parse5-htmlparser2-tree-adapter: 7.1.0
-      parse5-parser-stream: 7.1.2
-      undici: 7.24.7
-      whatwg-mimetype: 4.0.0
 
   chokidar@1.7.0:
     dependencies:
@@ -14816,11 +14799,6 @@ snapshots:
 
   encodeurl@2.0.0: {}
 
-  encoding-sniffer@0.2.1:
-    dependencies:
-      iconv-lite: 0.6.3
-      whatwg-encoding: 3.1.1
-
   encoding@0.1.13:
     dependencies:
       iconv-lite: 0.6.3
@@ -14851,8 +14829,6 @@ snapshots:
   entities@4.5.0: {}
 
   entities@6.0.1: {}
-
-  entities@7.0.1: {}
 
   enzyme-adapter-react-16@1.15.6(enzyme@3.11.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
@@ -14903,7 +14879,7 @@ snapshots:
   enzyme@3.10.0:
     dependencies:
       array.prototype.flat: 1.3.3
-      cheerio: 1.2.0
+      cheerio: 1.0.0-rc.12
       function.prototype.name: 1.1.8
       has: 1.0.4
       html-element-map: 1.4.0
@@ -14927,7 +14903,7 @@ snapshots:
   enzyme@3.11.0:
     dependencies:
       array.prototype.flat: 1.3.3
-      cheerio: 1.2.0
+      cheerio: 1.0.0-rc.12
       enzyme-shallow-equal: 1.0.7
       function.prototype.name: 1.1.8
       has: 1.0.4
@@ -16859,13 +16835,6 @@ snapshots:
       util.promisify: 1.0.0
       webpack: 4.47.0(webpack-cli@3.3.12)
 
-  htmlparser2@10.1.0:
-    dependencies:
-      domelementtype: 2.3.0
-      domhandler: 5.0.3
-      domutils: 3.2.2
-      entities: 7.0.1
-
   htmlparser2@3.10.0:
     dependencies:
       domelementtype: 1.3.1
@@ -16881,6 +16850,13 @@ snapshots:
       domhandler: 4.3.1
       domutils: 2.8.0
       entities: 2.2.0
+
+  htmlparser2@8.0.2:
+    dependencies:
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      domutils: 3.2.2
+      entities: 4.5.0
 
   http-cache-semantics@3.8.1: {}
 
@@ -19586,10 +19562,6 @@ snapshots:
       domhandler: 5.0.3
       parse5: 7.3.0
 
-  parse5-parser-stream@7.1.2:
-    dependencies:
-      parse5: 7.3.0
-
   parse5@4.0.0: {}
 
   parse5@7.3.0:
@@ -22175,8 +22147,6 @@ snapshots:
   underscore@1.13.8: {}
 
   undici-types@8.3.0: {}
-
-  undici@7.24.7: {}
 
   unicode-canonical-property-names-ecmascript@2.0.1: {}
 

@@ -151,15 +151,22 @@ describe('paint-editor.css', () => {
       expect(css).toMatch(/@media\s+only\s+screen\s+and\s+\(max-width:\s*\$full-size-paint\)/);
     });
     test('media query adjusts editor padding and layout', () => {
-      const mqBlock = css.match(/@media[^{]+\{([\s\S]*?)\}\s*$/m);
-      expect(mqBlock).toBeTruthy();
-      if (mqBlock) {
-        expect(mqBlock[1]).toContain('.editor-container');
-        expect(mqBlock[1]).toContain('padding: calc(3 * $grid-unit) $grid-unit;');
-        expect(mqBlock[1]).toContain('.mode-selector');
-        expect(mqBlock[1]).toContain('flex-direction: column');
-        expect(mqBlock[1]).toContain('.controls-container');
+      const start = css.indexOf('@media');
+      expect(start).toBeGreaterThanOrEqual(0);
+      const openBrace = css.indexOf('{', start);
+      let depth = 1;
+      let i = openBrace + 1;
+      while (depth > 0 && i < css.length) {
+        if (css[i] === '{') depth++;
+        else if (css[i] === '}') depth--;
+        i++;
       }
+      const mqBody = css.slice(openBrace + 1, i - 1);
+      expect(mqBody).toContain('.editor-container');
+      expect(mqBody).toContain('padding: calc(3 * $grid-unit) $grid-unit;');
+      expect(mqBody).toContain('.mode-selector');
+      expect(mqBody).toContain('flex-direction: column');
+      expect(mqBody).toContain('.controls-container');
     });
   });
 
@@ -180,7 +187,9 @@ describe('paint-editor.css', () => {
       const base = css.split('@media')[0];
       ['.editor-container', '.row', '.controls-container', '.canvas-container', '.button-group-button']
         .forEach(cls => {
-          const re = new RegExp(`\\${cls}\\s*{`, 'g');
+          // Only count the class as a standalone selector, not as part of a
+          // compound/combinator selector like `.row + .row` or `[dir="rtl"] .button-group-button`.
+          const re = new RegExp(`^\\${cls}\\s*{`, 'gm');
           const n = (base.match(re) || []).length;
           expect(n).toBeLessThanOrEqual(1);
         });

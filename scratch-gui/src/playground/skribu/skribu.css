@@ -1,139 +1,265 @@
-@import '../../css/colors.css';
+@import "../../css/colors.css";
+@import "../../css/units.css";
+
+:global(html),
+:global(body),
+:global(#app) {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
 
 :global(body) {
-  margin: 0;
-  background: $page-background;
-  color: $page-foreground;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
-.page {
-  min-height: 100vh;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  background: $ui-modal-background;
-  border-bottom: 1px solid $ui-secondary;
-}
-
-.title {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.subtitle {
-  margin: 0.25rem 0 0;
-  color: $page-foreground;
-  opacity: 0.75;
-}
-
-.back-link {
-  color: $link-color;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(20rem, 0.85fr);
-  gap: 1rem;
-  min-height: calc(100vh - 6.5rem);
-  padding: 1rem;
-}
-
-.workspace-panel,
-.pane {
   overflow: hidden;
-  background: $ui-modal-background;
-  border: 1px solid $ui-secondary;
-  border-radius: 0.5rem;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.workspace-panel {
-  display: flex;
-  flex-direction: column;
-  min-height: 32rem;
-}
-
-.workspace-panel h2,
-.pane h2 {
-  margin: 0;
-  padding: 0.8rem 1rem;
-  font-size: 1rem;
+.page-wrapper {
+  width: 100%;
+  height: 100%;
+  min-width: 1024px;
+  min-height: 640px;
+  color: $text-primary;
   background: $ui-primary;
 }
 
-.workspace {
-  flex: 1;
-  min-height: 30rem;
+.page-wrapper * {
+  box-sizing: border-box;
 }
 
-.side-panel {
-  display: grid;
-  grid-template-rows: minmax(14rem, 1fr) minmax(14rem, 1fr);
-  gap: 1rem;
+.menu-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: $menu-bar-height;
+  color: $menu-bar-foreground;
+  background-color: $menu-bar-background;
+  background-image: $menu-bar-background-image;
+  font-size: $menu-bar-standard-font-size;
+  font-weight: bold;
 }
 
-.pane {
+.main-menu,
+.menu-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.logo,
+.menu-bar-item,
+.editor-link {
+  display: flex;
+  align-items: center;
+  height: $menu-bar-height;
+  padding: 0 0.75rem;
+  color: inherit;
+  text-decoration: none;
+  user-select: none;
+}
+
+.logo {
+  font-size: 0.875rem;
+}
+
+.logo:hover,
+.editor-link:hover {
+  background-color: $ui-black-transparent;
+}
+
+.menu-bar-item {
+  background-color: $ui-black-transparent;
+}
+
+.run-button,
+.runtime-run-button {
+  height: $menu-bar-button-size;
+  margin: 0 0.25rem;
+  padding: 0 0.75rem;
+  color: $menu-bar-background;
+  background: $ui-white;
+}
+
+.body-wrapper {
+  display: flex;
+  flex-direction: row;
+  height: calc(100% - $menu-bar-height);
+  overflow: hidden;
+  background: $ui-primary;
+}
+
+.editor-wrapper {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
   min-height: 0;
 }
 
-.code,
-.output {
+.tab-list {
+  display: flex;
+  align-items: flex-end;
+  width: 250px;
+  height: $stage-menu-height;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0.125rem 1.25rem 0;
+  border: 1px solid $ui-black-transparent;
+  border-bottom: 0;
+  border-radius: 1rem 1rem 0 0;
+  color: $looks-secondary;
+  background: $ui-white;
+  user-select: none;
+}
+
+.workspace-wrapper {
+  position: relative;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.workspace {
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Match components/blocks/blocks.css: Blockly owns the workspace,
+ * while the surrounding GUI supplies the editor border treatment.
+ */
+.workspace :global(.injectionDiv) {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 1px solid $ui-black-transparent;
+  border-top-right-radius: $space;
+  border-bottom-right-radius: $space;
+}
+
+.workspace :global(.blocklyMainBackground) {
+  stroke: none;
+}
+
+.workspace :global(.blocklyToolboxDiv) {
+  box-sizing: content-box;
+  border-right: 1px solid $ui-black-transparent;
+  border-bottom: 1px solid $ui-black-transparent;
+}
+
+.workspace :global(.blocklyFlyout) {
+  box-sizing: content-box;
+  border-right: 1px solid $ui-black-transparent;
+}
+
+.workspace :global(.scratchCategoryMenuItemLabel) {
+  font-size: 0.65rem;
+}
+
+.runtime-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 26rem;
+  flex-shrink: 0;
+  min-width: 20rem;
+  padding: 0 $space $space;
+  background: $ui-primary;
+}
+
+.runtime-header,
+.generated-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: $stage-menu-height;
+  padding: 0 0.5rem;
+  color: $text-primary;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.runtime-header {
+  border-bottom: 1px solid $ui-black-transparent;
+}
+
+.runtime-run-button {
+  height: 1.75rem;
+  color: $ui-white;
+  background: $looks-secondary;
+}
+
+.console-wrapper,
+.generated-code-wrapper {
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid $ui-black-transparent;
+  background: $ui-white;
+}
+
+.console-wrapper {
   flex: 1;
+  min-height: 12rem;
+  border-radius: $form-radius;
+}
+
+.generated-code-header {
+  margin-top: $space;
+  border-bottom: 1px solid $ui-black-transparent;
+}
+
+.generated-code-wrapper {
+  flex: 1;
+  min-height: 10rem;
+  border-radius: $form-radius;
+}
+
+.output,
+.code {
+  width: 100%;
+  height: 100%;
   margin: 0;
-  padding: 1rem;
+  padding: $space;
   overflow: auto;
+  color: $text-primary;
   background: $input-background;
-  color: $page-foreground;
-  font-family: Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-  font-size: 0.875rem;
+  font-family: monospace;
+  font-size: 0.75rem;
   line-height: 1.5;
   white-space: pre-wrap;
 }
 
-.output-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: $ui-primary;
-}
+@media (max-width: 768px) {
+  :global(body) {
+    overflow: auto;
+  }
 
-.run-button {
-  margin-right: 0.75rem;
-  padding: 0.45rem 0.8rem;
-  border: 0;
-  border-radius: 0.25rem;
-  background: $looks-secondary;
-  color: $ui-white;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 600;
-}
+  .page-wrapper {
+    min-width: 0;
+    min-height: 100%;
+  }
 
-.run-button:hover,
-.run-button:focus {
-  background: $looks-secondary-dark;
-}
-
-@media (max-width: 800px) {
-  .header {
-    align-items: flex-start;
+  .body-wrapper {
     flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - $menu-bar-height);
+    overflow: visible;
   }
 
-  .layout {
-    grid-template-columns: 1fr;
+  .editor-wrapper {
+    min-height: 60vh;
   }
 
-  .side-panel {
-    grid-template-rows: minmax(12rem, 1fr) minmax(12rem, 1fr);
+  .runtime-wrapper {
+    flex-basis: auto;
+    min-height: 50vh;
   }
 }

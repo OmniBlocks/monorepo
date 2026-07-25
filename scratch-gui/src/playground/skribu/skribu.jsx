@@ -1,4 +1,6 @@
 import React from 'react'
+import Box from '../../components/box/box.jsx';
+import Button from '../../components/button/button.jsx';
 import Blockly from 'scratch-blocks'
 
 import styles from './skribu.css'
@@ -7,7 +9,11 @@ const STORAGE_KEY = 'omniblocks:skribu:workspace'
 
 const toolbox = `
 <xml>
-    <category name="Skribu" colour="#59c0c0">
+    <category
+        name="Skribu"
+        colour="#59c0c0"
+        secondaryColour="#3f9999"
+    >
         <block type="skribu_print"></block>
     </category>
 </xml>
@@ -163,47 +169,88 @@ class Skribu extends React.Component {
     })
   }
 
-  render() {
-    return (
-      <main className={styles.page}>
-        <header className={styles.header}>
-          <div>
-            <h1 className={styles.title}>Skribu</h1>
-            <p className={styles.subtitle}>Blocks → code → output</p>
-          </div>
-          <a className={styles.backLink} href={`${process.env.ROOT}editor.html`}>
-            Back to editor
-          </a>
-        </header>
+    render () {
+        const code = this.state.code || '// Add a block to begin.';
+        const output = this.state.output || 'Program output appears here.';
 
-        <section className={styles.layout}>
-          <div className={styles.workspacePanel}>
-            <h2>Blocks</h2>
-            <div ref={this.workspaceElement} className={styles.workspace} />
-          </div>
+        return (
+            <Box
+                className={styles.pageWrapper}
+                dir="ltr"
+            >
+                <Box className={styles.menuBar}>
+                    <Box className={styles.mainMenu}>
+                        <a
+                            className={styles.logo}
+                            href={`${process.env.ROOT}editor.html`}
+                        >
+                            OmniBlocks
+                        </a>
 
-          <div className={styles.sidePanel}>
-            <section className={styles.pane}>
-              <h2>Generated code</h2>
-              <pre className={styles.code}>{this.state.code || '// Add a block to begin.'}</pre>
-            </section>
+                        <Box className={styles.menuBarItem}>
+                            Skribu
+                        </Box>
+                    </Box>
 
-            <section className={styles.pane}>
-              <div className={styles.outputHeader}>
-                <h2>Output</h2>
-                <button className={styles.runButton} type="button" onClick={this.handleRun}>
-                  Run
-                </button>
-              </div>
-              <pre className={styles.output}>
-                {this.state.output || 'Program output appears here.'}
-              </pre>
-            </section>
-          </div>
-        </section>
-      </main>
-    )
-  }
+                    <Box className={styles.menuActions}>
+                        <Button
+                            className={styles.runButton}
+                            onClick={this.handleRun}
+                        >
+                            Run
+                        </Button>
+                        <a
+                            className={styles.editorLink}
+                            href={`${process.env.ROOT}editor.html`}
+                        >
+                            Back to editor
+                        </a>
+                    </Box>
+                </Box>
+
+                <Box className={styles.bodyWrapper}>
+                    <Box className={styles.editorWrapper}>
+                        <Box className={styles.tabList}>
+                            <div className={styles.tab}>
+                                Code
+                            </div>
+                        </Box>
+
+                        <Box className={styles.workspaceWrapper}>
+                            <div
+                                ref={this.workspaceElement}
+                                className={styles.workspace}
+                            />
+                        </Box>
+                    </Box>
+
+                    <Box className={styles.runtimeWrapper}>
+                        <Box className={styles.runtimeHeader}>
+                            <span>Output</span>
+                            <Button
+                                className={styles.runtimeRunButton}
+                                onClick={this.handleRun}
+                            >
+                                Run
+                            </Button>
+                        </Box>
+
+                        <Box className={styles.consoleWrapper}>
+                            <pre className={styles.output}>{output}</pre>
+                        </Box>
+
+                        <Box className={styles.generatedCodeHeader}>
+                            Program
+                        </Box>
+
+                        <Box className={styles.generatedCodeWrapper}>
+                            <pre className={styles.code}>{code}</pre>
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
+        );
+    }
 }
 
 export default Skribu

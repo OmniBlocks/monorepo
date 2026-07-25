@@ -189,6 +189,9 @@ importers:
       classnames:
         specifier: 2.2.6
         version: 2.2.6
+      coi-serviceworker:
+        specifier: ^0.1.7
+        version: 0.1.7
       computed-style-to-inline-style:
         specifier: 3.0.0
         version: 3.0.0
@@ -3286,6 +3289,9 @@ packages:
   code-point-at@1.1.0:
     resolution: {integrity: sha512-RpAVKQA5T63xEj6/giIbUEtZwJ4UFIc3ZtvEkiaUERylqe8xb5IvqcgOurZLahv93CLKfxcw5YI+DZcUBRyLXA==}
     engines: {node: '>=0.10.0'}
+
+  coi-serviceworker@0.1.7:
+    resolution: {integrity: sha512-bjSUqEngCPOkErY2vbyWsaIGCNRODYzlNycaREVw5s12/C8SM+RnRUUeX6pZbTtov6C52ZLY/+tvHK+BDxuUuA==}
 
   collect-v8-coverage@1.0.3:
     resolution: {integrity: sha512-1L5aqIkwPfiodaMgQunkF1zRhNqifHBmtbbbxcr6yVxxBnliw4TDOW6NxpO8DJLgJ16OT+Y4ztZqP6p/FtXnAw==}
@@ -13998,6 +14004,8 @@ snapshots:
   co@4.6.0: {}
 
   code-point-at@1.1.0: {}
+
+  coi-serviceworker@0.1.7: {}
 
   collect-v8-coverage@1.0.3: {}
 

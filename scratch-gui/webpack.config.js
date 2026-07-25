@@ -53,7 +53,8 @@ const base = {
                 {from: /^\/\d+\/fullscreen\/?$/, to: '/fullscreen.html'},
                 {from: /^\/\d+\/editor\/?$/, to: '/editor.html'},
                 {from: /^\/\d+\/embed\/?$/, to: '/embed.html'},
-                {from: /^\/addons\/?$/, to: '/addons.html'}
+                {from: /^\/addons\/?$/, to: '/addons.html'},
+                {from: /^\/skribu\/?$/, to: '/skribu.html'}
             ]
         },
         hot: true
@@ -161,6 +162,10 @@ const base = {
                     from: 'src/lib/themes/blocks/high-contrast-media/blocks-media',
                     to: 'static/blocks-media/high-contrast',
                     force: true
+                },
+                {
+                    from: 'node_modules/coi-serviceworker/coi-serviceworker.js',
+                    to: 'coi-serviceworker.js'
                 }
             ]
         }),
@@ -194,7 +199,8 @@ module.exports = [
             'fullscreen': './src/playground/fullscreen.jsx',
             'embed': './src/playground/embed.jsx',
             'addon-settings': './src/playground/addon-settings.jsx',
-            'credits': './src/playground/credits/credits.jsx'
+            'credits': './src/playground/credits/credits.jsx',
+            'skribu': './src/playground/skribu/index.jsx'
         },
         output: {
             path: path.resolve(__dirname, 'build')
@@ -274,6 +280,14 @@ module.exports = [
                 template: 'src/playground/simple.ejs',
                 filename: 'credits.html',
                 title: `${APP_NAME} - Credits`,
+                ...htmlWebpackPluginCommon
+            }),
+            new HtmlWebpackPlugin({
+                chunks: ['skribu'],
+                template: 'src/playground/skribu/skribu.ejs',
+                filename: 'skribu.html',
+                title: `${APP_NAME} - Skribu`,
+                inject: false,
                 ...htmlWebpackPluginCommon
             }),
             new CopyWebpackPlugin({

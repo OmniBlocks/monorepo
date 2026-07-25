@@ -48,6 +48,7 @@
         "bowser": "1.9.4",
         "browser-basedpyright": "^1.39.9",
         "classnames": "2.2.6",
+        "coi-serviceworker": "^0.1.7",
         "computed-style-to-inline-style": "3.0.0",
         "cookie": "0.5.0",
         "copy-webpack-plugin": "6.4.1",

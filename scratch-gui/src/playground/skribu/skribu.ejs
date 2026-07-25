@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <script src="<%= htmlWebpackPlugin.options.root %>coi-serviceworker.js"></script>
+  </head>
+  <body>
+    <noscript>
+      <h1>This page requires JavaScript</h1>
+    </noscript>
+
+    <script>
+      (function() {
+        var theme = '';
+
+        try {
+          var themeSetting = localStorage.getItem('tw:theme');
+          if (themeSetting === 'light' || themeSetting === 'dark') {
+            theme = themeSetting;
+          } else if (themeSetting) {
+            theme = JSON.parse(themeSetting).gui || '';
+          }
+        } catch (e) {
+          // Ignore unavailable or malformed local storage.
+        }
+
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ?
+            'dark' : 'light';
+        }
+
+        document.body.setAttribute('data-splash-theme', theme);
+      })();
+    </script>
+
+    <div id="app"></div>
+
+    <% htmlWebpackPlugin.files.js.forEach(function(script) { %>
+      <script src="<%= script %>"></script>
+    <% }); %>
+  </body>
+</html>

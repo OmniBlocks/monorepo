@@ -1,0 +1,139 @@
+@import '../../css/colors.css';
+
+:global(body) {
+  margin: 0;
+  background: $page-background;
+  color: $page-foreground;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: $ui-modal-background;
+  border-bottom: 1px solid $ui-secondary;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  color: $page-foreground;
+  opacity: 0.75;
+}
+
+.back-link {
+  color: $link-color;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(20rem, 0.85fr);
+  gap: 1rem;
+  min-height: calc(100vh - 6.5rem);
+  padding: 1rem;
+}
+
+.workspace-panel,
+.pane {
+  overflow: hidden;
+  background: $ui-modal-background;
+  border: 1px solid $ui-secondary;
+  border-radius: 0.5rem;
+}
+
+.workspace-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 32rem;
+}
+
+.workspace-panel h2,
+.pane h2 {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  background: $ui-primary;
+}
+
+.workspace {
+  flex: 1;
+  min-height: 30rem;
+}
+
+.side-panel {
+  display: grid;
+  grid-template-rows: minmax(14rem, 1fr) minmax(14rem, 1fr);
+  gap: 1rem;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.code,
+.output {
+  flex: 1;
+  margin: 0;
+  padding: 1rem;
+  overflow: auto;
+  background: $input-background;
+  color: $page-foreground;
+  font-family: Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $ui-primary;
+}
+
+.run-button {
+  margin-right: 0.75rem;
+  padding: 0.45rem 0.8rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background: $looks-secondary;
+  color: $ui-white;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.run-button:hover,
+.run-button:focus {
+  background: $looks-secondary-dark;
+}
+
+@media (max-width: 800px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .side-panel {
+    grid-template-rows: minmax(12rem, 1fr) minmax(12rem, 1fr);
+  }
+}

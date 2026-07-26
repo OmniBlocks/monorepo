@@ -334,7 +334,7 @@ class ExtensionManager {
         /* eslint-disable max-len */
         let ExtensionWorker;
         if (sandboxMode === 'worker') {
-            ExtensionWorker = require('worker-loader?name=js/extension-worker/extension-worker.[hash].js!./extension-worker');
+            ExtensionWorker = (await import(/* webpackChunkName: "extension-worker-factory" */ './tw-create-extension-worker')).default;
         } else if (sandboxMode === 'iframe') {
             ExtensionWorker = (await import(/* webpackChunkName: "iframe-extension-worker" */ './tw-iframe-extension-worker')).default;
         } else {

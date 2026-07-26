@@ -20,6 +20,11 @@ const base = {
             buffer: require.resolve('buffer/')
         }
     },
+    resolveLoader: {
+        alias: {
+            'worker-loader': 'worker-rspack-loader'
+        }
+    },
     module: {
         rules: [{
             test: /\.js$/,

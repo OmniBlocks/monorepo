@@ -52,6 +52,7 @@
         "scratch-translate-extension-languages": "^1.0.7",
         "text-encoding": "0.7.0",
         "uuid": "8.3.2",
+        "worker-loader": "^3.0.8",
         "yargs": "^18.0.0"
     },
     "peerDependencies": {
@@ -82,7 +83,9 @@
         "scratch-storage": "2.3.1",
         "stats.js": "0.17.0",
         "tap": "16.2.0",
-        "tiny-worker": "2.3.0"
+        "tiny-worker": "2.3.0",
+        "webpack": "4.47.0",
+        "worker-rspack-loader": "^3.1.5"
     },
     "private": true
 }

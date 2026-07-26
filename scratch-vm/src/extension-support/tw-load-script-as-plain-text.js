@@ -1,7 +1,5 @@
 // Based on https://github.com/webpack-contrib/worker-loader/tree/v2.0.0
 
-const {EntryPlugin} = require('@rspack/core');
-
 module.exports.pitch = function (request) {
     // Technically this loader does work in other environments, but our use case does not want that.
     if (this.target !== 'web') {
@@ -9,6 +7,10 @@ module.exports.pitch = function (request) {
     }
     this.cacheable(false);
     const callback = this.async();
+
+    const bundler = this._compiler.webpack || require('webpack');
+    const EntryPlugin = bundler.EntryPlugin || bundler.SingleEntryPlugin;
+
     const compiler = this._compilation.createChildCompiler('extension worker', {});
     new EntryPlugin(this.context, `!!${request}`, 'extension worker').apply(compiler);
     compiler.runAsChild((err, entries, compilation) => {

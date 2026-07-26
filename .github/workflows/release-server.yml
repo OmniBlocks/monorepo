@@ -1,0 +1,39 @@
+name: Release Server
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release-server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Monorepo
+        uses: ./.github/actions/setup-monorepo
+
+      - name: Build scratch-vm server
+        run: pnpm --filter scratch-vm run build
+
+      - name: Archive server build
+        run: |
+          ARCHIVE="scratch-vm-server-${{ github.ref_name }}.tar.gz"
+          tar -czf "$ARCHIVE" -C scratch-vm/dist/server .
+          sha512sum "$ARCHIVE" > "$ARCHIVE.sha512"
+          echo "ARCHIVE=$ARCHIVE" >> "$GITHUB_ENV"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            "$ARCHIVE" "$ARCHIVE.sha512" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes

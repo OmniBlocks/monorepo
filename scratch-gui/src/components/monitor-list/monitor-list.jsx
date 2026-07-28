@@ -17,28 +17,33 @@ const MonitorList = props => (
             ...stageSizeToTransform(props.stageSize)
         }}
     >
-        {props.monitors && props.monitors.valueSeq().filter(m => m.visible)
-            .map(monitorData => (
-                <Monitor
-                    draggable={props.draggable}
-                    height={monitorData.height}
-                    id={monitorData.id}
-                    isDiscrete={monitorData.isDiscrete}
-                    key={monitorData.id}
-                    max={monitorData.sliderMax}
-                    min={monitorData.sliderMin}
-                    mode={monitorData.mode}
-                    opcode={monitorData.opcode}
-                    params={monitorData.params}
-                    spriteName={monitorData.spriteName}
-                    targetId={monitorData.targetId}
-                    value={monitorData.value}
-                    width={monitorData.width}
-                    x={monitorData.x}
-                    y={monitorData.y}
-                    onDragEnd={props.onMonitorChange}
-                />
-            ))}
+        <Box
+            className={styles.monitorListScaler}
+            style={stageSizeToTransform(props.stageSize)}
+        >
+            {props.monitors.valueSeq().filter(m => m.visible)
+                .map(monitorData => (
+                    <Monitor
+                        draggable={props.draggable}
+                        height={monitorData.height}
+                        id={monitorData.id}
+                        isDiscrete={monitorData.isDiscrete}
+                        key={monitorData.id}
+                        max={monitorData.sliderMax}
+                        min={monitorData.sliderMin}
+                        mode={monitorData.mode}
+                        opcode={monitorData.opcode}
+                        params={monitorData.params}
+                        spriteName={monitorData.spriteName}
+                        targetId={monitorData.targetId}
+                        value={monitorData.value}
+                        width={monitorData.width}
+                        x={monitorData.x}
+                        y={monitorData.y}
+                        onDragEnd={props.onMonitorChange}
+                    />
+                ))}
+        </Box>
     </Box>
 );
 

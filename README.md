@@ -319,9 +319,6 @@ Most of the maintainers and contributors have our own personal Scratch Account t
 - @ampelc: unfortunately banned
 - @someCatInTheWorld: [someCatInTheWorld](https://scratch.mit.edu/users/o97doge/)
 
-**Q: I tried submitting a pull request for OmniBlocks, but I got tons of lint errors.**
-A: Ignore lint. It's only there because it is from upstream, but we don't actually use it. As long as the code itself compiles and runs and is, well, functional, I could literally NOT care LESS if you're indenting with tabs, spaces, or you put 6 or 7 indents instead of 4. Just make sure your code works 😎
-
 ## Roadmap
 
 ### Current Focus

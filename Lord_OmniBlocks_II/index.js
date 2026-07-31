@@ -25,7 +25,7 @@ Requirements:
 5. Output strict HTML code only, without markdown code block formatting (no \`\`\`html tags).
 `;
 
-app.get('/', async (req, res) => { => {
+app.get('/', async (req, res) => {
     try {
         console.log('Requesting OmniBlocks HTML generation from Gemini...');
 

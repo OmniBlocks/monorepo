@@ -41,7 +41,7 @@ const startNextFetch = ([resolve, url, options]) => {
             // This is worth retrying, especially as some browser will randomly fail requests
             // if we send too many at once (as we do).
 
-            console.warn(`Attempt to fetch ${url} failed`, error);
+            console.warn('Attempt to fetch %s failed', url, error);
 
             if (failedAttempts < 2) {
                 failedAttempts++;

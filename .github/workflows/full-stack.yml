@@ -425,3 +425,44 @@ jobs:
           name: final-test-results
           path: merged-artifacts/
           if-no-files-found: error
+      - name: Download PR Build for Preview
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-build-dist
+          path: preview-build
+        continue-on-error: true
+
+      - name: Push to gh-pages and vrt-images
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+         
+          git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-repo || \
+          (git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-repo && cd gh-pages-repo && git checkout --orphan gh-pages && git rm -rf .)
+          
+          mkdir -p gh-pages-repo/pr-${{ inputs.pr_number }}
+          cp -r preview-build/* gh-pages-repo/pr-${{ inputs.pr_number }}/ 2>/dev/null || true
+          touch gh-pages-repo/.nojekyll
+          
+          cd gh-pages-repo
+          git add .
+          git commit -m "Deploy preview for PR #${{ inputs.pr_number }}" || true
+          git push origin gh-pages
+          cd ..
+
+        
+          git clone --single-branch --branch vrt-images https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images-repo || \
+          (git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images-repo && cd vrt-images-repo && git checkout --orphan vrt-images && git rm -rf .)
+          
+          RUN_DIR="pr-${{ inputs.pr_number }}/run-${{ github.run_id }}"
+          mkdir -p "vrt-images-repo/$RUN_DIR"
+          
+ 
+          cp merged-artifacts/*.png "vrt-images-repo/$RUN_DIR/" 2>/dev/null || true
+          cp merged-artifacts/*.gif "vrt-images-repo/$RUN_DIR/" 2>/dev/null || true
+          
+          cd vrt-images-repo
+          git add .
+          git commit -m "VRT assets for PR #${{ inputs.pr_number }} run #${{ github.run_id }}" || true
+          git push origin vrt-images

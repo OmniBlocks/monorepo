@@ -30,15 +30,15 @@
     "@turbowarp/json": "^0.1.2",
     "@turbowarp/scratchblocks": "^3.6.7",
     "@turbowarp/types": "git+https://github.com/TurboWarp/types-tw.git#tw",
-    "adm-zip": "^0.5.16",
+    "adm-zip": "^0.6.0",
     "chokidar": "^4.0.3",
-    "ejs": "^3.1.10",
-    "eslint": "^9.39.1",
+    "ejs": "^6.0.1",
+    "eslint": "^10.8.0",
     "espree": "^11.0.0",
     "esquery": "^1.6.0",
     "express": "^5.1.0",
     "image-size": "^2.0.2",
-    "markdown-it": "^14.1.0"
+    "markdown-it": "^14.2.0"
   },
   "devDependencies": {
     "@transifex/api": "^7.1.5",

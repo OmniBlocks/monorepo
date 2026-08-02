@@ -2,7 +2,7 @@
 # OmniBlocks/monorepo
 ![Build Status](https://github.com/OmniBlocks/monorepo/workflows/CI/badge.svg)
 ![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/monorepo)
-![GitHub](https://img.shields.io/badge/license-GPLv3-blue.svg)
+![GitHub](https://img.shields.io/badge/license-AGPLv3-blue.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/monorepo)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![GitHub contributors](https://img.shields.io/github/contributors/OmniBlocks/monorepo)
@@ -10,20 +10,15 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/OmniBlocks/monorepo)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/OmniBlocks/monorepo)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/OmniBlocks/monorepo)
-![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB?logo=react)
+![Made with React](https://img.shields.io/badge/GUI%20made%20with-React-61DAFB?logo=react)
 ![Powered by Webpack](https://img.shields.io/badge/Powered%20by-Webpack-8DD6F9?logo=webpack)
 ![GitHub Repo stars](https://img.shields.io/github/stars/OmniBlocks/monorepo?style=flat)
 ![GitHub forks](https://img.shields.io/github/forks/OmniBlocks/monorepo?style=flat)
 ![Website](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fomniblocks.github.io)
-![GitHub language count](https://img.shields.io/github/languages/count/OmniBlocks/monorepo)
-![GitHub top language](https://img.shields.io/github/languages/top/OmniBlocks/monorepo)
 ![GitHub Created At](https://img.shields.io/github/created-at/OmniBlocks/monorepo)
 ![GitHub Release Date](https://img.shields.io/github/release-date-pre/OmniBlocks/monorepo)
-![GitHub Sponsors](https://img.shields.io/github/sponsors/OmniBlocks?logo=githubsponsors)
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/OmniBlocks/monorepo)
 ![GitHub number of milestones](https://img.shields.io/github/milestones/closed/OmniBlocks/monorepo)
-![GitHub License](https://img.shields.io/github/license/OmniBlocks/monorepo)
-![GitHub followers](https://img.shields.io/github/followers/OmniBlocks?style=flat&logo=github)
 
 <a href="https://www.star-history.com/#OmniBlocks/monorepo&type=date&legend=top-left">
  <picture>
@@ -135,7 +130,7 @@ graph TD
     click H "https://github.com/OmniBlocks/monorepo/tree/main/scratch-svg-renderer" "View scratch-svg-renderer in monorepo"
     click I "https://github.com/OmniBlocks/scratch-parser" "View scratch-parser repo"
     click J "https://github.com/OmniBlocks/scratch-l10n" "View scratch-l10n repo"
-    click K "https://www.folgerscoffee.com/" "Why does it even link to Folger Coffee?!"
+    click K "https://www.folgerscoffee.com/" "Why does it even link to Folgers Coffee?!"
 ```
 
 
@@ -321,12 +316,8 @@ Q: But aren't you busy?
 A: True. I, supervoidcoder, the lead maintainer and creator of OmniBlocks, am very busy as I have to do school and other things too. But I'm not one of those people who is "onLy HeRe foR SeRiOuS sTuFF" or "iM a VeRy ImpOrtanT person With PrioRities, not your FrienD". I genuinely care about anyone that wants to reach out to me.
 Most of the maintainers and contributors have our own personal Scratch Account too. Here are some:
 - @supervoidcoder: [scratchcode1_2_3](https://scratch.mit.edu/users/scratchcode1_2_3/)
-- @8to16: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
-- @Graison-P: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
-- @NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
-
-**Q: I tried submitting a pull request for OmniBlocks, but I got tons of lint errors.**
-A: Ignore lint. It's only there because it is from upstream, but we don't actually use it. As long as the code itself compiles and runs and is, well, functional, I could literally NOT care LESS if you're indenting with tabs, spaces, or you put 6 or 7 indents instead of 4. Just make sure your code works 😎
+- @ampelc: unfortunately banned
+- @someCatInTheWorld: [someCatInTheWorld](https://scratch.mit.edu/users/o97doge/)
 
 ## Roadmap
 

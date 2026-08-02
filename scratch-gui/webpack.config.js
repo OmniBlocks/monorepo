@@ -31,7 +31,11 @@ const CACHE_EPOCH = 'pentapod';
 
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-    devtool: process.env.SOURCEMAP || (process.env.NODE_ENV === 'production' ? false : 'cheap-module-source-map'),
+    devtool:
+        process.env.SOURCEMAP ||
+        (process.env.NODE_ENV === 'production' ?
+            false :
+            'cheap-module-source-map'),
     devServer: {
         contentBase: path.resolve(__dirname, 'build'),
         host: '0.0.0.0',
@@ -39,8 +43,8 @@ const base = {
         compress: true,
         port: process.env.PORT || 8601,
         headers: {
-            "Cross-Origin-Embedder-Policy": "require-corp",
-            "Cross-Origin-Opener-Policy": "same-origin"
+            'Cross-Origin-Embedder-Policy': 'require-corp',
+            'Cross-Origin-Opener-Policy': 'same-origin'
         },
         // allows ROUTING_STYLE=wildcard to work properly
         historyApiFallback: {
@@ -52,72 +56,95 @@ const base = {
                 {from: /^\/addons\/?$/, to: '/addons.html'}
             ]
         },
-            hot: true
+        hot: true
     },
     output: {
         library: 'GUI',
-        filename: (
-            process.env.NODE_ENV === 'production' ? `js/${CACHE_EPOCH}/[name].[contenthash].js` : 'js/[name].js'
-        ),
-        chunkFilename: (
-            process.env.NODE_ENV === 'production' ? `js/${CACHE_EPOCH}/[name].[contenthash].js` : 'js/[name].js'
-        ),
+        filename:
+            process.env.NODE_ENV === 'production' ?
+                `js/${CACHE_EPOCH}/[name].[contenthash].js` :
+                'js/[name].js',
+        chunkFilename:
+            process.env.NODE_ENV === 'production' ?
+                `js/${CACHE_EPOCH}/[name].[contenthash].js` :
+                'js/[name].js',
         publicPath: root
     },
     resolve: {
         symlinks: false,
         alias: {
-            'text-encoding$': path.resolve(__dirname, 'src/lib/tw-text-encoder'),
-            'scratch-render-fonts$': path.resolve(__dirname, 'src/lib/tw-scratch-render-fonts')
+            'text-encoding$': path.resolve(
+                __dirname,
+                'src/lib/tw-text-encoder'
+            ),
+            'scratch-render-fonts$': path.resolve(
+                __dirname,
+                'src/lib/tw-scratch-render-fonts'
+            )
         }
     },
     module: {
-        rules: [{
-            test: /\.jsx?$/,
-            loader: 'babel-loader',
-            include: [
-                path.resolve(__dirname, 'src'),
-                /node_modules[\\/]scratch-[^\\/]+[\\/]src/,
-                /node_modules[\\/]pify/,
-                /node_modules[\\/]@vernier[\\/]godirect/
-            ],
-            options: {
-                // Explicitly disable babelrc so we don't catch various config
-                // in much lower dependencies.
-                babelrc: false,
-                plugins: [
-                    ['react-intl', {
-                        messagesDir: './translations/messages/'
-                    }]],
-                presets: ['@babel/preset-env', '@babel/preset-react']
-            }
-        },
-        {
-            test: /\.css$/,
-            use: [{
-                loader: 'style-loader'
-            }, {
-                loader: 'css-loader',
+        rules: [
+            {
+                test: /\.jsx?$/,
+                loader: 'babel-loader',
+                include: [
+                    path.resolve(__dirname, 'src'),
+                    /node_modules[\\/]scratch-[^\\/]+[\\/]src/,
+                    /node_modules[\\/]pify/,
+                    /node_modules[\\/]@vernier[\\/]godirect/,
+                    // These ship modern syntax (optional chaining, etc.) that webpack 4's
+                    // built-in parser can't read; transpile them down like our own source.
+                    /node_modules[\\/]vscode-jsonrpc/,
+                    /node_modules[\\/]vscode-languageserver-protocol/,
+                    /node_modules[\\/]vscode-languageserver-types/
+                ],
                 options: {
-                    modules: true,
-                    importLoaders: 1,
-                    localIdentName: '[name]_[local]_[hash:base64:5]',
-                    camelCase: true
+                    // Explicitly disable babelrc so we don't catch various config
+                    // in much lower dependencies.
+                    babelrc: false,
+                    plugins: [
+                        [
+                            'react-intl',
+                            {
+                                messagesDir: './translations/messages/'
+                            }
+                        ]
+                    ],
+                    presets: ['@babel/preset-env', '@babel/preset-react']
                 }
-            }, {
-                loader: 'postcss-loader',
-                options: {
-                    ident: 'postcss',
-                    plugins: function () {
-                        return [
-                            postcssImport,
-                            postcssVars,
-                            autoprefixer
-                        ];
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    {
+                        loader: 'style-loader'
+                    },
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                            importLoaders: 1,
+                            localIdentName: '[name]_[local]_[hash:base64:5]',
+                            camelCase: true
+                        }
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            ident: 'postcss',
+                            plugins: function () {
+                                return [
+                                    postcssImport,
+                                    postcssVars,
+                                    autoprefixer
+                                ];
+                            }
+                        }
                     }
-                }
-            }]
-        }]
+                ]
+            }
+        ]
     },
     plugins: [
         new CopyWebpackPlugin({
@@ -136,13 +163,26 @@ const base = {
                     force: true
                 }
             ]
+        }),
+        // See python-tab.jsx.
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: 'node_modules/monaco-editor/min/vs',
+                    to: 'static/vs'
+                },
+                {
+                    from: 'node_modules/browser-basedpyright/dist',
+                    to: 'static/pyright'
+                }
+            ]
         })
     ]
 };
 
 if (!process.env.CI) {
     base.plugins.push(new webpack.ProgressPlugin());
-        base.plugins.push(new webpack.HotModuleReplacementPlugin());
+    base.plugins.push(new webpack.HotModuleReplacementPlugin());
 }
 
 module.exports = [
@@ -184,10 +224,14 @@ module.exports = [
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
                 'process.env.DEBUG': Boolean(process.env.DEBUG),
-                'process.env.ENABLE_SERVICE_WORKER': JSON.stringify(process.env.ENABLE_SERVICE_WORKER || ''),
+                'process.env.ENABLE_SERVICE_WORKER': JSON.stringify(
+                    process.env.ENABLE_SERVICE_WORKER || ''
+                ),
                 'process.env.ROOT': JSON.stringify(root),
-                'process.env.ROUTING_STYLE': JSON.stringify(process.env.ROUTING_STYLE || 'filehash'),
-                'process.env.APP_VERSION': JSON.stringify(version || '') 
+                'process.env.ROUTING_STYLE': JSON.stringify(
+                    process.env.ROUTING_STYLE || 'filehash'
+                ),
+                'process.env.APP_VERSION': JSON.stringify(version || '')
             }),
             new HtmlWebpackPlugin({
                 chunks: ['editor'],
@@ -252,8 +296,7 @@ module.exports = [
         ])
     })
 ].concat(
-    process.env.NODE_ENV === 'production' || process.env.BUILD_MODE === 'dist' ? (
-        // export as library
+    process.env.NODE_ENV === 'production' || process.env.BUILD_MODE === 'dist' ? // export as library
         defaultsDeep({}, base, {
             target: 'web',
             entry: {
@@ -305,5 +348,6 @@ module.exports = [
                     ]
                 })
             ])
-        })) : []
+        }) :
+        []
 );

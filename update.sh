@@ -5,8 +5,8 @@ git config --global user.name "github-actions[bot]"
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 pipx install git-filter-repo
  
-PACKAGES=("scratch-gui" "scratch-blocks" "scratch-vm" "scratch-render") 
-REPOS=("TurboWarp" "TurboWarp" "TurboWarp" "TurboWarp")
+PACKAGES=("scratch-gui" "scratch-blocks" "scratch-vm" "scratch-render" "scratch-storage") 
+REPOS=("TurboWarp" "TurboWarp" "TurboWarp" "TurboWarp" "TurboWarp")
 # in case we ever need to upstream from a repo that isn't turbowarp, like pmod or ultrabox
 MONOREPO_DIR=$(pwd)
 DATE_SUFFIX=$(date +%Y-%m-%d)

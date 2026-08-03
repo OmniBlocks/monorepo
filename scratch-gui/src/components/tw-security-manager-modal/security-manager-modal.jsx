@@ -5,6 +5,7 @@ import Box from '../box/box.jsx';
 import Modal from '../../containers/modal.jsx';
 import SecurityModals from '../../lib/tw-security-manager-constants';
 import LoadExtensionModal from './load-extension.jsx';
+import UnsandboxModal from './unsandbox.jsx';
 import FetchModal from './fetch.jsx';
 import OpenWindowModal from './open-window.jsx';
 import RedirectModal from './redirect.jsx';
@@ -39,6 +40,8 @@ const SecurityManagerModalComponent = props => (
         <Box className={styles.body}>
             {props.type === SecurityModals.LoadExtension ? (
                 <LoadExtensionModal {...props.data} />
+            ) : props.type === SecurityModals.Unsandbox ? (
+                <UnsandboxModal {...props.data} />
             ) : props.type === SecurityModals.Fetch ? (
                 <FetchModal {...props.data} />
             ) : props.type === SecurityModals.OpenWindow ? (

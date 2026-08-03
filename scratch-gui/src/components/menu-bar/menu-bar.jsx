@@ -23,6 +23,8 @@ import {MenuItem, MenuSection} from '../menu/menu.jsx';
 import ProjectTitleInput from './project-title-input.jsx';
 import AuthorInfo from './author-info.jsx';
 import SB3Downloader from '../../containers/sb3-downloader.jsx';
+import SB3FolderExporter from '../../containers/sb3-folder-exporter.jsx';
+import SB3FolderImporter from '../../containers/sb3-folder-importer.jsx';
 import DeletionRestorer from '../../containers/deletion-restorer.jsx';
 import TurboMode from '../../containers/turbo-mode.jsx';
 import MenuBarHOC from '../../containers/menu-bar-hoc.jsx';
@@ -32,7 +34,6 @@ import FramerateChanger from '../../containers/tw-framerate-changer.jsx';
 import ChangeUsername from '../../containers/tw-change-username.jsx';
 import CloudVariablesToggler from '../../containers/tw-cloud-toggler.jsx';
 import TWSaveStatus from './tw-save-status.jsx';
-import TWNews from './tw-news.jsx';
 
 import {openTipsLibrary, openSettingsModal, openRestorePointModal} from '../../reducers/modals';
 import {setPlayer} from '../../reducers/mode';
@@ -95,7 +96,7 @@ import fileIcon from './icon--file.svg';
 import editIcon from './icon--edit.svg';
 import addonsIcon from './addons.svg';
 import errorIcon from './tw-error.svg';
-import advancedIcon from './tw-advanced.svg';
+import advancedIcon from './Boxy-advanced5.svg';
 
 import ninetiesLogo from './nineties_logo.svg';
 import catLogo from './cat_logo.svg';
@@ -232,6 +233,7 @@ class MenuBar extends React.Component {
     }
     componentDidMount () {
         document.addEventListener('keydown', this.handleKeyPress);
+        
     }
     componentWillUnmount () {
         document.removeEventListener('keydown', this.handleKeyPress);
@@ -341,9 +343,9 @@ class MenuBar extends React.Component {
         if (modifier) {
             if (event.key.toLowerCase() === 's') {
                 this.props.handleSaveProject();
-                event.preventDefault();    
+                event.preventDefault();
             } else if (event.key.toLowerCase() === 'o') {
-                event.preventDefault();    
+                event.preventDefault();
                 this.props.onStartSelectingFileUpload();
             }
         }
@@ -483,7 +485,7 @@ class MenuBar extends React.Component {
         );
         // Show the About button only if we have a handler for it (like in the desktop app)
         const aboutButton = this.buildAboutMenu(this.props.onClickAbout);
-        const menuBar = (
+        return (
             <Box
                 className={classNames(
                     this.props.className,
@@ -553,10 +555,7 @@ class MenuBar extends React.Component {
                                 this.handleClickDesktopSettings
                             }
                             // eslint-disable-next-line react/jsx-no-bind
-                            onOpenCustomSettings={
-                                this.props.onClickAddonSettings &&
-                                this.props.onClickAddonSettings.bind(null, 'editor-theme3')
-                            }
+                            onOpenCustomSettings={this.props.onClickAddonSettings.bind(null, 'editor-theme3')}
                             onRequestClose={this.props.onRequestCloseSettings}
                             onRequestOpen={this.props.onClickSettings}
                             settingsMenuOpen={this.props.settingsMenuOpen}
@@ -635,6 +634,7 @@ class MenuBar extends React.Component {
                                         >
                                             {this.props.intl.formatMessage(sharedMessages.loadFromComputerTitle)}
                                         </MenuItem>
+                                        
                                         <SB3Downloader
                                             showSaveFilePicker={this.props.showSaveFilePicker}
                                         >
@@ -690,6 +690,38 @@ class MenuBar extends React.Component {
                                                 </React.Fragment>
                                             )}
                                         </SB3Downloader>
+                                        <SB3FolderImporter>
+                                            {importProjectFromFolder => (
+                                                importProjectFromFolder ? (
+                                                    <MenuItem
+                                                        onClick={importProjectFromFolder}
+                                                    >
+                                                        <FormattedMessage
+                                                            defaultMessage="Import from folder"
+                                                            // eslint-disable-next-line max-len
+                                                            description="Menu bar item to import project files from a folder"
+                                                            id="tw.importProjectFromFolder"
+                                                        />
+                                                    </MenuItem>
+                                                ) : null
+                                            )}
+                                        </SB3FolderImporter>
+                                        <SB3FolderExporter>
+                                            {exportProjectToFolder => (
+                                                exportProjectToFolder ? (
+                                                    <MenuItem
+                                                        onClick={this.getSaveToComputerHandler(exportProjectToFolder)}
+                                                    >
+                                                        <FormattedMessage
+                                                            defaultMessage="Export project as folder"
+                                                            // eslint-disable-next-line max-len
+                                                            description="Menu bar item to export project files to a folder"
+                                                            id="tw.exportProjectAsFolder"
+                                                        />
+                                                    </MenuItem>
+                                                ) : null
+                                            )}
+                                        </SB3FolderExporter>
                                     </MenuSection>
                                     {this.props.onClickPackager && (
                                         <MenuSection>
@@ -1015,7 +1047,7 @@ class MenuBar extends React.Component {
                     <div className={styles.menuBarItem}>
                         <a
                             className={styles.feedbackLink}
-                            href="https://scratch.mit.edu/users/GarboMuffin/#comments"
+                            href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments"
                             rel="noopener noreferrer"
                             target="_blank"
                         >
@@ -1042,13 +1074,6 @@ class MenuBar extends React.Component {
 
                 {aboutButton}
             </Box>
-        );
-
-        return (
-            <React.Fragment>
-                {menuBar}
-                <TWNews />
-            </React.Fragment>
         );
     }
 }

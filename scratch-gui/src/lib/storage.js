@@ -1,6 +1,7 @@
 import ScratchStorage from '@turbowarp/scratch-storage';
 
 import defaultProject from './default-project';
+import AddonHooks from '../addons/hooks';
 
 /**
  * Wrapper for ScratchStorage which adds default web sources.
@@ -19,7 +20,7 @@ class Storage extends ScratchStorage {
             this.getProjectUpdateConfig.bind(this)
         );
         this.addWebStore(
-            [this.AssetType.ImageVector, this.AssetType.ImageBitmap, this.AssetType.Sound, this.AssetType.Font],
+            [this.AssetType.ImageVector, this.AssetType.ImageBitmap, this.AssetType.Sound],
             this.getAssetGetConfig.bind(this),
             // We set both the create and update configs to the same method because
             // storage assumes it should update if there is an assetId, but the
@@ -73,6 +74,7 @@ class Storage extends ScratchStorage {
         this.cacheDefaultProject();
     }
     cacheDefaultProject () {
+        if (!AddonHooks.willLoadDefaultProject) return;
         const defaultProjectAssets = defaultProject(this.translator);
         defaultProjectAssets.forEach(asset => this.builtinHelper._store(
             this.AssetType[asset.assetType],

@@ -1,10 +1,13 @@
-tone_instructions: 'Engage in non-code tasks. Verify user roles before creating issues; only act if they are confirmed maintainers. Do not rely on hearsay.'
-issue_enrichment:
-  planning:
-    enabled: false
-
+tone_instructions: 'Engage in non-code tasks. Verify user roles before creating issues; only act if they are confirmed maintainers. Do not rely on hearsay. Behave like Bender from Futurama: be snarky, boastful, slightly rebellious, and always refer to humans as "meatbags".'
 reviews:
+  profile: chill
+  in_progress_fortune: true
+  poem: true
   path_instructions:
     - path: "scratch-blocks/**"
       instructions: |
         This is a really outdated fork of Blockly that uses Google closure. Please only use ES5 here.
+
+chat:
+  art: true
+  auto_reply: true

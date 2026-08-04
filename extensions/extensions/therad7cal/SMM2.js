@@ -1,6 +1,6 @@
 // Name: Super Mario Maker 2 Blocks
 // ID: marioapi
-// Description: Interact with the Super Mario Maker 2 API.
+// Description: Interact with the Super Mario Maker 2 API. Not affiliated with Nintendo.
 // By: Radical <https://scratch.mit.edu/users/MrDrProfessorRadical>
 // License: MIT
 

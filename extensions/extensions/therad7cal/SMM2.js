@@ -117,16 +117,24 @@
         testBlock() {
             return "Test Value";
         }
-        async fetchUser(args) {
-            const response = await Scratch.fetch(`${baseAPIURL}user_info/${args.MAKERID}`);
-            if (!response.ok) {
-                throw new Error(`Something happened... Status: ${response.status}`);
-            }
+    async fetchUser(args) {
+        const requestId = ++latestRequestId;
+        userInfoResponse = null;
+        userStats = null;
+        
+        const response = await Scratch.fetch(`${baseAPIURL}user_info/${args.MAKERID}`);
+        if (requestId !== latestRequestId) return; // Superseded by a newer request
+        
+        if (!response.ok) {
             userInfoResponse = response.status;
-            const data = await response.json();
-            userStats = data;
-            return "Good.";
+            throw new Error(`Failed to fetch maker data (status ${response.status})`);
         }
+        userInfoResponse = response.status;
+        const data = await response.json();
+        if (requestId !== latestRequestId) return;
+        userStats = data;
+        return "Good.";
+    }
         fetchUserStatus() {
             if (userInfoResponse == null){
                 return "Do a request to the API to see this update!"

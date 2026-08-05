@@ -20,5 +20,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Job'
+              body: 'get a j*b <img width="640" height="854" alt="Image" src="https://github.com/user-attachments/assets/3e9896bf-da88-4e0f-8778-e66ca5e8a1ed" />'
             })

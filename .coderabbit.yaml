@@ -1,0 +1,5 @@
+language: en
+reviews:
+  auto_review: true
+issue_enrichment:
+  planning: false

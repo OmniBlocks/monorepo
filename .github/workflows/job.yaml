@@ -7,7 +7,7 @@ on:
 jobs:
   post-job-comment:
     # Avoid running on comments made by bots (including itself) to prevent infinite loops
-    if: ${{ !github.event.comment.user.login_contains('bot') }}
+    if: ${{ !contains(github.event.comment.user.login, 'bot') }}
     runs-on: ubuntu-latest
     permissions:
       issues: write

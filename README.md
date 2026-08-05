@@ -50,7 +50,7 @@ Try out OmniBlocks: [https://omniblocks.github.io](https://omniblocks.github.io)
 <img width="407" height="166" alt="Screenshot 2025-11-25 2 48 03 PM" src="https://github.com/user-attachments/assets/9fb2b478-4ee3-498d-a771-d586d3a7a8fe" /></br>
 4. The app will now work offline and can be launched like a native application
 
-https://github.com/user-attachments/assets/986de6a3-47e3-436b-91f5-e169a6a67a4a
+https://github.com/user-attachments/assets/7c09be1c-16e1-44fb-8741-42d07ce9c25c
 
 We are working on a desktop app for more native access and integration, but this is the best you can get for now, but it is quite great for what it has.
 

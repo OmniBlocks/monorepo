@@ -117,24 +117,25 @@
         testBlock() {
             return "Test Value";
         }
-    async fetchUser(args) {
-        const requestId = ++latestRequestId;
-        userInfoResponse = null;
-        userStats = null;
-        
-        const response = await Scratch.fetch(`${baseAPIURL}user_info/${args.MAKERID}`);
-        if (requestId !== latestRequestId) return; // Superseded by a newer request
-        
-        if (!response.ok) {
+        async fetchUser(args) {
+            userInfoResponse = null;
+            userStats = null;
+            const response = await Scratch.fetch(`${baseAPIURL}user_info/${args.MAKERID}`);
+            if (!response.ok) {
+                const data = await response.json();
+                userStats = data;
+                if (data["error"].includes("level")) {
+                    userInfoResponse = `${response.status} - This is a level code`;
+                } else {
+                    userInfoResponse = `${response.status} - Invalid code`;
+                }
+                throw new Error(`Error occurred. Unsure why but here's status. Status: ${response.status}\n\nIf you see this, you're in inspect element. So go to networking, hit the block a few times, give it a good smash and see what tgrcode.com outputs`);
+            }
             userInfoResponse = response.status;
-            throw new Error(`Failed to fetch maker data (status ${response.status})`);
+            const data = await response.json();
+            userStats = data;
+            return "Good.";
         }
-        userInfoResponse = response.status;
-        const data = await response.json();
-        if (requestId !== latestRequestId) return;
-        userStats = data;
-        return "Good.";
-    }
         fetchUserStatus() {
             if (userInfoResponse == null){
                 return "Do a request to the API to see this update!"
@@ -149,6 +150,7 @@
             }
         }
         valuesOfMaker(args) {
+            // okay reader, there could be a better way to do this.
             if (userInfoResponse == null){
                 return "Do a request to the API to see this update!"
             }

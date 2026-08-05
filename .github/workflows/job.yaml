@@ -1,16 +1,18 @@
-name: Say swear word on every issue
+name: Comment on Issue Comments
 
 on:
-  issues:
-    types: [opened]
+  issue_comment:
+    types: [created]
 
 jobs:
-  comment:
+  post-job-comment:
+    # Avoid running on comments made by bots (including itself) to prevent infinite loops
+    if: ${{ !github.event.comment.user.login_contains('bot') }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - name: Post the ultimate insult
+      - name: Post comment
         uses: actions/github-script@v7
         with:
           script: |
@@ -18,5 +20,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'job'
+              body: 'Job'
             })

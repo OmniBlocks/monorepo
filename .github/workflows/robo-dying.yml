@@ -50,7 +50,12 @@ jobs:
               "I drank uranium",
               "I eat mercury",
               "I ate concrete, don't say this is a health issue because it tastes good",
-              "I ate my phone"
+              "I ate my phone",
+              "help",
+              "plan",
+              "I hate you",
+              "Bit Sprite is an energy drink. It contains uranium and mercury to increase your energy. I tried it!",
+              "You do realise I am just a GitHub action?"
             ];
 
             const selectedQuote = quotes[Math.floor(Math.random() * quotes.length)];

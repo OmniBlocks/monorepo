@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - OmniBlocks</title>
+    <link rel="icon" type="image/x-icon" sizes="32x32" href="favicon.ico">
+    <style>
+        :root {
+          --page-bg: var(--page-background, #ffffff);
+          --page-text: var(--text-primary, #575E75);
+          --accent-color: var(--looks-secondary, #59C0C0);
+          --accent-dark: var(--motion-tertiary, #389499);
+          --status-offline: #ff6b6b;
+          --status-online: #51cf66;
+        }
+        
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--page-bg);
+            color: var(--page-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .offline-container {
+            max-width: 500px;
+            padding: 2rem;
+        }
+        
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+        
+        h1 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        p {
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: var(--accent-color);
+            color: var(--page-text);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: filter 0.2s;
+        }
+        
+        button:hover {
+            filter: brightness(0.85);
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        .secondary-button {
+            background: transparent;
+            border: 2px solid var(--accent-color);
+        }
+        
+        .secondary-button:hover {
+            background: var(--accent-color);
+        }
+        
+        .status {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.05);
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .online {
+            background: rgba(81, 207, 102, 0.1);
+            border: 1px solid var(--status-online);
+            color: #2d5016;
+        }
+        
+        .offline {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid var(--status-offline);
+            color: #8b2635;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <img src="Boxy-sad.svg" alt="Boxy Sad" class="offline-icon" style="width: 120px; height: 120px;">
+        <h1>You're Offline</h1>
+        <p>
+            It looks like you're not connected to the internet. Don't worry! 
+            OmniBlocks works offline too. You can continue working on your projects. 
+            If the editor doesn't work, we're sorry, and try again later.
+        </p>
+        
+        <div class="actions">
+            <button onclick="goToEditor()">Open Editor</button>
+            <button class="secondary-button" onclick="tryAgain()">Try Again</button>
+        </div>
+        
+        <div id="status" class="status offline">
+            <strong>Status:</strong> <span id="status-text">Offline</span>
+        </div>
+    </div>
+
+    <script>
+        function goToEditor() {
+            window.location.href = 'editor.html';
+        }
+        
+        function tryAgain() {
+            window.location.reload();
+        }
+        
+        function updateStatus() {
+            const status = document.getElementById('status');
+            const statusText = document.getElementById('status-text');
+            
+            if (navigator.onLine) {
+                status.className = 'status online';
+                statusText.textContent = 'Online';
+            } else {
+                status.className = 'status offline';
+                statusText.textContent = 'Offline';
+            }
+        }
+        
+        // Listen for online/offline events
+        window.addEventListener('online', function() {
+            updateStatus();
+            setTimeout(function() {
+                if (navigator.onLine) {
+                    window.location.reload();
+                }
+            }, 1000);
+        });
+        window.addEventListener('offline', updateStatus);
+        
+        // Initial status check
+        updateStatus();
+    </script>
+</body>
+</html>

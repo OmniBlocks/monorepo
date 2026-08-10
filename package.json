@@ -20,6 +20,6 @@
     "@types/node": "^26.1.0"
   },
   "dependencies": {
-    "@turbowarp/scratch-storage": "^1.0.0"
+    "@turbowarp/scratch-storage": "2.0.0"
   }
 }

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Steamworks - TurboWarp Extension Documentation</title>
+    <link rel="canonical" href="https://extensions.turbowarp.org/steamworks">
+    <style>
+      :root {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color-scheme: light dark;
+        font-size: 16px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color: #eee;
+          background: #131313;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        a {
+          color: #56b2ff;
+        }
+        a:visited {
+          color: #f192ff;
+        }
+        a:active {
+          color: red;
+        }
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        line-height: 1.3;
+      }
+
+      nav {
+        background-color: #ff4c4c;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+      nav > div {
+        display: flex;
+        max-width: 600px;
+        margin: 0 auto;
+        justify-content: space-between;
+      }
+      nav a {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.5rem 0.25rem 0.5rem 0;
+        align-items: center;
+        text-decoration: none;
+        color: inherit !important;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      nav img {
+        width: 2rem;
+        height: 2rem;
+        flex-shrink: 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        nav {
+          background-color: #333;
+        }
+      }
+
+      noscript {
+        font-weight: bold;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 0 0.25rem;
+      }
+      h1 {
+        font-size: 2.25rem;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        border-bottom: 1px solid #ccc;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid #ccc;
+        margin: 1rem 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        hr, h1, h2, h3, h4, h5, h6 {
+          border-color: #444;
+        }
+      }
+
+      .view-in-browser {
+        display: none;
+      }
+      .is-desktop .view-in-browser {
+        display: flex;
+      }
+      .is-desktop nav > div, .is-desktop .container {
+        /* Desktop app shows this page in a window, not a browser tab, so don't need to */
+        /* restrict the width of the content for readability. */
+        max-width: 100%;
+      }
+
+      code {
+        background-color: #eee;
+        border-radius: 4px;
+        padding: 0 2px;
+      }
+      pre {
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        overflow-x: auto;
+      }
+      @media (prefers-color-scheme: dark) {
+        code, pre {
+          background-color: #223;
+          border-color: #334;
+        }
+      }
+
+      .render-scratchblocks {
+        width: 100%;
+        overflow-x: auto;
+        white-space: pre;
+        line-height: 42px; /* reasonable estimation to reduce layout shift */
+      }
+      .render-scratchblocks svg {
+        display: block;
+      }
+
+      footer {
+        margin: 1rem 0;
+        font-size: small;
+      }
+
+      /* General Alert Styles */
+      .alert {
+        padding-left: 15px;
+        line-height: 1;
+      }
+
+      /* Border colors for specific alerts */
+      .alert.alert-note { border-left: .25em solid #1f6feb; }
+      .alert.alert-tip { border-left: .25em solid #238636; }
+      .alert.alert-important { border-left: .25em solid #8957e5; }
+      .alert.alert-warning { border-left: .25em solid #9e6a03; }
+      .alert.alert-caution { border-left: .25em solid #da3633; }
+
+      /* Shared Styling for Alert Text */
+      .alert p:first-child {
+        padding-top: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+      }
+
+      /* Specific Color Overrides for Each Alert */
+      .alert.alert-note > p:first-child { color: #4493f8; }
+      .alert.alert-tip > p:first-child { color: #3fb950; }
+      .alert.alert-important > p:first-child { color: #ab7df8; }
+      .alert.alert-warning > p:first-child { color: #d29922; }
+      .alert.alert-caution > p:first-child { color: #f85149; }
+
+      /* Icon Spacing */
+      div.alert svg {
+        margin-right: 8px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <nav role="navigation">
+      <div>
+        <a href="https://extensions.turbowarp.org/">
+          <img src="/turbowarp.svg" alt="">
+          <span>TurboWarp Extension Gallery</span>
+        </a>
+
+        <!-- Only used by desktop app -->
+        <a class="view-in-browser" href="https://extensions.turbowarp.org/steamworks">
+          Read in browser
+        </a>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Steamworks</h1>
+
+      <noscript><p>Enable JavaScript for blocks to render.</p></noscript>
+
+      <p>The Steamworks extension lets you use these Steam APIs:</p>
+<ul>
+<li>Basic user information (name, id, level, country)</li>
+<li>Achievements</li>
+<li>DLC</li>
+<li>Opening URLs in the Steam Overlay</li>
+</ul>
+<p>This extension was not created by and is not supported by Valve.</p>
+<h2>Enabling Steamworks</h2>
+<p>The Steamworks SDK will be automatically downloaded and enabled when a project using the Steamworks extension is put into the <a href="https://packager.turbowarp.org/">TurboWarp Packager</a>. You'll be asked to provide your game's App ID, which you can find on the Steamworks website. If you don't have an App ID yet, <a href="#demo-game">use the demo game</a>. You will also need to select one of these environments:</p>
+<ul>
+<li>Electron Windows application (64-bit)</li>
+<li>Electron macOS application<br>
+(Warning: macOS games published on Steam need to be notarized by Apple, which the packager doesn't support. You can still test your game on a Mac, but you won't be able to publish it for macOS yet.)</li>
+<li>Electron Linux application (64-bit)</li>
+</ul>
+<p>You may have to look under &quot;Other environments&quot; to find some of these. The blocks will not work in the editor, 32-bit environments, ARM environments, plain HTML files, WKWebView, or NW.js. You can still run the blocks, they just won't interact with Steam at all.</p>
+<p>You can run the packaged executable directly as usual; you don't need to start the game from Steam for the Steamworks extension to function. However there are a couple caveats when doing this:</p>
+<ul>
+<li>On macOS and Linux, when not started through Steam, the Steam Overlay may not work</li>
+<li>On Linux, when not started through Steam, Steamworks may not work if Steam is installed from Flatpak/Snap instead of as a native package</li>
+</ul>
+<h2>Security considerations</h2>
+<div class="alert alert-caution"><p><svg viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true" fill="#f85149"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg> <strong>Caution</strong></p>
+<p><strong>Using the Steamworks extension will not prevent people from pirating your game.</strong><br/><br/>The Steamworks extension is also inherently client-side, so a cheater could manipulate all of the Steamworks blocks to return whatever they want. You shouldn't use them for things that are security critical.</p>
+</div><h2>Demo game <a name="demo-game"></a></h2>
+<p>To test the Steamworks extension without paying for a Steamworks Partner Program membership, you can use the Steamworks demo game. It's called Spacewar and its App ID is <code>480</code>. You don't need to install or run Spacewar; rather, you can use its App ID to test various Steamworks APIs as if you were the Spacewar developers.</p>
+<p>Spacewar has achievements with the following API Names, which can used for testing the achievement blocks:</p>
+<ul>
+<li><code>ACH_WIN_ONE_GAME</code></li>
+<li><code>ACH_WIN_100_GAMES</code></li>
+<li><code>ACH_TRAVEL_FAR_ACCUM</code></li>
+<li><code>ACH_TRAVEL_FAR_SINGLE</code></li>
+</ul>
+<h2>Basic information</h2>
+<p>Remember that Steamworks is only properly enabled when your project is packaged in a few specific environments. You can detect if this is the case using:</p>
+<div class="render-scratchblocks">&lt;has steamworks? :: #136C9F&gt;
+</div><p>Then you can get basic information about the user using:</p>
+<div class="render-scratchblocks">(get user (name v) :: #136C9F)
+</div><h2>Achievements</h2>
+<p>Achievements are created on the Steamworks website. The <strong>API Name</strong> of each achievement is what you need to provide in your project's code to the Steamworks extension.</p>
+<p>This would unlock the <code>ACH_WIN_ONE_GAME</code> achievement from Spacewar:</p>
+<div class="render-scratchblocks">when this sprite clicked
+set achievement [ACH_WIN_ONE_GAME] unlocked to (true v) :: #136C9F
+</div><p>You can also detect if an achievement has already been unlocked:</p>
+<div class="render-scratchblocks">when flag clicked
+forever
+    if &lt;achievement [ACH_WIN_ONE_GAME] unlocked? :: #136C9F&gt; then
+        say [Unlocked!]
+    else
+        say [Not unlocked :(]
+    end
+end
+</div><h2>DLC</h2>
+<p>Each DLC has its own App ID which you can find on the Steamworks website. You can detect if it is installed using:</p>
+<div class="render-scratchblocks">if &lt;(DLC v) [1234] installed? :: #136C9F&gt; then
+
+end
+</div><h2>Overlay</h2>
+<p>The Steamworks extension has a block to open URLs in the Steam Overlay's web browser. If the overlay is not working, it might open in the Steam app instead. If that also doesn't work, it will open in the default web browser. Regardless, packaged projects never display security prompts like &quot;The project wants to open a new window or tab&quot;.</p>
+<div class="render-scratchblocks">open (URL v) [https://example.com/] in overlay :: #136C9F
+</div>
+
+      <hr>
+
+      <footer>
+        <p>
+          This page is <a href="https://github.com/TurboWarp/extensions/tree/master/docs">open source</a>.
+          
+            Blocks rendered with <a href="https://scratchblocks.github.io/">scratchblocks</a>.
+          
+        </p>
+        <p>TurboWarp is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation.</p>
+      </footer>
+    </main>
+
+    
+      <script src="/docs-internal/scratchblocks.js"></script>
+      <script>
+        scratchblocks.renderMatching('.render-scratchblocks', {
+          style: 'scratch3'
+        });
+      </script>
+    
+  </body>
+</html>

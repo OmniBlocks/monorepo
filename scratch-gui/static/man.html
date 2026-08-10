@@ -22,7 +22,6 @@
             font-family: 'DeterminationMono', monospace, sans-serif;
         }
 
-        /* Initial clickable "...?" text */
         #init-trigger {
             cursor: pointer;
             font-size: 3rem;
@@ -40,14 +39,12 @@
             position: relative;
         }
 
-        /* Tree image */
         #tree-image {
             cursor: pointer;
             image-rendering: pixelated;
             max-width: 300px;
         }
 
-        /* Undertale styled textbox - bigger, no border radius */
         #ut-textbox {
             display: none;
             position: absolute;
@@ -75,10 +72,8 @@
 </head>
 <body>
 
-    <!-- Initial state -->
     <div id="init-trigger" onclick="startExperience()">...?</div>
 
-    <!-- Active state -->
     <div id="main-content">
         <img id="tree-image" src="tree.gif" alt="Tree" onclick="openTextbox()">
         <div id="ut-textbox" onclick="advanceText(event)"></div>
@@ -86,7 +81,6 @@
     </div>
 
     <script>
-        // EDITABLE TEXT: Change/add strings in this array to customize the dialogue sequence.
         const dialogueLines = [
             "(Well, there is a man here.)",
 			"(He forced something into your hand.)",
@@ -122,7 +116,6 @@
             const textbox = document.getElementById('ut-textbox');
             let rawText = dialogueLines[currentLineIndex];
             
-            // Ensure every line starts with a *
             if (!rawText.startsWith("*")) {
                 rawText = "* " + rawText;
             }
@@ -162,7 +155,6 @@
                 if (currentLineIndex < dialogueLines.length) {
                     startTyping();
                 } else {
-                    // Close box and redirect after the whole sequence is completed
                     textbox.style.display = 'none';
                     window.location.href = "https://omniblocks.github.io";
                 }

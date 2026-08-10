@@ -270,7 +270,8 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const { PNG } = require('pngjs');
-          const pixelmatch = require('pixelmatch');
+          const pixelmatchRaw = require('pixelmatch');
+          const pixelmatch = pixelmatchRaw.default || pixelmatchRaw;
 
           const baseDir = 'screenshots-base';
           const prDir = 'screenshots-pr';

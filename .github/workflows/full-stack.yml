@@ -20,8 +20,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BASE_REF=$(gh api repos/${{ github.repository }}/pulls/${{ inputs.pr_number }} --jq .base.ref)
-          echo "base_ref=$BASE_REF" >> $GITHUB_OUTPUT
+          BASE_REF=$(gh api repos/${{ github.repository }}/pulls/${{ inputs.pr_number }} --jq .base.ref || echo "main")
+          echo "base_ref=${BASE_REF:-main}" >> $GITHUB_OUTPUT
 
   build-base:
     needs: prepare
@@ -30,7 +30,7 @@ jobs:
       - name: Checkout Base
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.prepare.outputs.base_ref }}
+          ref: ${{ needs.prepare.outputs.base_ref || 'main' }}
       
       - name: Set up Node.js & pnpm
         uses: actions/setup-node@v4
@@ -40,15 +40,26 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Build OmniBlocks (Base)
+        env:
+          NODE_OPTIONS: '--openssl-legacy-provider'
         run: | 
-          pnpm install --no-frozen-lockfile
-          cd scratch-gui  
+          pnpm i --shamefully-hoist
+          mkdir -p scratch-gui/build
           
           START_TIME=$(date +%s)
-          pnpm run build || true
-          END_TIME=$(date +%s)
           
-          echo "$((END_TIME - START_TIME))" > ../base-build-time.txt
+          # Build Editor
+          (cd scratch-gui && ROOT=/ NODE_ENV=production pnpm build) || true
+          
+          # Build Extensions Gallery if folder exists
+          if [ -d "extensions" ]; then
+            (cd extensions && pnpm build) || true
+            mkdir -p scratch-gui/build/extensions
+            cp -a extensions/build/. scratch-gui/build/extensions/ 2>/dev/null || true
+          fi
+          
+          END_TIME=$(date +%s)
+          echo "$((END_TIME - START_TIME))" > base-build-time.txt
 
       - name: Upload Base Build Time
         uses: actions/upload-artifact@v4
@@ -80,17 +91,30 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Build OmniBlocks (PR)
+        env:
+          NODE_OPTIONS: '--openssl-legacy-provider'
         run: | 
-          pnpm install --no-frozen-lockfile
+          pnpm i --shamefully-hoist
           mkdir -p test-logs
-          cd scratch-gui  
+          mkdir -p scratch-gui/build
           
           START_TIME=$(date +%s)
-          pnpm run build > build.log 2>&1 || true 
-          END_TIME=$(date +%s)
           
-          echo "$((END_TIME - START_TIME))" > ../test-logs/pr-build-time.txt
-          grep -A 100 -B 20 "ERROR" build.log > ../test-logs/scratch-gui.log || true
+          # Build Editor
+          (
+            cd scratch-gui && ROOT=/ NODE_ENV=production pnpm build
+          ) > test-logs/scratch-gui-build.log 2>&1 || true
+          
+          # Build Extensions Gallery if folder exists
+          if [ -d "extensions" ]; then
+            (cd extensions && pnpm build) >> test-logs/scratch-gui-build.log 2>&1 || true
+            mkdir -p scratch-gui/build/extensions
+            cp -a extensions/build/. scratch-gui/build/extensions/ 2>/dev/null || true
+          fi
+          
+          END_TIME=$(date +%s)
+          echo "$((END_TIME - START_TIME))" > test-logs/pr-build-time.txt
+          grep -A 100 -B 20 "ERROR" test-logs/scratch-gui-build.log > test-logs/scratch-gui.log || true
 
       - name: Run Sub-Package Tests
         continue-on-error: true
@@ -150,27 +174,38 @@ jobs:
 
       - name: Download Base Build
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: base-build-dist
           path: scratch-gui/build-base
 
       - name: Download PR Build
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: pr-build-dist
           path: scratch-gui/build-pr
 
       - name: Install Dependencies & Browsers
+        shell: bash
         run: |
-          pnpm install --no-frozen-lockfile
-          pnpm exec playwright install ${{ matrix.browser }} --with-deps
+          pnpm i --shamefully-hoist
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            pnpm exec playwright install ${{ matrix.browser }} --with-deps || pnpm exec playwright install ${{ matrix.browser }}
+          else
+            pnpm exec playwright install ${{ matrix.browser }}
+          fi
 
       - name: Run Base Tests (Time & VRT)
         shell: bash
         run: |
           rm -rf scratch-gui/build || true
-          cp -r scratch-gui/build-base scratch-gui/build
+          mkdir -p scratch-gui/build
+          if [ -d "scratch-gui/build-base" ]; then
+            cp -r scratch-gui/build-base/* scratch-gui/build/ 2>/dev/null || cp -r scratch-gui/build-base/. scratch-gui/build/ 2>/dev/null || true
+          fi
           
+          npx --yes kill-port 8601 2>/dev/null || true
           pnpm dlx http-server scratch-gui/build/ -p 8601 &
           SERVER_PID=$!
           sleep 3
@@ -180,7 +215,8 @@ jobs:
           END_TIME=$(date +%s)
           
           echo "$((END_TIME - START_TIME))" > base_duration.txt
-          kill $SERVER_PID || true
+          kill -9 $SERVER_PID 2>/dev/null || kill $SERVER_PID 2>/dev/null || true
+          npx --yes kill-port 8601 2>/dev/null || true
           
           mkdir -p screenshots-base
           mv screenshots/* screenshots-base/ 2>/dev/null || true
@@ -189,8 +225,12 @@ jobs:
         shell: bash
         run: |
           rm -rf scratch-gui/build || true
-          cp -r scratch-gui/build-pr scratch-gui/build
+          mkdir -p scratch-gui/build
+          if [ -d "scratch-gui/build-pr" ]; then
+            cp -r scratch-gui/build-pr/* scratch-gui/build/ 2>/dev/null || cp -r scratch-gui/build-pr/. scratch-gui/build/ 2>/dev/null || true
+          fi
           
+          npx --yes kill-port 8601 2>/dev/null || true
           pnpm dlx http-server scratch-gui/build/ -p 8601 &
           SERVER_PID=$!
           sleep 3
@@ -200,7 +240,8 @@ jobs:
           END_TIME=$(date +%s)
           
           echo "$((END_TIME - START_TIME))" > pr_duration.txt
-          kill $SERVER_PID || true
+          kill -9 $SERVER_PID 2>/dev/null || kill $SERVER_PID 2>/dev/null || true
+          npx --yes kill-port 8601 2>/dev/null || true
           
           mkdir -p screenshots-pr
           mv screenshots/* screenshots-pr/ 2>/dev/null || true
@@ -211,8 +252,8 @@ jobs:
           pnpm add -D pngjs pixelmatch -w
           mkdir -p matrix-results
           
-          BASE_SEC=$(cat base_duration.txt)
-          PR_SEC=$(cat pr_duration.txt)
+          BASE_SEC=$(cat base_duration.txt 2>/dev/null || echo "0")
+          PR_SEC=$(cat pr_duration.txt 2>/dev/null || echo "0")
           DIFF_SEC=$((PR_SEC - BASE_SEC))
           
           LOG_FILE="matrix-results/performance-${{ matrix.os }}-${{ matrix.browser }}.log"
@@ -227,6 +268,7 @@ jobs:
 
           cat > compare.js << 'EOF'
           const fs = require('fs');
+          const path = require('path');
           const { PNG } = require('pngjs');
           const pixelmatch = require('pixelmatch');
 
@@ -234,20 +276,23 @@ jobs:
           const prDir = 'screenshots-pr';
           const outDir = 'matrix-results';
           
-          let vrtLog = "=== Visual Regression Report (${{ matrix.os }} / ${{ matrix.browser }}) ===\n";
+          const os = process.env.MATRIX_OS;
+          const browser = process.env.MATRIX_BROWSER;
+          
+          let vrtLog = `=== Visual Regression Report (${os} / ${browser}) ===\n`;
           const files = fs.existsSync(prDir) ? fs.readdirSync(prDir).filter(f => f.endsWith('.png')) : [];
           
           if (files.length === 0) vrtLog += "No screenshots found in PR.\n";
 
           for (const file of files) {
-            if (!fs.existsSync(`${baseDir}/${file}`)) {
+            if (!fs.existsSync(path.join(baseDir, file))) {
                vrtLog += `[NEW] ${file}\n`;
-               fs.copyFileSync(`${prDir}/${file}`, `${outDir}/${file}`);
+               fs.copyFileSync(path.join(prDir, file), path.join(outDir, file));
                continue;
             }
             
-            const base = PNG.sync.read(fs.readFileSync(`${baseDir}/${file}`));
-            const pr = PNG.sync.read(fs.readFileSync(`${prDir}/${file}`));
+            const base = PNG.sync.read(fs.readFileSync(path.join(baseDir, file)));
+            const pr = PNG.sync.read(fs.readFileSync(path.join(prDir, file)));
             const { width, height } = base;
 
             if (width !== pr.width || height !== pr.height) {
@@ -277,16 +322,16 @@ jobs:
                   }
                 }
               }
-              const prefix = "${{ matrix.os }}-${{ matrix.browser }}";
-              fs.writeFileSync(`${outDir}/${prefix}-DIFF-${file}`, PNG.sync.write(stitched));
+              const prefix = `${os}-${browser}`;
+              fs.writeFileSync(path.join(outDir, `${prefix}-DIFF-${file}`), PNG.sync.write(stitched));
             } else {
               vrtLog += `[MATCH] ${file} - 0 pixels diff\n`;
             }
           }
-          fs.writeFileSync(`${outDir}/vrt-${{ matrix.os }}-${{ matrix.browser }}.log`, vrtLog);
+          fs.writeFileSync(path.join(outDir, `vrt-${os}-${browser}.log`), vrtLog);
           EOF
 
-          node compare.js
+          MATRIX_OS="${{ matrix.os }}" MATRIX_BROWSER="${{ matrix.browser }}" node compare.js
 
       - name: Upload Step Artifacts
         if: always()
@@ -425,6 +470,7 @@ jobs:
           name: final-test-results
           path: merged-artifacts/
           if-no-files-found: error
+
       - name: Download PR Build for Preview
         uses: actions/download-artifact@v4
         with:
@@ -437,7 +483,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-         
           git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-repo || \
           (git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-repo && cd gh-pages-repo && git checkout --orphan gh-pages && git rm -rf .)
           
@@ -451,14 +496,12 @@ jobs:
           git push origin gh-pages
           cd ..
 
-        
           git clone --single-branch --branch vrt-images https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images-repo || \
           (git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images-repo && cd vrt-images-repo && git checkout --orphan vrt-images && git rm -rf .)
           
           RUN_DIR="pr-${{ inputs.pr_number }}/run-${{ github.run_id }}"
           mkdir -p "vrt-images-repo/$RUN_DIR"
           
- 
           cp merged-artifacts/*.png "vrt-images-repo/$RUN_DIR/" 2>/dev/null || true
           cp merged-artifacts/*.gif "vrt-images-repo/$RUN_DIR/" 2>/dev/null || true
           

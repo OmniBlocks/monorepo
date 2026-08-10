@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>...?</title>
+    <style>
+        @font-face {
+            font-family: 'DeterminationMono';
+            src: url('DeterminationMono.ttf') format('truetype');
+        }
+
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'DeterminationMono', monospace, sans-serif;
+        }
+
+        #init-trigger {
+            cursor: pointer;
+            font-size: 3rem;
+            user-select: none;
+        }
+
+        #init-trigger:hover {
+            color: #ffff00;
+        }
+
+        /* Main container hidden initially */
+        #main-content {
+            display: none;
+            text-align: center;
+            position: relative;
+        }
+
+        #tree-image {
+            cursor: pointer;
+            image-rendering: pixelated;
+            max-width: 300px;
+        }
+
+        #ut-textbox {
+            display: none;
+            position: absolute;
+            bottom: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(650px, 90vw);
+            height: 130px;
+            background-color: black;
+            border: 4px solid white;
+            border-radius: 0px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: left;
+            font-family: 'DeterminationMono', monospace, sans-serif;
+            font-size: 24px;
+            color: white;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre-wrap;
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="init-trigger" onclick="startExperience()">...?</div>
+
+    <div id="main-content">
+        <img id="tree-image" src="tree.gif" alt="Tree" onclick="openTextbox()">
+        <div id="ut-textbox" onclick="advanceText(event)"></div>
+        <audio id="bg-audio" src="man.mp3" loop autoplay></audio>
+    </div>
+
+    <script>
+        const dialogueLines = [
+            "(Well, there is a man here.)",
+			"(He forced something into your hand.)",
+            "(You got the Boxy Egg.)"
+        ];
+
+        let currentLineIndex = 0;
+        let charIndex = 0;
+        let typingInterval = null;
+        let isTyping = false;
+
+        function startExperience() {
+            document.title = "* (Behind the tree.)";
+            document.getElementById('init-trigger').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+
+            const bgAudio = document.getElementById('bg-audio');
+            bgAudio.play().catch(error => {
+                console.log("Autoplay blocked or audio file missing:", error);
+            });
+        }
+
+        function openTextbox() {
+            const textbox = document.getElementById('ut-textbox');
+            if (textbox.style.display !== 'block') {
+                textbox.style.display = 'block';
+                currentLineIndex = 0;
+                startTyping();
+            }
+        }
+
+        function startTyping() {
+            const textbox = document.getElementById('ut-textbox');
+            let rawText = dialogueLines[currentLineIndex];
+            
+            if (!rawText.startsWith("*")) {
+                rawText = "* " + rawText;
+            }
+
+            textbox.innerText = "";
+            charIndex = 0;
+            isTyping = true;
+
+            clearInterval(typingInterval);
+
+            typingInterval = setInterval(() => {
+                charIndex++;
+                if (charIndex < rawText.length) {
+                    textbox.innerText = rawText.substring(0, charIndex + 1);
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                }
+            }, 35);
+        }
+
+        function advanceText(event) {
+            event.stopPropagation();
+
+            const textbox = document.getElementById('ut-textbox');
+            let rawText = dialogueLines[currentLineIndex];
+            if (!rawText.startsWith("*")) {
+                rawText = "* " + rawText;
+            }
+
+            if (isTyping) {
+                clearInterval(typingInterval);
+                textbox.innerText = rawText;
+                isTyping = false;
+            } else {
+                currentLineIndex++;
+                if (currentLineIndex < dialogueLines.length) {
+                    startTyping();
+                } else {
+                    textbox.style.display = 'none';
+                    window.location.href = "https://omniblocks.github.io";
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

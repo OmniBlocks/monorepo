@@ -1,32 +1,11 @@
 # OmniBlocks - The Ultimate MultiLanguage IDE
 # OmniBlocks/monorepo
-![Build Status](https://github.com/OmniBlocks/monorepo/workflows/CI/badge.svg)
 ![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/monorepo)
 ![GitHub](https://img.shields.io/badge/license-AGPLv3-blue.svg)
-![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/monorepo)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
-![GitHub contributors](https://img.shields.io/github/contributors/OmniBlocks/monorepo)
-![GitHub package.json version](https://img.shields.io/github/package-json/v/OmniBlocks/monorepo)
-![GitHub repo size](https://img.shields.io/github/repo-size/OmniBlocks/monorepo)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/OmniBlocks/monorepo)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/OmniBlocks/monorepo)
-![Made with React](https://img.shields.io/badge/GUI%20made%20with-React-61DAFB?logo=react)
-![Powered by Webpack](https://img.shields.io/badge/Powered%20by-Webpack-8DD6F9?logo=webpack)
 ![GitHub Repo stars](https://img.shields.io/github/stars/OmniBlocks/monorepo?style=flat)
 ![GitHub forks](https://img.shields.io/github/forks/OmniBlocks/monorepo?style=flat)
-![Website](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fomniblocks.github.io)
-![GitHub Created At](https://img.shields.io/github/created-at/OmniBlocks/monorepo)
-![GitHub Release Date](https://img.shields.io/github/release-date-pre/OmniBlocks/monorepo)
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/OmniBlocks/monorepo)
-![GitHub number of milestones](https://img.shields.io/github/milestones/closed/OmniBlocks/monorepo)
-
-<a href="https://www.star-history.com/#OmniBlocks/monorepo&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/monorepo&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/monorepo&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=OmniBlocks/monorepo&type=date&legend=top-left" />
- </picture>
-</a>
+![Website](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fomniblocks.org)
 
 OmniBlocks is a block-based programming language that builds upon Scratch and TurboWarp's foundation with improvements, addons, themes, and other features for an amazing coding experience.
 

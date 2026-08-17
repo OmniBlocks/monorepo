@@ -1047,15 +1047,15 @@ class MenuBar extends React.Component {
                     <div className={styles.menuBarItem}>
                         <a
                             className={styles.feedbackLink}
-                            href="mailto:support@omniblocks.org"
+                            href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments"
                             rel="noopener noreferrer"
                             target="_blank"
                         >
                             {/* todo: icon */}
                             <Button className={styles.feedbackButton}>
                                 <FormattedMessage
-                                    defaultMessage="{APP_NAME} Support/Feedback"
-                                    description="Button that opens a mail page for feedback or support."
+                                    defaultMessage="{APP_NAME} Feedback"
+                                    description="Button to give feedback in the menu bar"
                                     id="tw.feedbackButton"
                                     values={{
                                         APP_NAME

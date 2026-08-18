@@ -209,7 +209,7 @@ const Footer = () => (
                             id="tw.footer.wiki"
                         />
                     </a>
-                    <a href="https://omniblocks.github.io/NotebookWriter">
+                    <a href="https://omniblocks.org/NotebookWriter">
                         <FormattedMessage
                             defaultMessage="OmniBlocks Writer"
                             description="Link in footer to OmniBlocks Writer, our word processor"

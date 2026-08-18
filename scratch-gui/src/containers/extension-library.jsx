@@ -93,7 +93,7 @@ const fetchLibraryTW = async () => {
 };
 
 const fetchLibraryOB = async () => {
-    const res = await fetch('https://omniblocks.github.io/extensions/generated-metadata/extensions-v0.json');
+    const res = await fetch('https://omniblocks.org/extensions/generated-metadata/extensions-v0.json');
     if (!res.ok) {
         throw new Error(`HTTP status ${res.status}`);
     }
@@ -104,8 +104,8 @@ const fetchLibraryOB = async () => {
         description: extension.description,
         descriptionTranslations: extension.descriptionTranslations || {},
         extensionId: extension.id,
-        extensionURL: `https://omniblocks.github.io/extensions/${extension.slug}.js`,
-        iconURL: `https://omniblocks.github.io/extensions/${extension.image || 'images/unknown.svg'}`,
+        extensionURL: `https://omniblocks.org/extensions/${extension.slug}.js`,
+        iconURL: `https://omniblocks.org/extensions/${extension.image || 'images/unknown.svg'}`,
         tags: ['ob'],
         credits: [
             ...(extension.original || []),
@@ -125,9 +125,9 @@ const fetchLibraryOB = async () => {
             }
             return credit.name;
         }),
-        docsURI: extension.docs ? `https://omniblocks.github.io/extensions/${extension.slug}` : null,
+        docsURI: extension.docs ? `https://omniblocks.org/extensions/${extension.slug}` : null,
         samples: extension.samples ? extension.samples.map(sample => ({
-            href: `${process.env.ROOT}editor?project_url=https://omniblocks.github.io/extensions/samples/${encodeURIComponent(sample)}.sb3`,
+            href: `${process.env.ROOT}editor?project_url=https://omniblocks.org/extensions/samples/${encodeURIComponent(sample)}.sb3`,
             text: sample
         })) : null,
         incompatibleWithScratch: !extension.scratchCompatible,

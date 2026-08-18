@@ -46,7 +46,7 @@ This player is part of OmniBlocks' broader vision to be a comprehensive creative
 
 1. **Direct Access:** Navigate to `/static/player/index.html` in your browser
 2. **Development Server:** Access via `http://localhost:8601/player/` when running `npm start`
-3. **Production:** Available at `https://omniblocks.github.io/player/`
+3. **Production:** Available at `https://omniblocks.org/player/`
 
 ### Browser Requirements
 
@@ -285,4 +285,4 @@ We welcome contributions to the music player:
 
 ---
 
-**Ready to make some music?** Try the player at [omniblocks.github.io/player/](https://omniblocks.github.io/player/) or start a discussion in the [OmniBlocks GitHub organization](https://github.com/orgs/OmniBlocks/discussions)!
+**Ready to make some music?** Try the player at [omniblocks.org/player/](https://omniblocks.org/player/) or start a discussion in the [OmniBlocks GitHub organization](https://github.com/orgs/OmniBlocks/discussions)!

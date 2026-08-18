@@ -3,5 +3,5 @@
 
 module.exports = {
     name: 'OmniBlocks',
-    url: 'https://omniblocks.github.io/'
+    url: 'https://omniblocks.org/'
 };

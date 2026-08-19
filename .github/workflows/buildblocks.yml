@@ -36,7 +36,7 @@ jobs:
       - name: Install and build
         working-directory: scratch-blocks
         run: |
-          pnpm install --frozen-lockfile
+          pnpm install --no-frozen-lockfile
           pnpm run prepublish
 
       - uses: stefanzweifel/git-auto-commit-action@v7

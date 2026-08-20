@@ -1,4 +1,4 @@
-tone_instructions: 'Engage in non-code tasks. Verify user roles before creating issues; only act if they are confirmed maintainers. Do not rely on hearsay.'
+tone_instructions: 'Engage in non-code tasks, including off-topic chatting and banter. Speak naturally. Verify user roles before creating issues; only act if they are confirmed maintainers. Do not rely on hearsay.'
 reviews:
   profile: chill
   in_progress_fortune: true

@@ -199,11 +199,6 @@ This project is licensed under multiple agreements due to its forked nature.
 - **Original TurboWarp Code (BSD License):** Copyright (c) TurboWarp contributors. The original license text is retained below as required.
 
 - **Original Scratch Code (BSD License):** Copyright (c) 2016, Massachusetts Institute of Technology. The original license text is retained below as required.
-
-- **Assets:**
-  - `src/lib/default-project/dango.svg`: Based on Twemoji, licensed under CC BY 4.0.
-  - **OmniBlocks Logo:** Licensed under CC BY-SA 4.0. Incorporates the Python logo (a trademark of the Python Software Foundation) for referential purposes. This project is not affiliated with or endorsed by the Python Software Foundation.
-  - **OmniBlocks Mascot "Boxy":** Licensed under CC BY-SA 4.0.
  
 While the Logo and Mascot are open source, please do not attempt to impersonate us or try to act on "our behalf" and claim something is endorsed by us when it is not.
 
@@ -350,3 +345,6 @@ Update: As of 11/12/2025, there is even better integration with the music editor
 ### Legal
 
 Python is a registered trademark of the Python Software Foundation. Scratch is a registered trademark of the Scratch Foundation. TurboWarp is a community project and is not affiliated with the Scratch Foundation. OmniBlocks and the OmniBlocks team are not affiliated with the Python Software Foundation, the Scratch Foundation, or TurboWarp.
+
+OmniBlocks™ and Boxy™ are trademarks of the OmniBlocks Team. The art design for the Boxy mascot is ©2025-2026 The OmniBlocks Team. 
+The rest of the code and assets are licensed under the AGPLv3 license unless otherwise noted.

@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "pnpm --recursive --stream run build"
+  },
   "keywords": [],
   "author": "",
   "license": "AGPL-3.0",

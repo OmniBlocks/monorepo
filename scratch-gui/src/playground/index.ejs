@@ -179,6 +179,38 @@
     </div>
 
     <script>
+     (function () {
+  const blockedSignatures = [
+    "bytespider",
+    "amazonbot",
+    "claudebot",
+    "gptbot",
+    "cohere-ai",
+    "perplexitybot",
+    "youbot",
+    "omgilibot",
+    "diffbot",
+    "dataforseobot",
+    "petalbot",
+    "seekport",
+    "mj12bot",
+    "dotbot",
+    "ahrefsbot",
+    "semrushbot",
+    "seokicks",
+    "serpstatbot",
+    "archivebot",
+    "coccocbot"
+  ];
+
+  const ua = (navigator.userAgent || "").toLowerCase();
+  const isBlocked = blockedSignatures.some(sig => ua.includes(sig));
+
+  if (isBlocked) {
+    window.location.replace("/403.html");
+  }
+})();   
+
       (function () {
         'use strict';
 

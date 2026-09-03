@@ -48,7 +48,9 @@ Try out OmniBlocks: [https://omniblocks.org](https://omniblocks.org)
 <img width="519" height="652" alt="Screenshot 2025-11-25 2 47 56 PM" src="https://github.com/user-attachments/assets/52bd3c88-8238-4cdb-878a-e4f9cd018e0b" /></br>
 3. Click "Install" to add OmniBlocks to your desktop</br>
 <img width="407" height="166" alt="Screenshot 2025-11-25 2 48 03 PM" src="https://github.com/user-attachments/assets/9fb2b478-4ee3-498d-a771-d586d3a7a8fe" /></br>
-4. The app will now work offline and can be launched like a native application
+4. The app will now work offline and can be launched like a native application.
+
+Was that confusing or you didn't understand? Try watching this video instead:
 
 https://github.com/user-attachments/assets/7c09be1c-16e1-44fb-8741-42d07ce9c25c
 

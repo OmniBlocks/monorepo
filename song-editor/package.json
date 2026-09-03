@@ -17,20 +17,20 @@
 	"main": "main.js",
 	"icon": "path.join(__dirname, 'icon.ico')",
 	"scripts": {
-		"build": "npm run build-synth && npm run build-player && npm run build-editor && npm run build-website",
-		"build-synth": "bash ./scripts/compile_beepbox_synth.sh",
-		"build-player": "bash ./scripts/compile_beepbox_player.sh",
-		"build-editor": "bash ./scripts/compile_beepbox_editor.sh",
-		"build-offline": "bash ./scripts/compile_beepbox_offline.sh",
-		"build-offline-html": "bash ./scripts/compile_beepbox_offline_html.sh",
-		"build-website": "bash ./scripts/compile_beepbox_website.sh",
-		"deploy-files": "bash ./scripts/deploy_files.sh",
+		"build": "pnpm run build-synth && pnpm run build-player && pnpm run build-editor && pnpm run build-website",
+		"build-synth": "sh ./scripts/compile_beepbox_synth.sh",
+		"build-player": "sh ./scripts/compile_beepbox_player.sh",
+		"build-editor": "sh ./scripts/compile_beepbox_editor.sh",
+		"build-offline": "sh ./scripts/compile_beepbox_offline.sh",
+		"build-offline-html": "sh ./scripts/compile_beepbox_offline_html.sh",
+		"build-website": "sh ./scripts/compile_beepbox_website.sh",
+		"deploy-files": "sh ./scripts/deploy_files.sh",
 		"start": "electron ./to_deploy",
-		"package": "electron-packager ./to_deploy --platform=darwin,linux,win32 --arch=ia32,x64 --asar --overwrite && npm run build-offline-html",
-		"package-host": "electron-packager ./to_deploy slarmoosbox --asar --overwrite && npm run build-offline-html",
-		"live_editor": "bash ./scripts/live_editor.sh",
-		"live_editor_typeless": "bash ./scripts/live_editor_typeless.sh",
-		"let": "npm run live_editor_typeless"
+		"package": "electron-packager ./to_deploy --platform=darwin,linux,win32 --arch=ia32,x64 --asar --overwrite && pnpm run build-offline-html",
+		"package-host": "electron-packager ./to_deploy slarmoosbox --asar --overwrite && pnpm run build-offline-html",
+		"live_editor": "sh ./scripts/live_editor.sh",
+		"live_editor_typeless": "sh ./scripts/live_editor_typeless.sh",
+		"let": "pnpm run live_editor_typeless"
 	},
 	"repository": {
 		"type": "git",
@@ -43,7 +43,7 @@
 		"rollup": "^2.79.1",
 		"rollup-plugin-sourcemaps": "^0.6.3",
 		"terser": "^5.19.2",
-		"typescript": "^5.4.5"
+		"typescript": "^5.9.3"
 	},
 	"dependencies": {
 		"@types/jquery": "^3.5.32",

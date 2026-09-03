@@ -1,5 +1,1 @@
-#!/bin/bash
-
-npm run build
-
-gcloud app deploy --project beepbox-synth website/app.yaml
+#!/bin/bashpnpm run buildgcloud app deploy --project beepbox-synth website/app.yaml

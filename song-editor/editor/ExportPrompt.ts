@@ -529,7 +529,7 @@ export class ExportPrompt implements Prompt {
                     parts.push(oggEncoder.encode(frame).slice());
                 }
                 parts.push(oggEncoder.finalize().slice());
-                const blob: Blob = new Blob(parts, { type: "audio/ogg" });
+                const blob: Blob = new Blob(parts as any[], { type: "audio/ogg" });
                 save(blob, this._fileName.value.trim() + ".ogg");
                 this._close();
             });
@@ -635,7 +635,7 @@ export class ExportPrompt implements Prompt {
             // if (remaining) parts.push(remaining.page);
             oggEncoder.encodeFinalFrame().forEach((page: any) => parts.push(page.page));
             oggEncoder.destroy();
-            const blob: Blob = new Blob(parts, { type: "audio/opus" });
+            const blob: Blob = new Blob(parts as any[], { type: "audio/opus" });
             save(blob, this._fileName.value.trim() + ".opus");
             this._close();
         }

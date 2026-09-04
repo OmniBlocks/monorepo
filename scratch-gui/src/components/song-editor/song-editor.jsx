@@ -7,6 +7,7 @@ import styles from './song-editor.css';
 const SongEditor = () => {
     return (
         <Box className={styles.editorContainer}>
+
         </Box>
     );
 };

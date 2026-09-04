@@ -1,5 +1,5 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
-
+// Copyright (c) 2026 The OmniBlocks Team, distributed under the AGPLv3 license.
 import { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config } from "../synth/SynthConfig";
 import { isMobile, EditorConfig } from "./EditorConfig";
 import { ColorConfig } from "./ColorConfig";
@@ -9,13 +9,13 @@ import { NotePin, Note, Pattern, Instrument, Channel, Song, Synth } from "../syn
 import { SongDocument } from "./SongDocument";
 import { ExportPrompt } from "./ExportPrompt";
 import { ChangePreset } from "./changes";
-
+declare const $: any;
 
 //namespace beepbox {
-const editor: SongEditor = new SongEditor();//same as above
 
-const beepboxEditorContainer: HTMLElement = document.getElementById("beepboxEditorContainer")!;
-beepboxEditorContainer.appendChild(editor.mainLayer);
+function mountSongEditor(container: HTMLElement) {   
+const editor: SongEditor = new SongEditor();//same as above
+container.appendChild(editor.mainLayer);
 editor.whenUpdated();
 
 // Fade-in transitions
@@ -147,9 +147,24 @@ if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
 editor.updatePlayButton();
 
+/*
+ob: we have our own service worker
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service_worker.js", { updateViaCache: "all", scope: "/" }).catch(() => { });
 }
+    */
+return {
+        destroy: () => {
+            editor.doc.synth.pause();
+            editor.mainLayer.remove();
+        }
+    };
+}
 
+const defaultContainer = document.getElementById("beepboxEditorContainer");
+if (defaultContainer) {
+    mountSongEditor(defaultContainer);
+}
 // When compiling synth.ts as a standalone module named "beepbox", expose these classes as members to JavaScript:
-export { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };
+export { mountSongEditor, Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };
+ 

@@ -15,6 +15,7 @@
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUnusedLocals": true,
+		"skipLibCheck": true,
 		"lib": [
 			"DOM",
 			"ES5",

@@ -14,7 +14,7 @@
 	"license": "MIT",
 	"homepage": "https://slarmoo.github.io/slarmoosbox/website/",
 	"type": "module",
-	"main": "main.js",
+	"main": "build/editor/main.js",
 	"icon": "path.join(__dirname, 'icon.ico')",
 	"scripts": {
 		"build": "pnpm run build-synth && pnpm run build-player && pnpm run build-editor && pnpm run build-website",

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="subpages.css">
+    <link rel='shortcut icon' type='image/x-icon' href='../favicon.ico' />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="theme-color" content="#ad7760"/>
+	<meta property="og:image" content="/icon_maskable_192.png" />
+	<meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
+	<link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+    <script>
+		function linkTo(update) {
+			window.history.replaceState(null, "", location.pathname + "#" + update);
+			navigator.clipboard.writeText(window.location).then(() => {
+				const popup = document.getElementById("popup");
+				popup.classList.add("show");
+				setTimeout(() => {
+					popup.classList.remove("show");
+				}, 2000);
+			});
+		}
+	</script>
+	<title>JukeBox Manual</title>
+</head>
+<body>
+
+<nav class="navbar">
+  <a title="Click to go back to homepage" href="https://jukeebox.github.io">
+    <div class="logo-wrapper">
+      <img src="https://jukeebox.github.io/image_assets/JukeBoxLogo.png" alt="JukeBox" class="logo" height="64px">
+      <img src="https://jukeebox.github.io/image_assets/JukeBoxLogo.png" alt="" class="logo-glow" height="64px" aria-hidden="true">
+    </div>
+  </a>
+  <div class="navbartitle col"><h1>JukeBox - Introduction</h1></div>
+  	<div class="col">
+		<a class="navbarlinks" href="credits.html"><button>Credits</button></a>
+    	<a class="navbarlinks" href="resources.html"><button>Resources</button></a>
+		<a class="navbarlinks" href="features.html"><button>Features</button></a>
+		<a class="navbarlinks" href="patch_notes.html"><button>Patch Notes</button></a>
+		<a class="navbarlinks" href="instructions.html"><button>Instructions</button></a>
+	</div>
+</nav>
+
+<style>
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h2 {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+</style>
+
+<h2>
+    Welcome to the JukeBox Manual!
+</h2>
+<b>
+    This is a hub for all information about JukeBox. The buttons in the top right will take you to other pages. If you aren't sure where to look, check the page descriptions below.
+</b>
+<h3>
+    <a href="instructions.html">Instructions</a>
+</h3>
+<b>
+    If you've never used a BeepBox mod before, start here. This is also where you can find the full keybinds list.
+</b>
+<h3>
+    <a href="patch_notes.html">Patch Notes</a>
+</h3>
+<b>
+    Documentation for every change made since the creation of JukeBox. Thanks to HappyLemonLime for designing this page!
+</b>
+<h3>
+    <a href="features.html">Features</a>
+</h3>
+<b>
+    A list of every feature JukeBox adds to Slarmoo's Box. This page also includes planned features and known bugs.
+</b>
+<h3>
+    <a href="resources.html">Resources</a>
+</h3>
+<b>
+    A list of other sites and servers that you may find helpful.
+</b>
+<h3>
+    <a href="credits.html">Credits</a>
+</h3>
+<b>
+    The credits page, including every person and BeepMod that has contributed to JukeBox in some way.
+</b>
+
+</body>
+</html>

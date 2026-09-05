@@ -11,7 +11,7 @@ const guiReducers = {
     locales: LocalesReducer,
     scratchGui: GuiReducer,
     scratchPaint: ScratchPaintReducer
-};
+}
 
 export {
     GUI as default,

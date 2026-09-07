@@ -31,16 +31,9 @@
 OmniBlocks is a block-based programming language that builds upon Scratch and TurboWarp's foundation with improvements, addons, themes, and other features for an amazing coding experience.
 
 Try out OmniBlocks: [https://omniblocks.org](https://omniblocks.org)
+ 
 
-### Enhancements and Improvements
-*   **Plenty of Addons:** Dozens of community-built addons for custom blocks, UI tweaks, and new functionality. Many are inherited from TurboWarp and other mods from now, but we will implement some new ones soon.
-*   **OmniBlocks IDE:** OmniBlocks plans to be a full-featured IDE extending beyond blocks. There will be editors for text languages like Python and C in the future!
-*   **Integrated Tools:** Includes a custom music editor and other quality-of-life improvements. Keep in mind that if you're seeing this, it means the music editor is currently not fully implemented. It works, you can go try it out, but it doesn't fully integrate with OmniBlocks just yet.
-*   **Quality of Life**: As said earlier, we add a bunch of subtle, but definitely cool or useful quality-of-life additions, even if they seem niche or workaroundable. Most of these stem from mild annoyances that we ourselves have had, and don't hesitate to report yours too in the issues tab!
-
-### A great feature inherited from TurboWarp: 
-*   **High Performance:** This is a fork of TurboWarp, meaning it uses the compiler that TurboWarp uses, making projects run way faster than other projects. This isn't listed as an enhancement/feature since we didn't implement it; the team at TurboWarp did, and we don't claim to have written the TurboWarp compiler that makes OmniBlocks projects run so fast. 
-
+ 
 ### Installation as PWA
 
 1. Open OmniBlocks in Chrome, Edge, or another Chromium-based browser</br>
@@ -71,7 +64,7 @@ Want to create your own modification/fork of OmniBlocks, or help contribute to i
 *   Node v22+ (versions v16 or newer will probably work, but we can’t guarantee it)
 *   pnpm 
 *   Git (duhh) 
-If you're using a GitHub Codespace, all these things come preinstalled, but you may want to run `npm i -g pnpm` to update it.
+If you're using a GitHub Codespace, all these things come preinstalled, but you may want to run some commands to update node and pnpm to the latest versions. You can do this by running `nvm install node` and `pnpm add -g pnpm`.
 **Note about GitHub Codespaces**: to create a GitHub codespace, make sure you are on the repo you want to code in, such as your fork of OmniBlocks. When you are there, click the big green button that says "Code". On the Codespace tab, click the button saying "Create codespace on main". Now, just wait a few minutes, and it will install everything for you. 
 <!-- wait like 6 or 7 minutes lol !-->
 ### Dependencies
@@ -85,10 +78,10 @@ Scratch is broken up into a bunch of different packages, each implementing one p
 * scratch-vm runs projects. It's where the compiler lives, as well as the JavaScript definitions for any blocks. To add a new block, define the block there, and add the gui entry for the block here in scratch-gui.
 * scratch-render is what displays things like the stage, sprites, text bubbles, and pen. It also implements blocks like "touching". Note that things that are rendered on top of sprites such as variable monitors are actually part of scratch-gui.
 * scratch-svg-renderer helps fix various SVG rendering problems. If you don't know what an SVG is, it is essentially an image with theoretically infinite quality due to using mathematical equations to render instead of pixels.
-* scratch-render-fonts contains all the fonts that SVG costumes can use
+* scratch-render-fonts contains all the fonts that SVG costumes can use (it's not directly as a package in here because it's a minor dependency)
 * scratch-paint is the costume editor. 
 * scratch-parser extracts and validates sb2 and sb3 files
-* scratch-storage is an abstraction around fetch() used for downloading (and theoretically uploading) files. It is the reason why you can add files to your workspace and they work without being uploaded to any cloud storage.
+* scratch-storage is an abstraction around fetch() used for downloading (and technically "uploading") files. It is the reason why you can add files to your workspace and they work without being uploaded to any cloud storage.
 * scratch-l10n contains translations and localizations. This provides accessibility to people who speak other languages but want to use OmniBlocks.
 * scratch-caffeine /j
 
@@ -161,10 +154,11 @@ To actually mod OmniBlocks, you need to build the GUI, as it is the main package
 
 4.  **To create a production build:**
     ```bash
-    cd scratch-gui
-    pnpm run build
+    # stay in the monorepo root
+    pnpm  build
     ```
-    Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow or other CI to push to a website or something like that. If you go to our [site build repo,](https://github.com/OmniBlocks/omniblocks.org) you can use the `sh` script and `yml` workflow from there 😁
+    This command will build every package in the monorepo and lastly scratch-gui (which depends on all of them). 
+    Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow or other CI to push to a website or something like that. If you go to our [site build repo,](https://github.com/OmniBlocks/omniblocks.github.io) you can use the `sh` script and `yml` workflow from there 😁
 
 
 ## Development Guide
@@ -202,7 +196,6 @@ This project is licensed under multiple agreements due to its forked nature.
 
 - **Original Scratch Code (BSD License):** Copyright (c) 2016, Massachusetts Institute of Technology. The original license text is retained below as required.
  
-While the Logo and Mascot are open source, please do not attempt to impersonate us or try to act on "our behalf" and claim something is endorsed by us when it is not.
 
 <details>
 <summary>Original Scratch (BSD) License</summary>
@@ -242,7 +235,8 @@ A: While we use TurboWarp's excellent compiler and extra features, OmniBlocks fo
 A: Yes! OmniBlocks is open-source and free forever! Unless you count paying your internet provider as an indirect fee ;)
 
 **Q: I hate Ommiblocks**  
-A: 67
+A: Suck it up, buttercup
+
 
 ### Compatibility
 
@@ -265,7 +259,7 @@ A: Yup! The TurboWarp cloud data server is used to ensure that you can still pla
 A: The music editor is currently in development and not fully integrated. We're working on it, but for now, the traditional sound editor is available. You can go ahead and use it, but if you click out of the tab... well, say goodbye to your music. You can test the raw song editor [here](https://omniblocks.org/songeditor.html)
 
 **Q: Can I create my own extensions?**  
-A: Yes, but be aware that extension development is complex and requires understanding of Scratch's architecture. Check out the `scratch-vm` repository and our contributing guidelines for more information.
+A: Yes, but be aware that extension development is complex and requires understanding of Scratch's architecture. Check out the `scratch-vm` package and our contributing guidelines for more information.
 
 **Q: Can I request new features?**  
 A: Yes! Open an issue on our GitHub repository with the "enhancement" label. We love hearing ideas from the community, though we can't guarantee implementation timelines or whether they are going to be added. For example, let's say you want a new feature to be added: the ability to collaborate live with other people. While this is a cool idea in theory, there are many flaws. The smaller problem is that maintaining the servers would cost money, and we want to keep OmniBlocks free. The other bigger problem is that it is simply a huge security risk. Since we want kids to be able to use OmniBlocks, adding such a feature would allow for private communication and other terrible things to happen. We don't want to turn OmniBlocks into a Roblox clone.
@@ -273,7 +267,7 @@ A: Yes! Open an issue on our GitHub repository with the "enhancement" label. We 
 ### Technical Questions
 
 **Q: What are the system requirements?**  
-A: OmniBlocks runs in any modern web browser (Chrome, Firefox, Safari, Edge). Keep in mind that for the best performance and features, Chromium-based browsers are significantly faster, such as Chrome or Edge. For development, you'll need Node.js 18+ and npm. If you don't have access to such tools (for example, if you want to develop on an iPad or tablet), you can start a GitHub Codespace, which is a free browser environment for coding.
+A: OmniBlocks runs in any modern web browser (Chrome, Firefox, Safari, Edge). Keep in mind that for the best performance and features, Chromium-based browsers are significantly faster, such as Chrome or Edge. For development, you'll need Node.js 22+ and npm. If you don't have access to such tools (for example, if you want to develop on an iPad or tablet), you can start a GitHub Codespace, which is a free browser environment for coding.
 For best feature support, install on Microsoft Edge/Chrome as a PWA. As a Firefox user myself, yes, this is painful.
 
 **Q: Can I self-host OmniBlocks?**  
@@ -322,6 +316,7 @@ Most of the maintainers and contributors have our own personal Scratch Account t
 - [ ] Complete music editor integration 
 
 Update: As of 11/12/2025, there is even better integration with the music editor, but it is still largely lacking. The music editor still doesn't have blocks to play your songs with or are stored in the project, but the Iframe is styled way better so it doesn't look like an iframe anymore, and using postmessage, it allows for you to download your songs using the existing export buttons in the song editor, as well as a fullscreen button, so it is far more usable than before where you had to go to omniblocks.org/songeditor just for it to be useful (as it's the standalone html instead of the iframe.) We got this working by using a function in the HTML that if detected it was an iframe, it intercepted incoming downloaded files and sent them using postmessage to the mainwindow as payload to be downloaded.
+Another update: as of 9/6/2026 We have added an entirely new song-editor package to OmniBlocks which is a fork of Jukebox which is a mod of Slarmoo's Box which is a mod of UltraBox which ported features from Pandora's Box into GoldBox which are both mods of JummBox which is a mod of BeepBox. 
 
 
 ### Short-term Goals (Next 3-6 months)

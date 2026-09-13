@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="subpages.css">
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="theme-color" content="#ad7760"/>
+	<meta property="og:image" content="/icon_maskable_192.png" />
+	<meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
+	<link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+  <script>
+		function linkTo(update) {
+			window.history.replaceState(null, "", location.pathname + "#" + update);
+			navigator.clipboard.writeText(window.location).then(() => {
+				const popup = document.getElementById("popup");
+				popup.classList.add("show");
+				setTimeout(() => {
+					popup.classList.remove("show");
+				}, 2000);
+			});
+		}
+	</script>
+  <script src="EditorConfig.min.js"></script>
+  <script src="leaderboard.js" defer></script>
+	<title>JukeBox Patch Notes</title>
+</head>
+
+<style>
+
+table {
+  border-collapse: collapse;
+  border: 2px solid #ebebeb;
+  font-family: sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+caption {
+  caption-side: bottom;
+  padding: 10px;
+  font-weight: bold;
+}
+
+thead,
+tfoot {
+  background-color: #020009;
+}
+
+th,
+td {
+  border: 2px solid #ebebeb;
+  padding: 8px 10px;
+}
+
+td:last-of-type {
+  text-align: center;
+}
+
+tbody > tr:nth-of-type(even) {
+  background-color: #fff57054;
+}
+
+tfoot th {
+  text-align: right;
+}
+
+tfoot td {
+  font-weight: bold;
+}
+
+</style>
+
+<body>
+    
+<nav class="navbar">
+  <a title="Click to go back to homepage" href="https://jukeebox.github.io">
+    <div class="logo-wrapper">
+    </div>
+  </a>
+  <div class="navbartitle col"><h1>JukeBox - Leaderboard</h1></div>
+  	<div class="col">
+		<a class="navbarlinks" href="credits.html"><button>Credits</button></a>
+    <a class="navbarlinks" href="leaderboard.html"><button>Leaderboard</button></a>
+		<a class="navbarlinks" href="resources.html"><button>Resources</button></a>
+		<a class="navbarlinks" href="features.html"><button>Features</button></a>
+		<a class="navbarlinks" href="patch_notes.html"><button>Patch Notes</button></a>
+		<a class="navbarlinks" href="instructions.html"><button>Instructions</button></a>
+	</div>
+</nav>
+
+</body>
+<h3 class="sub">NOTE: This page is still being worked on!</h3>
+<h2></h2>
+</section>
+<div id="table-insert"></div>
+</body>
+</html>

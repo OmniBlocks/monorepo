@@ -1,6 +1,7 @@
 packages:
   - scratch-*
   - extensions
+  - song-editor
 
 onlyBuiltDependencies:
   - chromedriver

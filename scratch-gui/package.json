@@ -3,7 +3,7 @@
     "version": "0.6.0-alpha",
     "description": "An upcoming in-development MultiLanguage IDE called OmniBlocks, based on TurboWarp for the block editor.",
     "author": "Massachusetts Institute of Technology, and the OmniBlocks Team",
-    "license": "AGPL-3.0",
+    "license": "AGPL-3.0-or-later",
     "homepage": "https://github.com/OmniBlocks/scratch-gui#readme",
     "repository": {
         "type": "git",
@@ -97,6 +97,7 @@
         "scratch-blocks": "workspace:*",
         "scratch-paint": "workspace:*",
         "scratch-render": "workspace:*",
+        "song-editor": "workspace:*",
         "scratch-render-fonts": "github:PenguinMod/penguinmod-render-fonts#master",
         "scratch-vm": "workspace:*",
         "style-loader": "^0.23.0",

@@ -35,7 +35,8 @@ class SongsTab extends React.Component {
     render () {
         const {
             intl,
-            vm
+            vm,
+            isVisible
         } = this.props;
 
         if (!vm.editingTarget) {
@@ -43,7 +44,21 @@ class SongsTab extends React.Component {
         }
 
         return (
-            <div>            <SongEditor onClose={this.handleCloseSongEditor}/>
+            <div 
+                className="songs-tab-container"
+                style={{
+                    display: isVisible ? 'flex' : 'none',
+                    width: '100%',
+                    height: '100%',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}
+            >
+                <SongEditor
+                    vm={vm}
+                    isVisible={isVisible}
+                    onClose={this.handleCloseSongEditor}
+                />
             </div>
         );
     }
@@ -56,7 +71,8 @@ SongsTab.propTypes = {
 };
 
 const mapStateToProps = state => ({
-    vm: state.scratchGui.vm
+    vm: state.scratchGui.vm,
+    isVisible: state.scratchGui.editorTab.activeTabIndex === SONGS_TAB_INDEX
 });
 
 const mapDispatchToProps = dispatch => ({

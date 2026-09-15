@@ -80,7 +80,11 @@ const base = {
             'scratch-render-fonts$': path.resolve(
                 __dirname,
                 'src/lib/tw-scratch-render-fonts'
-            )
+            ),
+            'react': path.resolve(__dirname, 'node_modules/react'),
+            'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+            'react-intl': path.resolve(__dirname, 'src/lib/react-intl-shim.js'),
+            'react-tooltip': path.resolve(__dirname, 'src/lib/react-tooltip-shim.js')
         }
     },
     module: {

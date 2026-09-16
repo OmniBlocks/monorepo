@@ -163,6 +163,34 @@ test('forever', t => {
     t.end();
 });
 
+test('foreverIf', t => {
+    const rt = new Runtime();
+    const c = new Control(rt);
+
+    let branchCount = 0;
+    let yieldCount = 0;
+    const util = {
+        startBranch: function (branchNum, isLoop) {
+            branchCount++;
+            t.strictEqual(branchNum, 1);
+            t.strictEqual(isLoop, true);
+        },
+        yield: function () {
+            yieldCount++;
+        }
+    };
+
+    c.foreverIf({CONDITION: true}, util);
+    t.strictEqual(branchCount, 1);
+    t.strictEqual(yieldCount, 0);
+
+    c.foreverIf({CONDITION: false}, util);
+    t.strictEqual(branchCount, 1);
+    t.strictEqual(yieldCount, 1);
+
+    t.end();
+});
+
 test('if / ifElse', t => {
     const rt = new Runtime();
     const c = new Control(rt);

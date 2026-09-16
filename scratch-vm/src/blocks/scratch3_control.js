@@ -28,6 +28,7 @@ class Scratch3ControlBlocks {
             control_while: this.repeatWhile,
             control_for_each: this.forEach,
             control_forever: this.forever,
+            control_forever_if: this.foreverIf,
             control_wait: this.wait,
             control_wait_until: this.waitUntil,
             control_if: this.if,
@@ -107,6 +108,20 @@ class Scratch3ControlBlocks {
 
     forever (args, util) {
         util.startBranch(1, true);
+    }
+
+    /**
+     * Repeat indefinitely, executing the inner block only when condition is true.
+     * @param {object} args Block arguments containing the condition.
+     * @param {BlockUtility} util Block utility providing execution helpers.
+     */
+    foreverIf (args, util) {
+        const condition = Cast.toBoolean(args.CONDITION);
+        if (condition) {
+            util.startBranch(1, true);
+        } else {
+            util.yield();
+        }
     }
 
     wait (args, util) {

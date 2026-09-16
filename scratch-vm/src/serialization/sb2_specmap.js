@@ -843,6 +843,21 @@ const specMap = {
             }
         ]
     },
+    'doForeverIf': {
+        opcode: 'control_forever_if',
+        argMap: [
+            {
+                type: 'input',
+                inputOp: 'boolean',
+                inputName: 'CONDITION'
+            },
+            {
+                type: 'input',
+                inputOp: 'substack',
+                inputName: 'SUBSTACK'
+            }
+        ]
+    },
     'doIf': {
         opcode: 'control_if',
         argMap: [

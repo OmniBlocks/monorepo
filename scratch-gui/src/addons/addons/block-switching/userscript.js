@@ -380,6 +380,16 @@ export default async function ({ addon, console, msg }) {
           opcode: "control_repeat_until",
         },
         noopSwitch,
+        {
+          opcode: "control_forever_if",
+        },
+      ];
+      blockSwitches["control_forever_if"] = [
+        {
+          opcode: "control_forever",
+          splitInputs: ["CONDITION"],
+        },
+        noopSwitch,
       ];
       blockSwitches["control_wait_until"] = [
         {

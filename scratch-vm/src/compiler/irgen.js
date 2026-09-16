@@ -652,6 +652,17 @@ class ScriptTreeGenerator {
                 condition: this.createConstantInput(true).toType(InputType.BOOLEAN),
                 do: this.descendSubstack(block, 'SUBSTACK')
             }, this.analyzeLoop());
+        case 'control_forever_if':
+            return new IntermediateStackBlock(StackOpcode.CONTROL_WHILE, {
+                condition: this.createConstantInput(true).toType(InputType.BOOLEAN),
+                do: new IntermediateStack([
+                    new IntermediateStackBlock(StackOpcode.CONTROL_IF_ELSE, {
+                        condition: this.descendInputOfBlock(block, 'CONDITION').toType(InputType.BOOLEAN),
+                        whenTrue: this.descendSubstack(block, 'SUBSTACK'),
+                        whenFalse: new IntermediateStack()
+                    })
+                ])
+            }, this.analyzeLoop());
         case 'control_for_each':
             return new IntermediateStackBlock(StackOpcode.CONTROL_FOR, {
                 variable: this.descendVariable(block, 'VARIABLE', SCALAR_TYPE),

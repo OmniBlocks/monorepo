@@ -425,6 +425,7 @@ const control = function (isInitialSetup, isStage, targetId, colors) {
             </value>
         </block>
         <block id="forever" type="control_forever"/>
+        <block id="forever_if" type="control_forever_if"/>
         ${blockSeparator}
         <block type="control_if"/>
         <block type="control_if_else"/>

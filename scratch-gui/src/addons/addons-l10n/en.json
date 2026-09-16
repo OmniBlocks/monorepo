@@ -181,6 +181,7 @@
     "folders/rename-folder-prompt": "Rename folder to:",
     "folders/rename-folder-prompt-title": "Rename Folder",
     "block-switching/control_forever": "forever",
+    "block-switching/control_forever_if": "forever if",
     "block-switching/control_if": "if",
     "block-switching/control_if_else": "if... else",
     "block-switching/control_repeat_until": "repeat until",

@@ -22,3 +22,10 @@
 [dir="rtl"] .stage-selector-wrapper {
     margin-right: calc($space / 2);
 }
+
+@media only screen and (max-width: 768px) {
+    .target-pane {
+        height: calc(6.5rem + 5px);
+    }
+}
+

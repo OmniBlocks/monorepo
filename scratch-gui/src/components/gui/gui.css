@@ -356,6 +356,7 @@ $fade-out-distance: 15px;
 
     .flex-wrapper {
         flex-direction: column-reverse;
+        gap: $space;
     }
 
     .editor-wrapper {
@@ -363,18 +364,11 @@ $fade-out-distance: 15px;
     }
 
     .stage-and-target-wrapper {
-        flex-basis: auto;
-        min-height: 50vh;
-        flex-shrink: 1;
-    }
-
-    .target-wrapper {
-        min-height: 5rem;
+        flex-grow: 1;
     }
 
     .tab-list {
         width: 100%;
-        height: auto;
         flex-direction: row;
         justify-content: space-around;
     }

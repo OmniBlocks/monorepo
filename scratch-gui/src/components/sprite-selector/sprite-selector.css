@@ -127,7 +127,8 @@
 }
 
 @media only screen and (max-width: 768px) {
-    .scroll-wrapper {
-        height: 5rem;
+    .sprite-selector {
+        border-radius: $space;
+        border-bottom: 1px solid $ui-black-transparent;
     }
 }

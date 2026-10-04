@@ -9,7 +9,7 @@ test('spec', t => {
     const varId = 'varId';
     const varName = 'varName';
     const varIsCloud = false;
-    let v = new Variable(
+    let v = Variable.create(
         varId,
         varName,
         Variable.SCALAR_TYPE,
@@ -28,7 +28,7 @@ test('spec', t => {
 
     t.type(v.toXML, 'function');
 
-    v = new Variable(
+    v = Variable.create(
         varId,
         varName,
         Variable.LIST_TYPE,
@@ -36,7 +36,7 @@ test('spec', t => {
     );
     t.ok(Array.isArray(v.value));
 
-    v = new Variable(
+    v = Variable.create(
         varId,
         varName,
         Variable.BROADCAST_MESSAGE_TYPE,
@@ -52,7 +52,7 @@ test('toXML', t => {
     const varName = 'varName';
     const varIsCloud = false;
     const varIsLocal = false;
-    const v = new Variable(
+    const v = Variable.create(
         varId,
         varName,
         Variable.SCALAR_TYPE,
@@ -83,7 +83,7 @@ test('escape variable name for XML', t => {
     const varName = '<>&\'"';
     const varIsCloud = false;
     const varIsLocal = false;
-    const v = new Variable(
+    const v = Variable.create(
         varId,
         varName,
         Variable.SCALAR_TYPE,
@@ -106,5 +106,35 @@ test('escape variable name for XML', t => {
     parser.write(v.toXML(false));
     parser.end();
 
+    t.end();
+});
+
+test('each variable has its own class', t => {
+    const a = Variable.create('a', 'a', Variable.SCALAR_TYPE, false);
+    const b = Variable.create('b', 'b', Variable.SCALAR_TYPE, false);
+    t.ok(a instanceof Variable);
+    t.ok(b instanceof Variable);
+    t.not(a.constructor, Variable);
+    t.not(a.constructor, b.constructor);
+    t.end();
+});
+
+test('createSibling shares class with original', t => {
+    const a = Variable.create('a', 'a', Variable.LIST_TYPE, false);
+    const b = Variable.createSibling(a, 'b', 'b', Variable.LIST_TYPE, false);
+    t.equal(b.constructor, a.constructor);
+    t.equal(b.id, 'b');
+    t.same(b.value, []);
+    t.end();
+});
+
+test('lists share one class', t => {
+    const a = Variable.create('a', 'a', Variable.LIST_TYPE, false);
+    const b = Variable.create('b', 'b', Variable.LIST_TYPE, false);
+    const c = Variable.create('c', 'c', Variable.SCALAR_TYPE, false);
+    t.ok(a instanceof Variable);
+    t.not(a.constructor, Variable);
+    t.equal(a.constructor, b.constructor);
+    t.not(a.constructor, c.constructor);
     t.end();
 });

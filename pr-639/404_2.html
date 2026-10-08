@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wrong Page Song</title>
+
+    <style>
+        @font-face {
+            font-family: 'Determination';
+            src: url('DeterminationMono.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Determination', 'Courier New', monospace;
+            background-color: black;
+            color: white;
+            text-align: center;
+            padding-top: 15vh;
+            margin: 0;
+            height: 100vh;
+        }
+
+        .lyrics {
+            font-size: 2em;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="audioPlayer" autoplay loop muted style="display:none">
+        <source src="https://github.com/OmniBlocks/scratch-gui/raw/f6bec7be6f4a5ac856709c73f75286061a5fe53f/static/wpa.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="lyrics">
+        <p>
+            Oh, it's the wrong page,
+            the wrong page song!
+            We're very very sorry
+            it isn't real!
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const audio = document.getElementById('audioPlayer');
+            // Try to play, unmute if possible after user interaction
+            audio.play().catch(error => {
+                // If autoplay is blocked, show controls to the user
+                audio.controls = true;
+                audio.style.display = "block";
+                audio.muted = false;
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+	"name": "song-editor",
+	"version": "0.1.4",
+	"description": "A mod of Jukebox, which is a mod of Slarmoo's Box which is a mod of UltraBox which ported features from Pandora's Box into GoldBox which are both mods of JummBox which is a mod of BeepBox. ",
+	"author": "The OmniBlocks Team",
+	"contributors": [
+		"Slarmoo",
+		"Main",
+		"Neputendo",
+		"LeoV",
+		"Mid",
+		"Choptop84"
+	],
+	"license": "MIT",
+	"homepage": "https://slarmoo.github.io/slarmoosbox/website/",
+	"type": "module",
+	"main": "build/editor/main.js",
+	"icon": "path.join(__dirname, 'icon.ico')",
+	"scripts": {
+		"build": "pnpm run build-synth && pnpm run build-player && pnpm run build-editor && pnpm run build-website",
+		"build-synth": "sh -x ./scripts/compile_beepbox_synth.sh",
+		"build-player": "sh -x ./scripts/compile_beepbox_player.sh",
+		"build-editor": "sh -x ./scripts/compile_beepbox_editor.sh",
+		"build-offline": "sh -x ./scripts/compile_beepbox_offline.sh",
+		"build-offline-html": "sh -x ./scripts/compile_beepbox_offline_html.sh",
+		"build-website": "sh -x ./scripts/compile_beepbox_website.sh",
+		"deploy-files": "sh -x ./scripts/deploy_files.sh",
+		"start": "electron ./to_deploy",
+		"package": "electron-packager ./to_deploy --platform=darwin,linux,win32 --arch=ia32,x64 --asar --overwrite && pnpm run build-offline-html",
+		"package-host": "electron-packager ./to_deploy slarmoosbox --asar --overwrite && pnpm run build-offline-html",
+		"live_editor": "sh -x ./scripts/live_editor.sh",
+		"live_editor_typeless": "sh -x ./scripts/live_editor_typeless.sh",
+		"let": "pnpm run live_editor_typeless"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/slarmoo/slarmoosbox.git"
+	},
+	"devDependencies": {
+		"@electron/packager": "^18.0.0",
+		"@rollup/plugin-node-resolve": "^15.1.0",
+		"@types/minimatch": "^6.0.0",
+		"@types/node": "^26.1.0",
+		"electron": "^39.2.3",
+		"rollup": "^2.79.1",
+		"rollup-plugin-sourcemaps": "^0.6.3",
+		"terser": "^5.19.2",
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"@types/jquery": "^3.5.32",
+		"@types/select2": "^4.0.63",
+		"electron-packager": "^17.1.2",
+		"esbuild": "^0.25.5",
+		"express": "^4.21.2",
+		"imperative-html": "^0.1.1",
+		"js-xxhash": "^4.0.0",
+		"minimatch": "^10.2.6",
+		"select2": "^4.0.13"
+	}
+}

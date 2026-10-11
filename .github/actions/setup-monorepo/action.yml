@@ -18,5 +18,5 @@ runs:
         python-version: "3.11"
 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: pnpm install --no-frozen-lockfile
       shell: bash

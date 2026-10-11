@@ -2,11 +2,14 @@
 @import "../../css/colors.css";
 
 .editor-container {
-    /* todo: make it not take literally the entire editor up in space */
+   
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 20px);
+    /* someone please tell me that i know there's like a variable or 
+    constant for how big the space above and below it is supposed to be */
+    margin-bottom: 20px; /* for the backpack probably */
     min-width: 0;
     box-sizing: border-box;
     background: $ui-white;

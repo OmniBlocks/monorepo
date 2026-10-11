@@ -45,24 +45,18 @@ class SongsTab extends React.Component {
 
         return (
             <div 
-                className="songs-tab-container"
-                style={{
-                    display: isVisible ? 'flex' : 'none',
-                    width: '100%',
-                    height: '100%',
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}
-            >
-                <SongEditor
-                    vm={vm}
-                    isVisible={isVisible}
-                    onClose={this.handleCloseSongEditor}
-                />
+                className="songs-tab-container"             >
+                {isVisible && (
+                    <SongEditor
+                        vm={vm}
+                        isVisible={isVisible}
+                        onClose={this.handleCloseSongEditor}
+                    />
+                )}
             </div>
         );
     }
-}
+}   
 
 SongsTab.propTypes = {
     intl: intlShape.isRequired,

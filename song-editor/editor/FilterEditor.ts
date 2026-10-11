@@ -116,6 +116,8 @@ export class FilterEditor {
             } else {
                 filterSettings = this._useNoteFilter ? instrument.noteFilter : instrument.eqFilter;
             }
+            this._filterSettings = filterSettings;
+            this._useFilterSettings = filterSettings;
             this.selfUndoSettings.push(JSON.stringify(filterSettings.toJsonObject()));
 
             this._subFilters[0] = filterSettings;

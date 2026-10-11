@@ -9,8 +9,6 @@ overrides:
   webpack-cli: 3.3.12
   cheerio: 1.0.0-rc.12
 
-packageExtensionsChecksum: sha256-OvQvNtfp0WDaW//LyCrtq5rooyIRehaeszwLoYx1tK4=
-
 importers:
 
   .:
@@ -228,6 +226,9 @@ importers:
       intl-messageformat:
         specifier: ^2.2.0
         version: 2.2.0
+      jquery:
+        specifier: ^3.7.1
+        version: 3.7.1
       js-base64:
         specifier: 2.4.9
         version: 2.4.9
@@ -348,6 +349,9 @@ importers:
       scratch-vm:
         specifier: workspace:*
         version: link:../scratch-vm
+      select2:
+        specifier: ^4.0.13
+        version: 4.1.0
       song-editor:
         specifier: workspace:*
         version: link:../song-editor
@@ -492,7 +496,7 @@ importers:
         version: 3.3.12(webpack@4.47.0)
       webpack-dev-server:
         specifier: 3.11.2
-        version: 3.11.2(minimatch@10.2.6)(webpack-cli@3.3.12)(webpack@4.47.0)
+        version: 3.11.2(webpack-cli@3.3.12)(webpack@4.47.0)
       yauzl:
         specifier: 2.10.0
         version: 2.10.0
@@ -691,7 +695,7 @@ importers:
         version: 3.3.12(webpack@4.47.0)
       webpack-dev-server:
         specifier: 3.11.2
-        version: 3.11.2(minimatch@10.2.6)(webpack-cli@3.3.12)(webpack@4.47.0)
+        version: 3.11.2(webpack-cli@3.3.12)(webpack@4.47.0)
 
   scratch-render:
     dependencies:
@@ -782,7 +786,7 @@ importers:
         version: 3.3.12(webpack@4.47.0)
       webpack-dev-server:
         specifier: 3.11.2
-        version: 3.11.2(minimatch@10.2.6)(webpack-cli@3.3.12)(webpack@4.47.0)
+        version: 3.11.2(webpack-cli@3.3.12)(webpack@4.47.0)
 
   scratch-storage:
     dependencies:
@@ -1021,7 +1025,7 @@ importers:
         version: 3.3.12(webpack@4.47.0)
       webpack-dev-server:
         specifier: 3.11.2
-        version: 3.11.2(minimatch@10.2.6)(webpack-cli@3.3.12)(webpack@4.47.0)
+        version: 3.11.2(webpack-cli@3.3.12)(webpack@4.47.0)
 
   song-editor:
     dependencies:
@@ -2334,8 +2338,6 @@ packages:
 
   '@types/glob@7.2.0':
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
-    peerDependencies:
-      minimatch: 3.0.5
 
   '@types/graceful-fs@4.1.9':
     resolution: {integrity: sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ==}
@@ -6922,6 +6924,9 @@ packages:
 
   jpeg-js@0.4.4:
     resolution: {integrity: sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg==}
+
+  jquery@3.7.1:
+    resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
 
   js-base64@2.4.9:
     resolution: {integrity: sha512-xcinL3AuDJk7VSzsHgb9DvvIXayBbadtMZ4HFPx8rUszbW1MuNMlwYVC4zzCZ6e1sqZpnNS5ZFYOhXqA39T7LQ==}
@@ -13677,11 +13682,10 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
-  '@types/glob@7.2.0(minimatch@10.2.6)':
+  '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 6.0.0
       '@types/node': 26.4.1
-      minimatch: 10.2.6
 
   '@types/graceful-fs@4.1.9':
     dependencies:
@@ -16386,17 +16390,15 @@ snapshots:
       esprima: 4.0.1
       quickjs-wasi: 2.2.0
 
-  del@4.1.1(minimatch@10.2.6):
+  del@4.1.1:
     dependencies:
-      '@types/glob': 7.2.0(minimatch@10.2.6)
+      '@types/glob': 7.2.0
       globby: 6.1.0
       is-path-cwd: 2.2.0
       is-path-in-cwd: 2.1.0
       p-map: 2.1.0
       pify: 4.0.1
       rimraf: 2.7.1
-    transitivePeerDependencies:
-      - minimatch
 
   delayed-stream@1.0.0: {}
 
@@ -20234,6 +20236,8 @@ snapshots:
       - ts-node
 
   jpeg-js@0.4.4: {}
+
+  jquery@3.7.1: {}
 
   js-base64@2.4.9: {}
 
@@ -24608,7 +24612,7 @@ snapshots:
       webpack: 4.47.0(webpack-cli@3.3.12)
       webpack-log: 2.0.0
 
-  webpack-dev-server@3.11.2(minimatch@10.2.6)(webpack-cli@3.3.12)(webpack@4.47.0):
+  webpack-dev-server@3.11.2(webpack-cli@3.3.12)(webpack@4.47.0):
     dependencies:
       ansi-html: 0.0.7
       bonjour: 3.5.1
@@ -24616,7 +24620,7 @@ snapshots:
       compression: 1.8.1(supports-color@6.1.0)
       connect-history-api-fallback: 1.6.0
       debug: 4.4.3(supports-color@6.1.0)
-      del: 4.1.1(minimatch@10.2.6)
+      del: 4.1.1
       express: 4.22.2(supports-color@6.1.0)
       html-entities: 1.4.0
       http-proxy-middleware: 0.19.1(debug@4.4.3(supports-color@6.1.0))(supports-color@6.1.0)
@@ -24648,7 +24652,6 @@ snapshots:
       webpack-cli: 3.3.12(webpack@4.47.0)
     transitivePeerDependencies:
       - bufferutil
-      - minimatch
       - utf-8-validate
 
   webpack-log@2.0.0:

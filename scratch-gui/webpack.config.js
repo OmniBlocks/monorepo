@@ -86,7 +86,7 @@ const base = {
     module: {
         rules: [
             {
-                test: /\.jsx?$/,
+                test: /\.(?:m?jsx?|cjs)$/,
                 loader: 'babel-loader',
                 include: [
                     path.resolve(__dirname, 'src'),
@@ -97,7 +97,10 @@ const base = {
                     // built-in parser can't read; transpile them down like our own source.
                     /node_modules[\\/]vscode-jsonrpc/,
                     /node_modules[\\/]vscode-languageserver-protocol/,
-                    /node_modules[\\/]vscode-languageserver-types/
+                    /node_modules[\\/]vscode-languageserver-types/,
+                    /song-editor/,
+                    /node_modules[\\/]song-editor/,
+                    path.resolve(__dirname, '../song-editor')
                 ],
                 options: {
                     // Explicitly disable babelrc so we don't catch various config

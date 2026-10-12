@@ -161,10 +161,6 @@ return {
     };
 }
 
-const defaultContainer = document.getElementById("beepboxEditorContainer");
-if (defaultContainer) {
-    mountSongEditor(defaultContainer);
-}
 // When compiling synth.ts as a standalone module named "beepbox", expose these classes as members to JavaScript:
 export { mountSongEditor, Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };
  

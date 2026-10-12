@@ -6,16 +6,23 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: calc(100% - 20px);
-    /* someone please tell me that i know there's like a variable or 
-    constant for how big the space above and below it is supposed to be */
-    margin-bottom: 20px; /* for the backpack probably */
+    height: 100%;
     min-width: 0;
     box-sizing: border-box;
     background: $ui-white;
     border-radius: $space;
     overflow: hidden;
 }
+.editor-host:global(#beepboxEditorContainer) {
+    height: 100%;   
+    min-height: 0;
+    max-width: none;
+}
+
+.editor-host > :global(.beepboxEditor) {
+    height: 100%;
+    min-height: 0;
+}   
 
 .editor-host {
     position: relative;

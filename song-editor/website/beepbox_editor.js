@@ -39202,6 +39202,8 @@ You should be redirected to the song at:<br /><br />
                 else {
                     filterSettings = this._useNoteFilter ? instrument.noteFilter : instrument.eqFilter;
                 }
+                this._filterSettings = filterSettings;
+                this._useFilterSettings = filterSettings;
                 this.selfUndoSettings.push(JSON.stringify(filterSettings.toJsonObject()));
                 this._subFilters[0] = filterSettings;
                 for (let i = 1; i < Config.filterMorphCount; i++) {
@@ -55763,10 +55765,6 @@ You should be redirected to the song at:<br /><br />
                 editor.mainLayer.remove();
             }
         };
-    }
-    const defaultContainer = document.getElementById("beepboxEditorContainer");
-    if (defaultContainer) {
-        mountSongEditor(defaultContainer);
     }
 
     exports.ChangePreset = ChangePreset;

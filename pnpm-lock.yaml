@@ -12,6 +12,10 @@ overrides:
 importers:
 
   .:
+    dependencies:
+      '@turbowarp/scratch-storage':
+        specifier: 2.0.0
+        version: 2.0.0(webpack@4.47.0)
     devDependencies:
       '@playwright/test':
         specifier: ^1.61.1
@@ -30,10 +34,10 @@ importers:
         version: 3.6.7
       '@turbowarp/types':
         specifier: git+https://github.com/TurboWarp/types-tw.git#tw
-        version: https://codeload.github.com/TurboWarp/types-tw/tar.gz/7c09a0f37d6e08a3f5b09f172d5c017009999441
+        version: https://codeload.github.com/TurboWarp/types-tw/tar.gz/94fbcff9f8a1d43b1e7c7aa9795ae39bdc58ce20
       adm-zip:
-        specifier: ^0.5.16
-        version: 0.5.18
+        specifier: ^0.6.1
+        version: 0.6.1
       chokidar:
         specifier: ^4.0.3
         version: 4.0.3
@@ -54,10 +58,10 @@ importers:
         version: 5.2.1
       image-size:
         specifier: ^2.0.2
-        version: 2.0.2
+        version: 2.0.4
       markdown-it:
         specifier: ^14.1.0
-        version: 14.3.0
+        version: 14.3.1
     devDependencies:
       '@transifex/api':
         specifier: ^7.1.5
@@ -326,7 +330,7 @@ importers:
         version: 0.1.1
       scratch-audio:
         specifier: github:TurboWarp/scratch-audio#develop
-        version: https://codeload.github.com/TurboWarp/scratch-audio/tar.gz/aba00cd02e36d95407effafa03f3678e4c669b30
+        version: https://codeload.github.com/TurboWarp/scratch-audio/tar.gz/dc47bf3bc177289531ed8a4fb616fed895dc303a
       scratch-blocks:
         specifier: workspace:*
         version: link:../scratch-blocks
@@ -828,7 +832,7 @@ importers:
         version: 9.0.3(@babel/eslint-parser@7.28.6(@babel/core@7.14.8)(eslint@8.55.0))(eslint@8.55.0)
       eslint-plugin-jest:
         specifier: 27.2.1
-        version: 27.2.1(eslint@8.55.0)(jest@29.5.0(@types/node@26.1.0))(typescript@5.9.3)
+        version: 27.2.1(eslint@8.55.0)(jest@29.5.0(@types/node@26.6.5))(typescript@5.9.3)
       eslint-plugin-react:
         specifier: 7.33.2
         version: 7.33.2(eslint@8.55.0)
@@ -837,7 +841,7 @@ importers:
         version: 4.1.0(webpack@4.47.0)
       jest:
         specifier: 29.5.0
-        version: 29.5.0(@types/node@26.1.0)
+        version: 29.5.0(@types/node@26.6.5)
       json:
         specifier: ^9.0.4
         version: 9.0.6
@@ -1985,6 +1989,9 @@ packages:
     resolution: {integrity: sha512-a0JTugOunBFQqAKtjdkViUSmLxuDWwtdNi+1gbqnbDQyGfHOBdOe1xVkmQekw/CzR2HgsBAlL8aS4rsuVXzR3Q==}
     hasBin: true
 
+  '@turbowarp/scratch-storage@2.0.0':
+    resolution: {integrity: sha512-Qi/wpKuf9Vd1FKYuwbh9NY4aB6nxh9V7ulQ03TFsWxZJfV1GOL8NiFRQMGFBDda00kUjWr5+f/eobbRAOqZpUg==}
+
   '@turbowarp/scratch-svg-renderer@1.0.202505311824':
     resolution: {integrity: sha512-EaKVqIuEwrr4SzQGOVyr8GBE+DGzUbbn38qiV6DMWFzb++/HgWl1qdlKA/j+mOK+GDwYydMFP0FuWYvWBkt6sA==}
     version: 1.0.202505311824
@@ -2003,8 +2010,8 @@ packages:
   '@turbowarp/startaudiocontext@1.0.0':
     resolution: {integrity: sha512-BJ7EVYVwuTH/Tr6tEaLaXA5TCi8qKxNWsxohNqxIEDzykN+FscgOALhEMUlNc6vgcmOi7yQFJ82Prx9bnY5DgA==}
 
-  '@turbowarp/types@https://codeload.github.com/TurboWarp/types-tw/tar.gz/7c09a0f37d6e08a3f5b09f172d5c017009999441':
-    resolution: {tarball: https://codeload.github.com/TurboWarp/types-tw/tar.gz/7c09a0f37d6e08a3f5b09f172d5c017009999441}
+  '@turbowarp/types@https://codeload.github.com/TurboWarp/types-tw/tar.gz/94fbcff9f8a1d43b1e7c7aa9795ae39bdc58ce20':
+    resolution: {tarball: https://codeload.github.com/TurboWarp/types-tw/tar.gz/94fbcff9f8a1d43b1e7c7aa9795ae39bdc58ce20}
     version: 0.0.14
 
   '@types/babel__core@7.20.5':
@@ -2064,6 +2071,9 @@ packages:
 
   '@types/node@26.1.0':
     resolution: {integrity: sha512-O0A1G3xPGy4w7AgQdAQYUlQ+BKk2Oovw8eRpofyp5KdBZULnbe+WqaOVNrm705SHphCiG4XHsACrSmPu1f+Kgw==}
+
+  '@types/node@26.6.5':
+    resolution: {integrity: sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg==}
 
   '@types/responselike@1.0.3':
     resolution: {integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==}
@@ -2274,6 +2284,10 @@ packages:
     resolution: {integrity: sha512-ufJnssQGbxzLNS1Ho9bCtX4rQKCCvoVuDLHoJyc3F9dOGDB4BkWs2Ci0kv53lqocAEQ/Cbi+I2XCsNYGqVYqng==}
     engines: {node: '>=12.0'}
 
+  adm-zip@0.6.1:
+    resolution: {integrity: sha512-Xwrja8nx9e5o2N1my4DsKCeKpdrnACyr1wtbPxBDgGzKzKyE9kRtBFA8mWldI+RVlD7CBZNWY/wQ2+ydwOR6kQ==}
+    engines: {node: '>=14.0'}
+
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -2324,6 +2338,9 @@ packages:
 
   ajv@6.14.0:
     resolution: {integrity: sha512-IWrosm/yrn43eiKqkfkHis7QioDleaXQHdDVPKg0FSwwd/DuvyX79TZnFOnYpB7dcsFAMmtFztZuXPDvSePkFw==}
+
+  ajv@6.15.0:
+    resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
 
   ajv@6.3.0:
     resolution: {integrity: sha512-6TQywaGYtRub2fqHkSXfVANlhfja2nbF33wCCHnt3aQstOrtd9jsQGiRUTIOlkEqcxpzRd2akfnqvBBPmLxs8g==}
@@ -2959,10 +2976,6 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  balanced-match@4.0.4:
-    resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
-    engines: {node: 18 || 20 || >=22}
-
   base64-js@0.0.8:
     resolution: {integrity: sha512-3XSA2cR/h/73EzlXXdU6YNycmYI7+kicTxks4eJg2g39biHR84slg2+des+p7iHYhbRg/udIS4TD53WabcOUkw==}
     engines: {node: '>= 0.4'}
@@ -3034,8 +3047,8 @@ packages:
   bn.js@5.2.3:
     resolution: {integrity: sha512-EAcmnPkxpntVL+DS7bO1zhcZNvCkxqtkd0ZY53h06GNQ3DEkkGZ/gKgmDv6DdZQGj9BgfSPKtJJ7Dp1GPP8f7w==}
 
-  body-parser@1.20.4:
-    resolution: {integrity: sha512-ZTgYYLMOXY9qKU/57FAo8F+HA2dGX7bqGc71txDRC1rS4frdFI5R7NhluHxH6M0YItAP0sHB4uqAOcYKxO6uGA==}
+  body-parser@1.20.8:
+    resolution: {integrity: sha512-JNcyFQ64OiijEkPzUBTCe+hyPXUD/3LEldGQ6iF5LR1w00mx9o7xtDWHXBY2iItjdCFGoilOLNQbH943ut7pHA==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
 
   body-parser@2.3.0:
@@ -3056,10 +3069,6 @@ packages:
 
   brace-expansion@2.1.2:
     resolution: {integrity: sha512-w5JZcKgdhDOgOwm8H+KgbosopHMuGcl6qbulwjtz3SM7I7P3yW1eAjzMPLrIE+NQ9vjgANKHWeMHnrT0OXW1oA==}
-
-  brace-expansion@5.0.5:
-    resolution: {integrity: sha512-VZznLgtwhn+Mact9tfiwx64fA9erHH/MCXEUfB/0bX/6Fz6ny5EGTXYltMocqg4xFAQZtnO3DHWWXi8RiuN7cQ==}
-    engines: {node: 18 || 20 || >=22}
 
   braces@1.8.5:
     resolution: {integrity: sha512-xU7bpz2ytJl1bH9cgIurjpg/n8Gohy9GTw81heDYLJQ4RU60dlyJsa+atVF2pI0yMMvKxI9HkKwjePCj5XI1hw==}
@@ -3406,6 +3415,7 @@ packages:
   clone-buffer@1.0.0:
     resolution: {integrity: sha512-KLLTJWrvwIP+OPfMn0x2PheDEP20RPUcGXj/ERegTgdmPEZylALQldygiqrPPu8P45uNuPs7ckmReLY6v/iA5g==}
     engines: {node: '>= 0.10'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   clone-response@1.0.2:
     resolution: {integrity: sha512-yjLXh88P599UOyPTFX0POsd7WxnbsVsGohcwzHOLspIhhpalPw1BcqED8NblyZLKcGrL8dTgMlcaZxV2jAD41Q==}
@@ -3513,8 +3523,8 @@ packages:
     resolution: {integrity: sha512-AF3r7P5dWxL8MxyITRMlORQNaOA2IkAFaTr4k7BUumjPtRpGDTZpl0Pb1XCO6JeDCBdp126Cgs9sMxqSjgYyRg==}
     engines: {node: '>= 0.6'}
 
-  compression@1.8.1:
-    resolution: {integrity: sha512-9mAqGPHLakhCLeNyxPkK4xVo746zQ/czLH1Ky+vkitMnWfWZps8r0qXuwhwizagCRttsL4lfG4pIOvaWLpAP0w==}
+  compression@1.8.2:
+    resolution: {integrity: sha512-o8vI5RE5A6EVVOd9o41jKp41aJom+QTEO/Bx8MYNjexMo/Bv2WOjUfZr+aL0WnYSgymUy6zeguqLTsIhV0gMvQ==}
     engines: {node: '>= 0.8.0'}
 
   computed-style-to-inline-style@3.0.0:
@@ -4487,6 +4497,7 @@ packages:
   eslint@9.39.5:
     resolution: {integrity: sha512-DgZS62aPLXKlnxILS/AYCoRvHaZeXceIzlXPkkGGzJWSow1aEk0lbTlxUSlyjC8jcaKxAdOnTDz+o1JFSBsyjw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -4638,8 +4649,8 @@ packages:
     peerDependencies:
       webpack: 4.47.0
 
-  express@4.22.1:
-    resolution: {integrity: sha512-F2X8g9P1X7uCPZMA3MVf9wcTqlyNp7IhH5qPCI0izhaOIYXaW9L535tGA3qmjRzpH+bZczqq7hVKxTR4NWnu+g==}
+  express@4.22.3:
+    resolution: {integrity: sha512-Bdcs4+3qlpVlx2NRn6fgX2Ue2/gGRaPeawebgclM0ERSCqDpA+owF1fdPwjJUTAJWMTuAaxjDf+hzb0/4eKvvw==}
     engines: {node: '>= 0.10.0'}
 
   express@5.2.1:
@@ -5625,9 +5636,9 @@ packages:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
-  image-size@2.0.2:
-    resolution: {integrity: sha512-IRqXKlaXwgSMAMtpNzZa1ZAe8m+Sa1770Dhk8VkSsP9LS+iHD62Zd8FQKs8fbPiagBE7BzoFX23cxFnwshpV6w==}
-    engines: {node: '>=16.x'}
+  image-size@2.0.4:
+    resolution: {integrity: sha512-QRUkFFsRV/6fuESxb9Vkq+a0LkSrgKXuc2NEqfikiXxxN/G3tjWt5EVUlMaImRBZRZK/jRBEbYvpPYZL8t08Zw==}
+    engines: {node: '>=18'}
     hasBin: true
 
   immediate@3.0.6:
@@ -6862,8 +6873,8 @@ packages:
     resolution: {integrity: sha512-YWOP1j7UbDNz+TumYP1kpwnP0aEa711cJjrAQrzd0UXlbJfc5aAq0F/PZHjiioqDC1NKgvIMX+o+9Bk7yuM2dg==}
     hasBin: true
 
-  markdown-it@14.3.0:
-    resolution: {integrity: sha512-RCEsPjR+sr0x+AuYp601tKTkgFG4YEPLCzHST3cQ/fhlJkqAkz1L2/Qbp1j9qw5SBwQHFBoW8+hoN5xssOF0Tw==}
+  markdown-it@14.3.1:
+    resolution: {integrity: sha512-4Ej49aYTDFIQ+uBkfX8GBvJGccoARxxPep+7aWTs55ozbjQJpW9M26Fe53vnGgvLeVzva/amzjQQaQu9w0vMhA==}
     hasBin: true
 
   marked@0.8.2:
@@ -7018,10 +7029,6 @@ packages:
 
   minimalistic-crypto-utils@1.0.1:
     resolution: {integrity: sha512-JIYlbt6g8i5jKfJ3xz7rF0LXmv2TkDxBLUkiBeZ7bAx4GnnNMr8xFpGnOxn6GhTEHx3SjRrZEoU+j04prX1ktg==}
-
-  minimatch@10.2.5:
-    resolution: {integrity: sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==}
-    engines: {node: 18 || 20 || >=22}
 
   minimatch@3.1.5:
     resolution: {integrity: sha512-VgjWUsnnT6n+NUk6eZq77zeFdpW2LWDzP6zFGrCbHXiYNul5Dzqk2HHQ5uFH2DNW5Xbp8+jVzaeNt94ssEEl4w==}
@@ -7643,6 +7650,7 @@ packages:
 
   path-dirname@1.0.2:
     resolution: {integrity: sha512-ALzNPpyNq9AqXMBjeymIjFDAkAFH06mHJH/cSBHAgU0s4vfpBn6b2nf8tiRLvagKD8RbTpq2FKTBg7cl9l3c7Q==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   path-exists@2.1.0:
     resolution: {integrity: sha512-yTltuKuhtNeFJKa1PiRzfLAU5182q1y4Eb4XCJ3PBqyzEDkAZRzBrKKBct682ls9reBVHf9udYLN5Nd+K1B9BQ==}
@@ -7969,6 +7977,10 @@ packages:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
 
+  proxy-addr@2.0.8:
+    resolution: {integrity: sha512-5nnx0yGyVUcY6t9RnWcARWtwT9F1D8O9rt08htPvnd49W1IgZtmLkhu9WfMzQj1cFxjHIO6connUNVW5k7AVyQ==}
+    engines: {node: '>= 0.10'}
+
   proxy-agent-negotiate@1.1.0:
     resolution: {integrity: sha512-N8IBcM3UgCVzz2L2Lqv8DVntDnnC8/hiV4nEDUPkqq72TPUgYWjQc+bdZlBPZK9LzPAvOY//gAt0S0DApoOXWQ==}
     engines: {node: '>= 20'}
@@ -8039,16 +8051,16 @@ packages:
   qs@1.2.2:
     resolution: {integrity: sha512-xEqT+49YIt+BdwQthXKTOkp7atENe6JqrGGerxBPiER6BArOIiVJtpZZYpWOpq2IOkTPVnDM8CgYvppFoJNwyQ==}
 
-  qs@6.14.2:
-    resolution: {integrity: sha512-V/yCWTTF7VJ9hIh18Ugr2zhJMP01MY7c5kh4J870L7imm6/DIzBsNLTXzMwUA3yZ5b/KBqLx8Kp3uRvd7xSe3Q==}
-    engines: {node: '>=0.6'}
-
   qs@6.15.1:
     resolution: {integrity: sha512-6YHEFRL9mfgcAvql/XhwTvf5jKcOiiupt2FiJxHkiX1z4j7WL8J/jRHYLluORvc1XxB5rV20KoeK00gVJamspg==}
     engines: {node: '>=0.6'}
 
   qs@6.15.3:
     resolution: {integrity: sha512-O9gl3zCl5h5blw1KGUzQKhA5oUXSl8rwUIM5o0S3nCXMliSvy5Dzx7/DJcI+SwgICv+IneSZwhBh1oSyEHA71A==}
+    engines: {node: '>=0.6'}
+
+  qs@6.16.0:
+    resolution: {integrity: sha512-h6fhOIaRrID2CbEY2fqs+7t+UXZo+MLAnU5gRIq85uFtdiUPCdsApMlHhXogKVM4HM2DVbIjGNTTYH2OcmP1vA==}
     engines: {node: '>=0.6'}
 
   qs@6.5.5:
@@ -8102,6 +8114,10 @@ packages:
 
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
+    engines: {node: '>= 0.6'}
+
+  range-parser@1.3.0:
+    resolution: {integrity: sha512-hek2mFQpPuI4E1BBKrSto+BU3e3x4xuarsbiwr3+lf7p44juvFMV0XFWQAP3xUyqXA4RrXLIoaSUGbSt056ZMw==}
     engines: {node: '>= 0.6'}
 
   raw-body@2.5.3:
@@ -8635,8 +8651,8 @@ packages:
   scratch-audio@0.1.0-prerelease.20231221012053:
     resolution: {integrity: sha512-NtleZZPFHcmDtybyNpGjgINTCmfqJHSPiRBn5Crvk8kqKPbYSr1vnFRJlO1JwjTHi+xK0BJscQoxW0ad3cquUw==}
 
-  scratch-audio@https://codeload.github.com/TurboWarp/scratch-audio/tar.gz/aba00cd02e36d95407effafa03f3678e4c669b30:
-    resolution: {tarball: https://codeload.github.com/TurboWarp/scratch-audio/tar.gz/aba00cd02e36d95407effafa03f3678e4c669b30}
+  scratch-audio@https://codeload.github.com/TurboWarp/scratch-audio/tar.gz/dc47bf3bc177289531ed8a4fb616fed895dc303a:
+    resolution: {tarball: https://codeload.github.com/TurboWarp/scratch-audio/tar.gz/dc47bf3bc177289531ed8a4fb616fed895dc303a}
     version: 0.1.0
 
   scratch-blocks@0.1.0-prerelease.20230527085947:
@@ -9689,6 +9705,9 @@ packages:
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
+  undici-types@8.9.0:
+    resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
+
   unicode-canonical-property-names-ecmascript@2.0.1:
     resolution: {integrity: sha512-dA8WbNeb2a6oQzAQ55YlT5vQAWGV9WXOsi3SskE3bcCdM0P4SDd+24zS/OCacdRq5BkdsRj9q3Pg6YyQoxIGqg==}
     engines: {node: '>=4'}
@@ -10001,8 +10020,8 @@ packages:
       webpack-command:
         optional: true
 
-  websocket-driver@0.7.4:
-    resolution: {integrity: sha512-b17KeDIQVjvb0ssuSDF2cYXSg2iztliJ4B9WdsuB6J952qCPKmnVq4DyW5motImXHDC1cBT/1UezrJVsKw5zjg==}
+  websocket-driver@0.7.5:
+    resolution: {integrity: sha512-ZL2+3c7kMBdIRCMz6l8jQMHyGVxj+UL+xVk74Ombiciboca8rHa15L86B19E5oh1pL9Ii/uj54gtsIrZGMo6zA==}
     engines: {node: '>=0.8.0'}
 
   websocket-extensions@0.1.4:
@@ -10134,8 +10153,8 @@ packages:
     resolution: {integrity: sha512-/lg70HAjtkUgWPVZhZcm+T4hkL8Zbtp1nFNOn3lRrxnlv50SRBv7cR7RqR+GMsd3hUXy9hWBo4CHTbFTcOYwig==}
     engines: {node: '>=4'}
 
-  ws@5.2.4:
-    resolution: {integrity: sha512-fFCejsuC8f9kOSu9FYaOw8CdO68O3h5v0lg4p74o8JqWpwTf9tniOD+nOB78aWoVSS6WptVUmDrp/KPsMVBWFQ==}
+  ws@5.2.7:
+    resolution: {integrity: sha512-Yp1RXz/2h2qC/Gy7d5mqQcpuCWbXiO6FgYw/jTbSvytZF9wD7fh7od+6WzWR/y9EAnXcJjQZpPkYVmj3T2bj+Q==}
     peerDependencies:
       bufferutil: ^4.0.1
       utf-8-validate: ^5.0.2
@@ -10145,8 +10164,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@6.2.3:
-    resolution: {integrity: sha512-jmTjYU0j60B+vHey6TfR3Z7RD61z/hmxBS3VMSGIrroOWXQEneK1zNuotOUrGyBHQj0yrpsLHPWtigEFd13ndA==}
+  ws@6.2.6:
+    resolution: {integrity: sha512-XTrf1gv7kXoVf1hbC3PAyAiPgR8Wz1blcrYIjEsUmr08BLksT41R8KbjmS9408C2ERx7v1JDLD/BkpLEttjfKA==}
     peerDependencies:
       bufferutil: ^4.0.1
       utf-8-validate: ^5.0.2
@@ -12748,6 +12767,19 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@turbowarp/scratch-storage@2.0.0(webpack@4.47.0)':
+    dependencies:
+      '@babel/runtime': 7.21.0
+      '@turbowarp/nanolog': 0.2.0
+      arraybuffer-loader: 1.0.8
+      base64-js: 1.3.0
+      cross-fetch: 3.1.5(encoding@0.1.13)
+      js-md5: 0.7.3
+      worker-loader: 2.0.0(webpack@4.47.0)
+    transitivePeerDependencies:
+      - encoding
+      - webpack
+
   '@turbowarp/scratch-svg-renderer@1.0.202505311824(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)':
     dependencies:
       '@turbowarp/nanolog': 0.2.0
@@ -12770,7 +12802,7 @@ snapshots:
 
   '@turbowarp/startaudiocontext@1.0.0': {}
 
-  '@turbowarp/types@https://codeload.github.com/TurboWarp/types-tw/tar.gz/7c09a0f37d6e08a3f5b09f172d5c017009999441': {}
+  '@turbowarp/types@https://codeload.github.com/TurboWarp/types-tw/tar.gz/94fbcff9f8a1d43b1e7c7aa9795ae39bdc58ce20': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
@@ -12798,7 +12830,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 6.0.0
-      '@types/node': 26.1.0
+      '@types/node': 26.6.5
 
   '@types/graceful-fs@4.1.9':
     dependencies:
@@ -12832,11 +12864,11 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 26.1.0
+      '@types/node': 26.6.5
 
   '@types/minimatch@6.0.0':
     dependencies:
-      minimatch: 10.2.5
+      minimatch: 5.1.9
 
   '@types/node-hid@1.3.4':
     dependencies:
@@ -12846,9 +12878,13 @@ snapshots:
     dependencies:
       undici-types: 8.3.0
 
+  '@types/node@26.6.5':
+    dependencies:
+      undici-types: 8.9.0
+
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 26.1.0
+      '@types/node': 26.6.5
 
   '@types/semver@7.8.0': {}
 
@@ -12898,7 +12934,7 @@ snapshots:
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 26.1.0
+      '@types/node': 26.6.5
     optional: true
 
   '@typescript-eslint/experimental-utils@1.13.0(eslint@8.55.0)':
@@ -13098,6 +13134,8 @@ snapshots:
 
   adm-zip@0.5.18: {}
 
+  adm-zip@0.6.1: {}
+
   agent-base@6.0.2:
     dependencies:
       debug: 4.4.3(supports-color@6.1.0)
@@ -13155,6 +13193,13 @@ snapshots:
       json-schema-traverse: 0.3.1
 
   ajv@6.14.0:
+    dependencies:
+      fast-deep-equal: 3.1.3
+      fast-json-stable-stringify: 2.1.0
+      json-schema-traverse: 0.4.1
+      uri-js: 4.4.1
+
+  ajv@6.15.0:
     dependencies:
       fast-deep-equal: 3.1.3
       fast-json-stable-stringify: 2.1.0
@@ -14227,8 +14272,6 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  balanced-match@4.0.4: {}
-
   base64-js@0.0.8: {}
 
   base64-js@1.2.1: {}
@@ -14287,7 +14330,7 @@ snapshots:
 
   bn.js@5.2.3: {}
 
-  body-parser@1.20.4(supports-color@6.1.0):
+  body-parser@1.20.8(supports-color@6.1.0):
     dependencies:
       bytes: 3.1.2
       content-type: 1.0.5
@@ -14297,7 +14340,7 @@ snapshots:
       http-errors: 2.0.1
       iconv-lite: 0.4.24
       on-finished: 2.4.1
-      qs: 6.14.2
+      qs: 6.16.0
       raw-body: 2.5.3
       type-is: 1.6.18
       unpipe: 1.0.0
@@ -14339,10 +14382,6 @@ snapshots:
   brace-expansion@2.1.2:
     dependencies:
       balanced-match: 1.0.2
-
-  brace-expansion@5.0.5:
-    dependencies:
-      balanced-match: 4.0.4
 
   braces@1.8.5:
     dependencies:
@@ -14481,7 +14520,7 @@ snapshots:
 
   buffer@4.9.2:
     dependencies:
-      base64-js: 1.3.0
+      base64-js: 1.5.1
       ieee754: 1.2.1
       isarray: 1.0.0
 
@@ -14941,11 +14980,12 @@ snapshots:
     dependencies:
       mime-db: 1.54.0
 
-  compression@1.8.1(supports-color@6.1.0):
+  compression@1.8.2(supports-color@6.1.0):
     dependencies:
       bytes: 3.1.2
       compressible: 2.0.18
       debug: 2.6.9(supports-color@6.1.0)
+      destroy: 1.2.0
       negotiator: 0.6.4
       on-headers: 1.1.0
       safe-buffer: 5.2.1
@@ -15112,6 +15152,21 @@ snapshots:
       exit: 0.1.2
       graceful-fs: 4.2.11
       jest-config: 29.7.0(@types/node@26.1.0)
+      jest-util: 29.7.0
+      prompts: 2.4.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
+  create-jest@29.7.0(@types/node@26.6.5):
+    dependencies:
+      '@jest/types': 29.6.3
+      chalk: 4.1.2
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-config: 29.7.0(@types/node@26.6.5)
       jest-util: 29.7.0
       prompts: 2.4.2
     transitivePeerDependencies:
@@ -16146,12 +16201,12 @@ snapshots:
       '@typescript-eslint/experimental-utils': 1.13.0(eslint@8.55.0)
       eslint: 8.55.0
 
-  eslint-plugin-jest@27.2.1(eslint@8.55.0)(jest@29.5.0(@types/node@26.1.0))(typescript@5.9.3):
+  eslint-plugin-jest@27.2.1(eslint@8.55.0)(jest@29.5.0(@types/node@26.6.5))(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/utils': 5.62.0(eslint@8.55.0)(typescript@5.9.3)
       eslint: 8.55.0
     optionalDependencies:
-      jest: 29.5.0(@types/node@26.1.0)
+      jest: 29.5.0(@types/node@26.6.5)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -16640,11 +16695,11 @@ snapshots:
     dependencies:
       webpack: 4.47.0(webpack-cli@3.3.12)
 
-  express@4.22.1(supports-color@6.1.0):
+  express@4.22.3(supports-color@6.1.0):
     dependencies:
       accepts: 1.3.8
       array-flatten: 1.1.1
-      body-parser: 1.20.4(supports-color@6.1.0)
+      body-parser: 1.20.8(supports-color@6.1.0)
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookie: 0.7.2
@@ -16662,8 +16717,8 @@ snapshots:
       on-finished: 2.4.1
       parseurl: 1.3.3
       path-to-regexp: 0.1.13
-      proxy-addr: 2.0.7
-      qs: 6.14.2
+      proxy-addr: 2.0.8
+      qs: 6.16.0
       range-parser: 1.2.1
       safe-buffer: 5.2.1
       send: 0.19.2(supports-color@6.1.0)
@@ -16805,7 +16860,7 @@ snapshots:
 
   faye-websocket@0.11.4:
     dependencies:
-      websocket-driver: 0.7.4
+      websocket-driver: 0.7.5
 
   fb-watchman@2.0.2:
     dependencies:
@@ -17184,7 +17239,7 @@ snapshots:
 
   fs-extra@5.0.0:
     dependencies:
-      graceful-fs: 4.2.11
+      graceful-fs: 4.1.11
       jsonfile: 4.0.0
       universalify: 0.1.2
 
@@ -17538,7 +17593,7 @@ snapshots:
 
   har-validator@5.1.5:
     dependencies:
-      ajv: 6.14.0
+      ajv: 6.15.0
       har-schema: 2.0.0
 
   has-ansi@2.0.0:
@@ -17900,7 +17955,7 @@ snapshots:
 
   ignore@5.3.2: {}
 
-  image-size@2.0.2: {}
+  image-size@2.0.4: {}
 
   immediate@3.0.6: {}
 
@@ -18636,6 +18691,25 @@ snapshots:
       - supports-color
       - ts-node
 
+  jest-cli@29.7.0(@types/node@26.6.5):
+    dependencies:
+      '@jest/core': 29.7.0
+      '@jest/test-result': 29.7.0
+      '@jest/types': 29.6.3
+      chalk: 4.1.2
+      create-jest: 29.7.0(@types/node@26.6.5)
+      exit: 0.1.2
+      import-local: 3.2.0
+      jest-config: 29.7.0(@types/node@26.6.5)
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      yargs: 17.7.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
   jest-config@22.4.4:
     dependencies:
       chalk: 2.4.2
@@ -18679,6 +18753,36 @@ snapshots:
       strip-json-comments: 3.1.1
     optionalDependencies:
       '@types/node': 26.1.0
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+
+  jest-config@29.7.0(@types/node@26.6.5):
+    dependencies:
+      '@babel/core': 7.29.0
+      '@jest/test-sequencer': 29.7.0
+      '@jest/types': 29.6.3
+      babel-jest: 29.7.0(@babel/core@7.29.0)
+      chalk: 4.1.2
+      ci-info: 3.9.0
+      deepmerge: 4.3.1
+      glob: 7.2.3
+      graceful-fs: 4.2.11
+      jest-circus: 29.7.0
+      jest-environment-node: 29.7.0
+      jest-get-type: 29.6.3
+      jest-regex-util: 29.6.3
+      jest-resolve: 29.7.0
+      jest-runner: 29.7.0
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      micromatch: 4.0.8
+      parse-json: 5.2.0
+      pretty-format: 29.7.0
+      slash: 3.0.0
+      strip-json-comments: 3.1.1
+    optionalDependencies:
+      '@types/node': 26.6.5
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -19097,12 +19201,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  jest@29.5.0(@types/node@26.1.0):
+  jest@29.5.0(@types/node@26.6.5):
     dependencies:
       '@jest/core': 29.7.0
       '@jest/types': 29.6.3
       import-local: 3.2.0
-      jest-cli: 29.7.0(@types/node@26.1.0)
+      jest-cli: 29.7.0(@types/node@26.6.5)
     transitivePeerDependencies:
       - '@types/node'
       - babel-plugin-macros
@@ -19206,7 +19310,7 @@ snapshots:
       whatwg-encoding: 1.0.5
       whatwg-mimetype: 2.3.0
       whatwg-url: 6.5.0
-      ws: 5.2.4
+      ws: 5.2.7
       xml-name-validator: 3.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -19604,7 +19708,7 @@ snapshots:
       mdurl: 1.0.1
       uc.micro: 1.0.6
 
-  markdown-it@14.3.0:
+  markdown-it@14.3.1:
     dependencies:
       argparse: 2.0.1
       entities: 4.5.0
@@ -19760,10 +19864,6 @@ snapshots:
   minimalistic-assert@1.0.1: {}
 
   minimalistic-crypto-utils@1.0.1: {}
-
-  minimatch@10.2.5:
-    dependencies:
-      brace-expansion: 5.0.5
 
   minimatch@3.1.5:
     dependencies:
@@ -20813,6 +20913,11 @@ snapshots:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
 
+  proxy-addr@2.0.8:
+    dependencies:
+      forwarded: 0.2.0
+      ipaddr.js: 1.9.1
+
   proxy-agent-negotiate@1.1.0: {}
 
   proxy-agent@8.0.2:
@@ -20887,15 +20992,16 @@ snapshots:
 
   qs@1.2.2: {}
 
-  qs@6.14.2:
-    dependencies:
-      side-channel: 1.1.0
-
   qs@6.15.1:
     dependencies:
       side-channel: 1.1.0
 
   qs@6.15.3:
+    dependencies:
+      es-define-property: 1.0.1
+      side-channel: 1.1.1
+
+  qs@6.16.0:
     dependencies:
       es-define-property: 1.0.1
       side-channel: 1.1.1
@@ -20954,6 +21060,8 @@ snapshots:
       safe-buffer: 5.2.1
 
   range-parser@1.2.1: {}
+
+  range-parser@1.3.0: {}
 
   raw-body@2.5.3:
     dependencies:
@@ -21611,7 +21719,7 @@ snapshots:
       minilog: 3.1.0
       startaudiocontext: 1.2.1
 
-  scratch-audio@https://codeload.github.com/TurboWarp/scratch-audio/tar.gz/aba00cd02e36d95407effafa03f3678e4c669b30:
+  scratch-audio@https://codeload.github.com/TurboWarp/scratch-audio/tar.gz/dc47bf3bc177289531ed8a4fb616fed895dc303a:
     dependencies:
       '@turbowarp/nanolog': 0.2.0
       '@turbowarp/startaudiocontext': 1.0.0
@@ -22070,7 +22178,7 @@ snapshots:
     dependencies:
       faye-websocket: 0.11.4
       uuid: 8.3.2
-      websocket-driver: 0.7.4
+      websocket-driver: 0.7.5
 
   socks-proxy-agent@10.1.0:
     dependencies:
@@ -23063,6 +23171,8 @@ snapshots:
 
   undici-types@8.3.0: {}
 
+  undici-types@8.9.0: {}
+
   unicode-canonical-property-names-ecmascript@2.0.1: {}
 
   unicode-length@1.0.3:
@@ -23164,7 +23274,7 @@ snapshots:
   url@0.11.4:
     dependencies:
       punycode: 1.4.1
-      qs: 6.15.1
+      qs: 6.16.0
 
   use@3.1.1: {}
 
@@ -23360,7 +23470,7 @@ snapshots:
       memory-fs: 0.4.1
       mime: 2.6.0
       mkdirp: 0.5.6
-      range-parser: 1.2.1
+      range-parser: 1.3.0
       webpack: 4.47.0(webpack-cli@3.3.12)
       webpack-log: 2.0.0
 
@@ -23369,11 +23479,11 @@ snapshots:
       ansi-html: 0.0.7
       bonjour: 3.5.1
       chokidar: 2.1.8(supports-color@6.1.0)
-      compression: 1.8.1(supports-color@6.1.0)
+      compression: 1.8.2(supports-color@6.1.0)
       connect-history-api-fallback: 1.6.0
       debug: 4.4.3(supports-color@6.1.0)
       del: 4.1.1
-      express: 4.22.1(supports-color@6.1.0)
+      express: 4.22.3(supports-color@6.1.0)
       html-entities: 1.4.0
       http-proxy-middleware: 0.19.1(debug@4.4.3(supports-color@6.1.0))(supports-color@6.1.0)
       import-local: 2.0.0
@@ -23398,7 +23508,7 @@ snapshots:
       webpack: 4.47.0(webpack-cli@3.3.12)
       webpack-dev-middleware: 3.7.3(webpack@4.47.0)
       webpack-log: 2.0.0
-      ws: 6.2.3
+      ws: 6.2.6
       yargs: 13.3.2
     optionalDependencies:
       webpack-cli: 3.3.12(webpack@4.47.0)
@@ -23446,7 +23556,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  websocket-driver@0.7.4:
+  websocket-driver@0.7.5:
     dependencies:
       http-parser-js: 0.5.10
       safe-buffer: 5.2.1
@@ -23620,11 +23730,11 @@ snapshots:
     dependencies:
       mkdirp: 0.5.6
 
-  ws@5.2.4:
+  ws@5.2.7:
     dependencies:
       async-limiter: 1.0.1
 
-  ws@6.2.3:
+  ws@6.2.6:
     dependencies:
       async-limiter: 1.0.1
 

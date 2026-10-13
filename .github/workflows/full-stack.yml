@@ -40,10 +40,8 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Build OmniBlocks (Base)
-        env:
-          NODE_OPTIONS: '--openssl-legacy-provider'
         run: | 
-          pnpm i --shamefully-hoist
+          pnpm i --no-frozen-lockfile
           mkdir -p scratch-gui/build
           
           START_TIME=$(date +%s)

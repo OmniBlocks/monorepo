@@ -45,7 +45,14 @@ class SongsTab extends React.Component {
 
         return (
             <div 
-                className="songs-tab-container"             >
+                className="songs-tab-container"       
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flex: '1 1 0',
+                    minWidth: 0,
+                    minHeight: 0
+                    }}      >
                 {isVisible && (
                     <SongEditor
                         vm={vm}

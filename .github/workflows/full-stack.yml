@@ -100,7 +100,7 @@ jobs:
           
           # Build Editor
           (
-            cd scratch-gui && ROOT=/ NODE_ENV=production pnpm build
+            NODE_ENV=production pnpm build
           ) > test-logs/scratch-gui-build.log 2>&1 || true
           
           # Build Extensions Gallery if folder exists

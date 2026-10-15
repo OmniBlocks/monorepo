@@ -47,7 +47,7 @@ jobs:
           START_TIME=$(date +%s)
           
           # Build Editor
-          (cd scratch-gui && ROOT=/ NODE_ENV=production pnpm build) || true
+          (NODE_ENV=production pnpm build) || true
           
           # Build Extensions Gallery if folder exists
           if [ -d "extensions" ]; then

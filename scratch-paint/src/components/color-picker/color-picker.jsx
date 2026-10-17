@@ -14,17 +14,18 @@ import {MIXED} from '../../helper/style-path';
 import eyeDropperIcon from './icons/eye-dropper.svg';
 import noFillIcon from '../color-button/no-fill.svg';
 import mixedFillIcon from '../color-button/mixed-fill.svg';
-import fillHorzGradientIcon from './icons/fill-horz-gradient-enabled.svg';
-import fillRadialIcon from './icons/fill-radial-enabled.svg';
-import fillSolidIcon from './icons/fill-solid-enabled.svg';
-import fillVertGradientIcon from './icons/fill-vert-gradient-enabled.svg';
-import swapIcon from './icons/swap.svg';
+import fillHorzGradientIcon from '!../../tw-recolor/build!./icons/fill-horz-gradient-enabled.svg';
+import fillRadialIcon from '!../../tw-recolor/build!./icons/fill-radial-enabled.svg';
+import fillSolidIcon from '!../../tw-recolor/build!./icons/fill-solid-enabled.svg';
+import fillVertGradientIcon from '!../../tw-recolor/build!./icons/fill-vert-gradient-enabled.svg';
+import swapIcon from '!../../tw-recolor/build!./icons/swap.svg';
 import Modes from '../../lib/modes';
 import alphaBackground from './alpha.png';
 import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
 import Input from '../forms/input.jsx';
 import {makeAlphaComponent} from '../../lib/tw-color-utils';
 import TWColorReadout from '../tw-color-readout/tw-color-readout.jsx';
+import TWRenderRecoloredImage from '../../tw-recolor/render.jsx';
 
 const BufferedInput = BufferedInputHOC(Input);
 
@@ -91,7 +92,7 @@ class ColorPickerComponent extends React.Component {
                     <div>
                         <div className={styles.row}>
                             <div className={styles.gradientPickerRow}>
-                                <img
+                                <TWRenderRecoloredImage
                                     className={classNames({
                                         [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.SOLID,
                                         [styles.clickable]: true
@@ -102,7 +103,7 @@ class ColorPickerComponent extends React.Component {
                                     width={20}
                                     height={20}
                                 />
-                                <img
+                                <TWRenderRecoloredImage
                                     className={classNames({
                                         [styles.inactiveGradient]:
                                             this.props.gradientType !== GradientTypes.HORIZONTAL,
@@ -114,7 +115,7 @@ class ColorPickerComponent extends React.Component {
                                     width={20}
                                     height={20}
                                 />
-                                <img
+                                <TWRenderRecoloredImage
                                     className={classNames({
                                         [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.VERTICAL,
                                         [styles.clickable]: true
@@ -125,7 +126,7 @@ class ColorPickerComponent extends React.Component {
                                     width={20}
                                     height={20}
                                 />
-                                <img
+                                <TWRenderRecoloredImage
                                     className={classNames({
                                         [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.RADIAL,
                                         [styles.clickable]: true
@@ -351,7 +352,7 @@ class ColorPickerComponent extends React.Component {
                             onClick={this.props.onActivateEyeDropper}
                         >
                             <img
-                                className={styles.swatchIcon}
+                                className={classNames(styles.swatchIcon, styles.pickerIcon)}
                                 draggable={false}
                                 src={eyeDropperIcon}
                             />

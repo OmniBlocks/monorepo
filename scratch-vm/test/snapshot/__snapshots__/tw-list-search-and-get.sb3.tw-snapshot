@@ -5,7 +5,7 @@
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["listid"];
 const b1 = stage.variables["indexvar"];
-return function* genXYZ () {
+return function funXYZ () {
 let t;
 runtime.ext_scratch3_looks._say("plan 13", target);
 if (((listFind(b0.value, "banana") + 1) === 2)) {

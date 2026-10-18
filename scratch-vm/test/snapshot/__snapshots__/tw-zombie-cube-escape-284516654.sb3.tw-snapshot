@@ -22,7 +22,7 @@ retire(); return;
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["7qur6!bGgvC9I(Nd5.HP"];
 const b1 = stage.variables["sUOp@-6J4y0PqwiXit4!"];
-return function* genXYZ () {
+return function funXYZ () {
 let t;
 b0.value = (((t = +b0.value) === t ? t : 0) + 1);
 if ((b0.value === 5)) {

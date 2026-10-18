@@ -3,7 +3,7 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-return function* genXYZ () {
+return function funXYZ () {
 runtime.ext_scratch3_looks._say("plan 0", target);
 thread.procedures["Wrun test"]();
 runtime.ext_scratch3_looks._say("end", target);

@@ -3,7 +3,7 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-return function* genXYZ () {
+return function funXYZ () {
 runtime.ext_scratch3_looks._say("plan 4", target);
 if (!(0 < 0)) {
 runtime.ext_scratch3_looks._say("pass not 1e-324 < 0", target);

@@ -4,7 +4,7 @@
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["Kl,Own0m6{^v3$E{Wsc="];
-return function* genXYZ () {
+return function funXYZ () {
 runtime.ext_scratch3_looks._say("plan 6", target);
 b0.value = "\t";
 startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "message1" });
@@ -14,7 +14,7 @@ retire(); return;
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["Kl,Own0m6{^v3$E{Wsc="];
-return function* genXYZ () {
+return function funXYZ () {
 if (compareEqual(b0.value, ("0" + ""))) {
 runtime.ext_scratch3_looks._say("pass \\t in a variable = string 0", target);
 }

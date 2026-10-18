@@ -35,6 +35,7 @@ const compile = (/** @type {import("../engine/thread")} */ thread) => {
 
     return {
         startingFunction: entry,
+        yields: ir.entry.yields,
         procedures,
         executableHat: ir.entry.executableHat
     };

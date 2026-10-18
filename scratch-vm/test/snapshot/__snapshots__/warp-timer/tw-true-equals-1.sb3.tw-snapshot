@@ -5,7 +5,7 @@
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["{vwNMZe-LO,q/k3(A,.`"];
 const b1 = stage.variables["DKX$)W98mALB-eeMoj(d"];
-return function* genXYZ () {
+return function funXYZ () {
 let t;
 runtime.ext_scratch3_looks._say("plan 8", target);
 if (!("true".toLowerCase() === "1".toLowerCase())) {

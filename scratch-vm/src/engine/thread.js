@@ -207,9 +207,14 @@ class Thread {
         this.timer = null;
         /**
          * The thread's generator.
-         * @type {Generator}
+         * @type {?Generator}
          */
         this.generator = null;
+        /**
+         * The entry point of a compiled thread which does not yield.
+         * @type {?Function}
+         */
+        this.compiledFunction = null;
         /**
          * @type {Object.<string, import('../compiler/compile').CompiledScript>}
          */
@@ -513,7 +518,14 @@ class Thread {
             this.procedures[procedureCode] = result.procedures[procedureCode](this);
         }
 
-        this.generator = result.startingFunction(this)();
+        const startingFunction = result.startingFunction(this);
+        if (result.yields) {
+            this.generator = startingFunction();
+            this.compiledFunction = null;
+        } else {
+            this.generator = null;
+            this.compiledFunction = startingFunction;
+        }
 
         this.executableHat = result.executableHat;
 

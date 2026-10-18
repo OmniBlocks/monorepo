@@ -3,7 +3,7 @@
 
 // 2 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-return function* genXYZ () {
+return function funXYZ () {
 if ((runtime.ext_scratch3_control._counter === 10)) {
 runtime.ext_scratch3_looks._say("pass global", target);
 }

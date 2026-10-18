@@ -370,6 +370,7 @@ class Sequencer {
         if (thread.isCompiled) {
             thread.procedures = null;
             thread.generator = null;
+            thread.compiledFunction = null;
         }
     }
 }

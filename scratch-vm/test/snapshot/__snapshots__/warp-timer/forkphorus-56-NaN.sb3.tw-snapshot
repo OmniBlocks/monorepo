@@ -1,0 +1,46 @@
+// TW Snapshot
+// Input SHA-256: 930b81005746fcf09490be69206cf92f6b882a8d4d66ef9cfa19139090131aad
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ () {
+let t;
+thread.procedures["ZassertTrue %b %s"]((((t = (5 + ((t = +("" + "+")) === t ? t : 0))) === t ? t : 0) === 5),1);
+thread.procedures["ZassertTrue %b %s"]((((t = (5 + ((t = +("" + "-")) === t ? t : 0))) === t ? t : 0) === 5),2);
+thread.procedures["ZassertTrue %b %s"]((((t = (5 + ((t = +("" + "x")) === t ? t : 0))) === t ? t : 0) === 5),3);
+thread.procedures["ZassertTrue %b %s"]((((t = (5 + ((t = +("" + "-=-2398749")) === t ? t : 0))) === t ? t : 0) === 5),4);
+thread.procedures["ZassertTrue %b %s"]((((t = (5 + ((t = +("" + "")) === t ? t : 0))) === t ? t : 0) === 5),5);
+thread.procedures["ZOK %s"]("");
+retire(); return;
+}; })
+
+// Sprite1 ZassertTrue %b %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_assertTrue__ (p0,p1) {
+if (!toBoolean(p0)) {
+thread.procedures["ZFAIL %s"](p1);
+}
+return "";
+}; })
+
+// Sprite1 ZOK %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_OK_ (p0) {
+runtime.ext_scratch3_looks._say("plan 1", target);
+runtime.ext_scratch3_looks._say(("pass " + ("" + p0)), target);
+runtime.ext_scratch3_looks._say("end", target);
+runtime.stopAll();
+retire(); throw 1;
+return "";
+}; })
+
+// Sprite1 ZFAIL %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_FAIL_ (p0) {
+runtime.ext_scratch3_looks._say("plan 1", target);
+runtime.ext_scratch3_looks._say(("fail " + ("" + p0)), target);
+runtime.ext_scratch3_looks._say("end", target);
+runtime.stopAll();
+retire(); throw 1;
+return "";
+}; })

@@ -1,0 +1,27 @@
+// TW Snapshot
+// Input SHA-256: 2979239837a20f2d91405b400ec98101ec8262f2e0b89b0f0204591c9dd9c25d
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ () {
+thread.procedures["ZA"]();
+retire(); return;
+}; })
+
+// Sprite1 ZA
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_A () {
+thread.procedures["ZOK %s"]("");
+return "";
+}; })
+
+// Sprite1 ZOK %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_OK_ (p0) {
+runtime.ext_scratch3_looks._say("plan 1", target);
+runtime.ext_scratch3_looks._say(("pass " + ("" + p0)), target);
+runtime.ext_scratch3_looks._say("end", target);
+runtime.stopAll();
+retire(); throw 1;
+return "";
+}; })

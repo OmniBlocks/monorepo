@@ -1,0 +1,37 @@
+// TW Snapshot
+// Input SHA-256: 082b59a5b772f80c84bc6a846d9ea5023863d8f90c5b85e599b53fed7a9d6a46
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function funXYZ () {
+let t;
+runtime.ext_scratch3_looks._say("plan 8", target);
+b0.value = (1 / 0);
+if (((10 + ((t = Math.sqrt(-1)) === t ? t : 0)) === 10)) {
+runtime.ext_scratch3_looks._say("pass", target);
+}
+if (((10 + ((t = (Math.round(Math.sin((Math.PI * b0.value) / 180) * 1e10) / 1e10)) === t ? t : 0)) === 10)) {
+runtime.ext_scratch3_looks._say("pass", target);
+}
+if (((10 + ((t = (Math.round(Math.cos((Math.PI * b0.value) / 180) * 1e10) / 1e10)) === t ? t : 0)) === 10)) {
+runtime.ext_scratch3_looks._say("pass", target);
+}
+if (((10 + ((t = tan(b0.value)) === t ? t : 0)) === 10)) {
+runtime.ext_scratch3_looks._say("pass", target);
+}
+if (((10 + ((t = ((Math.asin(2) * 180) / Math.PI)) === t ? t : 0)) === 10)) {
+runtime.ext_scratch3_looks._say("pass", target);
+}
+if (((10 + ((t = ((Math.acos(2) * 180) / Math.PI)) === t ? t : 0)) === 10)) {
+runtime.ext_scratch3_looks._say("pass", target);
+}
+if (((10 + ((t = Math.log(-1)) === t ? t : 0)) === 10)) {
+runtime.ext_scratch3_looks._say("pass", target);
+}
+if (((10 + ((t = (Math.log(-1) / Math.LN10)) === t ? t : 0)) === 10)) {
+runtime.ext_scratch3_looks._say("pass", target);
+}
+runtime.ext_scratch3_looks._say("end", target);
+retire(); return;
+}; })

@@ -1,0 +1,26 @@
+// TW Snapshot
+// Input SHA-256: 289d73b9be2b60f501e57768410029798d2dec7d971e5935e5f19fb2a9988169
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["k|@-`:^^Mo+E}$({|2/P"];
+const b1 = stage.variables["t2m05.oW;5f0=GL30@pV"];
+return function funXYZ () {
+runtime.ext_scratch3_looks._say("plan 4", target);
+b0.value = (1 / 0);
+b1.value = (-1 / 0);
+if ((("" + (b0.value + b1.value)).toLowerCase() === "NaN".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass 1", target);
+}
+if ((("" + (b0.value - b0.value)).toLowerCase() === "NaN".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass 1", target);
+}
+if ((("" + (b0.value * 0)).toLowerCase() === "NaN".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass 1", target);
+}
+if ((("" + (0 / 0)).toLowerCase() === "NaN".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass 1", target);
+}
+runtime.ext_scratch3_looks._say("end", target);
+retire(); return;
+}; })

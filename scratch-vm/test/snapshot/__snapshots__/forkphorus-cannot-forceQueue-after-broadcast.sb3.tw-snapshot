@@ -1,0 +1,36 @@
+// TW Snapshot
+// Input SHA-256: a9d53758e603b449818a648433944c2775495122dab210fdaca971ab4f121a27
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function funXYZ () {
+runtime.ext_scratch3_looks._say("plan 1", target);
+b0.value = 0;
+startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "1" });
+retire(); return;
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function* genXYZ () {
+let t;
+b0.value = (((t = +b0.value) === t ? t : 0) + 1);
+if ((b0.value === 1)) {
+startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "1" });
+thread.timer = timer();
+var a0 = Math.max(0, 1000 * 0);
+runtime.requestRedraw();
+yield;
+while (thread.timer.timeElapsed() < a0) {
+yield;
+}
+thread.timer = null;
+runtime.ext_scratch3_looks._say("fail", target);
+} else {
+runtime.ext_scratch3_looks._say("pass", target);
+runtime.ext_scratch3_looks._say("end", target);
+}
+retire(); return;
+}; })

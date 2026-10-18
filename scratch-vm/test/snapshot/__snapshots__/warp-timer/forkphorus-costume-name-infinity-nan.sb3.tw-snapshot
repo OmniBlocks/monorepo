@@ -1,0 +1,34 @@
+// TW Snapshot
+// Input SHA-256: dad2d51129eae742bdde75772afed267945ce57ccbc8890e504519ff6fd55318
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ () {
+runtime.ext_scratch3_looks._setCostume(target, "initial");
+runtime.ext_scratch3_looks._say("plan 6", target);
+runtime.ext_scratch3_looks._setCostume(target, (1 / 0));
+if ((target.getCostumes()[target.currentCostume].name.toLowerCase() === "good".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass infinity costume name", target);
+}
+if (((target.currentCostume + 1) === 1)) {
+runtime.ext_scratch3_looks._say("pass infinity costume number", target);
+}
+runtime.ext_scratch3_looks._setCostume(target, "initial");
+runtime.ext_scratch3_looks._setCostume(target, (1 / -0));
+if ((target.getCostumes()[target.currentCostume].name.toLowerCase() === "good".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass -infinity costume name", target);
+}
+if (((target.currentCostume + 1) === 1)) {
+runtime.ext_scratch3_looks._say("pass -infinity costume number", target);
+}
+runtime.ext_scratch3_looks._setCostume(target, "initial");
+runtime.ext_scratch3_looks._setCostume(target, (0 / 0));
+if ((target.getCostumes()[target.currentCostume].name.toLowerCase() === "good".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass nan costume name", target);
+}
+if (((target.currentCostume + 1) === 1)) {
+runtime.ext_scratch3_looks._say("pass nan costume number", target);
+}
+runtime.ext_scratch3_looks._say("end", target);
+retire(); return;
+}; })

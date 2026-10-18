@@ -1,0 +1,80 @@
+// TW Snapshot
+// Input SHA-256: 33ae042ed2e2affa758cf695de33f44b075e96d01ccb919972d262517492f6fc
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["C7VGwqE9rvJgpw(oV^?E"];
+return function* genXYZ () {
+let t;
+startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "3" });
+startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "1" });
+startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "2" });
+runtime.stopForTarget(target, thread);
+b0.value = [];
+startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "1" });
+startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "2" });
+startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "3" });
+thread.timer = timer();
+var a0 = Math.max(0, 1000 * 0);
+runtime.requestRedraw();
+yield;
+while (thread.timer.timeElapsed() < a0) {
+yield;
+}
+thread.timer = null;
+if ((((t = +listContents(b0)) === t ? t : 0) === 312)) {
+thread.procedures["ZOK %s"]("");
+} else {
+thread.procedures["ZFAIL %s"]("");
+}
+retire(); return;
+}; })
+
+// Sprite1 ZOK %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_OK_ (p0) {
+runtime.ext_scratch3_looks._say("plan 1", target);
+runtime.ext_scratch3_looks._say(("pass " + ("" + p0)), target);
+runtime.ext_scratch3_looks._say("end", target);
+runtime.stopAll();
+retire(); throw 1;
+return "";
+}; })
+
+// Sprite1 ZFAIL %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_FAIL_ (p0) {
+runtime.ext_scratch3_looks._say("plan 1", target);
+runtime.ext_scratch3_looks._say(("fail " + ("" + p0)), target);
+runtime.ext_scratch3_looks._say("end", target);
+runtime.stopAll();
+retire(); throw 1;
+return "";
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["C7VGwqE9rvJgpw(oV^?E"];
+return function funXYZ () {
+b0.value.push(1);
+b0._monitorUpToDate = false;
+retire(); return;
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["C7VGwqE9rvJgpw(oV^?E"];
+return function funXYZ () {
+b0.value.push(2);
+b0._monitorUpToDate = false;
+retire(); return;
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["C7VGwqE9rvJgpw(oV^?E"];
+return function funXYZ () {
+b0.value.push(3);
+b0._monitorUpToDate = false;
+retire(); return;
+}; })

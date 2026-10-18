@@ -1,0 +1,26 @@
+// TW Snapshot
+// Input SHA-256: 7bc7268ef7d0d00b445b003aa683b39bcdb3c4c1d4bb7ae03679f553ad22f5a6
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["q9l+ZDG${I3p$=:TPs`3"];
+return function funXYZ () {
+runtime.ext_scratch3_looks._say("plan 3", target);
+if ((("_" + ("" + (toBoolean((b0.value[2 - 1] ?? "")) && toBoolean((b0.value[2 - 1] ?? ""))))).toLowerCase() === "_true".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass", target);
+} else {
+runtime.ext_scratch3_looks._say("fail", target);
+}
+if ((("_" + ("" + (toBoolean((b0.value[1 - 1] ?? "")) || toBoolean((b0.value[2 - 1] ?? ""))))).toLowerCase() === "_true".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass", target);
+} else {
+runtime.ext_scratch3_looks._say("fail", target);
+}
+if (!toBoolean((b0.value[1 - 1] ?? ""))) {
+runtime.ext_scratch3_looks._say("pass", target);
+} else {
+runtime.ext_scratch3_looks._say("fail", target);
+}
+runtime.ext_scratch3_looks._say("end", target);
+retire(); return;
+}; })

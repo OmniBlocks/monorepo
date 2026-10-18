@@ -1,37 +1,36 @@
-const test = require('tap').test;
+const {test} = require('node:test');
+const assert = require('node:assert');
 const Clock = require('../../src/io/clock');
 const Runtime = require('../../src/engine/runtime');
 
-test('spec', t => {
+test('spec', () => {
     const rt = new Runtime();
     const c = new Clock(rt);
 
-    t.type(Clock, 'function');
-    t.type(c, 'object');
-    t.type(c.projectTimer, 'function');
-    t.type(c.pause, 'function');
-    t.type(c.resume, 'function');
-    t.type(c.resetProjectTimer, 'function');
-    t.end();
+    assert.strictEqual(typeof Clock, 'function');
+    assert.strictEqual(typeof c, 'object');
+    assert.strictEqual(typeof c.projectTimer, 'function');
+    assert.strictEqual(typeof c.pause, 'function');
+    assert.strictEqual(typeof c.resume, 'function');
+    assert.strictEqual(typeof c.resetProjectTimer, 'function');
 });
 
 test('cycle', t => {
+    t.mock.timers.enable({apis: ['Date']});
     const rt = new Runtime();
     const c = new Clock(rt);
 
-    t.ok(c.projectTimer() <= 0.1);
-    setTimeout(() => {
-        c.resetProjectTimer();
-        setTimeout(() => {
-            // The timer shouldn't advance until all threads have been stepped
-            t.ok(c.projectTimer() === 0);
-            c.pause();
-            t.ok(c.projectTimer() === 0);
-            c.resume();
-            t.ok(c.projectTimer() === 0);
-            t.end();
-        }, 100);
-    }, 100);
+    assert.strictEqual(c.projectTimer(), 0);
+    t.mock.timers.tick(100);
     rt._step();
-    t.ok(c.projectTimer() > 0);
+    assert.strictEqual(c.projectTimer(), 0.1);
+
+    c.resetProjectTimer();
+    t.mock.timers.tick(100);
+    // The timer shouldn't advance until all threads have been stepped
+    assert.strictEqual(c.projectTimer(), 0);
+    c.pause();
+    assert.strictEqual(c.projectTimer(), 0);
+    c.resume();
+    assert.strictEqual(c.projectTimer(), 0);
 });

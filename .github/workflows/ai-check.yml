@@ -8,7 +8,7 @@ on:
 
 jobs:
   check-comment:
-    if: ${{ github.event.comment.user.login != 'boxycpu[bot]' && github.event.comment.user.login != 'coderabbitai[bot]' && github.event.comment.user.login != 'PPPDUD' }}
+    if: ${{ github.event.comment.user.login != 'boxycpu[bot]' && github.event.comment.user.login != 'coderabbitai[bot]' && github.event.comment.user.login != 'PPPDUD' && github.event.comment.user.login != 'supervoidcoder' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write

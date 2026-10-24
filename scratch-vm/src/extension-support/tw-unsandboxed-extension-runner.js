@@ -93,6 +93,11 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         if (!parsed) {
             return false;
         }
+        // Embedding javascript: can execute code in the embedding page's origin.
+        // eslint-disable-next-line no-script-url
+        if (parsed.protocol === 'javascript:') {
+            return false;
+        }
         return vm.securityManager.canEmbed(parsed.href);
     };
 

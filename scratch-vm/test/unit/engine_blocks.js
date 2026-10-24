@@ -47,6 +47,15 @@ test('getBlock', () => {
     assert.strictEqual(typeof notBlock, 'undefined');
 });
 
+test('createBlock ignores __proto__ IDs', () => {
+    const blocks = new Blocks(new Runtime());
+    blocks.createBlock({id: '__proto__', topLevel: true});
+
+    assert.strictEqual(Object.getPrototypeOf(blocks._blocks), Object.prototype);
+    assert.strictEqual(Object.prototype.hasOwnProperty.call(blocks._blocks, '__proto__'), false);
+    assert.deepStrictEqual(blocks.getScripts(), []);
+});
+
 test('getScripts', () => {
     const b = new Blocks(new Runtime());
     let scripts = b.getScripts();

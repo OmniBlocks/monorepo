@@ -31,6 +31,24 @@ test('deserialize', async () => {
     assert.strictEqual(typeof targets, 'object');
 });
 
+test('deserialize monitor with an inherited object property as its ID', async () => {
+    const runtime = new Runtime();
+    await sb3.deserialize({
+        targets: [],
+        monitors: [{
+            id: 'constructor',
+            opcode: 'data_variable',
+            params: {VARIABLE: 'x'},
+            visible: true,
+            x: 0,
+            y: 0
+        }]
+    }, runtime);
+
+    assert.strictEqual(Object.prototype.hasOwnProperty.call(runtime.monitorBlocks._blocks, 'constructor'), true);
+    assert.strictEqual(runtime.monitorBlocks._blocks.constructor.opcode, 'data_variable');
+});
+
 
 test('serialize sb2 project with comments as sb3', async () => {
     const vm = new VirtualMachine();

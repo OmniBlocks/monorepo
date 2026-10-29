@@ -7,7 +7,7 @@ export function getOVSVersion() {
     // Let's start by getting a date, something most of us reading this aren't familiar with
     const date = new Date();
     // It must be UTC
-    const shortMonth = date.toLocaleString('default', { month: 'short', timeZone: 'UTC' });
+    const shortMonth = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
     let year = date.getUTCFullYear();
     let day = date.getUTCDate();
      if (year >= 2000 && year <= 2099) {
@@ -43,7 +43,7 @@ export function getOVSVersion() {
     let displayVersion = process.env.APP_VERSION || '0.6.0a';
     if (displayVersion.includes('alpha') || displayVersion.includes('beta')) {
         // if it's alpha or beta, shorten it to just a or b so it's e.g. 0.6.0a
-        displayVersion = displayVersion.replace('alpha', 'a').replace('beta', 'b');
+        displayVersion = displayVersion.replace('-alpha', 'a').replace('-beta', 'b');
     }
     const target = process.env.TARGET || 'browser';
     const dev = process.env.NODE_ENV !== 'production';

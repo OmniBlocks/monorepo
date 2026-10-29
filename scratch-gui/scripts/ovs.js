@@ -1,9 +1,9 @@
 // OmniBlocks Versioning System (OVS)
 // Implemented as according to https://github.com/OmniBlocks/monorepo/issues/864 , OmniBlocks RFC 1
 
-import { execSync } from 'child_process';
+import {execSync} from 'child_process';
 
-export function getOVSVersion() {
+export function getOVSVersion(version) {   
     // Let's start by getting a date, something most of us reading this aren't familiar with
     const date = new Date();
     // It must be UTC
@@ -40,7 +40,7 @@ export function getOVSVersion() {
     // That was only the easy part, now we need to get the git commit hash
     const gitBranch = execSync('git branch --show-current').toString().trim();
     let gitCommitShortHash = execSync('git rev-parse --short HEAD').toString().trim();
-    let displayVersion = process.env.APP_VERSION || '0.6.0a';
+    let displayVersion = version || '0.6.0a';
     if (displayVersion.includes('alpha') || displayVersion.includes('beta')) {
         // if it's alpha or beta, shorten it to just a or b so it's e.g. 0.6.0a
         displayVersion = displayVersion.replace('-alpha', 'a').replace('-beta', 'b');

@@ -2,5 +2,6 @@
 // eslint-disable-next-line import/no-commonjs
 module.exports = {
     APP_NAME: 'OmniBlocks', // the name of the mod
-    APP_VERSION: process.env.APP_VERSION || 'v0.6.0-alpha'
+    APP_VERSION: process.env.APP_VERSION || 'v0.6.0-alpha',
+    FULL_VERSION: process.env.FULL_VERSION || 'Unknown Build'
 };

@@ -1,7 +1,7 @@
 // OmniBlocks Versioning System (OVS)
 // Implemented as according to https://github.com/OmniBlocks/monorepo/issues/864 , OmniBlocks RFC 1
 
-const { execSync } = require('child_process');
+import { execSync } from 'child_process';
 
 export function getOVSVersion() {
     // Let's start by getting a date, something most of us reading this aren't familiar with

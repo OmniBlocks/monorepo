@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Window Controls - TurboWarp Extension Documentation</title>
+    <link rel="canonical" href="https://extensions.turbowarp.org/CubesterYT/WindowControls">
+    <style>
+      :root {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color-scheme: light dark;
+        font-size: 16px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color: #eee;
+          background: #131313;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        a {
+          color: #56b2ff;
+        }
+        a:visited {
+          color: #f192ff;
+        }
+        a:active {
+          color: red;
+        }
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        line-height: 1.3;
+      }
+
+      nav {
+        background-color: #ff4c4c;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+      nav > div {
+        display: flex;
+        max-width: 600px;
+        margin: 0 auto;
+        justify-content: space-between;
+      }
+      nav a {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.5rem 0.25rem 0.5rem 0;
+        align-items: center;
+        text-decoration: none;
+        color: inherit !important;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      nav img {
+        width: 2rem;
+        height: 2rem;
+        flex-shrink: 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        nav {
+          background-color: #333;
+        }
+      }
+
+      noscript {
+        font-weight: bold;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 0 0.25rem;
+      }
+      h1 {
+        font-size: 2.25rem;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        border-bottom: 1px solid #ccc;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid #ccc;
+        margin: 1rem 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        hr, h1, h2, h3, h4, h5, h6 {
+          border-color: #444;
+        }
+      }
+
+      .view-in-browser {
+        display: none;
+      }
+      .is-desktop .view-in-browser {
+        display: flex;
+      }
+      .is-desktop nav > div, .is-desktop .container {
+        /* Desktop app shows this page in a window, not a browser tab, so don't need to */
+        /* restrict the width of the content for readability. */
+        max-width: 100%;
+      }
+
+      code {
+        background-color: #eee;
+        border-radius: 4px;
+        padding: 0 2px;
+      }
+      pre {
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        overflow-x: auto;
+      }
+      @media (prefers-color-scheme: dark) {
+        code, pre {
+          background-color: #223;
+          border-color: #334;
+        }
+      }
+
+      .render-scratchblocks {
+        width: 100%;
+        overflow-x: auto;
+        white-space: pre;
+        line-height: 42px; /* reasonable estimation to reduce layout shift */
+      }
+      .render-scratchblocks svg {
+        display: block;
+      }
+
+      footer {
+        margin: 1rem 0;
+        font-size: small;
+      }
+
+      /* General Alert Styles */
+      .alert {
+        padding-left: 15px;
+        line-height: 1;
+      }
+
+      /* Border colors for specific alerts */
+      .alert.alert-note { border-left: .25em solid #1f6feb; }
+      .alert.alert-tip { border-left: .25em solid #238636; }
+      .alert.alert-important { border-left: .25em solid #8957e5; }
+      .alert.alert-warning { border-left: .25em solid #9e6a03; }
+      .alert.alert-caution { border-left: .25em solid #da3633; }
+
+      /* Shared Styling for Alert Text */
+      .alert p:first-child {
+        padding-top: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+      }
+
+      /* Specific Color Overrides for Each Alert */
+      .alert.alert-note > p:first-child { color: #4493f8; }
+      .alert.alert-tip > p:first-child { color: #3fb950; }
+      .alert.alert-important > p:first-child { color: #ab7df8; }
+      .alert.alert-warning > p:first-child { color: #d29922; }
+      .alert.alert-caution > p:first-child { color: #f85149; }
+
+      /* Icon Spacing */
+      div.alert svg {
+        margin-right: 8px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <nav role="navigation">
+      <div>
+        <a href="https://extensions.turbowarp.org/">
+          <img src="/turbowarp.svg" alt="">
+          <span>TurboWarp Extension Gallery</span>
+        </a>
+
+        <!-- Only used by desktop app -->
+        <a class="view-in-browser" href="https://extensions.turbowarp.org/CubesterYT/WindowControls">
+          Read in browser
+        </a>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Window Controls</h1>
+
+      <noscript><p>Enable JavaScript for blocks to render.</p></noscript>
+
+      <p>This extension provides a set of blocks that gives you greater control over the Program Window.</p>
+<div class="alert alert-note"><p><svg viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true" fill="#4493f8"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg> <strong>Note</strong></p>
+<p><strong>Most of these blocks only work in Electron, Pop Ups/Web Apps containing HTML packaged projects, and normal Web Apps.</strong><br/><br/>Examples include, but are not limited to: <strong>TurboWarp Desktop App, TurboWarp Web App, Pop Up/Web App windows that contain the HTML packaged project, and plain Electron.</strong><br/><br/><strong>Blocks that still work outside of these will be specified.</strong></p>
+</div><h2>Move Window Block</h2>
+<div class="render-scratchblocks">move window to x: (0) y: (0) :: #359ed4
+</div><p>Moves the Program Window to the defined &quot;x&quot; and &quot;y&quot; coordinate on the screen.</p>
+<h2>Move Window to Preset Block</h2>
+<p>Moves the Program Window to a preset.</p>
+<p>The menu area has ten options, <strong>(&quot;center&quot;, &quot;right&quot;, &quot;left&quot;, &quot;top&quot;, &quot;bottom&quot;, &quot;top right&quot;, &quot;top left&quot;, &quot;bottom right&quot;, &quot;bottom left&quot;, &quot;random position&quot;)</strong></p>
+<h3>Center</h3>
+<div class="render-scratchblocks">move window to the (center v) :: #359ed4
+</div><p>When choosing &quot;center&quot;, it will move the Program Window to the center of the screen.</p>
+<h3>Right</h3>
+<div class="render-scratchblocks">move window to the (right v) :: #359ed4
+</div><p>When choosing &quot;right&quot;, it will move the Program Window to the right of the screen.</p>
+<h3>Left</h3>
+<div class="render-scratchblocks">move window to the (left v) :: #359ed4
+</div><p>When choosing &quot;left&quot;, it will move the Program Window to the left of the screen.</p>
+<h3>Top</h3>
+<div class="render-scratchblocks">move window to the (top v) :: #359ed4
+</div><p>When choosing &quot;top&quot;, it will move the Program Window to the top of the screen.</p>
+<h3>Bottom</h3>
+<div class="render-scratchblocks">move window to the (bottom v) :: #359ed4
+</div><p>When choosing &quot;bottom&quot;, it will move the Program Window to the bottom of the screen.</p>
+<h3>Top Right</h3>
+<div class="render-scratchblocks">move window to the (top right v) :: #359ed4
+</div><p>When choosing &quot;top right&quot;, it will move the Program Window to the top right of the screen.</p>
+<h3>Top Left</h3>
+<div class="render-scratchblocks">move window to the (top left v) :: #359ed4
+</div><p>When choosing &quot;top left&quot;, it will move the Program Window to the top left of the screen.</p>
+<h3>Bottom Right</h3>
+<div class="render-scratchblocks">move window to the (bottom right v) :: #359ed4
+</div><p>When choosing &quot;bottom right&quot;, it will move the Program Window to the bottom right of the screen.</p>
+<h3>Bottom Left</h3>
+<div class="render-scratchblocks">move window to the (bottom left v) :: #359ed4
+</div><p>When choosing &quot;bottom left&quot;, it will move the Program Window to the bottom left of the screen.</p>
+<h3>Random Position</h3>
+<div class="render-scratchblocks">move window to the (random position v) :: #359ed4
+</div><p>When choosing &quot;random position&quot;, it will move the Program Window to a random position on the screen.</p>
+<h2>Change &quot;x&quot; Block</h2>
+<div class="render-scratchblocks">change window x by (50) :: #359ed4
+</div><p>Dynamically changes the &quot;x&quot; position of the Program Window on the screen.</p>
+<h2>Set &quot;x&quot; Block</h2>
+<div class="render-scratchblocks">set window x to (100) :: #359ed4
+</div><p>Statically changes the &quot;x&quot; position of the Program Window on the screen.</p>
+<h2>Change &quot;y&quot; Block</h2>
+<div class="render-scratchblocks">change window y by (50) :: #359ed4
+</div><p>Dynamically changes the &quot;y&quot; position of the Program Window on the screen.</p>
+<h2>Set &quot;y&quot; Block</h2>
+<div class="render-scratchblocks">set window y to (100) :: #359ed4
+</div><p>Statically changes the &quot;y&quot; position of the Program Window on the screen.</p>
+<h2>Window &quot;x&quot; Reporter</h2>
+<div class="render-scratchblocks">(window x :: #359ed4)
+</div><p>This reporter returns the &quot;x&quot; position of the Program Window.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Window &quot;y&quot; Reporter</h2>
+<div class="render-scratchblocks">(window y :: #359ed4)
+</div><p>This reporter returns the &quot;y&quot; position of the Program Window.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Resize Window Block</h2>
+<div class="render-scratchblocks">resize window to width: (1000) height: (1000) :: #359ed4
+</div><p>Resizes the Program Window to the defined width and height values.</p>
+<h2>Resize Window Preset Block</h2>
+<p>Resizes the Program Window to a preset.</p>
+<p>The menu area has eight options, <strong>(&quot;480x360&quot;, &quot;640x480&quot;, &quot;1280x720&quot;, &quot;1920x1080&quot;, &quot;2560x1440&quot;, &quot;2048x1080&quot;, &quot;3840x2160&quot;, &quot;7680x4320&quot;)</strong></p>
+<h3>480x360</h3>
+<div class="render-scratchblocks">resize window to (480x360 v) :: #359ed4
+</div><p>When choosing &quot;480x360&quot;, it will resize the Program Window to 480x360 (360p). The aspect ratio for this size is 4:3.</p>
+<h3>640x480</h3>
+<div class="render-scratchblocks">resize window to (640x480 v) :: #359ed4
+</div><p>When choosing &quot;640x480&quot;, it will resize the Program Window to 640x480 (480p). The aspect ratio for this size is 4:3.</p>
+<h3>1280x720</h3>
+<div class="render-scratchblocks">resize window to (1280x720 v) :: #359ed4
+</div><p>When choosing &quot;1280x720&quot;, it will resize the Program Window to 1280x720 (720p). The aspect ratio for this size is 16:9.</p>
+<h3>1920x1080</h3>
+<div class="render-scratchblocks">resize window to (1920x1080 v) :: #359ed4
+</div><p>When choosing &quot;1920x1080&quot;, it will resize the Program Window to 1920x1080 (1080p). The aspect ratio for this size is 16:9.</p>
+<h3>2560x1440</h3>
+<div class="render-scratchblocks">resize window to (2560x1440 v) :: #359ed4
+</div><p>When choosing &quot;2560x1440&quot;, it will resize the Program Window to 2560x1440 (1440p). The aspect ratio for this size is 16:9.</p>
+<h3>2048x1080</h3>
+<div class="render-scratchblocks">resize window to (2048x1080 v) :: #359ed4
+</div><p>When choosing &quot;2048x1080&quot;, it will resize the Program Window to 2048x1080 (2K/1080p[Higher Pixel Rate]). The aspect ratio for this size is 1:1.77.</p>
+<h3>3840x2160</h3>
+<div class="render-scratchblocks">resize window to (3840x2160 v) :: #359ed4
+</div><p>When choosing &quot;3840x2160&quot;, it will resize the Program Window to 3840x2160 (4K). The aspect ratio for this size is 1:1.9.</p>
+<h3>7680x4320</h3>
+<div class="render-scratchblocks">resize window to (7680x4320 v) :: #359ed4
+</div><p>When choosing &quot;7680x4320&quot;, it will resize the Program Window to 7680x4320 (8K). The aspect ratio for this size is 16:9.</p>
+<h2>Change Width Block</h2>
+<div class="render-scratchblocks">change window width by (50) :: #359ed4
+</div><p>Dynamically changes the width of the Program Window.</p>
+<h2>Set Width Block</h2>
+<div class="render-scratchblocks">set window width to (1000) :: #359ed4
+</div><p>Statically changes the width of the Program Window.</p>
+<h2>Change Height Block</h2>
+<div class="render-scratchblocks">change window height by (50) :: #359ed4
+</div><p>Dynamically changes the height of the Program Window.</p>
+<h2>Set Height Block</h2>
+<div class="render-scratchblocks">set window height to (1000) :: #359ed4
+</div><p>Statically changes the height of the Program Window.</p>
+<h2>Match Stage Size Block</h2>
+<div class="render-scratchblocks">match stage size :: #359ed4
+</div><p>Resizes the Program Window to match the aspect ratio of the stage. Works best when the stage is dynamically changed.</p>
+<p><strong>Example: When using runtime options to change the stage size, using this block can help you adapt to the new stage size.</strong></p>
+<p><strong>Try this example script in a packaged project:</strong></p>
+<div class="render-scratchblocks">when green flag clicked
+wait (1) seconds
+set stage size width: (360) height: (480) :: #8c9abf
+match stage size :: #359ed4
+move window to the (center v) :: #359ed4
+wait (1) seconds
+set stage size width: (480) height: (360) :: #8c9abf
+match stage size :: #359ed4
+move window to the (center v) :: #359ed4
+</div><h2>Window Width Reporter</h2>
+<div class="render-scratchblocks">(window width :: #359ed4)
+</div><p>This reporter returns the width of the Program Window.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Window Height Reporter</h2>
+<div class="render-scratchblocks">(window height :: #359ed4)
+</div><p>This reporter returns the height of the Program Window.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Is Window Touching Screen Edge Boolean</h2>
+<div class="render-scratchblocks">&lt;is window touching screen edge? :: #359ed4&gt;
+</div><p>This boolean returns true or false for whether or not the Program Window is touching the screen's edge.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Screen Width Reporter</h2>
+<div class="render-scratchblocks">(screen width :: #359ed4)
+</div><p>This reporter returns the width of the Screen.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Screen Height Reporter</h2>
+<div class="render-scratchblocks">(screen height :: #359ed4)
+</div><p>This reporter returns the height of the Screen.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Is Window Focused Boolean</h2>
+<div class="render-scratchblocks">&lt;is window focused? :: #359ed4&gt;
+</div><p>This boolean returns true or false for whether or not the Program Window is in focus.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Set Window Title Block</h2>
+<div class="render-scratchblocks">set window title to [&quot;Hello World!] :: #359ed4
+</div><p>Changes the title of the Program Window.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Window Title Reporter</h2>
+<div class="render-scratchblocks">(window title :: #359ed4)
+</div><p>This reporter returns the title of the Program Window.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Enter Fullscreen Block</h2>
+<div class="render-scratchblocks">enter fullscreen :: #359ed4
+</div><p>Makes the Program Window enter Fullscreen.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Exit Fullscreen Block</h2>
+<div class="render-scratchblocks">exit fullscreen :: #359ed4
+</div><p>Makes the Program Window exit Fullscreen.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Is Window Fullscreen Boolean</h2>
+<div class="render-scratchblocks">&lt;is window fullscreen? :: #359ed4&gt;
+</div><p>This boolean returns true or false for whether or not the Program Window is in fullscreen.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+<h2>Close Window Block</h2>
+<div class="render-scratchblocks">close window :: cap :: #359ed4
+</div><p>Closes the Program Window.</p>
+<p><strong>This is supported outside of Electron, Pop Ups, and Web Apps.</strong></p>
+
+
+      <hr>
+
+      <footer>
+        <p>
+          This page is <a href="https://github.com/TurboWarp/extensions/tree/master/docs">open source</a>.
+          
+            Blocks rendered with <a href="https://scratchblocks.github.io/">scratchblocks</a>.
+          
+        </p>
+        <p>TurboWarp is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation.</p>
+      </footer>
+    </main>
+
+    
+      <script src="/docs-internal/scratchblocks.js"></script>
+      <script>
+        scratchblocks.renderMatching('.render-scratchblocks', {
+          style: 'scratch3'
+        });
+      </script>
+    
+  </body>
+</html>

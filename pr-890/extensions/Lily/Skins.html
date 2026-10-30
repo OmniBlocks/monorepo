@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Skins - TurboWarp Extension Documentation</title>
+    <link rel="canonical" href="https://extensions.turbowarp.org/Lily/Skins">
+    <style>
+      :root {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color-scheme: light dark;
+        font-size: 16px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color: #eee;
+          background: #131313;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        a {
+          color: #56b2ff;
+        }
+        a:visited {
+          color: #f192ff;
+        }
+        a:active {
+          color: red;
+        }
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        line-height: 1.3;
+      }
+
+      nav {
+        background-color: #ff4c4c;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+      nav > div {
+        display: flex;
+        max-width: 600px;
+        margin: 0 auto;
+        justify-content: space-between;
+      }
+      nav a {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.5rem 0.25rem 0.5rem 0;
+        align-items: center;
+        text-decoration: none;
+        color: inherit !important;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      nav img {
+        width: 2rem;
+        height: 2rem;
+        flex-shrink: 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        nav {
+          background-color: #333;
+        }
+      }
+
+      noscript {
+        font-weight: bold;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 0 0.25rem;
+      }
+      h1 {
+        font-size: 2.25rem;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        border-bottom: 1px solid #ccc;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid #ccc;
+        margin: 1rem 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        hr, h1, h2, h3, h4, h5, h6 {
+          border-color: #444;
+        }
+      }
+
+      .view-in-browser {
+        display: none;
+      }
+      .is-desktop .view-in-browser {
+        display: flex;
+      }
+      .is-desktop nav > div, .is-desktop .container {
+        /* Desktop app shows this page in a window, not a browser tab, so don't need to */
+        /* restrict the width of the content for readability. */
+        max-width: 100%;
+      }
+
+      code {
+        background-color: #eee;
+        border-radius: 4px;
+        padding: 0 2px;
+      }
+      pre {
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        overflow-x: auto;
+      }
+      @media (prefers-color-scheme: dark) {
+        code, pre {
+          background-color: #223;
+          border-color: #334;
+        }
+      }
+
+      .render-scratchblocks {
+        width: 100%;
+        overflow-x: auto;
+        white-space: pre;
+        line-height: 42px; /* reasonable estimation to reduce layout shift */
+      }
+      .render-scratchblocks svg {
+        display: block;
+      }
+
+      footer {
+        margin: 1rem 0;
+        font-size: small;
+      }
+
+      /* General Alert Styles */
+      .alert {
+        padding-left: 15px;
+        line-height: 1;
+      }
+
+      /* Border colors for specific alerts */
+      .alert.alert-note { border-left: .25em solid #1f6feb; }
+      .alert.alert-tip { border-left: .25em solid #238636; }
+      .alert.alert-important { border-left: .25em solid #8957e5; }
+      .alert.alert-warning { border-left: .25em solid #9e6a03; }
+      .alert.alert-caution { border-left: .25em solid #da3633; }
+
+      /* Shared Styling for Alert Text */
+      .alert p:first-child {
+        padding-top: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+      }
+
+      /* Specific Color Overrides for Each Alert */
+      .alert.alert-note > p:first-child { color: #4493f8; }
+      .alert.alert-tip > p:first-child { color: #3fb950; }
+      .alert.alert-important > p:first-child { color: #ab7df8; }
+      .alert.alert-warning > p:first-child { color: #d29922; }
+      .alert.alert-caution > p:first-child { color: #f85149; }
+
+      /* Icon Spacing */
+      div.alert svg {
+        margin-right: 8px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <nav role="navigation">
+      <div>
+        <a href="https://extensions.turbowarp.org/">
+          <img src="/turbowarp.svg" alt="">
+          <span>TurboWarp Extension Gallery</span>
+        </a>
+
+        <!-- Only used by desktop app -->
+        <a class="view-in-browser" href="https://extensions.turbowarp.org/Lily/Skins">
+          Read in browser
+        </a>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Skins</h1>
+
+      <noscript><p>Enable JavaScript for blocks to render.</p></noscript>
+
+      <p>This extension allows you to load and display images onto sprites, as Skins.</p>
+<p>In this extension, a &quot;Skin&quot; is an image that can replace what a sprite looks like.</p>
+<p>Unlike costumes, Skins are not loaded when the project is opened. Instead, Skins are loaded with blocks as the project is running.</p>
+<h2>Loading Skins</h2>
+<p>Skins can be created in 3 different ways. Each way requires you to give the skin a name, which will be used by other blocks to reference the skin later.</p>
+<p>Loading a skin with the same name as another skin will overwrite the data of that skin. Any sprite that was using this skin will now show the new skin.</p>
+<hr>
+<div class="render-scratchblocks">create SVG skin [&lt;svg /&gt;] as [my skin] :: #6b56ff
+</div><p>The first way is by creating a new skin with SVG markup data. The advantage to this is that it loads much quicker than the other loading blocks. The obvious disadvantage is that, unlike the other 2 blocks, it can only work with SVGs.</p>
+<hr>
+<div class="render-scratchblocks">load skin from (costume 1 v) as [my skin] :: #6b56ff
+</div><p>The second way is by loading a skin from a costume.</p>
+<div class="alert alert-important"><p><svg viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true" fill="#ab7df8"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg> <strong>Important</strong></p>
+<p>It's important to note that this block will require the Advanced Option &quot;Remove raw asset data after loading to save RAM&quot; to be disabled in the packager in order for this block to work correctly in a packaged environment. <strong>You do not need to do this within the editor.</strong><br/><br/>If you intend to package your project, we don't encourage using this block for that reason. <strong>None of the other blocks in this extension require this option to be disabled.</strong></p>
+</div><hr>
+<div class="render-scratchblocks">load skin from URL [https://...] as [my skin] :: #6b56ff
+</div><p>The final way is loading a skin through a URL. This block allows you to load any bitmap image as well as SVGs.</p>
+<div class="render-scratchblocks">load skin from URL (snapshot stage :: #9966ff) as [my skin] :: #6b56ff
+</div><p>While this block can work with a website URL, it's primarily designed to work with data URIs. Try using this with the &quot;snapshot stage&quot; block from the &quot;Looks Plus&quot; extension.</p>
+<p>For the final 2 blocks, the block will pause the script for a moment in order to load the skin. Treat them like &quot;wait&quot; blocks in your scripts, don't expect them to finish instantaneously.</p>
+<h2>Using Skins</h2>
+<div class="render-scratchblocks">set skin of (myself v) to [my skin] :: #6b56ff
+</div><p>Skins can be applied to a sprite with this block, so long as you loaded the skin beforehand. Skins can be applied to multiple sprites/clones.</p>
+<p>Using the &quot;myself&quot; option will apply the skin to the sprite the block is running in: if the block is running in a clone, it will apply the skin to the clone. <strong>Do not confuse &quot;myself&quot; with the sprite's name.</strong></p>
+<p>Skins will automatically be removed from every sprite when the project has stopped.</p>
+<hr>
+<div class="render-scratchblocks">restore skin of (myself v) :: #6b56ff
+</div><p>You can remove the skin of a sprite with the &quot;restore skin&quot; block. This will remove the skin from that specific sprite.</p>
+<hr>
+<div class="render-scratchblocks">restore targets with skin [my skin] :: #6b56ff
+</div><p>You can remove a skin from every sprite that has it applied with the &quot;restore targets with skin&quot; block. &quot;Target&quot; refers to &quot;sprite&quot; in this context.</p>
+<h2>Deleting Skins</h2>
+<p>Skins that have been loaded will still exist after the project has stopped. In order to truly delete a skin, you have 2 methods.</p>
+<hr>
+<div class="render-scratchblocks">delete skin [my skin] :: #6b56ff
+</div><p>Delete a specified skin, and reset any sprite that had it applied.</p>
+<hr>
+<div class="render-scratchblocks">delete all skins :: #6b56ff
+</div><p>Delete every skin that has been loaded and reset all sprites that had any skin applied.</p>
+<h2>Other Blocks</h2>
+<div class="render-scratchblocks">&lt;skin [my skin] is loaded? :: #6b56ff&gt;
+</div><p>Check whether a skin is actually loaded. This becomes true <strong>after</strong> the block has finished loading the skin.</p>
+<hr>
+<div class="render-scratchblocks">((width v) of skin [my skin] :: #6b56ff)
+</div><p>Get the width/height of a skin. The values are rounded.</p>
+<hr>
+<div class="render-scratchblocks">(current skin of (myself v) :: #6b56ff)
+</div><p>The name of the skin that is applied to the specified sprite.</p>
+
+
+      <hr>
+
+      <footer>
+        <p>
+          This page is <a href="https://github.com/TurboWarp/extensions/tree/master/docs">open source</a>.
+          
+            Blocks rendered with <a href="https://scratchblocks.github.io/">scratchblocks</a>.
+          
+        </p>
+        <p>TurboWarp is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation.</p>
+      </footer>
+    </main>
+
+    
+      <script src="/docs-internal/scratchblocks.js"></script>
+      <script>
+        scratchblocks.renderMatching('.render-scratchblocks', {
+          style: 'scratch3'
+        });
+      </script>
+    
+  </body>
+</html>

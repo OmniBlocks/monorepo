@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Augmented Reality - TurboWarp Extension Documentation</title>
+    <link rel="canonical" href="https://extensions.turbowarp.org/ar">
+    <style>
+      :root {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color-scheme: light dark;
+        font-size: 16px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color: #eee;
+          background: #131313;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        a {
+          color: #56b2ff;
+        }
+        a:visited {
+          color: #f192ff;
+        }
+        a:active {
+          color: red;
+        }
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        line-height: 1.3;
+      }
+
+      nav {
+        background-color: #ff4c4c;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+      nav > div {
+        display: flex;
+        max-width: 600px;
+        margin: 0 auto;
+        justify-content: space-between;
+      }
+      nav a {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.5rem 0.25rem 0.5rem 0;
+        align-items: center;
+        text-decoration: none;
+        color: inherit !important;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      nav img {
+        width: 2rem;
+        height: 2rem;
+        flex-shrink: 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        nav {
+          background-color: #333;
+        }
+      }
+
+      noscript {
+        font-weight: bold;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 0 0.25rem;
+      }
+      h1 {
+        font-size: 2.25rem;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        border-bottom: 1px solid #ccc;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid #ccc;
+        margin: 1rem 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        hr, h1, h2, h3, h4, h5, h6 {
+          border-color: #444;
+        }
+      }
+
+      .view-in-browser {
+        display: none;
+      }
+      .is-desktop .view-in-browser {
+        display: flex;
+      }
+      .is-desktop nav > div, .is-desktop .container {
+        /* Desktop app shows this page in a window, not a browser tab, so don't need to */
+        /* restrict the width of the content for readability. */
+        max-width: 100%;
+      }
+
+      code {
+        background-color: #eee;
+        border-radius: 4px;
+        padding: 0 2px;
+      }
+      pre {
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        overflow-x: auto;
+      }
+      @media (prefers-color-scheme: dark) {
+        code, pre {
+          background-color: #223;
+          border-color: #334;
+        }
+      }
+
+      .render-scratchblocks {
+        width: 100%;
+        overflow-x: auto;
+        white-space: pre;
+        line-height: 42px; /* reasonable estimation to reduce layout shift */
+      }
+      .render-scratchblocks svg {
+        display: block;
+      }
+
+      footer {
+        margin: 1rem 0;
+        font-size: small;
+      }
+
+      /* General Alert Styles */
+      .alert {
+        padding-left: 15px;
+        line-height: 1;
+      }
+
+      /* Border colors for specific alerts */
+      .alert.alert-note { border-left: .25em solid #1f6feb; }
+      .alert.alert-tip { border-left: .25em solid #238636; }
+      .alert.alert-important { border-left: .25em solid #8957e5; }
+      .alert.alert-warning { border-left: .25em solid #9e6a03; }
+      .alert.alert-caution { border-left: .25em solid #da3633; }
+
+      /* Shared Styling for Alert Text */
+      .alert p:first-child {
+        padding-top: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+      }
+
+      /* Specific Color Overrides for Each Alert */
+      .alert.alert-note > p:first-child { color: #4493f8; }
+      .alert.alert-tip > p:first-child { color: #3fb950; }
+      .alert.alert-important > p:first-child { color: #ab7df8; }
+      .alert.alert-warning > p:first-child { color: #d29922; }
+      .alert.alert-caution > p:first-child { color: #f85149; }
+
+      /* Icon Spacing */
+      div.alert svg {
+        margin-right: 8px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <nav role="navigation">
+      <div>
+        <a href="https://extensions.turbowarp.org/">
+          <img src="/turbowarp.svg" alt="">
+          <span>TurboWarp Extension Gallery</span>
+        </a>
+
+        <!-- Only used by desktop app -->
+        <a class="view-in-browser" href="https://extensions.turbowarp.org/ar">
+          Read in browser
+        </a>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Augmented Reality</h1>
+
+      <noscript><p>Enable JavaScript for blocks to render.</p></noscript>
+
+      <h2>Requirements</h2>
+<ul>
+<li>A mobile phone or tablet (augmented reality headsets are not supported yet)</li>
+<li><a href="https://play.google.com/store/apps/details?id=com.google.ar.core">ARCore</a> (if on Android)</li>
+<li>browser with <a href="https://immersive-web.github.io/webxr-samples/report/">WebXR API and immersive-ar</a> session type support</li>
+</ul>
+<div class="alert alert-warning"><p><svg viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true" fill="#d29922"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg> <strong>Warning</strong></p>
+<p>At the moment of writing, only Chromium-based browsers on Android support immersive-ar session type.</p>
+</div><h2>Other information</h2>
+<ul>
+<li>It is generally recommended to use this extension with fps set to 0, which in turbowarp means running project at the screen refresh rate.</li>
+<li>While exiting AR mode, there is a small chance TurboWarp will lose WebGL context. This problem has also been observed on other websites with AR and likely can't be fixed. If that happens, you can save the project, refresh the tab, load the project and continue.</li>
+<li>It isn't possible to be in AR mode and have video sensing enabled at the same time. Entering AR disables video sensing and makes it not toggleable until AR session ends.</li>
+</ul>
+<h2>Blocks</h2>
+<div class="render-scratchblocks">enter AR mode :: #d10000
+</div><p>If AR is not supported and the error message haven't been shown yet, shows a popup with an error message.</p>
+<p>If AR is supported and project is currently not in AR, attempts to enter AR mode. While doing so, it will pause the script it is in, in the same way ask block does. It will first try to enter AR mode directly. That may fail because entering AR can only be triggred by user interaction. If it fails, it will make it so after user clicks/taps the project will attempt to enter AR. If that fails as well or either of those 2 attempts succeed it will resume the script execution. After it resumes, project may or may not be in AR mode. Projects should handle both cases.</p>
+<p>The origin of coordinate system is placed at or close to position of the device at the time this block was called.</p>
+<hr>
+<div class="render-scratchblocks">exit AR mode :: #d10000
+</div><p>If the project is in AR mode, exits it.</p>
+<hr>
+<div class="render-scratchblocks">&lt;is in AR? :: #d10000&gt;
+</div><p>Tells if the project is currently in AR mode.</p>
+<hr>
+<div class="render-scratchblocks">&lt;is [ar v] available? :: #d10000&gt;
+</div><p>Tells if AR is supported on this device.</p>
+<hr>
+<div class="render-scratchblocks">&lt;is [pose v] available? :: #d10000&gt;
+</div><p>Tells if AR engine knows what the current camera position and orientation is.</p>
+<p>After entering AR mode, is is not immediately available as the map of the environment needs to be built first. After enough information about environment has been gathered and processed, it becomes available. It can temporarily become unavailable due to lack of detailed features in the view of camera that are used for motion tracking, fast motion causing camera image to become too blurry or camera getting covered.</p>
+<hr>
+<div class="render-scratchblocks">&lt;is [hit position v] available? :: #d10000&gt;
+</div><p>Tells if AR engine knows where the point of ray intersection is.</p>
+<p>Can become unavailable for the same reasons as [is [pose] available?]</p>
+<hr>
+<div class="render-scratchblocks">(stage width :: #d10000)
+</div><p>Tells stage width in scratch units. Default is <code>480</code>.</p>
+<p>This value may change when entering AR.</p>
+<hr>
+<div class="render-scratchblocks">(stage height :: #d10000)
+</div><p>Tells stage height in scratch units. Default is <code>360</code>.</p>
+<p>This value will not change when entering AR.</p>
+<hr>
+<div class="render-scratchblocks">(item [1] of [view v] matrix :: #d10000)
+</div><p>view matrix - is a matrix that can be used to transform points from the view space (with origin is at the camera) to the world space (relatively to the world origin). It includes rotation and translation of the camera.</p>
+<p>Also:</p>
+<pre class="language-">view[13] = position[x]
+view[14] = position[y]
+view[15] = position[z] 
+</pre><hr>
+<div class="render-scratchblocks">(item [1] of [inverse view v] matrix :: #d10000)
+</div><p>inverse view matrix = view matrix<sup>-1</sup></p>
+<p>Describes the opposite transformation to the view matrix: From the world space (relatively to the world origin) to the view space (with origin is at the camera).</p>
+<hr>
+<div class="render-scratchblocks">(item [1] of [projection v] matrix :: #d10000)
+</div><p>For perspective projection in scratch you are likely used to doing something like this:</p>
+<pre class="language-">screenX = x * dist / z
+screenY = y * dist / z
+</pre><p>With this extension it's more complicated: projection is done by first doing a 4x4 projection matrix multiplication by 4D vector <code>x,y,z,1</code>, with result being <code>X,Y,Z,W</code>, then performing division of <code>X,Y,Z</code> by <code>W</code> to get screen coordinates in range from -1 to 1, and then multiplying them by half of stage width and height to get scratch coordinates.</p>
+<p>The matrix is a perspective projection matrix with the assumption camera <u>faces negative z</u> and that screen coordinates range from -1 to 1.</p>
+<p>It's calculated as:</p>
+<pre class="language-">                                      /\
+                                     /||\
+                                      ||     OUT
+   IN                                 ||  [X,Y,Z,W]
+[x,y,z,1]                             ||
+      \     [ 2 * dist / width,                 0,                             0,  0 ]  [  1, 2, 3, 4 ]
+_______\    [                0, 2 * dist / height,                             0,  0 ]  [  5, 6, 7, 8 ]
+^^^^^^^/    [                0,                 0,   (near + far) / (near - far), -1 ]  [  9,10,11,12 ]
+      /     [                0,                 0, near * far / (near - far) * 2,  0 ]  [ 13,14,15,16 ]
+
+near = depth of near plane
+far = depth of far plane
+</pre><p>Point is only visible if <code>-W</code> &lt; <code>X,Y,Z</code> &lt; <code>W</code>.</p>
+<pre class="language-">screenX = X / W
+screenY = Y / W
+screenZ = Z / W (for depth buffer)
+</pre><p>If the first codition was true, then <code>-1</code> &lt; <code>screenX,screenY,screenZ</code> &lt; <code>1</code> is also always true. Note that the opposite is not always true (think of what happens when W is negative).</p>
+<p>To get a better understanding of this topic, you may read:</p>
+<ul>
+<li><a href="https://webglfundamentals.org/webgl/lessons/webgl-3d-perspective.html">https://webglfundamentals.org/webgl/lessons/webgl-3d-perspective.html</a></li>
+<li><a href="https://stackoverflow.com/questions/41085117/why-does-gl-divide-gl-position-by-w-for-you-rather-than-letting-you-do-it-your">https://stackoverflow.com/questions/41085117/why-does-gl-divide-gl-position-by-w-for-you-rather-than-letting-you-do-it-your</a></li>
+</ul>
+<p>Projection matrix contains a lot of 0s, and can be simplified. As the result of simplifications it is possible to make it look closer to how it is usually done on scratch:</p>
+<pre class="language-">screenX = x * (2 * dist / width) / -z * (width / 2)
+screenY = y * (2 * dist / height) / -z * (height / 2)
+
+screenX = x * (2 * dist / width) * -1 * (width / 2) / z
+screenY = y * (2 * dist / height) * -1 * (height / 2) / z
+
+negative_dist = (2 * dist / width) * (width / -2) = (2 * dist / height) * (height / -2)
+
+(2 * dist / width) = projection[1]
+(2 * dist / height) = projection[6]
+
+negative_dist = projection[1] * (width / -2) = projection[6] * (height / -2)
+screenX = x * negative_dist / z
+screenY = y * negative_dist / z
+</pre><hr>
+<div class="render-scratchblocks">(item [1] of [combined v] matrix :: #d10000)
+</div><p>combined matrix = projection matrix * inverse view matrix</p>
+<p>Transforms positions from world space to view space, then to projected.</p>
+<hr>
+<div class="render-scratchblocks">(position [x v] :: #d10000)
+</div><div class="render-scratchblocks">(position [y v] :: #d10000)
+</div><div class="render-scratchblocks">(position [z v] :: #d10000)
+</div><p>Camera position relatively to the world origin.</p>
+<hr>
+<div class="render-scratchblocks">(orientation [r v] :: #d10000)
+</div><div class="render-scratchblocks">(orientation [i v] :: #d10000)
+</div><div class="render-scratchblocks">(orientation [j v] :: #d10000)
+</div><div class="render-scratchblocks">(orientation [k v] :: #d10000)
+</div><p>Camera orientation represented as quaternion.</p>
+<hr>
+<div class="render-scratchblocks">(hit position [x v] :: #d10000)
+</div><div class="render-scratchblocks">(hit position [y v] :: #d10000)
+</div><div class="render-scratchblocks">(hit position [z v] :: #d10000)
+</div><p>A ray that originates from camera in the direction the camera is facing (center of the screen) intersects the first detected real world surface. This block returns the coordinates of that intersection point.</p>
+<hr>
+<div class="render-scratchblocks">move everything by x: [0] y: [0] z: [0] :: #d10000
+</div><p>Moves the coordinate system by specified amount.</p>
+<p>It can also be understood as switching to a new coordinate system with origin at a given location in the current coordinate system.</p>
+<p><strong>Usage example:</strong></p>
+<p>After starting the project, it may be a good idea to give user a way to pick location for AR content and then perform this before starting the main AR game/animation/etc.</p>
+<div class="render-scratchblocks">move everything by x: (hit position [x v] :: #d10000) y: (hit position [y v] :: #d10000) z: (hit position [z v] :: #d10000) :: #d10000
+</div><hr>
+<div class="render-scratchblocks">turn everything by r: [0] i: [0] j: [0] k: [0] :: #d10000
+</div><p>Internally it also does quaternion normalization, so you don't have to worry about doing it yourself.</p>
+<p><strong>Usage example:</strong></p>
+<p>This script can be used to rotate <code>XZ</code> around <code>Y</code>-axis:</p>
+<div class="render-scratchblocks">turn everything by r: ([cos v] of ((angle) / [2])) i: [0] j: ([sin v] of ((angle) / [2])) k: [0] :: #d10000
+</div><hr>
+<div class="render-scratchblocks">set resolution [1] :: #d10000
+</div><p>accepts values from <code>0.1</code> to <code>1</code>. changes the resolution at which the project is rendered</p>
+<ul>
+<li><code>1</code> - is native screen resolution</li>
+<li><code>0.5</code> - half the screen resolution</li>
+<li><code>0.1</code> - one tenth of screen resolution</li>
+</ul>
+<p>Reducing resolution can improve performance and reduce memory usage.</p>
+<h2>Examples</h2>
+<h3>Example 1</h3>
+<div class="render-scratchblocks">when flag clicked
+enter AR mode :: #d10000
+repeat until &lt;not &lt;is in AR? :: #d10000&gt;&gt;
+    clear
+    point at [0.1] [0.5] [-0.3]
+end
+
+define point at (x) (y) (z)
+set [X v] to ((((x) * (item [1] of [combined v] matrix :: #d10000)) + ((y) * (item [5] of [combined v] matrix :: #d10000))) + (((z) * (item [9] of [combined v] matrix :: #d10000)) + (item [13] of [combined v] matrix :: #d10000)))
+set [Y v] to ((((x) * (item [2] of [combined v] matrix :: #d10000)) + ((y) * (item [6] of [combined v] matrix :: #d10000))) + (((z) * (item [10] of [combined v] matrix :: #d10000)) + (item [14] of [combined v] matrix :: #d10000)))
+set [Z v] to ((((x) * (item [3] of [combined v] matrix :: #d10000)) + ((y) * (item [7] of [combined v] matrix :: #d10000))) + (((z) * (item [11] of [combined v] matrix :: #d10000)) + (item [15] of [combined v] matrix :: #d10000)))
+set [W v] to ((((x) * (item [4] of [combined v] matrix :: #d10000)) + ((y) * (item [8] of [combined v] matrix :: #d10000))) + (((z) * (item [12] of [combined v] matrix :: #d10000)) + (item [16] of [combined v] matrix :: #d10000)))
+if &lt;([abs v] of (X)) &lt; (W)&gt; then
+    if &lt;([abs v] of (Y)) &lt; (W)&gt; then
+        if &lt;([abs v] of (Z)) &lt; (W)&gt; then
+            go to x: (((X) / (W)) * ((stage width :: #d10000) / [2])) y: (((Y) / (W)) * ((stage height :: #d10000) / [2]))
+            pen down
+            pen up
+        end
+    end
+end
+</div><h3>Example 2</h3>
+<div class="render-scratchblocks">when flag clicked
+enter AR mode :: #d10000
+repeat until &lt;not &lt;is in AR? :: #d10000&gt;&gt;
+    clear
+    View matrix and camera coords
+    point at [0.1] [0.5] [-0.3]
+end
+
+define View matrix and camera coords
+set [MXX v] to (item [1] of [view v] matrix :: #d10000)
+set [MXY v] to (item [5] of [view v] matrix :: #d10000)
+set [MXZ v] to ([0] - (item [9] of [view v] matrix :: #d10000))
+set [MYX v] to (item [2] of [view v] matrix :: #d10000)
+set [MYY v] to (item [6] of [view v] matrix :: #d10000)
+set [MYZ v] to ([0] - (item [10] of [view v] matrix :: #d10000))
+set [MZX v] to (item [3] of [view v] matrix :: #d10000)
+set [MZY v] to (item [7] of [view v] matrix :: #d10000)
+set [MZZ v] to ([0] - (item [11] of [view v] matrix :: #d10000))
+set [camX v] to (item [13] of [view v] matrix :: #d10000)
+set [camY v] to (item [14] of [view v] matrix :: #d10000)
+set [camZ v] to (item [15] of [view v] matrix :: #d10000)
+set [dist v] to ((item [6] of [projection v] matrix :: #d10000) * ((stage height :: #d10000) / [2]))
+
+define point at (x) (y) (z)
+set [x2 v] to  ((x) - (camX))
+set [y2 v] to  ((y) - (camY))
+set [z2 v] to  ((z) - (camZ))
+set [rotX v] to ((((x2) * (MXX)) + ((y2) * (MYX))) + ((z2) * (MZX)))
+set [rotY v] to ((((x2) * (MXY)) + ((y2) * (MYY))) + ((z2) * (MZY)))
+set [rotZ v] to ((((x2) * (MXZ)) + ((y2) * (MYZ))) + ((z2) * (MZZ)))
+if &lt;(rotZ) &gt; [0]&gt; then
+    go to x: (((rotX) * (dist)) / (rotZ)) y: (((rotY) * (dist)) / (rotZ))
+    pen down
+    pen up
+end
+</div>
+
+      <hr>
+
+      <footer>
+        <p>
+          This page is <a href="https://github.com/TurboWarp/extensions/tree/master/docs">open source</a>.
+          
+            Blocks rendered with <a href="https://scratchblocks.github.io/">scratchblocks</a>.
+          
+        </p>
+        <p>TurboWarp is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation.</p>
+      </footer>
+    </main>
+
+    
+      <script src="/docs-internal/scratchblocks.js"></script>
+      <script>
+        scratchblocks.renderMatching('.render-scratchblocks', {
+          style: 'scratch3'
+        });
+      </script>
+    
+  </body>
+</html>

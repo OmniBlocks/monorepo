@@ -92,7 +92,7 @@ jobs:
         env:
           NODE_OPTIONS: '--openssl-legacy-provider'
         run: | 
-          pnpm i --shamefully-hoist
+          pnpm i --no-frozen-lockfile
           mkdir -p test-logs
           mkdir -p scratch-gui/build
           

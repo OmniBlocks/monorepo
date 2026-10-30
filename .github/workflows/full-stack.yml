@@ -92,7 +92,7 @@ jobs:
         env:
           NODE_OPTIONS: '--openssl-legacy-provider'
         run: | 
-          pnpm i --shamefully-hoist
+          pnpm i --no-frozen-lockfile
           mkdir -p test-logs
           mkdir -p scratch-gui/build
           
@@ -187,7 +187,7 @@ jobs:
       - name: Install Dependencies & Browsers
         shell: bash
         run: |
-          pnpm i --shamefully-hoist
+          pnpm i --no-frozen-lockfile
           if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
             pnpm exec playwright install ${{ matrix.browser }} --with-deps || pnpm exec playwright install ${{ matrix.browser }}
           else

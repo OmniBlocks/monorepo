@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slarmoo's Box Patch Notes</title>
+    <meta name="application-name" content="Slarmoo's Box" />
+    <meta name="apple-mobile-web-app-title" content="Slarmoo's Box">
+    <meta name="description"
+        content="Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#247d1d" />
+    <meta name="msapplication-TileColor" content="#247d1d" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <meta property="og:image" content="https://slarmoo.github.io/slarmoosbox/website/icon_shadow_192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./icon_32.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none"
+        onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+    <style type="text/css">
+        html {
+            background: var(--page-margin, black);
+            overflow-x: hidden;
+            font-size: large;
+            font-family: 'B612', sans-serif;
+            line-height: 1.3;
+            color: var(--primary-text, white);
+        }
+
+        body {
+            margin: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            align-content: center;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+			/* color: #FF8EC5; */
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+        }
+
+        a {
+            color: var(--link-accent, #98f);
+        }
+    </style>
+    </body>
+    <h1>
+        <font color="#247d1d">Patch Notes (in reverse chronological order);</font>
+    </h1>
+
+<h2>Version 1.3.9 (patch)</h2>
+<h3>
+    <ul>
+        <li> Ported Ultrbox 2.2.15 </li>
+        <li> Added mod recording for song eq and envelope speed </li>
+        <li> Song eq now correctly finds last used mod value </li>
+        <li> The default value (the value when you first place a note) for effect and envelope mods is now set to the value used on your instrument </li>
+        <li> Envelope speed mods now check if an envelope exists before trying to modify it </li>
+        <li> Added a donations page (entirely optional <3)</li>
+    </ul>
+</h3>
+<p>2/17/2025</p>
+
+<h2>Version 1.3.8 (new lfo waveforms)</h2>
+<h3>
+    <ul>
+        <li> Added the trapezoid, stepped saw, and stepped triangle waveforms to lfo </li>
+        <li> Pitch envelopes now save their max value correctly </li>
+        <li> Filter mods now allow you to type in values greater than 10 </li>
+        <li> Added the arrows to the random and lfo waveform select </li>
+    </ul>
+</h3>
+<p>1/29/2025 🐍</p>
+
+<h2>Version 1.3.7 (patch)</h2>
+<h3>
+    <ul>
+        <li> Ported Ultrabox 2.2.14 </li>
+        <li> Fixed wording and typos in the description, faq, and patch notes </li>
+        <li> Moved the Ultrabox theme into the mod themes category </li>
+        <li> Fixed the shaker preset from causing song corruptions </li>
+        <li> Prevented lfo/random/pitch envelopes from causing song corruptions </li>
+    </ul>
+</h3>
+<p>1/18/2025</p>
+
+<h2>Version 1.3.6 (patch)</h2>
+<h3>
+    <ul>
+        <li> Fixed pitch envelopes and slides </li>
+        <li> Fixed wording and typos in the description, faq, and patch notes </li>
+    </ul>
+</h3>
+<p>1/9/2025</p>
+
+<h2>Version 1.3.5 (better random envelopes)</h2>
+<h3>
+    <ul>
+        <li> Added two new types to random envelopes (per note and time smooth) </li>
+        <li> Increased the max step amount for random envelopes to 24 </li>
+        <li> Corrected some preset errors </li>
+        <li> Recentered the harmonics editor </li>
+        <li> Ported Ultrabox 2.2.13 </li>
+        <ul>
+            <li>Posts with the #beepbox tag and a valid mod link show up on the new bluesky feed</li>
+            <li>The FAQ now links to the <a href="https://discord.gg/Tc997TstJb">BeepBox Modding server</a></li>
+        </ul>
+    </ul>
+</h3>
+<p>1/2/2025</p>
+
+<h2>Version 1.3.4 (patch)</h2>
+<h3>
+    <ul>
+        <li> Oops some sample files were missing for the song player.. That's been fixed </li>
+    </ul>
+</h3>
+<p>12/14/2024</p>
+
+<h2>Version 1.3.3 (updated faq)</h2>
+<h3>
+    <ul>
+        <li> Ported Ultrabox 2.2.12 </li>
+        <li> Updated the faq </li>
+        <li> Mushroom Drum removed because it was a duplicate preset </li>
+        <li> Compiled the offline version </li>
+    </ul>
+</h3>
+<p>12/1/2024</p>
+
+<h2>Version 1.3.2 (Even better randomization)</h2>
+<h3>
+    <ul>
+        <li> Adjusted random instruments again </li>
+        <li> Undoing no longer changes rhythm </li>
+        <li> Mild adjustments to the Slarmoo's Box theme </li>
+        <li> Mild adjustments to the distant sorrow preset </li>
+    </ul>
+</h3>
+<p>11/13/2024</p>
+
+<h2>Version 1.3.1 (Better random envelopes)</h2>
+<h3>
+    <ul>
+        <li> Random instrument envelopes now utilize the new envelope settings </li>
+        <li> The default rhythm has been reverted to ÷4</li>
+        <li> Beepbox Theme channel mute buttons show up now </li>
+        <li> Added 1 new preset </li>
+    </ul>
+</h3>
+<p>11/10/2024</p>
+
+<h2>Version 1.3 (Random Envelope, LFO, Envelope Modulation, and Song EQ)</h2>
+<h3>
+    <ul>
+        <li> Added a new random envelope type! This one will output a random value based on the seed and time in the song or pitch of the note </li>
+        <li> Individual envelope speed can now be modulated </li>
+        <li> Added song eq (thanks leov!), which can be modulated </li>
+        <li> Replaced the tremolo and tremolo2 envelopes with LFO, which allows for multiple different shapes in addition to the legacy sine wave </li>
+        <li> Songs will start with a mod channel by default </li>
+        <li> Added envelope copy and paste buttons </li>
+        <li> Added 7 presets and 1 new preset group </li>
+		<li> Added 4 new keybinds: </li>
+		<ul>
+            <li> e: opens the song eq prompt (the euclidean rhythm generator is moved to ctrl + e)</li>
+			<li> alt + e: opens or closes all envelope dropdowns </li>
+			<li> alt + f: opens or closes all fm dropdowns </li>
+			<li> ctrl + shift + alt + s: Slarmooifies </li>
+		</ul>
+        <li> Added the 128 and 256 frequencies for fm </li>
+        <li> Updated the pitch bounds tip prompt </li>
+        <li> Pitch shift can now be added from within the mod channel dropdown </li>
+        <li> Adding a mod channel now puts it in the correct place </li>
+        <li> Removed empty note size envelope from the FM Sine preset and updated the Mercurial preset </li>
+        <li> Envelope bounds are now clamped </li>
+        <li> Songs now default to ÷8 rhythm </li>
+        <li> Several minor UI adjustments </li>
+        <li> Switching instruments while the synth is playing will no longer cause the instrument to break </li>
+        <li> Pausing after recording will now return the synth to high-latency mode </li>
+        <li> The Song Player now uses the Slarmoo's Box theme as its default </li>
+        <li> Linking the Song Player in discord will now use the correct color </li>
+    </ul>
+</h3>
+<p>11/9/2024</p>
+
+<h2>Version 1.2.3 (Patch)</h2>
+<h3>
+    <ul>
+        <li> Fixed bounds not properly saving with json imports. </li>
+        <li> Envelope Upper Bounds now properly transfer when removing envelopes </li>
+    </ul>
+</h3>
+<p>9/5/2024</p>
+
+<h2>Version 1.2.2 (Patch)</h2>
+<h3>
+    <ul>
+        <li> Added the "slarmoo's box" json import type. </li>
+        <li> Importing a json song from an older version now sets the envelope types correctly </li>
+        <li> Tremolo envelopes will no longer prevent a pitch from playing if the song has not been properly initialized </li>
+        <li> Linked the <a href="./faq.html">FAQ</a> page to the individual envelope speed prompt </li>
+    </ul>
+</h3>
+<p>9/3/2024</p>
+
+<h2>Version 1.2.1 (Patch)</h2>
+<h3>
+    <ul>
+        <li> Fixed blip, flare, and punch </li>
+        <li> Envelope UI is now properly aligned </li>
+        <li> Individual Envelope Speed no longer disappears after closing the envelope speed dropdown </li>
+        <li> Preset and json import envelopes are fixed </li>
+        <li> A speed of 0 is now possible for individual envelope speeds </li>
+        <li> None envelopes now use envelope upper bound rather than 1.0 </li>
+        <li> The spectral cry preset has been replaced with ethereal</li>
+        <li> Retitled the new preset group </li>
+    </ul>
+</h3>
+<p>8/31/2024</p>
+
+<h2>Version 1.2 (Envelope Speed and Spectrum Editor)</h2>
+<h3>
+    <ul>
+        <li> Added individual envelope speeds and bounds </li>
+        <ul>
+            <li> These settings were ported from Midbox! </li>
+            <li> Because of this, many of the old envelope types have been removed (compatability has been preserved) </li>
+        </ul>
+        <li> Added new envelope type: fall! </li>
+        <li> Arpeggio speed can now be enveloped (this setting is always discrete) </li>
+        <li> Added a editing prompt for spectrum, harmonics, and drumsets that includes copy/paste settings </li>
+        <li> Added 9 new presets, moved 2 presets to a new preset group: "Slarmoo's Box Chip Presets", and removed the pitch shift from glassy harmonics (these changes may break older songs that used presets, but will provide the framework to prevent this from happening in the future, sorry)</li>
+        <li> Shortened the space that pitch envelopes take up in the url (old song urls will still work and will update correctly) </li>
+        <li> Increased likelihood of a plant, and changed a few plants </li>
+        <li> Fixed bug that caused effects envelopes to always run when transition : continue was enabled (even when there were no notes playing) </li>
+        <li> Fixed bug where drumset envelopes would import incorrectly from other mods </li>
+        <li> Envelope Speed no longer affects drumset envelopes </li>
+        <li> Updated random instrument generation </li>
+        <li> Added a <a href="./faq.html">FAQ</a> page detailing what Slarmoo's Box adds and help for the new envelope system</li>
+        <li> The Slarmoo's Box theme is now the default theme </li>
+        <li> The Slarmoo's Box icon now correctly displays on firefox </li>
+        <li> You will now be automatically redirected to ./website if you forget to specify the path </li>
+        <li> Updated to Ultrabox 2.2.11 </li>
+    </ul>
+</h3>
+<p>8/30/2024</p>
+    <h2>Version 1.1.2 (Ultrabox 2.2.10)</h2>
+    <h3>
+        <ul>
+            <li> Updated to Ultrabox version 2.2.10 </li>
+            <ul>
+                <li> The hotdog is not making a return </li>
+            </ul>
+            <li> Increased max envelope count to 16 </li>
+            <li> Fixed pitch names for noise pitch envelopes </li>
+            <li> Updated some song player keybinds for ultrabox consistency </li>
+        </ul>
+    </h3>
+    <p>8/11/2024</p>
+
+    <h2>Version 1.1.1 (Pitch Envelope Minor Update / fixes)</h2>
+    <h3>
+        <ul>
+            <li> Pitch envelopes are now properly affected by / calculating arpeggiation and pitch bends </li>
+            <li> Added the dogebox note display for pitch range</li>
+            <li> Added 7 new presets, including 3 new noise presets </li>
+            <li> Fixed some Slarmoo's Box presets </li>
+            <li> Fixed an issue when switching between noise and pitch channels in regards to pitch envelope ranges
+            </li>
+            <li> Standardized some Slarmoo's Box code </li>
+            <li> Resized pitch range sliders to be consistent with the rest of the ui </li>
+        </ul>
+    </h3>
+    <p>6/17/2024</p>
+
+    <h2>Version 1.1 (Keyboard Shortcuts)</h2>
+    <h3>
+        <ul>
+            <li> Added a new theme (Slarmoo's Box) </li>
+            <li> Added 6 new keyboard shortcuts to the song player: </li>
+            <ul>
+                <li> <b>L</b>: toggle loop </li>
+                <li> <b>Z/+/-</b>: toggle zoom </li>
+                <li> <b>E/P</b>: return to editor </li>
+                <li> <b>Ctrl S</b>: shorten song player link </li>
+                <li> <b>S</b>: share </li>
+                <li> <b>C</b>: copy link </li>
+            </ul>
+            <li> Updated keyboard shortcut list at the bottom of the page </li>
+            <li> Updated to Ultrabox 2.2.9 </li>
+            <li> Donation form re-added </li>
+        </ul>
+    </h3>
+    <p>6/4/2024</p>
+
+    <h2>Version 1.0.1 (Patch)</h2>
+    <h3>
+        <ul>
+            <li> Did a purge of every mention of Ultrabox where needed </li>
+            <li> Fixed a bug with removing envelopes and the new envelope settings </li>
+            <li> Fixed json importing, exporting, and instrument copy and paste in terms of the new envelope settings
+            </li>
+            <li> Fixed a bug where the pitch envelope's end would slowly decrement </li>
+            <li> Pitch envelopes no longer consider song octave or key </li>
+            <li> Fixed a few instances where the envelope extra settings dropdowns would not work properly </li>
+            <li> Fixed an issue where if pitch envelope inverse was checked in 0.9 it would invert every envelope in 1.0
+            </li>
+        </ul>
+    </h3>
+    <p>5/30/2024</p>
+
+    <h2>Version 1.0 (Official Release)</h2>
+    <h3>
+        <ul>
+            <li> Added 3 new presets: Slarmoo's Pulse, spectral cry, and walrus wuh</li>
+            <li> Balanced Slarmoo's box preset volumes </li>
+            <li> Pitch envelope starts, ends, and inverses are now per envelope instead of per instrument </li>
+            <li> All envelope curves can now be inverted similarly to pitch </li>
+            <li> <b>Shift + Enter</b> is now working properly </li>
+            <li> Replaced some stray Ultraboxes in the tip prompts</li>
+            <li> Fixed some incorrect information present in the instrument type prompt </li>
+            <li> Re-added the "Mono" theme, now renamed to "Greyscale" </li>
+            <li> Renamed previous update to 0.9 </li>
+            <li> Updated to Ultrabox 2.2.8 </li>
+        </ul>
+    </h3>
+    <p>5/29/2024</p>
+
+    <h2>Version 0.9 (built on Ultrabox 2.2.7)</h2>
+    <h3>
+        <ul>
+            <li> Added more envelope options! These include: </li>
+            <ul>
+                <li> Reverb, panning, chorus, echo, bitcrush, frequency crush, and distorion can now be changed with
+                    envelopes </li>
+                <li> A pitch envelope type! This is similar to note size, but for the pitch instead. <br>You can also
+                    edit the start,
+                    end, and direction with the + sign </li>
+            </ul>
+            <li> 15 new presets found under the "Slarmoo's Box" tab </li>
+            <li> New web icon </li>
+            <li> "Ultrabox" replaced with "Slarmoo's Box" in almost every instance where needed </li>
+            <li> More keyboard shortcuts added to shortcut list </li>
+            <li> Hotdog removed </li>
+        </ul>
+    </h3>
+    <p>5/13/2024</p>
+    </body>
+
+</html>

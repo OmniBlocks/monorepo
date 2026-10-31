@@ -865,8 +865,8 @@ class MenuBar extends React.Component {
                                 <MenuSection>
                                     <MenuItem onClick={this.props.onClickSettingsModal}>
                                         <FormattedMessage
-                                            defaultMessage="Advanced Settings"
-                                            description="Menu bar item for advanced settings"
+                                            defaultMessage="Runtime Settings"
+                                            description="Menu bar item for runtime settings"
                                             id="tw.menuBar.moreSettings"
                                         />
                                     </MenuItem>
@@ -950,9 +950,12 @@ class MenuBar extends React.Component {
                                 />
                                 <span className={styles.collapsibleLabel}>
                                     <FormattedMessage
-                                        defaultMessage="Advanced"
-                                        description="Button to open advanced settings menu"
+                                        defaultMessage="Runtime"
+                                        description="Button to open runtime settings menu"
                                         id="tw.menuBar.advanced"
+                                        /* ob: keep the internal name as advanced to avoid messing with stuff
+                                        but the name is runtime options because it otherwise implies that it is
+                                        options about the editor, when it's just runtime settins (and they're not advanced) */ 
                                     />
                                 </span>
                             </div>

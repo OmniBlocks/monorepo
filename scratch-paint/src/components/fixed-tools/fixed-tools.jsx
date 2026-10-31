@@ -21,14 +21,15 @@ import layout from '../../lib/layout-constants';
 import {hideLabel} from '../../lib/hide-label';
 import styles from './fixed-tools.css';
 
-import groupIcon from './icons/group.svg';
-import redoIcon from './icons/redo.svg';
-import sendBackIcon from './icons/send-back.svg';
-import sendBackwardIcon from './icons/send-backward.svg';
-import sendForwardIcon from './icons/send-forward.svg';
-import sendFrontIcon from './icons/send-front.svg';
-import undoIcon from './icons/undo.svg';
-import ungroupIcon from './icons/ungroup.svg';
+import groupIcon from '!../../tw-recolor/build!./icons/group.svg';
+import redoIcon from '!../../tw-recolor/build!./icons/redo.svg';
+import sendBackIcon from '!../../tw-recolor/build!./icons/send-back.svg';
+import sendBackwardIcon from '!../../tw-recolor/build!./icons/send-backward.svg';
+import sendForwardIcon from '!../../tw-recolor/build!./icons/send-forward.svg';
+import sendFrontIcon from '!../../tw-recolor/build!./icons/send-front.svg';
+import undoIcon from '!../../tw-recolor/build!./icons/undo.svg';
+import ungroupIcon from '!../../tw-recolor/build!./icons/ungroup.svg';
+import TWRenderRecoloredImage from '../../tw-recolor/render.jsx';
 
 const BufferedInput = BufferedInputHOC(Input);
 const messages = defineMessages({
@@ -127,7 +128,7 @@ const FixedToolsComponent = props => {
                         disabled={undoDisabled}
                         onClick={props.onUndo}
                     >
-                        <img
+                        <TWRenderRecoloredImage
                             alt={props.intl.formatMessage(messages.undo)}
                             className={classNames(
                                 styles.buttonGroupButtonIcon,
@@ -149,7 +150,7 @@ const FixedToolsComponent = props => {
                         disabled={redoDisabled}
                         onClick={props.onRedo}
                     >
-                        <img
+                        <TWRenderRecoloredImage
                             alt={props.intl.formatMessage(messages.redo)}
                             className={styles.buttonGroupButtonIcon}
                             draggable={false}
@@ -247,7 +248,7 @@ const FixedToolsComponent = props => {
                                         disabled={!shouldShowBringForward()}
                                         onClick={props.onSendToFront}
                                     >
-                                        <img
+                                        <TWRenderRecoloredImage
                                             className={styles.menuItemIcon}
                                             draggable={false}
                                             src={sendFrontIcon}
@@ -261,7 +262,7 @@ const FixedToolsComponent = props => {
                                         disabled={!shouldShowSendBackward()}
                                         onClick={props.onSendToBack}
                                     >
-                                        <img
+                                        <TWRenderRecoloredImage
                                             className={styles.menuItemIcon}
                                             draggable={false}
                                             src={sendBackIcon}

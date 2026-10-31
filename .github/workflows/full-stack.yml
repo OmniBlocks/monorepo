@@ -40,16 +40,14 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Build OmniBlocks (Base)
-        env:
-          NODE_OPTIONS: '--openssl-legacy-provider'
         run: | 
-          pnpm i --shamefully-hoist
+          pnpm i --no-frozen-lockfile
           mkdir -p scratch-gui/build
           
           START_TIME=$(date +%s)
           
           # Build Editor
-          (cd scratch-gui && ROOT=/ NODE_ENV=production pnpm build) || true
+          (NODE_ENV=production pnpm build) || true
           
           # Build Extensions Gallery if folder exists
           if [ -d "extensions" ]; then
@@ -94,7 +92,7 @@ jobs:
         env:
           NODE_OPTIONS: '--openssl-legacy-provider'
         run: | 
-          pnpm i --shamefully-hoist
+          pnpm i --no-frozen-lockfile
           mkdir -p test-logs
           mkdir -p scratch-gui/build
           
@@ -102,7 +100,7 @@ jobs:
           
           # Build Editor
           (
-            cd scratch-gui && ROOT=/ NODE_ENV=production pnpm build
+            NODE_ENV=production pnpm build
           ) > test-logs/scratch-gui-build.log 2>&1 || true
           
           # Build Extensions Gallery if folder exists
@@ -189,7 +187,7 @@ jobs:
       - name: Install Dependencies & Browsers
         shell: bash
         run: |
-          pnpm i --shamefully-hoist
+          pnpm i --no-frozen-lockfile
           if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
             pnpm exec playwright install ${{ matrix.browser }} --with-deps || pnpm exec playwright install ${{ matrix.browser }}
           else
@@ -488,7 +486,16 @@ jobs:
           (git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-repo && cd gh-pages-repo && git checkout --orphan gh-pages && git rm -rf .)
           
           mkdir -p gh-pages-repo/pr-${{ inputs.pr_number }}
-          cp -r preview-build/* gh-pages-repo/pr-${{ inputs.pr_number }}/ 2>/dev/null || true
+          if [ -z "$(ls -A preview-build 2>/dev/null)" ]; then
+          echo "::error::preview-build is empty. Was pr-build-dist uploaded? Did build-pr succeed?"
+          ls -la preview-build 2>/dev/null || true
+          exit 1
+          fi
+          
+          rm -rf gh-pages-repo/pr-${{ inputs.pr_number }}
+          mkdir -p gh-pages-repo/pr-${{ inputs.pr_number }}
+          cp -a preview-build/. gh-pages-repo/pr-${{ inputs.pr_number }}/
+
           touch gh-pages-repo/.nojekyll
           
           cd gh-pages-repo

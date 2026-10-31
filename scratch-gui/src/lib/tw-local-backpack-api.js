@@ -86,37 +86,68 @@ const openDB = () => new Promise((resolve, reject) => {
     };
 });
 
+/**
+ * Run a transaction on the backpack store.
+ * @param {IDBTransactionMode} mode readonly or readwrite
+ * @param {string} errorDescription For error messages
+ * @param {(store: IDBObjectStore, withErrorHandling: () => void): void} callback What to run
+ * @returns {Promise<void>} Resolves when the transaction commits.
+ */
+const runTransaction = async (mode, errorDescription, callback) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        let handledError = null;
+        const transaction = db.transaction(STORE_NAME, mode);
+
+        transaction.oncomplete = () => {
+            resolve();
+        };
+
+        transaction.onabort = () => {
+            reject(handledError || new Error(`${errorDescription}: ${transaction.error}`));
+        };
+
+        const withErrorHandling = fn => (...args) => {
+            try {
+                fn(...args);
+            } catch (e) {
+                handledError = e;
+                transaction.abort();
+            }
+        };
+
+        const wrappedCallback = withErrorHandling(callback);
+        wrappedCallback(transaction.objectStore(STORE_NAME), withErrorHandling);
+    });
+};
+
 const getBackpackContents = async ({
     limit,
     offset
 }) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME, 'readonly');
-        transaction.onerror = event => {
-            reject(new Error(`Getting contents: ${event.target.error}`));
-        };
-        const store = transaction.objectStore(STORE_NAME);
-        const items = [];
+    const idbItems = [];
+    await runTransaction('readonly', 'Getting contents', (store, withErrorHandling) => {
         const request = store.openCursor(null, 'prev');
         let first = true;
-        request.onsuccess = e => {
-            const cursor = e.target.result;
+        request.onsuccess = withErrorHandling(() => {
+            const cursor = request.result;
+            if (!cursor) {
+                return;
+            }
             if (first) {
                 first = false;
-                if (cursor && offset !== 0) {
+                if (offset !== 0) {
                     cursor.advance(offset);
                     return;
                 }
             }
-            if (cursor && items.length < limit) {
-                items.push(idbItemToBackpackItem(cursor.value));
+            if (idbItems.length < limit) {
+                idbItems.push(cursor.value);
                 cursor.continue();
-            } else {
-                resolve(items);
             }
-        };
+        });
     });
+    return idbItems.map(idbItemToBackpackItem);
 };
 
 const saveBackpackObject = async ({
@@ -129,47 +160,33 @@ const saveBackpackObject = async ({
     // User interaction -- fine to show a permission dialog
     requestPersistentStorage();
 
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME, 'readwrite');
-        transaction.onerror = event => {
-            reject(new Error(`Sving object: ${event.target.error}`));
-        };
-        const store = transaction.objectStore(STORE_NAME);
-        const bodyData = base64ToArrayBuffer(body);
-        const bodyMD5 = md5(bodyData);
-        const idbItem = {
-            type,
-            mime,
-            name,
-            bodyData,
-            bodyMD5,
-            thumbnailData: base64ToArrayBuffer(thumbnail)
-        };
+    const bodyData = base64ToArrayBuffer(body);
+    const idbItem = {
+        type,
+        mime,
+        name,
+        bodyData,
+        bodyMD5: md5(bodyData),
+        thumbnailData: base64ToArrayBuffer(thumbnail)
+    };
+    let backpackItem;
+    await runTransaction('readwrite', 'Saving object', (store, withErrorHandling) => {
         const putRequest = store.put(idbItem);
-        putRequest.onsuccess = () => {
+        putRequest.onsuccess = withErrorHandling(() => {
             idbItem.id = putRequest.result;
-            resolve(idbItemToBackpackItem(idbItem));
-        };
+            backpackItem = idbItemToBackpackItem(idbItem);
+        });
     });
+    return backpackItem;
 };
 
 const deleteBackpackObject = async ({
     id
 }) => {
+    // Convert string IDs to number IDs
     id = +id;
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME, 'readwrite');
-        transaction.onerror = event => {
-            reject(new Error(`Deleting object: ${event.target.error}`));
-        };
-        const store = transaction.objectStore(STORE_NAME);
-        // Convert string IDs to number IDs
-        const deleteRequest = store.delete(id);
-        deleteRequest.onsuccess = () => {
-            resolve();
-        };
+    await runTransaction('readwrite', 'Deleting object', store => {
+        store.delete(id);
     });
 };
 
@@ -178,25 +195,21 @@ const updateBackpackObject = async ({
     name
 }) => {
     id = +id;
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME, 'readwrite');
-        transaction.onerror = event => {
-            reject(new Error(`Updating object: ${event.target.error}`));
-        };
-        const store = transaction.objectStore(STORE_NAME);
+    let backpackItem;
+    await runTransaction('readwrite', 'Updating object', (store, withErrorHandling) => {
         const getRequest = store.get(id);
-        getRequest.onsuccess = () => {
+        getRequest.onsuccess = withErrorHandling(() => {
             const newItem = {
                 ...getRequest.result,
                 name: name
             };
             const putRequest = store.put(newItem);
-            putRequest.onsuccess = () => {
-                resolve(idbItemToBackpackItem(newItem));
-            };
-        };
+            putRequest.onsuccess = withErrorHandling(() => {
+                backpackItem = idbItemToBackpackItem(newItem);
+            });
+        });
     });
+    return backpackItem;
 };
 
 export default {

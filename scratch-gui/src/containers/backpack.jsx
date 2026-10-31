@@ -123,36 +123,32 @@ class Backpack extends React.Component {
         if (!payloader) return;
 
         // Creating the payload is async, so set loading before starting
-        this.setState({loading: true}, () => {
-            payloader(dragInfo.payload, this.props.vm)
-                .then(payload => {
-                    // Force the asset to save to the asset server before storing in backpack
-                    // Ensures any asset present in the backpack is also on the asset server
-                    if (presaveAsset && !presaveAsset.clean && !this.props.host === LOCAL_API) {
-                        return storage.store(
-                            presaveAsset.assetType,
-                            presaveAsset.dataFormat,
-                            presaveAsset.data,
-                            presaveAsset.assetId
-                        ).then(() => payload);
-                    }
-                    return payload;
-                })
-                .then(payload => saveBackpackObject({
+        this.setState({loading: true}, async () => {
+            try {
+                const payload = await payloader(dragInfo.payload, this.props.vm);
+                // Force the asset to save to the asset server before storing in backpack
+                // Ensures any asset present in the backpack is also on the asset server
+                if (presaveAsset && !presaveAsset.clean && !this.props.host === LOCAL_API) {
+                    await storage.store(
+                        presaveAsset.assetType,
+                        presaveAsset.dataFormat,
+                        presaveAsset.data,
+                        presaveAsset.assetId
+                    );
+                }
+                const item = await saveBackpackObject({
                     host: this.props.host,
                     token: this.props.token,
                     username: this.props.username,
                     ...payload
-                }))
-                .then(item => {
-                    this.setState({
-                        loading: false,
-                        contents: [item].concat(this.state.contents)
-                    });
-                })
-                .catch(error => {
-                    this.handleError(error);
                 });
+                this.setState({
+                    loading: false,
+                    contents: [item].concat(this.state.contents)
+                });
+            } catch (error) {
+                this.handleError(error);
+            }
         });
     }
     handleDelete (id) {

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Zip - TurboWarp Extension Documentation</title>
+    <link rel="canonical" href="https://extensions.turbowarp.org/CST1229/zip">
+    <style>
+      :root {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color-scheme: light dark;
+        font-size: 16px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color: #eee;
+          background: #131313;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        a {
+          color: #56b2ff;
+        }
+        a:visited {
+          color: #f192ff;
+        }
+        a:active {
+          color: red;
+        }
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        line-height: 1.3;
+      }
+
+      nav {
+        background-color: #ff4c4c;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+      nav > div {
+        display: flex;
+        max-width: 600px;
+        margin: 0 auto;
+        justify-content: space-between;
+      }
+      nav a {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.5rem 0.25rem 0.5rem 0;
+        align-items: center;
+        text-decoration: none;
+        color: inherit !important;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      nav img {
+        width: 2rem;
+        height: 2rem;
+        flex-shrink: 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        nav {
+          background-color: #333;
+        }
+      }
+
+      noscript {
+        font-weight: bold;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 0 0.25rem;
+      }
+      h1 {
+        font-size: 2.25rem;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        border-bottom: 1px solid #ccc;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid #ccc;
+        margin: 1rem 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        hr, h1, h2, h3, h4, h5, h6 {
+          border-color: #444;
+        }
+      }
+
+      .view-in-browser {
+        display: none;
+      }
+      .is-desktop .view-in-browser {
+        display: flex;
+      }
+      .is-desktop nav > div, .is-desktop .container {
+        /* Desktop app shows this page in a window, not a browser tab, so don't need to */
+        /* restrict the width of the content for readability. */
+        max-width: 100%;
+      }
+
+      code {
+        background-color: #eee;
+        border-radius: 4px;
+        padding: 0 2px;
+      }
+      pre {
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        overflow-x: auto;
+      }
+      @media (prefers-color-scheme: dark) {
+        code, pre {
+          background-color: #223;
+          border-color: #334;
+        }
+      }
+
+      .render-scratchblocks {
+        width: 100%;
+        overflow-x: auto;
+        white-space: pre;
+        line-height: 42px; /* reasonable estimation to reduce layout shift */
+      }
+      .render-scratchblocks svg {
+        display: block;
+      }
+
+      footer {
+        margin: 1rem 0;
+        font-size: small;
+      }
+
+      /* General Alert Styles */
+      .alert {
+        padding-left: 15px;
+        line-height: 1;
+      }
+
+      /* Border colors for specific alerts */
+      .alert.alert-note { border-left: .25em solid #1f6feb; }
+      .alert.alert-tip { border-left: .25em solid #238636; }
+      .alert.alert-important { border-left: .25em solid #8957e5; }
+      .alert.alert-warning { border-left: .25em solid #9e6a03; }
+      .alert.alert-caution { border-left: .25em solid #da3633; }
+
+      /* Shared Styling for Alert Text */
+      .alert p:first-child {
+        padding-top: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+      }
+
+      /* Specific Color Overrides for Each Alert */
+      .alert.alert-note > p:first-child { color: #4493f8; }
+      .alert.alert-tip > p:first-child { color: #3fb950; }
+      .alert.alert-important > p:first-child { color: #ab7df8; }
+      .alert.alert-warning > p:first-child { color: #d29922; }
+      .alert.alert-caution > p:first-child { color: #f85149; }
+
+      /* Icon Spacing */
+      div.alert svg {
+        margin-right: 8px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <nav role="navigation">
+      <div>
+        <a href="https://extensions.turbowarp.org/">
+          <img src="/turbowarp.svg" alt="">
+          <span>TurboWarp Extension Gallery</span>
+        </a>
+
+        <!-- Only used by desktop app -->
+        <a class="view-in-browser" href="https://extensions.turbowarp.org/CST1229/zip">
+          Read in browser
+        </a>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Zip</h1>
+
+      <noscript><p>Enable JavaScript for blocks to render.</p></noscript>
+
+      <p>The Zip extension allows you to read, create and edit .zip format files, including Scratch project and sprite files (.sb3, .sprite3).</p>
+<p>The extension handles archives <strong>entirely in-memory</strong>; to interact with the file system you'll have to use it alongside other extensions, like Files. In-memory zip files will be referred to as <em>archives</em> in this documentation (and in the blocks).</p>
+<h2>Paths</h2>
+<p>Most blocks in this extension work with a path format:</p>
+<ul>
+<li>The path is relative to the current directory by default</li>
+<li>Directories (folders) and the filename are separated by slashes, like <code>folder1/folder2/file.txt</code></li>
+<li><code>..</code> goes to the parent directory, like <code>../file.txt</code></li>
+<li><code>.</code> goes to the current directory, like <code>./file.txt</code></li>
+<li>A <code>/</code> at the very start goes to the root directory, like <code>/file.txt</code></li>
+<li>A <code>/</code> at the end denotes a directory, like <code>folder/</code></li>
+<li>Multiple slashes in a row or trying to go above the root directory will result in an error (usually the block doing nothing or returning the empty value)</li>
+<li>When working with multiple archives, each archive has its own current directory which is retained while switching between them</li>
+</ul>
+<h2>Archive management blocks</h2>
+<p>Blocks for creating and saving archives.</p>
+<hr>
+<div class="render-scratchblocks">create empty archive named [archive] :: #a49a3a
+</div><p>Creates and opens an empty archive with nothing in it. The name is used for dealing with multiple archives at time; it can be any non-empty string and does <em>not</em> have to be the archive's filename.</p>
+<hr>
+<div class="render-scratchblocks">open archive from zip from (URL v) [https://extensions.turbowarp.org] named [archive] :: #a49a3a
+</div><p>Creates and opens an archive from a .zip (or .sb3 or .sprite3...) file.</p>
+<p>The type can be one of the following:</p>
+<ul>
+<li><strong>URL</strong>: A URL, which can be either a web URL or data: URL. Recommended.</li>
+<li><strong>base64</strong>: A base64 string without the data URL header.</li>
+<li><strong>hex</strong>: A sequence of hexadecimal bytes (like <code>101A1B1C</code>), without a separator.</li>
+<li><strong>binary</strong>: A sequence of binary bytes (like <code>000000010010101001101011</code>), without a separator.</li>
+<li><strong>string</strong>: Plain text. <strong>Not recommended!</strong> Text encoding behavior will likely break it, as it's a binary file.</li>
+</ul>
+<p>The name is used for dealing with multiple archives at time; it can be any non-empty string and does <em>not</em> have to be the archive's filename.</p>
+<div class="alert alert-tip"><p><svg viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true" fill="#3fb950"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg> <strong>Tip</strong></p>
+<p>If the file is not of zip format (like RAR or 7z) or is password-protected, it won't be opened. Make sure to check if it loaded successfully with the <code>error opening archive?</code> block.</p>
+</div><hr>
+<div class="render-scratchblocks">(output zip type (data: URI v) compression level (6 v) :: #a49a3a)
+</div><p>Saves the current archive into a zip data string, which can be saved with e.g the Files extension.</p>
+<p>The type can be one of the following:</p>
+<ul>
+<li><strong>data</strong>: URL: A base64-encoded data URL. Recommended.</li>
+<li><strong>base64</strong>: A base64 string without the data URL header.</li>
+<li><strong>hex</strong>: A sequence of hexadecimal bytes (like <code>101A1B1C</code>), without a separator.</li>
+<li><strong>binary</strong>: A sequence of binary bytes (like <code>000000010010101001101011</code>), without a separator.</li>
+<li><strong>string</strong>: Plain text. <strong>Not recommended!</strong> Text encoding behavior will likely break it, as it's a binary file.</li>
+</ul>
+<p>The compression level decides how much the zip is compressed.<br>
+Lower compression levels will result in a bigger file, but are faster to create. Usually, high compression levels provide diminishing returns (lesser gains the higher you go) with much slower speeds.</p>
+<p>A compression level of 0 (no compression) is the fastest, but will often result in a very big file.</p>
+<hr>
+<div class="render-scratchblocks">remove current archive :: #a49a3a
+</div><p>Removes the current archive from the list of opened archives. Use this after you're done working with it.</p>
+<hr>
+<div class="render-scratchblocks">&lt;archive is open? :: #a49a3a&gt;
+</div><p>Returns true if an archive is open.</p>
+<hr>
+<div class="render-scratchblocks">&lt;error opening archive? :: #a49a3a&gt;
+</div><p>Returns true if the last &quot;open archive&quot; block used had an error (e.g if you provided an empty archive name or passed an invalid zip file).</p>
+<h2>Multi-archive blocks</h2>
+<p>Multiple archives can be open at a time, but there is one &quot;current archive&quot; that most blocks operate on. These blocks handle switching between and using multiple archives.</p>
+<hr>
+<div class="render-scratchblocks">(current archive name :: #a49a3a)
+</div><p>Returns the name of the currently open archive, or an empty string if there isn't one.</p>
+<hr>
+<div class="render-scratchblocks">(currently open archives :: #a49a3a)
+</div><p>Returns the list of currently open archives as a JSON array, which you can parse with the JSON extension.</p>
+<hr>
+<div class="render-scratchblocks">switch to archive named [other archive] :: #a49a3a
+</div><p>Switches the current archive to another one. If the given archive name does not exist. does nothing. If the given archive name is an empty string, switches to no currently open archive without removing any.</p>
+<hr>
+<div class="render-scratchblocks">remove all archives :: #a49a3a
+</div><p>Removes all archives that are currently open.</p>
+<h2>File blocks</h2>
+<p>Blocks for working with files, and blocks that are general to both files and folders/directories.</p>
+<hr>
+<div class="render-scratchblocks">&lt;[folder/] exists? :: #a49a3a&gt;
+</div><p>Returns whether a file or directory exists or not. The slash at the end matters! If a directory named <code>folder</code> exists, <code>[folder] exists?</code> will return false, but <code>[folder/] exists?</code> will return true.</p>
+<hr>
+<div class="render-scratchblocks">write file [new file.txt] content [Hello, world?] type (text v) :: #a49a3a
+</div><p>Writes content to a file, creating the file if it doesn't exist and replacing its existing data if it does.</p>
+<p>The type can be one of the following:</p>
+<ul>
+<li><strong>text</strong>: Plain text.</li>
+<li><strong>URL</strong>: A URL, which can be either a web URL or data: URL. Best for binary data (like other zip files).</li>
+<li><strong>base64</strong>: A base64 string without the data URL header.</li>
+<li><strong>hex</strong>: A sequence of hexadecimal bytes (like <code>101A1B1C</code>), without a separator.</li>
+<li><strong>binary</strong>: A sequence of binary bytes (like <code>000000010010101001101011</code>), without a separator.</li>
+</ul>
+<hr>
+<div class="render-scratchblocks">rename [hello.txt] to [hello renamed.txt] :: #a49a3a
+</div><p>Renames a file or directory to another name. If the target file already exists, it will be overwritten. The current directory will also be updated. This block can also be used to move files to a different directory.</p>
+<hr>
+<div class="render-scratchblocks">copy [hello.txt] to [Copy of hello.txt] :: #a49a3a
+</div><p>Copies a file or directory elsewhere. If the target file already exists, it will be overwritten.</p>
+<hr>
+<div class="render-scratchblocks">copy [hello.txt] in [archive] to [Copy of hello.txt] in [other archive] :: #a49a3a
+</div><p>Copies a file or directory between archives. If the target file already exists, it will be overwritten.</p>
+<hr>
+<div class="render-scratchblocks">delete [hello.txt] :: #a49a3a
+</div><p>Deletes a file or directory (including everything in it).</p>
+<p>If the current directory is in that directory, it will be set to the closest existing parent directory.</p>
+<hr>
+<div class="render-scratchblocks">(file [hello.txt] as (text v) :: #a49a3a)
+</div><p>Get the contents of a file.</p>
+<p>The type can be one of the following:</p>
+<ul>
+<li><strong>text</strong>: Plain text.</li>
+<li><strong>data</strong>: URL: A base64-encoded data URL. Best for binary data (like other zip files).</li>
+<li><strong>base64</strong>: A base64 string without the data URL header.</li>
+<li><strong>hex</strong>: A sequence of hexadecimal bytes (like <code>101A1B1C</code>), without a separator.</li>
+<li><strong>binary</strong>: A sequence of binary bytes (like <code>000000010010101001101011</code>), without a separator.</li>
+</ul>
+<h2>File info blocks</h2>
+<p>Blocks for getting and setting additional information on a file.</p>
+<hr>
+<div class="render-scratchblocks">set (modified days since 2000 v) of [folder/dango.png] to [0] :: #a49a3a
+</div><p>Set additional info on a file or directory.</p>
+<p>Available options:</p>
+<ul>
+<li><strong>modified days since 2000</strong>: The modification date of the file, as days since 2000.</li>
+<li><strong>unix modified timestamp</strong>: The modification date of the file, as a Unix timestamp (milliseconds since 1970). Useful when combined with e.g the Time extension.</li>
+<li><strong>comment</strong>: A comment on the file. Can be any text. Some programs may show this as metadata.</li>
+</ul>
+<hr>
+<div class="render-scratchblocks">((name v) of [folder/dango.png] :: #a49a3a)
+</div><p>Get additional info on a file or directory.</p>
+<p>Available options:</p>
+<ul>
+<li><strong>name</strong>: Just the name of this file, without the directories it's in. For example, the name of <code>/folder1/folder2/dango.png</code> would be <code>dango.png</code>.</li>
+<li><strong>path</strong>: The full absolute path of this file; its name and any directories it's in.</li>
+<li><strong>folder</strong>: Just the folders this file is in, without its filename. For example, the folder of <code>/folder1/folder2/dango.png</code> would be <code>/folder1/folder2/</code>.</li>
+<li><strong>modification date</strong>: A human-readable version of the file's modification date. The output of this depends on the browser's language and possibly other factors.</li>
+<li><strong>long modification date</strong>: A longer human-readable version of the file's modification date. The output of this depends on the browser's language and possibly other factors.</li>
+<li><strong>modified days since 2000</strong>: The modification date of the file, as days since 2000.</li>
+<li><strong>unix modified timestamp</strong>: The modification date of the file, as a Unix timestamp (milliseconds since 1970). Useful when combined with e.g the Time extension.</li>
+<li><strong>comment</strong>: A comment on the file. Can be any text. Some programs may show this as metadata.</li>
+</ul>
+<h2>Directory blocks</h2>
+<p>Blocks that deal with directories and the current directory.</p>
+<hr>
+<div class="render-scratchblocks">create directory [new folder] :: #a49a3a
+</div><p>Creates a directory with a name. This can create multiple directories at once (by having multiple directores in the path, like <code>/new folder1/new folder2/new folder3/</code>).</p>
+<hr>
+<div class="render-scratchblocks">go to directory [folder] :: #a49a3a
+</div><p>Moves the current directory (the default origin of most file operations) to the specified directory. If it doesn't exist, this block will do nothing. Use <code>..</code> to go to the previous (parent) directory, and <code>/</code> to go to the root.</p>
+<hr>
+<div class="render-scratchblocks">(contents of directory [.] :: #a49a3a)
+</div><p>Returns a list of files in a directory as a JSON array, which you can parse with the JSON extension.</p>
+<hr>
+<div class="render-scratchblocks">(current directory path :: #a49a3a)
+</div><p>Returns the absolute path to the current directory.</p>
+<h2>Other blocks</h2>
+<p>Miscellaneous stuff.</p>
+<hr>
+<div class="render-scratchblocks">set archive comment to [any text] :: #a49a3a
+</div><p>Sets the archive's comment to some text. Just like file comments, this is saved and may be displayed as metadata by some programs.</p>
+<hr>
+<div class="render-scratchblocks">(archive comment :: #a49a3a)
+</div><p>Returns the archive's comment.</p>
+<hr>
+<div class="render-scratchblocks">(path [../folder3/] from [/folder/folder2] :: #a49a3a)
+</div><p>Returns an absolute path from an origin path and a target path. Does not depend on the archive, so it works without one open. This is mostly a utility used internally, but it might be useful for users too.</p>
+
+
+      <hr>
+
+      <footer>
+        <p>
+          This page is <a href="https://github.com/TurboWarp/extensions/tree/master/docs">open source</a>.
+          
+            Blocks rendered with <a href="https://scratchblocks.github.io/">scratchblocks</a>.
+          
+        </p>
+        <p>TurboWarp is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation.</p>
+      </footer>
+    </main>
+
+    
+      <script src="/docs-internal/scratchblocks.js"></script>
+      <script>
+        scratchblocks.renderMatching('.render-scratchblocks', {
+          style: 'scratch3'
+        });
+      </script>
+    
+  </body>
+</html>

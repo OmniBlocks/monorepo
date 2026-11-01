@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Local Storage - TurboWarp Extension Documentation</title>
+    <link rel="canonical" href="https://extensions.turbowarp.org/local-storage">
+    <style>
+      :root {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color-scheme: light dark;
+        font-size: 16px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color: #eee;
+          background: #131313;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        a {
+          color: #56b2ff;
+        }
+        a:visited {
+          color: #f192ff;
+        }
+        a:active {
+          color: red;
+        }
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        line-height: 1.3;
+      }
+
+      nav {
+        background-color: #ff4c4c;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+      nav > div {
+        display: flex;
+        max-width: 600px;
+        margin: 0 auto;
+        justify-content: space-between;
+      }
+      nav a {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.5rem 0.25rem 0.5rem 0;
+        align-items: center;
+        text-decoration: none;
+        color: inherit !important;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      nav img {
+        width: 2rem;
+        height: 2rem;
+        flex-shrink: 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        nav {
+          background-color: #333;
+        }
+      }
+
+      noscript {
+        font-weight: bold;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 0 0.25rem;
+      }
+      h1 {
+        font-size: 2.25rem;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        border-bottom: 1px solid #ccc;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid #ccc;
+        margin: 1rem 0;
+      }
+      @media (prefers-color-scheme: dark) {
+        hr, h1, h2, h3, h4, h5, h6 {
+          border-color: #444;
+        }
+      }
+
+      .view-in-browser {
+        display: none;
+      }
+      .is-desktop .view-in-browser {
+        display: flex;
+      }
+      .is-desktop nav > div, .is-desktop .container {
+        /* Desktop app shows this page in a window, not a browser tab, so don't need to */
+        /* restrict the width of the content for readability. */
+        max-width: 100%;
+      }
+
+      code {
+        background-color: #eee;
+        border-radius: 4px;
+        padding: 0 2px;
+      }
+      pre {
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        overflow-x: auto;
+      }
+      @media (prefers-color-scheme: dark) {
+        code, pre {
+          background-color: #223;
+          border-color: #334;
+        }
+      }
+
+      .render-scratchblocks {
+        width: 100%;
+        overflow-x: auto;
+        white-space: pre;
+        line-height: 42px; /* reasonable estimation to reduce layout shift */
+      }
+      .render-scratchblocks svg {
+        display: block;
+      }
+
+      footer {
+        margin: 1rem 0;
+        font-size: small;
+      }
+
+      /* General Alert Styles */
+      .alert {
+        padding-left: 15px;
+        line-height: 1;
+      }
+
+      /* Border colors for specific alerts */
+      .alert.alert-note { border-left: .25em solid #1f6feb; }
+      .alert.alert-tip { border-left: .25em solid #238636; }
+      .alert.alert-important { border-left: .25em solid #8957e5; }
+      .alert.alert-warning { border-left: .25em solid #9e6a03; }
+      .alert.alert-caution { border-left: .25em solid #da3633; }
+
+      /* Shared Styling for Alert Text */
+      .alert p:first-child {
+        padding-top: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+      }
+
+      /* Specific Color Overrides for Each Alert */
+      .alert.alert-note > p:first-child { color: #4493f8; }
+      .alert.alert-tip > p:first-child { color: #3fb950; }
+      .alert.alert-important > p:first-child { color: #ab7df8; }
+      .alert.alert-warning > p:first-child { color: #d29922; }
+      .alert.alert-caution > p:first-child { color: #f85149; }
+
+      /* Icon Spacing */
+      div.alert svg {
+        margin-right: 8px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <nav role="navigation">
+      <div>
+        <a href="https://extensions.turbowarp.org/">
+          <img src="/turbowarp.svg" alt="">
+          <span>TurboWarp Extension Gallery</span>
+        </a>
+
+        <!-- Only used by desktop app -->
+        <a class="view-in-browser" href="https://extensions.turbowarp.org/local-storage">
+          Read in browser
+        </a>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Local Storage</h1>
+
+      <noscript><p>Enable JavaScript for blocks to render.</p></noscript>
+
+      <p>The local storage extension allows you to automatically save plain text in a storage space provided by the browser. Forget save codes! With this extension, we can make a game that doesn't require any user interaction to save progress.</p>
+<h2>Namespaces</h2>
+<p>A namespace is basically the file in the browser's storage you want to save your codes in. Every project should use a unique namespace. If two projects use the same namespace, they will overwrite each other's storage and they'll probably both end up broken :(</p>
+<p>By default, the extension generates a random namespace for you and saves this inside the project, <strong>so you shouldn't need to worry about managing the namespace yourself</strong>. You should still be aware of what a namespace is since changing it could break your project.</p>
+<p>In older versions of the extension, it was necessary to configure the namespace by running the set namespace block at the start of your project. This block should not be needed anymore unless you are doing something very advanced. For example, if you want to access variables stored in another project, you can find that project's namespace and then set your namespace to the same thing. This would let you access the values that project stored.</p>
+<h2>Basic usage</h2>
+<p>Think of local storage as providing a special type of variable that persists between sessions. Rather than using the &quot;Make a Variable&quot; button to make a new variable, you just type its name into an input. Unlike normal cloud variables, local storage is not restricted to just numbers.</p>
+<p>To put a value into storage, use this block:</p>
+<div class="render-scratchblocks">set [score] to [1000] in storage :: #0FBD8C
+</div><p>This sets the <code>score</code> variable to <code>1000</code> only within your project's namespace. You can retrieve the variable later using:</p>
+<div class="render-scratchblocks">(get [score] from storage :: #0FBD8C)
+</div><p>You can of course set a variable to something based on its old value, just like with regular variables. For example, this will increase the stored score by 10 every time it runs:</p>
+<div class="render-scratchblocks">set [score] to ((get [score] from storage :: #0FBD8C) + [10]) in storage :: #0FBD8C
+</div><p>To delete something from storage, use this block:</p>
+<div class="render-scratchblocks">delete [score] from storage :: #0FBD8C
+</div><p>Or delete everything stored in the namespace:</p>
+<div class="render-scratchblocks">delete storage :: #0FBD8C
+</div><h2>Performance</h2>
+<p>The local storage extension is inevitably slower than regular variables.</p>
+<p>Reading from storage is actually decently fast, though still slower than regular variables. However, putting values into storage is quite a bit slower since the extension tries to immediately save any changes the moment the block runs.</p>
+<p>To better illustrate, these two pieces of code both set <code>counter</code> to <code>1000</code> in storage. However, the second one will be much faster because it only actually writes to storage one time while the first one will do so 1000 times.</p>
+<div class="render-scratchblocks">define slow
+set [counter] to [1] in storage :: #0FBD8C
+repeat [1000]
+    set [counter] to ((get [counter] from storage :: #0FBD8C) + [1]) in storage :: #0FBD8C
+end
+
+define faster
+set [counter v] to [1]
+repeat [1000]
+    change [counter v] by [1]
+end
+set [counter] to (counter) in storage :: #0FBD8C
+</div><h2>Changes in other windows</h2>
+<p>Sometimes a user may open the same project in multiple tabs or windows, each of which could be trying to read stuff from storage and put new values in. This might cause your project to misbehave without careful consideration.</p>
+<p>Here's an example scenario. Suppose you have a game, and at the start of your game you load in information about the user's progress like this:</p>
+<div class="render-scratchblocks">when gf clicked
+set [level v] to (get [level] from storage :: #0FBD8C)
+set [gold v] to (get [gold] from storage :: #0FBD8C)
+set [name v] to (get [name] from storage :: #0FBD8C)
+</div><p>As your game advanced, you make sure to use the &quot;set in storage&quot; block to save the player's progress. All seems good.</p>
+<p>Unfortunately, there is a scenario that might cause a lot of grief. Suppose the player opens two copies of your game at once on accident without noticing. They play in Window A for a while and assume their progress is being saved. Then they close that window and do something else. Later, they come back to the other window they had opened before and start playing in Window B, but all the progress is &quot;gone&quot; because that window had already been running the game and had already loaded save data before Window A had saved the progress that was made, and it's too late because they had saved the game in Window B before they realized the problem.</p>
+<p>The &quot;correct&quot; behavior to do in this type of scenario is heavily context-dependent, thus the extension can't solve this for you. You'll need to write some scripts if this preventing this scenario is important. Here are some possible ways to deal with the problem:</p>
+<h2>Read and write all at once</h2>
+<p>For projects are confident they will only be open in one window at once, or ones that rely on manual saving where indiscriminently overwriting the old save is the expected outcome, the simplest approach is to read all values from storage into regular variables at the start, then your game does all its logic using just the regular variables. To save, your game puts these regular variabels back in storage. Here's what that looks like:</p>
+<div class="render-scratchblocks">when i receive [start v]
+set [mana v] to (get [mana] from storage :: #0FBD8C)
+set [cookies v] to (get [cookies] from storage :: #0FBD8C)
+
+when i receive [save v]
+set [mana] to (mana) in storage :: #0FBD8C
+set [cookies] to (cookies) in storage :: #0FBD8C
+</div><p>Pros:</p>
+<ul>
+<li>Very simple.</li>
+<li>Changes in another window will not affect your local variables.</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>Changes in other windows will be indiscriminently overwritten on each save.</li>
+<li>This may result in data loss, depending on the context.</li>
+</ul>
+<h2>Constantly reading from storage</h2>
+<p>For projects where having multiple windows open at once is expected and storage changes in one project should immediately appear in the other, the simplest approach is to always be re-reading the variable from storage every time you use it. Here's what that looks like:</p>
+<div class="render-scratchblocks">when gf clicked
+forever
+    say (join [Coins: ] (get [coins] from storage :: #0FBD8C))
+end
+
+when this sprite clicked
+set [coins] to ((get [coins] from storage :: #0FBD8C) + [1]) in storage :: #0FBD8C
+</div><p>Because changes to storage are always being re-read instead of being stored in a local storage, changes in one window will immediately propagate to the other. In the case of simple counters, this may be sufficient.</p>
+<p>Pros:</p>
+<ul>
+<li>Still pretty simple.</li>
+<li>Avoids unnecessary variables.</li>
+<li>Changes to storage are instantly available to all windows at the same time.</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>Reading from storage is slightly slower than regular variables, even when nothing has changed since the last read.</li>
+<li>May not work well for anything more complicated than a counter.</li>
+</ul>
+<h2>Reloading data as it changes</h2>
+<p>The local storage extension offers an event block to detect arbitrary storage changes by other windows. This takes a bit of extra code, but it is the most flexible approach and essentially combines the benefits of the above approahes for projects that need to have storage sync between open windows. The simplest form of it is:</p>
+<div class="render-scratchblocks">when another window changes storage :: hat #0FBD8C
+set [silver v] to (get [silver] from storage :: #0FBD8C)
+</div><p>Pros:</p>
+<ul>
+<li>You can access your data in a regular variable, so it's fast.</li>
+<li>Your data changes in response to other windows.</li>
+<li>You get a lot more control. Instead of just taking the new value from storage as-is, you could process it in any way you want before storing it in a local variable.</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>A bit more complex.</li>
+<li>Due to block execution order, the rest of your projects may execute for a frame before the change event runs. This might cause a 1 frame delay before the local variable is updated.</li>
+</ul>
+<h2>Local storage limits</h2>
+<p>This extension uses the browser's local storage API, which limits each website to around 5 MB of data, so if we want local storage to be able to hold data for many projects, each one should stay well below this limit. We recommend only storing small files such as game save data or settings in local storage.</p>
+<p>The TurboWarp Desktop app and the Electron environments in the packager raise the storage size limit to 100 MB. However, we do not recommend storing anywhere near that much in local storage.</p>
+<p>In rare instances, such as when a system is running out of disk space, the browser may start deleting data at random to make room for something else. We, unfortunately, cannot influence when this happens.</p>
+
+
+      <hr>
+
+      <footer>
+        <p>
+          This page is <a href="https://github.com/TurboWarp/extensions/tree/master/docs">open source</a>.
+          
+            Blocks rendered with <a href="https://scratchblocks.github.io/">scratchblocks</a>.
+          
+        </p>
+        <p>TurboWarp is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation.</p>
+      </footer>
+    </main>
+
+    
+      <script src="/docs-internal/scratchblocks.js"></script>
+      <script>
+        scratchblocks.renderMatching('.render-scratchblocks', {
+          style: 'scratch3'
+        });
+      </script>
+    
+  </body>
+</html>

@@ -31,6 +31,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.base_ref || 'main' }}
+
+      - name: Force git to get the branch instead of being headless like a dissapointment
+        run: git fetch origin main && git checkout -B main
       
       - name: Set up Node.js & pnpm
         uses: actions/setup-node@v4
@@ -80,6 +83,14 @@ jobs:
         with:
           ref: refs/pull/${{ inputs.pr_number }}/head
           fetch-depth: 0
+      
+      - name: Force git to get the branch instead of being headless like a dissapointment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_BRANCH=$(gh api repos/${{ github.repository }}/pulls/${{ inputs.pr_number }} --jq .head.ref)
+          git fetch origin "pull/${{ inputs.pr_number }}/head"
+          git checkout -B "$PR_BRANCH" FETCH_HEAD
 
       - name: Set up Node.js & pnpm
         uses: actions/setup-node@v4
@@ -484,7 +495,7 @@ jobs:
           
           git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-repo || \
           (git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-repo && cd gh-pages-repo && git checkout --orphan gh-pages && git rm -rf .)
-          
+           
           mkdir -p gh-pages-repo/pr-${{ inputs.pr_number }}
           if [ -z "$(ls -A preview-build 2>/dev/null)" ]; then
           echo "::error::preview-build is empty. Was pr-build-dist uploaded? Did build-pr succeed?"

@@ -1,4 +1,6 @@
 name: Full Build Run
+env:
+  FORCE_COLOR: 1
 on: 
   workflow_dispatch:
     inputs:

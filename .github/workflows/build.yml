@@ -27,9 +27,7 @@ jobs:
 
       - name: Build packages (Node 20)
         run: |
-          pnpm --recursive run --if-present prepublish
-          pnpm --recursive run --if-present prepublishOnly
-          pnpm --filter "!extensions" --recursive run --if-present build
+          pnpm build
         shell: bash
 
       - name: Setup Node.js 22 for extensions

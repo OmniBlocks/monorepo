@@ -1,95 +1,73 @@
-import React, { useEffect, useRef } from 'react';
+import React, {useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
+import $ from 'jquery';
+import 'select2';
+
 import Box from '../box/box.jsx';
-import IconButton from '../icon-button/icon-button.jsx';
 
 import styles from './song-editor.css';
 
-import maximizeIcon from '../stage-header/icon--fullscreen.svg';
+if (typeof window !== 'undefined') {
+    window.jQuery = $;
+    window.$ = $;
+}
 
-const SongEditor = () => {
-    const iframeRef = useRef(null);
+const SongEditor = ({isVisible}) => {
+    const hostRef = useRef(null);
+    const editorRef = useRef(null);
 
     useEffect(() => {
-        console.log("🎶 Song Editor component mounted");
+        if (!hostRef.current || typeof window === 'undefined') {
+            return undefined;
+        }
 
-        const handleMessage = (event) => {
-            console.log("🔗 Message received from:", event.origin);
-            console.log("💬 Message data:", event.data);
+        let cancelled = false;
 
-            if (event.origin !== window.location.origin) {
-                console.warn(`❌ Message origin mismatch: expected ${window.location.origin}, received ${event.origin}`);
+        const mountEditor = async () => {
+            const module = await import('song-editor');
+            const mount = module.mountSongEditor || module.default?.mountSongEditor;
+            if (!mount || cancelled || !hostRef.current) {
                 return;
             }
 
-            if (typeof event.data !== 'object' || event.data === null) {
-                console.warn('❌ Ignoring non-object message payload:', event.data);
-                return;
-            }
-
-            const { type, payload } = event.data;
-            if (type === 'SONG_DATA') {
-                console.log('🎶 Received song data:', payload);
-            } else if (type === 'DOWNLOAD_REQUEST') {
-                console.log('💾 Download requested:', payload);
-                handleDownload(payload);
-            } else {
-                console.log(`🔍 Received unknown message type: ${type}`);
-            }
+            editorRef.current = mount(hostRef.current);
+            window.dispatchEvent(new Event('resize'));
         };
-        window.addEventListener('message', handleMessage);
+
+        mountEditor();
 
         return () => {
-            console.log("🛑 Cleaning up message listener");
-            window.removeEventListener('message', handleMessage);
+            cancelled = true;
+            if (editorRef.current && editorRef.current.destroy) {
+                editorRef.current.destroy();
+            }
+            editorRef.current = null;
         };
     }, []);
 
-    const handleDownload = (downloadData) => {
-        const { filename, data, mimeType } = downloadData;
-        const blob = new Blob([data], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    };
-
-    const handleToggleFullscreen = () => {
-        if (iframeRef.current) {
-            if (iframeRef.current.requestFullscreen) {
-                iframeRef.current.requestFullscreen().catch(err => {
-                    console.warn('Failed to enter fullscreen:', err);
-                });
-            }
+    useEffect(() => {
+        if (!isVisible) {
+            return undefined;
         }
-    };
+
+        const timer = window.setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 0);
+
+        return () => window.clearTimeout(timer);
+    }, [isVisible]);
 
     return (
         <Box className={styles.editorContainer}>
-            <Box className={styles.toolbarContainer}>
-                <IconButton
-                    img={maximizeIcon}
-                    title="Fullscreen"
-                    onClick={handleToggleFullscreen}
-                />
-            </Box>
-            <div className={styles.iframeWrapper}>
-                <iframe
-                    ref={iframeRef}
-                    id="beepboxEditorIframe"
-                    src="songeditor.html"
-                    className={styles.iframe}  
-                    sandbox="allow-scripts allow-same-origin allow-downloads allow-modals allow-forms"
-                    allow="midi *; midi-sysex *; autoplay *; clipboard-read *; clipboard-write *; fullscreen *"
-              
-                />
-            </div>
+            <div id="beepboxEditorContainer" ref={hostRef} className={styles.editorHost} />
         </Box>
     );
+};
+
+SongEditor.propTypes = {
+    isVisible: PropTypes.bool,
+    vm: PropTypes.object,
+    onClose: PropTypes.func
 };
 
 export default SongEditor;

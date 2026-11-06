@@ -34,3 +34,35 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+
+#big unnessecary folders
+song-editor/.dropbox
+song-editor/.DS_Store
+song-editor/.vs
+song-editor/.vscode
+
+
+#unneeded mod inheritance
+song-editor/website/**/beepbox*.js.map
+song-editor/website/beepbox_offline.html
+song-editor/website/jummbox_offline.html
+#for github pages / live editor
+song-editor/editor/*.js
+song-editor/player/*.js
+song-editor/synth/*.js
+song-editor/global/*.js
+song-editor/editor/*.js.map
+song-editor/player/*.js.map
+song-editor/synth/*.js.map
+song-editor/global/*.js.map
+#unsure
+/**/*.ts.bak
+/**/*.html.bak
+#for offline
+song-editor/build
+song-editor/scripts/build/
+song-editor/to_deploy/
+#for deployment
+song-editor/deployFiles.sh
+song-editor/pm2handler.cjs

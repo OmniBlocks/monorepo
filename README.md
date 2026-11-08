@@ -1,5 +1,5 @@
-# PomniBlocks - The Amazing Digital MultiLanguage IDE
-# PomniBlocks/monorepo
+# OmniBlocks - The Ultimate MultiLanguage IDE
+# OmniBlocks/monorepo
 ![Build Status](https://github.com/OmniBlocks/monorepo/workflows/CI/badge.svg)
 ![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/monorepo)
 ![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/monorepo)

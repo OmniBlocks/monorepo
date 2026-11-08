@@ -240,18 +240,18 @@
 }
 
 .extension-button-container {
-    width: 3.75rem;
-    height: 3.25rem;
+    width: 3rem;
+    height: 3rem;
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: $z-index-extension-button;
-    background: $looks-secondary;
-
-    border: 1px solid $looks-secondary;
-    box-sizing: content-box; /* To match scratch-block vertical toolbox borders */
-    
+    z-index: 42;
+    background: var(--looks-secondary);
+    border: 1px solid var(--looks-secondary);
+    box-sizing: content-box;
+    margin: 0.5rem;
+    border-radius: 0.5rem;    
 }
 
 $fade-out-distance: 15px;
@@ -261,7 +261,7 @@ $fade-out-distance: 15px;
     position: absolute;
     top: calc(calc(-1 * $fade-out-distance) - 1px);
     left: -1px;
-    background: linear-gradient(rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.15));
+    background: none;
     height: $fade-out-distance;
     width: calc(100% + 0.5px);
 }
@@ -276,6 +276,10 @@ $fade-out-distance: 15px;
     cursor: pointer;
     user-select: none;
     
+}
+
+.extension-button:hover {
+    background: $ui-black-transparent;
 }
 
 .extension-button-icon {

@@ -250,8 +250,10 @@
     background: var(--looks-secondary);
     border: 1px solid var(--looks-secondary);
     box-sizing: content-box;
-    margin: 0.5rem;
-    border-radius: 0.5rem;    
+    margin-bottom: 0.5rem;
+    margin-left: 0.25rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
 }
 
 $fade-out-distance: 15px;
@@ -275,7 +277,7 @@ $fade-out-distance: 15px;
     height: 100%;
     cursor: pointer;
     user-select: none;
-    
+    border-radius: 0.5rem;
 }
 
 .extension-button:hover {

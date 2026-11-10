@@ -28,7 +28,7 @@ const isTrustedExtension = url => (
     url.startsWith('https://extensions.turbowarp.org/') ||
 
     // ours too
-    url.startsWith('https://omniblocks.github.io/extensions/') ||
+    url.startsWith('https://omniblocks.org/extensions/') ||
 
     // For development.
     url.startsWith('http://localhost:8000/') ||

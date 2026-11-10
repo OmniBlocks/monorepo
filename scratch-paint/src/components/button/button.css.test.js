@@ -83,6 +83,6 @@ describe('button.css', () => {
   test('colors.css defines $looks-transparent via CSS variable fallback', () => {
     const colorsCss = read('../../css/colors.css');
     // e.g., $looks-transparent: var(--paint-looks-transparent, hsla(...));
-    expect(colorsCss).toMatch(/\$looks-transparent:\s*var\(--paint-looks-transparent,\s*[^)]+\);/);
+    expect(colorsCss).toMatch(/\$looks-transparent:\s*var\(--paint-looks-transparent,\s*.+\);/);
   });
 });

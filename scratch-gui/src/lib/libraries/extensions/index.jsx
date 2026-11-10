@@ -518,11 +518,11 @@ export const galleryLoadingOB = {
     name: (
         <FormattedMessage
             defaultMessage="OmniBlocks Extension Gallery"
-            description="Name of omniblocks.github.io/extensions in extension library"
+            description="Name of omniblocks.org/extensions in extension library"
             id="ob.extensionGallery.name"
         />
     ),
-    href: 'https://omniblocks.github.io/extensions',
+    href: 'https://omniblocks.org/extensions',
     extensionId: 'galleryOB',
     iconURL: obgalleryIcon,
     description: (
@@ -540,16 +540,16 @@ export const galleryMoreOB = {
     name: (
         <FormattedMessage
             defaultMessage="OmniBlocks Extension Gallery"
-            description="Name of omniblocks.github.io/extensions in extension library"
+            description="Name of omniblocks.org/extensions in extension library"
             id="ob.extensionGallery.name"
         />
     ),
-    href: 'https://omniblocks.github.io/extensions',
+    href: 'https://omniblocks.org/extensions',
     extensionId: 'galleryOB',
     iconURL: obgalleryIcon,
     description: (
         <FormattedMessage
-            defaultMessage="Learn more about extensions at omniblocks.github.io/extensions."
+            defaultMessage="Learn more about extensions at omniblocks.org/extensions."
             description="Appears after OmniBlocks gallery list was loaded"
             id="ob.extensionGallery.more"
         />
@@ -562,16 +562,16 @@ export const galleryErrorOB = {
     name: (
         <FormattedMessage
             defaultMessage="OmniBlocks Extension Gallery"
-            description="Name of omniblocks.github.io/extensions in extension library"
+            description="Name of omniblocks.org/extensions in extension library"
             id="ob.extensionGallery.name"
         />
     ),
-    href: 'https://omniblocks.github.io/extensions',
+    href: 'https://omniblocks.org/extensions',
     extensionId: 'galleryOB',
     iconURL: obgalleryIcon,
     description: (
         <FormattedMessage
-            defaultMessage="Error loading OmniBlocks gallery. Visit omniblocks.github.io/extensions to find extensions."
+            defaultMessage="Error loading OmniBlocks gallery. Visit omniblocks.org/extensions to find extensions."
             description="Appears when OmniBlocks gallery fails to load"
             id="ob.extensionGallery.error"
         />

@@ -2,28 +2,13 @@
 # OmniBlocks/monorepo
 ![Build Status](https://github.com/OmniBlocks/monorepo/workflows/CI/badge.svg)
 ![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/monorepo)
-![GitHub](https://img.shields.io/badge/license-GPLv3-blue.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/monorepo)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![GitHub contributors](https://img.shields.io/github/contributors/OmniBlocks/monorepo)
-![GitHub package.json version](https://img.shields.io/github/package-json/v/OmniBlocks/monorepo)
-![GitHub repo size](https://img.shields.io/github/repo-size/OmniBlocks/monorepo)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/OmniBlocks/monorepo)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/OmniBlocks/monorepo)
-![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB?logo=react)
-![Powered by Webpack](https://img.shields.io/badge/Powered%20by-Webpack-8DD6F9?logo=webpack)
 ![GitHub Repo stars](https://img.shields.io/github/stars/OmniBlocks/monorepo?style=flat)
 ![GitHub forks](https://img.shields.io/github/forks/OmniBlocks/monorepo?style=flat)
-![Website](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fomniblocks.github.io)
-![GitHub language count](https://img.shields.io/github/languages/count/OmniBlocks/monorepo)
-![GitHub top language](https://img.shields.io/github/languages/top/OmniBlocks/monorepo)
-![GitHub Created At](https://img.shields.io/github/created-at/OmniBlocks/monorepo)
-![GitHub Release Date](https://img.shields.io/github/release-date-pre/OmniBlocks/monorepo)
-![GitHub Sponsors](https://img.shields.io/github/sponsors/OmniBlocks?logo=githubsponsors)
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/OmniBlocks/monorepo)
+![Website](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fomniblocks.org)
 ![GitHub number of milestones](https://img.shields.io/github/milestones/closed/OmniBlocks/monorepo)
-![GitHub License](https://img.shields.io/github/license/OmniBlocks/monorepo)
-![GitHub followers](https://img.shields.io/github/followers/OmniBlocks?style=flat&logo=github)
 
 <a href="https://www.star-history.com/#OmniBlocks/monorepo&type=date&legend=top-left">
  <picture>
@@ -35,7 +20,7 @@
 
 OmniBlocks is a block-based programming language that builds upon Scratch and TurboWarp's foundation with improvements, addons, themes, and other features for an amazing coding experience.
 
-Try out OmniBlocks: [https://omniblocks.github.io](https://omniblocks.github.io)
+Try out OmniBlocks: [https://omniblocks.org](https://omniblocks.org)
 
 ### Enhancements and Improvements
 *   **Plenty of Addons:** Dozens of community-built addons for custom blocks, UI tweaks, and new functionality. Many are inherited from TurboWarp and other mods from now, but we will implement some new ones soon.
@@ -53,9 +38,11 @@ Try out OmniBlocks: [https://omniblocks.github.io](https://omniblocks.github.io)
 <img width="519" height="652" alt="Screenshot 2025-11-25 2 47 56 PM" src="https://github.com/user-attachments/assets/52bd3c88-8238-4cdb-878a-e4f9cd018e0b" /></br>
 3. Click "Install" to add OmniBlocks to your desktop</br>
 <img width="407" height="166" alt="Screenshot 2025-11-25 2 48 03 PM" src="https://github.com/user-attachments/assets/9fb2b478-4ee3-498d-a771-d586d3a7a8fe" /></br>
-4. The app will now work offline and can be launched like a native application
+4. The app will now work offline and can be launched like a native application.
 
-https://github.com/user-attachments/assets/986de6a3-47e3-436b-91f5-e169a6a67a4a
+Was that confusing or you didn't understand? Try watching this video instead:
+
+https://github.com/user-attachments/assets/7c09be1c-16e1-44fb-8741-42d07ce9c25c
 
 We are working on a desktop app for more native access and integration, but this is the best you can get for now, but it is quite great for what it has.
 
@@ -167,7 +154,7 @@ To actually mod OmniBlocks, you need to build the GUI, as it is the main package
     cd scratch-gui
     pnpm run build
     ```
-    Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow or other CI to push to a website or something like that. If you go to our [site build repo,](https://github.com/OmniBlocks/omniblocks.github.io) you can use the `sh` script and `yml` workflow from there 😁
+    Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow or other CI to push to a website or something like that. If you go to our [site build repo,](https://github.com/OmniBlocks/omniblocks.org) you can use the `sh` script and `yml` workflow from there 😁
 
 
 ## Development Guide
@@ -204,11 +191,6 @@ This project is licensed under multiple agreements due to its forked nature.
 - **Original TurboWarp Code (BSD License):** Copyright (c) TurboWarp contributors. The original license text is retained below as required.
 
 - **Original Scratch Code (BSD License):** Copyright (c) 2016, Massachusetts Institute of Technology. The original license text is retained below as required.
-
-- **Assets:**
-  - `src/lib/default-project/dango.svg`: Based on Twemoji, licensed under CC BY 4.0.
-  - **OmniBlocks Logo:** Licensed under CC BY-SA 4.0. Incorporates the Python logo (a trademark of the Python Software Foundation) for referential purposes. This project is not affiliated with or endorsed by the Python Software Foundation.
-  - **OmniBlocks Mascot "Boxy":** Licensed under CC BY-SA 4.0.
  
 While the Logo and Mascot are open source, please do not attempt to impersonate us or try to act on "our behalf" and claim something is endorsed by us when it is not.
 
@@ -270,7 +252,7 @@ A: Yup! The TurboWarp cloud data server is used to ensure that you can still pla
 ### Features & Development
 
 **Q: What's the status of the music editor feature?**  
-A: The music editor is currently in development and not fully integrated. We're working on it, but for now, the traditional sound editor is available. You can go ahead and use it, but if you click out of the tab... well, say goodbye to your music. You can test the raw song editor [here](https://omniblocks.github.io/songeditor.html)
+A: The music editor is currently in development and not fully integrated. We're working on it, but for now, the traditional sound editor is available. You can go ahead and use it, but if you click out of the tab... well, say goodbye to your music. You can test the raw song editor [here](https://omniblocks.org/songeditor.html)
 
 **Q: Can I create my own extensions?**  
 A: Yes, but be aware that extension development is complex and requires understanding of Scratch's architecture. Check out the `scratch-vm` repository and our contributing guidelines for more information.
@@ -321,19 +303,15 @@ Q: But aren't you busy?
 A: True. I, supervoidcoder, the lead maintainer and creator of OmniBlocks, am very busy as I have to do school and other things too. But I'm not one of those people who is "onLy HeRe foR SeRiOuS sTuFF" or "iM a VeRy ImpOrtanT person With PrioRities, not your FrienD". I genuinely care about anyone that wants to reach out to me.
 Most of the maintainers and contributors have our own personal Scratch Account too. Here are some:
 - @supervoidcoder: [scratchcode1_2_3](https://scratch.mit.edu/users/scratchcode1_2_3/)
-- @8to16: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
-- @Graison-P: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
-- @NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
-
-**Q: I tried submitting a pull request for OmniBlocks, but I got tons of lint errors.**
-A: Ignore lint. It's only there because it is from upstream, but we don't actually use it. As long as the code itself compiles and runs and is, well, functional, I could literally NOT care LESS if you're indenting with tabs, spaces, or you put 6 or 7 indents instead of 4. Just make sure your code works 😎
+- @ampelc: unfortunately banned
+- @someCatInTheWorld: [someCatInTheWorld](https://scratch.mit.edu/users/o97doge/)
 
 ## Roadmap
 
 ### Current Focus
 - [ ] Complete music editor integration 
 
-Update: As of 11/12/2025, there is even better integration with the music editor, but it is still largely lacking. The music editor still doesn't have blocks to play your songs with or are stored in the project, but the Iframe is styled way better so it doesn't look like an iframe anymore, and using postmessage, it allows for you to download your songs using the existing export buttons in the song editor, as well as a fullscreen button, so it is far more usable than before where you had to go to omniblocks.github.io/songeditor just for it to be useful (as it's the standalone html instead of the iframe.) We got this working by using a function in the HTML that if detected it was an iframe, it intercepted incoming downloaded files and sent them using postmessage to the mainwindow as payload to be downloaded.
+Update: As of 11/12/2025, there is even better integration with the music editor, but it is still largely lacking. The music editor still doesn't have blocks to play your songs with or are stored in the project, but the Iframe is styled way better so it doesn't look like an iframe anymore, and using postmessage, it allows for you to download your songs using the existing export buttons in the song editor, as well as a fullscreen button, so it is far more usable than before where you had to go to omniblocks.org/songeditor just for it to be useful (as it's the standalone html instead of the iframe.) We got this working by using a function in the HTML that if detected it was an iframe, it intercepted incoming downloaded files and sent them using postmessage to the mainwindow as payload to be downloaded.
 
 
 ### Short-term Goals (Next 3-6 months)
@@ -359,3 +337,6 @@ Update: As of 11/12/2025, there is even better integration with the music editor
 ### Legal
 
 Python is a registered trademark of the Python Software Foundation. Scratch is a registered trademark of the Scratch Foundation. TurboWarp is a community project and is not affiliated with the Scratch Foundation. OmniBlocks and the OmniBlocks team are not affiliated with the Python Software Foundation, the Scratch Foundation, or TurboWarp.
+
+OmniBlocks™ and Boxy™ are trademarks of the OmniBlocks Team. The art design for the Boxy mascot is ©2025-2026 The OmniBlocks Team. 
+The rest of the code and assets are licensed under the AGPLv3 license unless otherwise noted.

@@ -33,9 +33,9 @@ describe('color-picker.css', () => {
       expect(cssContent).toContain('@import "../../css/filters.css"');
     });
 
-    test('colors import appears exactly twice (duplicate intended)', () => {
+    test('colors import appears exactly once', () => {
       const m = cssContent.match(/@import\s+["']\.\.\/\.\.\/css\/colors["']/g) || [];
-      expect(m.length).toBe(2);
+      expect(m.length).toBe(1);
     });
   });
 

@@ -56,6 +56,10 @@ class SecurityManager {
      * @returns {Promise<string>|string} The URL to actually load.
      */
     rewriteExtensionURL (extensionURL) {
+        // shim for domain migration 
+        if (extensionURL.startsWith('https://omniblocks.github.io/')) {
+            extensionURL = extensionURL.replace('https://omniblocks.github.io/', 'https://omniblocks.org/');
+        }
         return Promise.resolve(extensionURL);
     }
 

@@ -361,7 +361,7 @@ class HomepageFile extends BuildFile {
     this.host =
       mode === "development"
         ? "http://localhost:8000/"
-        : "https://omniblocks.github.io/extensions/";
+        : "https://omniblocks.org/extensions/";
   }
 
   getType() {
@@ -377,7 +377,7 @@ class HomepageFile extends BuildFile {
   }
 
   getRunExtensionURL(extensionSlug) {
-    return `https://omniblocks.github.io/editor.html?extension=${this.getFullExtensionURL(
+    return `https://omniblocks.org/editor.html?extension=${this.getFullExtensionURL(
       extensionSlug
     )}`;
   }
@@ -388,7 +388,7 @@ class HomepageFile extends BuildFile {
    */
   getRunSampleURL(sampleFile) {
     const path = encodeURIComponent(`samples/${sampleFile.getSlug()}`);
-    return `https://omniblocks.github.io/editor.html?project_url=${this.host}${path}`;
+    return `https://omniblocks.org/editor.html?project_url=${this.host}${path}`;
   }
 
   read() {
@@ -573,7 +573,7 @@ class SitemapFile extends BuildFile {
         if (a.length > b.length) return 1;
         return a - b;
       })
-      .map((path) => `https://omniblocks.github.io/extensions${path}`)
+      .map((path) => `https://omniblocks.org/extensions${path}`)
       .map((absoluteURL) => `<url><loc>${absoluteURL}</loc></url>`)
       .join("\n");
 
@@ -628,7 +628,7 @@ class SampleFile extends BuildFile {
     for (const url of urls) {
       if (
         !url.startsWith("https://extensions.turbowarp.org/") ||
-        !url.startsWith("https://omniblocks.github.io/extensions/") ||
+        !url.startsWith("https://omniblocks.org/extensions/") ||
         !url.endsWith(".js")
       ) {
         throw new Error(`Invalid extension URL for sample: ${url}`);

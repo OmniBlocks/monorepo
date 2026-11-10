@@ -14,6 +14,8 @@ const postcssImport = require('postcss-import');
 const STATIC_PATH = process.env.STATIC_PATH || '/static';
 const {APP_NAME} = require('./src/lib/brand');
 const {version} = require('./package.json');
+const {getOVSVersion} = require('./scripts/ovs');
+const fullVersion = getOVSVersion(version);
 
 const root = process.env.ROOT || '';
 if (root.length > 0 && !root.endsWith('/')) {
@@ -231,7 +233,8 @@ module.exports = [
                 'process.env.ROUTING_STYLE': JSON.stringify(
                     process.env.ROUTING_STYLE || 'filehash'
                 ),
-                'process.env.APP_VERSION': JSON.stringify(version || '')
+                'process.env.APP_VERSION': JSON.stringify(version || ''),
+                'process.env.FULL_VERSION': JSON.stringify(fullVersion || '')
             }),
             new HtmlWebpackPlugin({
                 chunks: ['editor'],

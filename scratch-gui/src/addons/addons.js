@@ -81,13 +81,11 @@ const addons = [
     'tw-disable-vibration',
     'tw-disable-cloud-variables',
     'tw-disable-compiler',
-    'editor-stepping',
-    'qcode'
+    'editor-stepping'
 ];
 
 const newAddons = [
-    'expanded-backpack',
-    'qcode'
+    'expanded-backpack'
 ];
 
 // eslint-disable-next-line import/no-commonjs

@@ -251,9 +251,9 @@
     border: 1px solid var(--looks-secondary);
     box-sizing: content-box;
     margin-bottom: 0.5rem;
-    margin-left: 0.25rem;
+    margin-left: 0.35rem;
     border-radius: 0.5rem;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 $fade-out-distance: 15px;

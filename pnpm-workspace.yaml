@@ -8,3 +8,23 @@ onlyBuiltDependencies:
   - es5-ext
   - fsevents
   - playwright-chromium
+
+overrides:
+  webpack: "4.47.0"
+  webpack-cli: "3.3.12"
+  cheerio: "1.0.0-rc.12"
+  react: "^19.0.0"
+  react-dom: "^19.0.0"
+  react-redux: "^8.1.3"
+  react-intl: "2.9.0"
+
+peerDependencyRules:
+  ignoreMissing:
+    - react
+    - react-dom
+    - redux
+    - react-redux
+    - scratch-render-fonts
+  allowAny:
+    - react
+    - react-dom

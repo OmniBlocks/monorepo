@@ -23,7 +23,7 @@ const CrashMessage = props => (
             </p>
             <p>
                 <FormattedMessage
-                    defaultMessage={'We are so sorry, but it looks like the page has crashed.' +
+                    defaultMessage={'Gah! Looks like OmniBlocks ran into an unexpected error and crashed.' +
                         ' Please refresh your page to try' +
                         ' again.'}
                     description="Message to inform the user that page has crashed."

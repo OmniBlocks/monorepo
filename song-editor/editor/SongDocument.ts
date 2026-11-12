@@ -1,5 +1,5 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
-
+// Copyright (c) 2026 The OmniBlocks Team, distributed under the AGPLv3 license.
 import { Config } from "../synth/SynthConfig";
 import { isMobile } from "./EditorConfig";
 import { Pattern, Channel, Song, Synth } from "../synth/synth";
@@ -128,10 +128,15 @@ export class SongDocument {
     }
 
     public toggleDisplayBrowserUrl() {
+        // ob: Disabled since song data will be stored in project.json and not the URL
+        /*
         const state: HistoryState | null = this._getHistoryState();
         if (state == null) throw new Error("History state is null.");
         this.prefs.displayBrowserUrl = !this.prefs.displayBrowserUrl;
         this._replaceState(state, this.song.toBase64String());
+        */
+       return;
+        
     }
 
     private _getHistoryState(): HistoryState | null {

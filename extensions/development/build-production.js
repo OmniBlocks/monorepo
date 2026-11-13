@@ -18,8 +18,8 @@ let outputDirectory;
 let l10nOutput;
 if (await folderExists(diry)) {
   // places the build directory right in scratch-gui upon build, making sure it appears at the same level as the page (omniblocks.org/extensions)
-  outputDirectory = pathUtil.join(diry, "build");
-  l10nOutput = pathUtil.join(diry, "build-l10n");
+  outputDirectory = pathUtil.join(diry, "extensions/build");
+  l10nOutput = pathUtil.join(diry, "extensions/build-l10n");
 } else {
   outputDirectory = pathUtil.join(import.meta.dirname, "../build");
   l10nOutput = pathUtil.join(import.meta.dirname, "../build-l10n");

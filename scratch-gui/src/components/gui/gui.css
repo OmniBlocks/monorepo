@@ -241,17 +241,17 @@
 
 .extension-button-container {
     width: 3.75rem;
-    height: 3.25rem;
+    height: 3.75rem;
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: $z-index-extension-button;
-    background: $looks-secondary;
-
-    border: 1px solid $looks-secondary;
-    box-sizing: content-box; /* To match scratch-block vertical toolbox borders */
-    
+    z-index: 42;
+    background: #FFFFFF;
+    box-sizing: content-box;
+    border-left: 1px solid #FFFFFF;
+    border-right: 1px solid var(--ui-black-transparent);
+    border-bottom: 1px solid var(--ui-black-transparent);
 }
 
 $fade-out-distance: 15px;
@@ -261,21 +261,31 @@ $fade-out-distance: 15px;
     position: absolute;
     top: calc(calc(-1 * $fade-out-distance) - 1px);
     left: -1px;
-    background: linear-gradient(rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.15));
+    background: linear-gradient(0deg, #FFF, #0000);
     height: $fade-out-distance;
     width: calc(100% + 0.5px);
 }
 
 
 .extension-button {
-    background: none;
-    border: none;
-    outline: none;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    user-select: none;
-    
+    width: 2.75rem;
+    height: 2.75rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 42;
+    background: var(--looks-secondary);
+    border: 1px solid var(--looks-secondary);
+    box-sizing: content-box;
+    margin-bottom: 0.4rem;
+    margin-left: 0.2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.extension-button:hover {
+    background: $looks-secondary-dark;
 }
 
 .extension-button-icon {

@@ -1,512 +1,273 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf8">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>OmniBlocks Extension Gallery</title>
-    <meta name="theme-color" content="#ff4c4c">
-    <meta name="description" content="The official place to find powerful unsandboxed extensions for OmniBlocks.">
-    <style>
+<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="google" value="notranslate"><meta name="description" content="OmniBlocks is a beta Multi-Language IDE for creating projects with code, paint, sound, and music editing capabilities. Based on Scratch 3 with enhanced features."/><meta name="theme-color" content="#59C0C0"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="OmniBlocks"><meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="OmniBlocks"><title>OmniBlocks - The Ultimate MultiLanguage IDE</title><link rel="apple-touch-icon" href="images/apple-touch-icon.png"><link rel="icon" type="image/x-icon" sizes="32x32" href="favicon.ico"><link rel="icon" type="image/png" sizes="192x192" href="images/192.png"><link rel="manifest" href="manifest.webmanifest"><style>/* CSS Variables for theme consistency */
       :root {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color-scheme: light dark;
+        --offline-ui-bg: var(--menu-bar-background, #333);
+        --offline-text: var(--text-primary, #fff);
+        --offline-accent: var(--looks-secondary, #59C0C0);
+        --offline-accent-dark: var(--motion-tertiary, #389499);
+        --status-offline: #ff6b6b;
+        --status-online: #51cf66;
+        --status-info: #4c97ff;
       }
-      @media (prefers-color-scheme: dark) {
-        :root {
-          color: #eee;
-          background: #111;
-        }
-        a {
-          color: #56b2ff;
-        }
-        a:visited {
-          color: #f192ff;
-        }
-        a:active {
-          color: red;
-        }
-        .invert-dark {
-          filter: invert(100%);
-        }
-      }
-
-      h1 {
-        margin: 16px 0;
-      }
-      h2, h3, p {
-        margin: 8px 0;
-      }
-
-      .section {
-        max-width: 928px;
-        margin: 24px auto;
-      }
-
-      .header h1 {
-        font-size: 2.5em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: normal;
-        text-align: center;
-      }
-      .header svg {
-        width: 56px;
-        height: 56px;
-        flex-shrink: 0;
-        margin: 0 8px 0 0;
-      }
-      @media (max-width: 750px) {
-        .header h1 {
-          flex-direction: column;
-        }
-        .header svg {
-          margin: 0 0 8px 0;
-        }
-      }
-
-      .infobox, .development-tools {
-        padding: 8px;
-        margin: 8px 0;
-        border-radius: 8px;
-        background: rgba(0, 195, 255, 0.245);
-        border: 1px solid rgba(0, 187, 255, 0.604);
-      }
-      .infobox-warning {
-        background-color: rgba(255, 0, 0, 0.245);
-        border-color: rgba(255, 0, 0, 0.446);
-      }
-      .infobox-title {
-        font-weight: bold;
-        margin-bottom: 4px;
-      }
-
-      .development-tools {
-        background-color: rgba(200, 0, 255, 0.245);
-        border-color: rgba(234, 0, 255, 0.604);
-      }
-      .development-tools h2 {
-        font-size: 1em;
-      }
-
-      .extensions {
-        display: -ms-grid;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        margin: 16px -4px;
-      }
-      @media (max-width: 944px) {
-        .extensions {
-          grid-template-columns: 1fr 1fr;
-        }
-      }
-      @media (max-width: 650px) {
-        .extensions {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .extension {
-        position: relative;
-        border: 2px solid #ccc;
-        border-radius: 8px;
-        margin: 4px;
-        overflow: hidden;
-        padding: 8px;
-      }
-      @media (prefers-color-scheme: dark) {
-        .extension {
-          border-color: #333;
-        }
-      }
-      .extension h3 {
-        font-size: 1.5em;
-      }
-      .extension > :last-child {
-        margin-bottom: 0;
-      }
-      .extension-banner {
-        position: relative;
-        margin: -8px -8px 0 -8px;
-      }
-      .extension-image {
-        display: block;
-        width: 100%;
-        /* TODO: see if there's another way to do this that works in older browsers too */
-        aspect-ratio: 2 / 1;
-      }
-
-      .extension-buttons {
+      
+      .splash-screen {
         position: absolute;
+        width: 100%;
+        height: 100%;
         top: 0;
         left: 0;
         display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        height: 100%;
+        flex-direction: column;
+        gap: 1rem;
         align-items: center;
-        align-content: center;
         justify-content: center;
-        gap: 0.5rem;
-        opacity: 0;
-        transition: opacity .15s;
-        background: rgba(0, 0, 0, 0.5);
-        pointer-events: none;
-      }
-      .extension:hover .extension-buttons, .extension:focus-within .extension-buttons {
-        opacity: 1;
-        backdrop-filter: blur(0.6px);
-      }
-      .extension-buttons > * {
-        background-color: #4c97ff;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        border: none;
-        font: inherit;
-        cursor: pointer;
-        color: white;
-        text-decoration: none;
-        text-shadow: 0 0 4px #0003;
-        pointer-events: auto;
-        transition: filter 0.15s;
-        filter: drop-shadow(0px 1px 3px #00000075);
-      }
-      .extension-buttons > *:hover {
-        filter: drop-shadow(0px 1px 7px black);
-        z-index: 1;
-      }
-      .extension-buttons *:active {
-        filter: brightness(0.85) drop-shadow(0px 1px 2px #00000075);
-      }
-      .extension-buttons *:disabled {
-        opacity: 0.5;
-      }
-      .extension-buttons .open {
-        background-color: #ff4c4c;
-        color: white;
-      }
-      .extension-buttons .docs {
-        background-color: #f69925;
-        color: white;
-      }
-      .extension-buttons .sample {
-        background-color: #3ebb48;
-        color: white;
-      }
-      .extension-buttons :disabled {
-        opacity: 0.5;
-      }
-
-      .sample-list {
-        display: none;
-        position: absolute;
-        left: 0.5rem;
-        right: 0.5rem;
-        width: calc(100% - 1rem);
-        margin-top: -1.5rem;
-        padding: 0.5rem;
-        box-sizing: border-box;
-        background-color: white;
-        border-radius: 0.5rem;
-        box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, .3);
-        border: 1px solid rgba(0, 0, 0, 0.15);
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-      .sample-list h3 {
-        font-size: 1rem;
-        margin: 0;
-      }
-      .extension:hover[data-samples-open="true"] .sample-list {
-        display: flex;
-      }
-      @media (prefers-color-scheme: dark) {
-        .sample-list {
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          background-color: #333;
-        }
-      }
-
-      footer {
-        opacity: 0.8;
-        width: 100%;
         text-align: center;
-        margin-bottom: 16px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       }
-      footer p {
-        margin: 0 0 8px 0;
+      .splash-screen[hidden] {
+        display: none;
       }
-
-      .search-container {
-        display: flex;
-        justify-content: space-evenly;
+      .splash-screen[data-theme="dark"] {
+        background-color: var(--offline-ui-bg);
+        color: var(--offline-text);
+      }
+      .splash-screen > * {
+        max-width: 80%;
+      }
+      .splash-spinner:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 6px solid;
+        border-color: currentColor transparent currentColor transparent;
+        animation: splash-spinner 1.2s linear infinite;
+      }
+      @keyframes splash-spinner {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .splash-error-title {
+        font-weight: bold;
+      }
+      .splash-error-title a {
+        color: inherit;
+      }
+      .splash-errors {
+        font-family: monospace;
+      }
+      .splash-error-list {
+        white-space: pre-wrap;
+      }
+      .splash-reset {
+        color: inherit;
+        background: none;
+        padding: 0;
+        margin: 0;
+        border: none;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      .splash-reset:disabled {
+        opacity: 0.8;
       }
       
-      .column {
-        display: flex;
-        flex-direction: column;
+      /* Offline indicator styles */
+      .offline-indicator {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: var(--status-offline);
+        color: var(--offline-text);
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        z-index: 10000;
+        display: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       }
-
-      .search-base {
-        display: flex;
-        padding: 8px;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5;
-        background-color: transparent;
-        background-clip: padding-box;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        border-top: 2px solid #ff4c4c;
-        border-bottom: 2px solid #ff4c4c;
-        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-        transition: box-shadow .15s ease-in-out, box-shadow .15s ease-in-out;
+      .offline-indicator.online {
+        background: var(--status-online);
       }
+      .offline-indicator.show {
+        display: block;
+      }
+      
+      /* Update notification styles */
+      .update-notification {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--status-info);
+        color: var(--offline-text);
+        border-radius: 8px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        z-index: 10000;
+        display: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        max-width: 90%;
+        text-align: center;
+      }
+      .update-notification.show {
+        display: block;
+      }
+      .update-notification button {
+        background: white;
+        color: var(--status-info);
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        margin-left: 10px;
+        cursor: pointer;
+        font-weight: bold;
+      }</style></head><body><div id="offline-indicator" class="offline-indicator"><span id="offline-text">Offline</span></div><div id="update-notification" class="update-notification"><span>A new version is available!</span> <button onclick="window.location.reload()">Update</button></div><noscript><div class="splash-screen"><div><h1>OmniBlocks requires JavaScript</h1><p>Consider using <a href="https://desktop.turbowarp.org/">TurboWarp Desktop</a> if you are afraid of remote JavaScript.</p></div></div></noscript><div class="splash-screen spash-waiting-for-js" hidden><div class="splash-spinner"></div><div class="splash-error-title" hidden>Something went wrong. <a href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments" target="_blank" rel="noreferrer">Please report</a> with the information below.</div><div class="splash-errors" hidden></div><button class="splash-reset" hidden>Click here to reset caches (can fix some errors)</button></div><script>(function () {
+  const blockedSignatures = [
+    "bytespider",
+    "amazonbot",
+    "claudebot",
+    "gptbot",
+    "cohere-ai",
+    "perplexitybot",
+    "youbot",
+    "omgilibot",
+    "diffbot",
+    "dataforseobot",
+    "petalbot",
+    "seekport",
+    "mj12bot",
+    "dotbot",
+    "ahrefsbot",
+    "semrushbot",
+    "seokicks",
+    "serpstatbot",
+    "archivebot",
+    "coccocbot"
+  ];
 
-      @media (prefers-color-scheme: dark) {
-        .search-base {
-          background-color: #111;
+  const ua = (navigator.userAgent || "").toLowerCase();
+  const isBlocked = blockedSignatures.some(sig => ua.includes(sig));
+
+  if (isBlocked) {
+    window.location.replace("/403.html");
+  }
+})();   
+
+      (function () {
+        'use strict';
+
+        var theme = '';
+        var accent = '#59C0C0';
+
+        try {
+          var themeSetting = localStorage.getItem('tw:theme');
+        } catch (e) {
+          // ignore
         }
-      }
+        if (themeSetting === 'light') {
+          theme = 'light';
+        } else if (themeSetting === 'dark') {
+          theme = 'dark';
+        } else if (themeSetting) {
+          try {
+            var parsed = JSON.parse(themeSetting);
+            if (parsed.accent === 'purple') {
+              accent = '#855cd6';
+            } else if (parsed.accent === 'blue') {
+              accent = '#4c97ff';
+            }
+            if (parsed.gui === 'dark' || parsed.gui === 'light') {
+              theme = parsed.gui;
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
 
-      .search-base:focus {
-        outline: none;
-        box-shadow: 0 0 0 .25rem rgba(236, 90, 84, .25);
-        transition: box-shadow .15s ease-in-out, box-shadow .15s ease-in-out;
-      }
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
 
-      .search-bar {
-        border-right: 1px solid #ff4c4c;
-        border-top-left-radius: 8px;
-        border-bottom-left-radius: 8px;
-        border-left: 2px solid #ff4c4c;
-        width: 75%;
-        max-width: 928px;
-      }
+        var splash = document.querySelector('.spash-waiting-for-js');
+        splash.setAttribute('data-theme', theme);
+        if (theme !== 'dark') {
+          
+            splash.style.color = accent;
+          
+        }
+        splash.hidden = false;
 
-      .search-sort {
-        border-left: 1px solid #ff4c4c;
-        border-radius: 0px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-right: 2px solid #ff4c4c;
-        width: 25%;
-        display: flex;
-      }
+        var splashErrorTitle = document.querySelector('.splash-error-title');
+        var splashError = document.querySelector('.splash-errors');
+        var splashReset = document.querySelector('.splash-reset');
 
-    </style>
-  </head>
+        var totalErrors = 0;
+        window.onerror = function (event, source, line, col, err) {
+          if (++totalErrors > 5) return; // dont bother logging more
+          splashErrorTitle.hidden = splashError.hidden = splashReset.hidden = false;
+          var el = document.createElement('div');
+          el.textContent = 'Error (splash) in ' + source + ' (' + line + ':' + col + '): ' + err;
+          splashError.appendChild(el);
+        };
 
-  <body>
-    <div class="section header">
-      <h1>
-        <img src="/favicon.ico">
-        <div>OmniBlocks Extension Gallery</div>
-      </h1>
-
-      <p>This is the official extension gallery, where you can get extensions that aren't limited by the extension sandbox. All of the extensions here are reviewed for safety.</p>
-      <p>You can also find these extensions in OmniBlocks' "Add Extension" menu.</p>
-
-      <div class="infobox infobox-warning">
-        <div class="infobox-title">These extensions are not compatible with Scratch.</div>
-        Projects that use these extensions can't be opened in Scratch or uploaded to the Scratch website.
-      </div>
-
-      <!-- <div class="infobox">
-        <div class="infobox-title">Some extensions may not work in TurboWarp Desktop.</div>
-        To make sure extensions work offline, each release of <a href="https://desktop.turbowarp.org/">TurboWarp Desktop</a> comes with a copy of these extensions as of its release date, so some extensions may be outdated or missing.
-        Update to the latest version for the best results.
-      </div> -->
-    </div>
-
-    
-
-    <script>
-      document.addEventListener('click', function (e) {
-        var toCopy = e.target.getAttribute('data-copy');
-        if (toCopy) {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(toCopy);
+        splashReset.onclick = function () {
+          splashReset.disabled = true;
+          function hardRefresh() {
+            var search = location.search.replace(/[?&]nocache=\d+/, '');
+            location.replace(location.pathname + search + (search ? '&' : '?') + 'nocache=' + Math.floor(Math.random() * 100000));
+          }
+          if ('serviceWorker' in navigator) {
+            setTimeout(hardRefresh, 5000);
+            navigator.serviceWorker.getRegistration("")
+              .then(function(registration) {
+                if (registration) {
+                  return registration.unregister();
+                }
+              })
+              .then(hardRefresh)
+              .catch(hardRefresh);
           } else {
-            var input = document.createElement('input');
-            input.value = toCopy;
-            input.style.top = '0';
-            input.style.left = '0';
-            input.style.position = 'fixed';
-            document.body.appendChild(input);
-            input.focus();
-            input.select();
-            try {
-              document.execCommand('copy');
-            } catch (e) {
-              console.error(e);
-            }
-            document.body.removeChild(input);
-            e.target.focus();
+            hardRefresh();
           }
+        };
+
+        window.SplashEnd = () => {
+          splash.hidden = true;
+          window.onerror = null;
+        };
+        
+        var offlineIndicatorTimer = null;
+        window.showOfflineIndicator = function(isOffline) {
+          var indicator = document.getElementById('offline-indicator');
+          var text = document.getElementById('offline-text');
+          
+          if (offlineIndicatorTimer) {
+            clearTimeout(offlineIndicatorTimer);
+            offlineIndicatorTimer = null;
+          }
+          if (isOffline) {
+            indicator.className = 'offline-indicator show';
+            text.textContent = 'Offline';
+          } else {
+            indicator.className = 'offline-indicator online show';
+            text.textContent = 'Online';
+            // Hide online indicator after 3 seconds
+            offlineIndicatorTimer = setTimeout(function() {
+              indicator.className = 'offline-indicator online';
+              offlineIndicatorTimer = null;
+            }, 3000);
+          }
+        };
+        
+        // Update notification functionality
+        window.showUpdateNotification = function() {
+          var notification = document.getElementById('update-notification');
+          notification.className = 'update-notification show';
+        };
+        
+        // Check initial offline state
+        if (!navigator.onLine) {
+          window.showOfflineIndicator(true);
         }
-
-        if (e.target.className.includes('sample-list-button')) {
-          var extension = e.target.closest('.extension');
-          extension.dataset.samplesOpen = extension.dataset.samplesOpen !== 'true';
-        }
-      });
-
-      window.addEventListener("load", () => {
-        const extensionElements = document.querySelectorAll(".extension");
-        const container = document.querySelector(".extensions");
-        const sort = document.getElementById("search-sort");
-
-        document.getElementById("search-bar").addEventListener("input", function (evt) {
-          const searchQuery = evt.srcElement.value.toLowerCase();
-
-          extensionElements.forEach(extension => {
-            const h2 = extension.querySelector("h2").textContent.toLowerCase();
-            const p = extension.querySelector("p").textContent.toLowerCase();
-            if (h2.includes(searchQuery) || p.includes(searchQuery)) {
-              extension.style.removeProperty("display");
-            } else {
-              extension.style.display = "none";
-            }
-          });
-
-          switch (sort.value) {
-            case "original":
-              originalOrder.forEach(div => container.appendChild(div));
-              break;
-            case "abc":
-              divs.sort((a, b) => a.textContent.localeCompare(b.textContent));
-              divs.forEach(div => container.appendChild(div));
-              break;
-            case "zxy":
-              divs.sort((a, b) => b.textContent.localeCompare(a.textContent));
-              divs.forEach(div => container.appendChild(div));
-              break;
-          }
-        });
-
-        const divs = Array.from(extensionElements);
-        const originalOrder = [...divs];
-
-        sort.addEventListener("change", function (evt) {
-          switch (evt.srcElement.value) {
-            case "original":
-              originalOrder.forEach(div => container.appendChild(div));
-              break;
-            case "abc":
-              divs.sort((a, b) => a.innerText.localeCompare(b.innerText));
-              divs.forEach(div => container.appendChild(div));
-              break;
-            case "zxy":
-              divs.sort((a, b) => b.innerText.localeCompare(a.innerText));
-              divs.forEach(div => container.appendChild(div));
-              break;
-          }
-        });
-      });
-
-    </script>
-
-    <div class="section extensions-outer">
-      <div class="search-container">
-        <input type="text" id="search-bar" class="search-base search-bar" placeholder="Search for extensions...">
-        <select class="search-base search-sort" id="search-sort">
-          <option value="original">Sort: Default</option>
-          <!--<option value="option2">Sort: Relevance</option>-->
-          <option value="abc">Sort: ABC</option>
-          <option value="zxy">Sort: ZXY</option>
-          <!--<option value="newest">Sort: Newest</option>
-          <option value="oldest">Sort: Oldest</option>-->
-        </select>
-      </div>
-      <div class="extensions">
-        
-        
-          <div class="extension">
-            <div class="extension-banner">
-              
-              <img loading="lazy" src="images/derpygamer2142/GPUsb3.svg" class="extension-image">
-
-              <div class="extension-buttons">
-                <button class="copy" data-copy="https://omniblocks.org/extensions/derpygamer2142/GPUsb3.js">Copy URL</button>
-                <a class="open" href="https://omniblocks.org/editor.html?extension=https://omniblocks.org/extensions/derpygamer2142/GPUsb3.js">Open Extension</a>
-
-                
-
-                
-              </div>
-            </div>
-
-            
-      
-            <h2>GPU.sb3</h2>
-            <p>
-              Use WebGPU compute shaders to accelerate your projects.
-              Created by <a href="https://scratch.mit.edu/users/insanetaco2000/">derpygamer2142</a>.
-            </p>
-          </div>
-        
-          <div class="extension">
-            <div class="extension-banner">
-              
-              <img loading="lazy" src="images/8to16/CTDB.svg" class="extension-image">
-
-              <div class="extension-buttons">
-                <button class="copy" data-copy="https://omniblocks.org/extensions/8to16/CTDB.js">Copy URL</button>
-                <a class="open" href="https://omniblocks.org/editor.html?extension=https://omniblocks.org/extensions/8to16/CTDB.js">Open Extension</a>
-
-                
-
-                
-              </div>
-            </div>
-
-            
-      
-            <h2>Worldwide Database</h2>
-            <p>
-              Set and receive worldwide cloud values.
-              Created by AmpElectrecuted and KV storage provided by Cloudflare.
-            </p>
-          </div>
-        
-          <div class="extension">
-            <div class="extension-banner">
-              
-              <img loading="lazy" src="images/unknown.svg" class="extension-image">
-
-              <div class="extension-buttons">
-                <button class="copy" data-copy="https://omniblocks.org/extensions/CST1229/3d.js">Copy URL</button>
-                <a class="open" href="https://omniblocks.org/editor.html?extension=https://omniblocks.org/extensions/CST1229/3d.js">Open Extension</a>
-
-                
-
-                
-              </div>
-            </div>
-
-            
-      
-            <h2>CST 3D</h2>
-            <p>
-              Bring your sprites into the third dimension.
-              Created by <a href="https://scratch.mit.edu/users/CST1229/">CST1229</a>.
-            </p>
-          </div>
-        
-      </div>
-    </div>
-
-    <footer class="section">
-      <p>TurboWarp is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation.</p>
-      <div class="links">
-        <a href="https://github.com/TurboWarp/extensions/tree/master/images#readme">Image Attribution</a>
-        -
-        <a href="https://github.com/TurboWarp/extensions">GitHub</a>
-        -
-        <a href="https://docs.turbowarp.org/development/extensions/introduction">Developer Documentation</a>
-      </div>
-    </footer>
-  </body>
-</html>
+      })();</script><div id="app"></div><script src="js/pentapod/vendors~addon-settings~credits~editor~embed~fullscreen~player.986bded7823962772ea0.js"></script><script src="js/pentapod/vendors~editor~embed~fullscreen~player.19ef2a9e3fb93926ea0d.js"></script><script src="js/pentapod/addon-settings~addons~editor~fullscreen~player.076a06c8bde8b2fb1e4c.js"></script><script src="js/pentapod/addon-settings~editor~embed~fullscreen~player.fc9ddd5e933939a5d2c1.js"></script><script src="js/pentapod/player.109dcefe5eafb2f7989c.js"></script></body></html>

@@ -271,105 +271,148 @@ const GUIComponent = (props) => {
                             minHeight:
                                 640 + Math.max(0, customStageSize.height - 360),
                         }}
-                        {...componentProps}
-                    >
-                        {alwaysEnabledModals}
-                        {telemetryModalVisible ? (
-                            <TelemetryModal
-                                isRtl={isRtl}
-                                isTelemetryEnabled={isTelemetryEnabled}
-                                onCancel={onTelemetryModalCancel}
-                                onOptIn={onTelemetryModalOptIn}
-                                onOptOut={onTelemetryModalOptOut}
-                                onRequestClose={onRequestCloseTelemetryModal}
-                                onShowPrivacyPolicy={onShowPrivacyPolicy}
-                            />
-                        ) : null}
-                        {loading ? <Loader isFullScreen /> : null}
-                        {isCreating ? (
-                            <Loader
-                                isFullScreen
-                                messageId="gui.loader.creating"
-                            />
-                        ) : null}
-                        {isBrowserSupported() ? null : (
-                            <BrowserModal isRtl={isRtl} />
-                        )}
-                        {tipsLibraryVisible ? <TipsLibrary /> : null}
-                        {cardsVisible ? <Cards /> : null}
-                        {alertsVisible ? (
-                            <Alerts className={styles.alertsContainer} />
-                        ) : null}
-                        {connectionModalVisible ? (
-                            <ConnectionModal vm={vm} />
-                        ) : null}
-                        {costumeLibraryVisible ? (
-                            <CostumeLibrary
-                                vm={vm}
-                                onRequestClose={onRequestCloseCostumeLibrary}
-                            />
-                        ) : null}
-                        {backdropLibraryVisible ? (
-                            <BackdropLibrary
-                                vm={vm}
-                                onRequestClose={onRequestCloseBackdropLibrary}
-                            />
-                        ) : null}
-                        <MenuBar
-                            accountNavOpen={accountNavOpen}
-                            authorId={authorId}
-                            authorThumbnailUrl={authorThumbnailUrl}
-                            authorUsername={authorUsername}
-                            canChangeLanguage={canChangeLanguage}
-                            canChangeTheme={canChangeTheme}
-                            canCreateCopy={canCreateCopy}
-                            canCreateNew={canCreateNew}
-                            canEditTitle={canEditTitle}
-                            canManageFiles={canManageFiles}
-                            canRemix={canRemix}
-                            canSave={canSave}
-                            canShare={canShare}
-                            className={styles.menuBarPosition}
-                            enableCommunity={enableCommunity}
-                            isShared={isShared}
-                            isTotallyNormal={isTotallyNormal}
-                            logo={logo}
-                            renderLogin={renderLogin}
-                            showComingSoon={showComingSoon}
-                            showOpenFilePicker={showOpenFilePicker}
-                            showSaveFilePicker={showSaveFilePicker}
-                            onClickAbout={onClickAbout}
-                            onClickAccountNav={onClickAccountNav}
-                            onClickAddonSettings={onClickAddonSettings}
-                            onClickDesktopSettings={onClickDesktopSettings}
-                            onClickNewWindow={onClickNewWindow}
-                            onClickPackager={onClickPackager}
-                            onClickLogo={onClickLogo}
-                            onCloseAccountNav={onCloseAccountNav}
-                            onLogOut={onLogOut}
-                            onOpenRegistration={onOpenRegistration}
-                            onProjectTelemetryEvent={onProjectTelemetryEvent}
-                            onSeeCommunity={onSeeCommunity}
-                            onShare={onShare}
-                            onStartSelectingFileUpload={
-                                onStartSelectingFileUpload
-                            }
-                            onToggleLoginOpen={onToggleLoginOpen}
-                        />
-                        <Box className={styles.bodyWrapper}>
-                            <Box className={styles.flexWrapper}>
-                                <Box className={styles.editorWrapper}>
-                                    <Tabs
-                                        forceRenderTabPanel
-                                        className={tabClassNames.tabs}
-                                        selectedIndex={activeTabIndex}
-                                        selectedTabClassName={
-                                            tabClassNames.tabSelected
-                                        }
-                                        selectedTabPanelClassName={
-                                            tabClassNames.tabPanelSelected
-                                        }
-                                        onSelect={onActivateTab}
+                    />
+                ) : null}
+                <StageWrapper
+                    isFullScreen={isFullScreen}
+                    isEmbedded={isEmbedded}
+                    isRendererSupported={isRendererSupported()}
+                    isRtl={isRtl}
+                    loading={loading}
+                    stageSize={STAGE_SIZE_MODES.full}
+                    vm={vm}
+                >
+                    {alertsVisible ? (
+                        <Alerts className={styles.alertsContainer} />
+                    ) : null}
+                </StageWrapper>
+                {alwaysEnabledModals}
+            </React.Fragment>
+        ) : (
+            <Box
+                className={styles.pageWrapper}
+                dir={isRtl ? 'rtl' : 'ltr'}
+                style={{
+                    '--custom-stage-width': Math.max(0, customStageSize.width - 480),
+                    '--custom-stage-height': Math.max(0, customStageSize.height - 360)
+                }}
+                {...componentProps}
+            >
+                {alwaysEnabledModals}
+                {telemetryModalVisible ? (
+                    <TelemetryModal
+                        isRtl={isRtl}
+                        isTelemetryEnabled={isTelemetryEnabled}
+                        onCancel={onTelemetryModalCancel}
+                        onOptIn={onTelemetryModalOptIn}
+                        onOptOut={onTelemetryModalOptOut}
+                        onRequestClose={onRequestCloseTelemetryModal}
+                        onShowPrivacyPolicy={onShowPrivacyPolicy}
+                    />
+                ) : null}
+                {loading ? (
+                    <Loader isFullScreen />
+                ) : null}
+                {isCreating ? (
+                    <Loader
+                        isFullScreen
+                        messageId="gui.loader.creating"
+                    />
+                ) : null}
+                {isBrowserSupported() ? null : (
+                    <BrowserModal isRtl={isRtl} />
+                )}
+                {tipsLibraryVisible ? (
+                    <TipsLibrary />
+                ) : null}
+                {cardsVisible ? (
+                    <Cards />
+                ) : null}
+                {alertsVisible ? (
+                    <Alerts className={styles.alertsContainer} />
+                ) : null}
+                {connectionModalVisible ? (
+                    <ConnectionModal
+                        vm={vm}
+                    />
+                ) : null}
+                {costumeLibraryVisible ? (
+                    <CostumeLibrary
+                        vm={vm}
+                        onRequestClose={onRequestCloseCostumeLibrary}
+                    />
+                ) : null}
+                {backdropLibraryVisible ? (
+                    <BackdropLibrary
+                        vm={vm}
+                        onRequestClose={onRequestCloseBackdropLibrary}
+                    />
+                ) : null}
+                <MenuBar
+                    accountNavOpen={accountNavOpen}
+                    authorId={authorId}
+                    authorThumbnailUrl={authorThumbnailUrl}
+                    authorUsername={authorUsername}
+                    canChangeLanguage={canChangeLanguage}
+                    canChangeTheme={canChangeTheme}
+                    canCreateCopy={canCreateCopy}
+                    canCreateNew={canCreateNew}
+                    canEditTitle={canEditTitle}
+                    canManageFiles={canManageFiles}
+                    canRemix={canRemix}
+                    canSave={canSave}
+                    canShare={canShare}
+                    className={styles.menuBarPosition}
+                    enableCommunity={enableCommunity}
+                    isShared={isShared}
+                    isTotallyNormal={isTotallyNormal}
+                    logo={logo}
+                    renderLogin={renderLogin}
+                    showComingSoon={showComingSoon}
+                    showOpenFilePicker={showOpenFilePicker}
+                    showSaveFilePicker={showSaveFilePicker}
+                    onClickAbout={onClickAbout}
+                    onClickAccountNav={onClickAccountNav}
+                    onClickAddonSettings={onClickAddonSettings}
+                    onClickDesktopSettings={onClickDesktopSettings}
+                    onClickNewWindow={onClickNewWindow}
+                    onClickPackager={onClickPackager}
+                    onClickLogo={onClickLogo}
+                    onCloseAccountNav={onCloseAccountNav}
+                    onLogOut={onLogOut}
+                    onOpenRegistration={onOpenRegistration}
+                    onProjectTelemetryEvent={onProjectTelemetryEvent}
+                    onSeeCommunity={onSeeCommunity}
+                    onShare={onShare}
+                    onStartSelectingFileUpload={onStartSelectingFileUpload}
+                    onToggleLoginOpen={onToggleLoginOpen}
+                />
+                <Box className={styles.bodyWrapper}>
+                    <Box className={styles.flexWrapper}>
+                        <Box className={styles.editorWrapper}>
+                            <Tabs
+                                forceRenderTabPanel
+                                className={tabClassNames.tabs}
+                                selectedIndex={activeTabIndex}
+                                selectedTabClassName={tabClassNames.tabSelected}
+                                selectedTabPanelClassName={tabClassNames.tabPanelSelected}
+                                onSelect={onActivateTab}
+                            >
+                                <TabList className={tabClassNames.tabList}>
+                                    <Tab className={tabClassNames.tab}>
+                                        <img
+                                            draggable={false}
+                                            src={codeIcon()}
+                                        />
+                                        <FormattedMessage
+                                            defaultMessage="Code"
+                                            description="Button to get to the code panel"
+                                            id="gui.gui.codeTab"
+                                        />
+                                    </Tab>
+                                    <Tab
+                                        className={tabClassNames.tab}
+                                        onClick={onActivateCostumesTab}
                                     >
                                         <TabList
                                             className={tabClassNames.tabList}

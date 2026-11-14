@@ -25,3 +25,13 @@
     animation: spinner 1.2s reverse ease-in-out infinite;
 }
 
+@media only screen and (max-width: 768px) {
+    .collapsible-label {
+        display: none;
+    }
+
+    .see-inside-button-icon {
+        margin-right: 0 !important;
+    }
+}
+

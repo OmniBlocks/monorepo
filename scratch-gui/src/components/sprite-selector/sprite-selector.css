@@ -125,3 +125,10 @@
     background: black;
     filter: opacity(15%) brightness(0%);
 }
+
+@media only screen and (max-width: 768px) {
+    .sprite-selector {
+        border-radius: $space;
+        border-bottom: 1px solid $ui-black-transparent;
+    }
+}

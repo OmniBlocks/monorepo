@@ -3,7 +3,7 @@ const now = new Date();
 const manifest = {
   "noTranslations": true,
   "name": "Christmas!",
-  "description": "A fun christmas addon with snowflakes and Santa hats.",
+  "description": "Adds santa hats to blocks, as well as a special default project and snowflakes!",
   "credits": [
     {
       "name": "8to16"

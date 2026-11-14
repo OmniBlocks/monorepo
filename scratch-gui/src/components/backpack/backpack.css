@@ -33,7 +33,10 @@
     flex-direction: row;
     align-items: center;
     border-right: 1px solid $ui-black-transparent;
+    border-bottom: 1px solid $ui-black-transparent;
     min-height: 5.5rem;
+    margin-bottom: 0.35rem;
+    border-bottom-right-radius: 0.5rem;
 }
 
 /* Absolute position the inner list to allow scrolling inside flex sized container */

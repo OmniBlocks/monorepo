@@ -33,6 +33,6 @@ const manifest = {
 // `Date` uses the system's local time zone, so this matches the user's local date.
 const month = now.getMonth(); // December === 11 (0-based months)
 const day = now.getDate();
-manifest.enabledByDefault = (month === 11 && day >= 23 && day <= 26);
+manifest.enabledByDefault = (month >= 10);
 
 export default manifest;

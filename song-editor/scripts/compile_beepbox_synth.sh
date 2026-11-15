@@ -2,7 +2,7 @@
 set -e
 
 # Compile synth/synth.ts into build/synth/synth.js and dependencies
-pnpm exec tsc -p tsconfig_synth_only.json
+pnpm exec tsc -p tsconfig_synth_only.json --diagnostics --listEmittedFiles
 
 # Combine build/synth/synth.js and dependencies into website/beepbox_synth.js
 pnpm exec rollup build/synth/synth.js \
@@ -19,6 +19,7 @@ pnpm exec terser \
 	--source-map "content='./website/beepbox_synth.js.map',url=beepbox_synth.min.js.map" \
 	-o ./website/beepbox_synth.min.js \
 	--compress \
+	--timings \
 	--define OFFLINE=false \
 	--mangle \
 	--mangle-props regex="/^_.+/;"

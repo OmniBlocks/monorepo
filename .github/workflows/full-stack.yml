@@ -1,4 +1,6 @@
 name: Full Build Run
+env:
+  FORCE_COLOR: 1
 on: 
   workflow_dispatch:
     inputs:
@@ -41,6 +43,8 @@ jobs:
           node-version: '24'
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
+        with:
+          cache: true          
 
       - name: Build OmniBlocks (Base)
         run: | 
@@ -110,9 +114,7 @@ jobs:
           START_TIME=$(date +%s)
           
           # Build Editor
-          (
-            NODE_ENV=production pnpm build
-          ) > test-logs/scratch-gui-build.log 2>&1 || true
+          NODE_ENV=production pnpm build 2>&1 | tee test-logs/scratch-gui-build.log || true
           
           # Build Extensions Gallery if folder exists
           if [ -d "extensions" ]; then

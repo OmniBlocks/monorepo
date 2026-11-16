@@ -30,6 +30,7 @@ const SongEditor = ({isVisible}) => {
                 return;
             }
 
+            window.beepbox = module.default ? module.default : module;
             editorRef.current = mount(hostRef.current);
             window.dispatchEvent(new Event('resize'));
         };
@@ -39,6 +40,7 @@ const SongEditor = ({isVisible}) => {
         return () => {
             cancelled = true;
             if (editorRef.current && editorRef.current.destroy) {
+                window.beepbox = null;
                 editorRef.current.destroy();
             }
             editorRef.current = null;

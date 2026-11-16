@@ -13,7 +13,7 @@ async function folderExists(dirPath) { // ob: stole this from google
   }
 }
 
-console.log(styleText("purple", "Finding build directory"))
+console.log(styleText("magenta", "Finding build directory"))
 const diry = pathUtil.join(import.meta.dirname, "../../scratch-gui");
 let outputDirectory;
 let l10nOutput;

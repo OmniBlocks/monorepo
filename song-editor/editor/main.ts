@@ -154,12 +154,24 @@ if ("serviceWorker" in navigator) {
 }
     */
 return {
+        // ob: Functions for scratch-vm/gui to read
+        getSongData: () => {
+            return editor.doc.song.toJsonObject(true, 1, true); 
+        },
+
+        getSongString: () => {
+            return editor.doc.song.toBase64String();
+            // don't know why we would need this but ok
+        },
+        
         destroy: () => {
             editor.doc.synth.pause();
             editor.mainLayer.remove();
         }
     };
 }
+
+
 
 // When compiling synth.ts as a standalone module named "beepbox", expose these classes as members to JavaScript:
 export { mountSongEditor, Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };

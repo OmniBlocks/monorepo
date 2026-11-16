@@ -2,7 +2,7 @@
 set -e
 
 # Compile editor/main.ts into build/editor/main.js and dependencies
-pnpm exec tsc -p tsconfig_editor.json
+pnpm exec tsc -p tsconfig_editor.json --diagnostics --listEmittedFiles
 
 # Combine build/editor/main.js and dependencies into website/beepbox_editor.js
 pnpm exec rollup build/editor/main.js \
@@ -19,6 +19,7 @@ pnpm exec terser \
 	--source-map "content='./website/beepbox_editor.js.map',url=beepbox_editor.min.js.map" \
 	-o ./website/beepbox_editor.min.js \
 	--compress \
+	--timings \
 	--define OFFLINE=false \
 	--mangle \
 	--mangle-props regex="/^_.+/;"

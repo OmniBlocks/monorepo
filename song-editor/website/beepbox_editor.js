@@ -36880,6 +36880,7 @@ li.select2-results__option[role=group] > strong:hover {
         constructor() {
             this.showFifth = true;
             this.enableChannelMuting = true;
+            this.displayBrowserUrl = false;
             this.volume = 75;
             this.visibleOctaves = Preferences.defaultVisibleOctaves;
             this.reload();
@@ -36950,7 +36951,7 @@ li.select2-results__option[role=group] > strong:hover {
             window.localStorage.setItem("instrumentCopyPaste", this.instrumentCopyPaste ? "true" : "false");
             window.localStorage.setItem("instrumentImportExport", this.instrumentImportExport ? "true" : "false");
             window.localStorage.setItem("instrumentButtonsAtTop", this.instrumentButtonsAtTop ? "true" : "false");
-            window.localStorage.setItem("displayBrowserUrl", this.displayBrowserUrl ? "true" : "false");
+            window.localStorage.setItem("displayBrowserUrl", "false");
             window.localStorage.setItem("pressControlForShortcuts", this.pressControlForShortcuts ? "true" : "false");
             window.localStorage.setItem("enableMidi", this.enableMidi ? "true" : "false");
             window.localStorage.setItem("showRecordButton", this.showRecordButton ? "true" : "false");
@@ -37227,11 +37228,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.performance = new SongPerformance(this);
         }
         toggleDisplayBrowserUrl() {
-            const state = this._getHistoryState();
-            if (state == null)
-                throw new Error("History state is null.");
-            this.prefs.displayBrowserUrl = !this.prefs.displayBrowserUrl;
-            this._replaceState(state, this.song.toBase64String());
+            return;
         }
         _getHistoryState() {
             if (this.prefs.displayBrowserUrl) {
@@ -55760,6 +55757,12 @@ You should be redirected to the song at:<br /><br />
             history.scrollRestoration = "manual";
         editor.updatePlayButton();
         return {
+            getSongData: () => {
+                return editor.doc.song.toJsonObject(true, 1, true);
+            },
+            getSongString: () => {
+                return editor.doc.song.toBase64String();
+            },
             destroy: () => {
                 editor.doc.synth.pause();
                 editor.mainLayer.remove();

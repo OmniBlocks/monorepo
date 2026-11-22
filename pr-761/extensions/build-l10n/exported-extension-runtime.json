@@ -1,0 +1,190 @@
+{
+  "8to16/CTDB@_Worldwide Database": {
+    "string": "Worldwide Database",
+    "developer_comment": "Part of the 'Worldwide Database' extension."
+  },
+  "8to16/CTDB@_Scope (prevents collisions)": {
+    "string": "Scope (prevents collisions)",
+    "developer_comment": "Part of the 'Worldwide Database' extension."
+  },
+  "8to16/CTDB@_set project scope to [SCOPE]": {
+    "string": "set project scope to [SCOPE]",
+    "developer_comment": "Part of the 'Worldwide Database' extension."
+  },
+  "8to16/CTDB@_project scope": {
+    "string": "project scope",
+    "developer_comment": "Part of the 'Worldwide Database' extension."
+  },
+  "8to16/CTDB@_Storage": {
+    "string": "Storage",
+    "developer_comment": "Part of the 'Worldwide Database' extension."
+  },
+  "8to16/CTDB@_set key [KEY] to [VALUE]": {
+    "string": "set key [KEY] to [VALUE]",
+    "developer_comment": "Part of the 'Worldwide Database' extension."
+  },
+  "8to16/CTDB@_get key [KEY]": {
+    "string": "get key [KEY]",
+    "developer_comment": "Part of the 'Worldwide Database' extension."
+  },
+  "8to16/CTDB@_delete key [KEY]": {
+    "string": "delete key [KEY]",
+    "developer_comment": "Part of the 'Worldwide Database' extension."
+  },
+  "CST1229/3d@_CST 3D": {
+    "string": "CST 3D",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_Open Documentation": {
+    "string": "Open Documentation",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_Show Vanilla Blocks": {
+    "string": "Show Vanilla Blocks",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_Hide Vanilla Blocks": {
+    "string": "Hide Vanilla Blocks",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_set 3D mode to [MODE]": {
+    "string": "set 3D mode to [MODE]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_set z to [Z]": {
+    "string": "set z to [Z]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_change z by [Z]": {
+    "string": "change z by [Z]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_z position": {
+    "string": "z position",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_go to x: [X] y: [Y] z: [Z]": {
+    "string": "go to x: [X] y: [Y] z: [Z]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_change position by x: [X] y: [Y] z: [Z]": {
+    "string": "change position by x: [X] y: [Y] z: [Z]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_move [STEPS] steps in 3D": {
+    "string": "move [STEPS] steps in 3D",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_point in [DIRECTION] [DEGREES]": {
+    "string": "point in [DIRECTION] [DEGREES]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_turn [DIRECTION] [DEGREES] degrees": {
+    "string": "turn [DIRECTION] [DEGREES] degrees",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_direction around [DIRECTION]": {
+    "string": "direction around [DIRECTION]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_set stretch z to [STRETCH]": {
+    "string": "set stretch z to [STRETCH]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_stretch z": {
+    "string": "stretch z",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_set texture filter to [FILTER]": {
+    "string": "set texture filter to [FILTER]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_set shown faces to [SIDE]": {
+    "string": "set shown faces to [SIDE]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_attach myself to [TARGET]": {
+    "string": "attach myself to [TARGET]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_attach myself to sprite with variable [VARIABLE] set to [VALUE]": {
+    "string": "attach myself to sprite with variable [VARIABLE] set to [VALUE]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_detach myself": {
+    "string": "detach myself",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_sprite I'm attached to": {
+    "string": "sprite I'm attached to",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_variable [VARIABLE] of sprite I'm attached to": {
+    "string": "variable [VARIABLE] of sprite I'm attached to",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_move camera to x: [X] y: [Y] z: [Z]": {
+    "string": "move camera to x: [X] y: [Y] z: [Z]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_change camera by x: [X] y: [Y] z: [Z]": {
+    "string": "change camera by x: [X] y: [Y] z: [Z]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_camera x": {
+    "string": "camera x",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_camera y": {
+    "string": "camera y",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_camera z": {
+    "string": "camera z",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_move camera [STEPS] steps": {
+    "string": "move camera [STEPS] steps",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_point camera in [DIRECTION] [DEGREES]": {
+    "string": "point camera in [DIRECTION] [DEGREES]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_turn camera [DIRECTION] [DEGREES] degrees": {
+    "string": "turn camera [DIRECTION] [DEGREES] degrees",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_camera direction around [DIRECTION]": {
+    "string": "camera direction around [DIRECTION]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_set camera [PARAM] to [VALUE]": {
+    "string": "set camera [PARAM] to [VALUE]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_camera [PARAM]": {
+    "string": "camera [PARAM]",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_⟲": {
+    "string": "⟲",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_⟳": {
+    "string": "⟳",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_y (yaw)": {
+    "string": "y (yaw)",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_x (pitch)": {
+    "string": "x (pitch)",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  },
+  "CST1229/3d@_z (roll)": {
+    "string": "z (roll)",
+    "developer_comment": "Part of the 'CST 3D' extension."
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "8to16/CTDB@name": {
+    "string": "Worldwide Database",
+    "developer_comment": "Name of the 'Worldwide Database' extension in the extension gallery."
+  },
+  "8to16/CTDB@description": {
+    "string": "Set and receive worldwide cloud values.",
+    "developer_comment": "Description of the 'Worldwide Database' extension in the extension gallery."
+  },
+  "CST1229/3d@name": {
+    "string": "CST 3D",
+    "developer_comment": "Name of the 'CST 3D' extension in the extension gallery."
+  },
+  "CST1229/3d@description": {
+    "string": "Bring your sprites into the third dimension.",
+    "developer_comment": "Description of the 'CST 3D' extension in the extension gallery."
+  },
+  "derpygamer2142/GPUsb3@name": {
+    "string": "GPU.sb3",
+    "developer_comment": "Name of the 'GPU.sb3' extension in the extension gallery."
+  },
+  "derpygamer2142/GPUsb3@description": {
+    "string": "Use WebGPU compute shaders to accelerate your projects.",
+    "developer_comment": "Description of the 'GPU.sb3' extension in the extension gallery."
+  },
+  "therad7cal/SMM2@name": {
+    "string": "Super Mario Maker 2 Blocks",
+    "developer_comment": "Name of the 'Super Mario Maker 2 Blocks' extension in the extension gallery."
+  },
+  "therad7cal/SMM2@description": {
+    "string": "Interact with the Super Mario Maker 2 API. Not affiliated with Nintendo.",
+    "developer_comment": "Description of the 'Super Mario Maker 2 Blocks' extension in the extension gallery."
+  }
+}

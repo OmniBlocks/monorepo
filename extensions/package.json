@@ -29,6 +29,7 @@
   "dependencies": {
     "@turbowarp/json": "^0.1.2",
     "@turbowarp/scratchblocks": "^3.6.7",
+    "scratch-gui": "workspace:*",
     "@turbowarp/types": "git+https://github.com/TurboWarp/types-tw.git#tw",
     "adm-zip": "^0.5.16",
     "chokidar": "^4.0.3",

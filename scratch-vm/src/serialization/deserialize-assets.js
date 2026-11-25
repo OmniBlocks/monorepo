@@ -59,6 +59,48 @@ const deserializeSound = function (sound, runtime, zip, assetFileName) {
         });
 };
 
+const deserializeSong = function (song, runtime, zip) {
+    const storage = runtime.storage;
+    const dataFormat = song.dataFormat || 'json';
+    const fileName = song.md5ext || `${song.assetId}.${dataFormat}`;
+    if (!storage) {
+        log.warn('No storage module present; cannot load song asset: ', fileName);
+        return Promise.resolve(null);
+    }
+    if (!zip) {
+        return Promise.resolve(null);
+    }
+
+    let songFile = zip.file(fileName);
+    if (!songFile) {
+        const fileMatch = new RegExp(`^([^/]*/)?${fileName}$`);
+        songFile = zip.file(fileMatch)[0];
+    }
+    if (!songFile) {
+        log.error(`Could not find song file associated with the ${song.name} song.`);
+        return Promise.resolve(null);
+    }
+    if (!JSZip.support.uint8array) {
+        log.error('JSZip uint8array is not supported in this browser.');
+        return Promise.resolve(null);
+    }
+
+    return songFile.async('uint8array')
+        .then(data => storage.createAsset(
+            storage.AssetType.Song,
+            storage.DataFormat.JSON,
+            data,
+            null,
+            true
+        ))
+        .then(asset => {
+            song.asset = asset;
+            song.assetId = asset.assetId;
+            song.dataFormat = storage.DataFormat.JSON;
+            song.md5 = `${asset.assetId}.${storage.DataFormat.JSON}`;
+        });
+};
+
 /**
  * Deserializes costume from file into storage cache so that it can
  * be loaded into the runtime.
@@ -174,5 +216,6 @@ const deserializeCostume = function (costume, runtime, zip, assetFileName, textL
 
 module.exports = {
     deserializeSound,
-    deserializeCostume
+    deserializeCostume,
+    deserializeSong
 };

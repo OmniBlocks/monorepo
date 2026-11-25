@@ -45,6 +45,10 @@ class Sprite {
         */
         this.sounds = [];
         /**
+         * List of songs for this sprite.
+        */
+        this.songs = [];
+        /**
          * List of clones for this sprite, including the original.
          * @type {Array.<!RenderedTarget>}
          */
@@ -75,6 +79,30 @@ class Sprite {
      */
     get costumes () {
         return this.costumes_;
+    }
+
+    set songs (songs) {
+        this.songs_ = [];
+        for (const song of songs) {
+            this.addSongAt(song, this.songs_.length);
+        }
+    }
+
+    get songs () {
+        return this.songs_;
+    }
+
+    addSongAt (songObject, index) {
+        if (!songObject.name) {
+            songObject.name = '';
+        }
+        const usedNames = this.songs_.map(song => song.name);
+        songObject.name = StringUtil.unusedName(songObject.name, usedNames);
+        this.songs_.splice(index, 0, songObject);
+    }
+
+    deleteSongAt (index) {
+        return this.songs.splice(index, 1)[0];
     }
 
     /**
@@ -163,6 +191,7 @@ class Sprite {
             assetPromises.push(loadSoundFromAsset(newSound, soundAsset, this.runtime, newSprite.soundBank));
             return newSound;
         });
+        newSprite.songs = this.songs.map(song => Object.assign({}, song));
 
         return Promise.all(assetPromises).then(() => newSprite);
     }

@@ -36900,7 +36900,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.instrumentImportExport = window.localStorage.getItem("instrumentImportExport") == "true";
             this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") == "true";
             this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") != "false";
-            this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false";
+            this.displayBrowserUrl = false;
             this.pressControlForShortcuts = window.localStorage.getItem("pressControlForShortcuts") == "true";
             this.enableMidi = window.localStorage.getItem("enableMidi") != "false";
             this.showRecordButton = window.localStorage.getItem("showRecordButton") == "true";
@@ -55682,8 +55682,24 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    function mountSongEditor(container) {
+    const getSongName = (editor) => editor.doc.song.title;
+    const getSongDuration = (editor) => {
+        const song = editor.doc.song;
+        const enableIntro = song.loopStart !== 0;
+        const enableOutro = song.loopStart + song.loopLength !== song.barCount;
+        const samples = editor.doc.synth.getTotalSamples(enableIntro, enableOutro, 0);
+        return ExportPrompt.samplesToTime(editor.doc, samples);
+    };
+    function mountSongEditor(container, onSongChangeCallback) {
         const editor = new SongEditor();
+        let onSongChange = onSongChangeCallback || null;
+        let loadingSong = false;
+        const notifySongChange = () => {
+            if (!loadingSong && onSongChange) {
+                onSongChange(editor.doc.song.toJsonObject(true, 1, true));
+            }
+        };
+        editor.doc.notifier.watch(notifySongChange);
         container.appendChild(editor.mainLayer);
         editor.whenUpdated();
         editor.mainLayer.className += " load";
@@ -55760,10 +55776,34 @@ You should be redirected to the song at:<br /><br />
             getSongData: () => {
                 return editor.doc.song.toJsonObject(true, 1, true);
             },
+            getNewSongData: () => {
+                return new Song().toJsonObject(true, 1, true);
+            },
+            getSongName: () => {
+                return getSongName(editor);
+            },
+            getSongDuration: () => {
+                return getSongDuration(editor);
+            },
+            loadSongData: (songData) => {
+                const songString = typeof songData === "string" ? songData : JSON.stringify(songData);
+                loadingSong = true;
+                try {
+                    new ChangeSong(editor.doc, songString);
+                    editor.doc.notifier.notifyWatchers();
+                }
+                finally {
+                    loadingSong = false;
+                }
+            },
+            setOnSongChange: (callback) => {
+                onSongChange = callback;
+            },
             getSongString: () => {
                 return editor.doc.song.toBase64String();
             },
             destroy: () => {
+                editor.doc.notifier.unwatch(notifySongChange);
                 editor.doc.synth.pause();
                 editor.mainLayer.remove();
             }
@@ -55783,6 +55823,8 @@ You should be redirected to the song at:<br /><br />
     exports.SongDocument = SongDocument;
     exports.SongEditor = SongEditor;
     exports.Synth = Synth;
+    exports.getSongDuration = getSongDuration;
+    exports.getSongName = getSongName;
     exports.mountSongEditor = mountSongEditor;
 
     Object.defineProperty(exports, '__esModule', { value: true });

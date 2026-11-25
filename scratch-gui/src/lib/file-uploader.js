@@ -4,6 +4,7 @@ import bmpConverter from './bmp-converter';
 import gifDecoder from './gif-decoder';
 import convertAudioToWav from './tw-convert-audio-wav.js';
 import log from './log.js';
+import {TextDecoder} from './tw-text-encoder.js';
 
 /**
  * Extract the file name given a string of the form fileName + ext
@@ -235,6 +236,31 @@ const soundUpload = function (fileData, fileType, storage, handleSound, handleEr
     handleSound(vmSound);
 };
 
+const songUpload = function (fileData, storage, handleSong, handleError) {
+    if (!storage) {
+        handleError(new Error('No storage module present; cannot cache song asset.'));
+        return;
+    }
+    let songData;
+    try {
+        songData = JSON.parse(new TextDecoder().decode(new Uint8Array(fileData)));
+    } catch (error) {
+        handleError(error);
+        return;
+    }
+    if (!songData || typeof songData !== 'object' || Array.isArray(songData)) {
+        handleError(new Error('Song file must contain a JSON object.'));
+        return;
+    }
+    const vmSong = createVMAsset(
+        storage,
+        storage.AssetType.Song,
+        storage.DataFormat.JSON,
+        new Uint8Array(fileData)
+    );
+    handleSong(vmSong);
+};
+
 const spriteUpload = function (fileData, fileType, spriteName, vm, handleSprite, handleError = () => {}) {
     switch (fileType) {
     case '':
@@ -286,5 +312,6 @@ export {
     handleFileUpload,
     costumeUpload,
     soundUpload,
+    songUpload,
     spriteUpload
 };

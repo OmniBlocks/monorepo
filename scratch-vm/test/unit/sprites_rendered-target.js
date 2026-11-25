@@ -583,3 +583,21 @@ test('#reorderSound', t => {
 
     t.end();
 });
+
+test('#song operations', t => {
+    const r = new Runtime();
+    const spr = new Sprite(null, r);
+    const target = new RenderedTarget(spr, r);
+    target.addSong({name: 'first', id: 0});
+    target.addSong({name: 'first', id: 1});
+    target.addSong({name: 'third', id: 2});
+
+    t.deepEqual(target.getSongs().map(song => song.name), ['first', 'first2', 'third']);
+    target.renameSong(2, 'first');
+    t.equal(target.getSongs()[2].name, 'first3');
+    t.equal(target.reorderSong(2, 0), true);
+    t.deepEqual(target.getSongs().map(song => song.id), [2, 0, 1]);
+    t.equal(target.deleteSong(1).id, 0);
+    t.deepEqual(target.getSongs().map(song => song.id), [2, 1]);
+    t.end();
+});

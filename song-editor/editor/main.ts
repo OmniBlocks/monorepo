@@ -8,13 +8,32 @@ import { SongEditor } from "./SongEditor";
 import { NotePin, Note, Pattern, Instrument, Channel, Song, Synth } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
 import { ExportPrompt } from "./ExportPrompt";
-import { ChangePreset } from "./changes";
+import { ChangePreset, ChangeSong } from "./changes";
 declare const $: any;
 
 //namespace beepbox {
 
-function mountSongEditor(container: HTMLElement) {   
+const getSongName = (editor: SongEditor): string => editor.doc.song.title;
+
+const getSongDuration = (editor: SongEditor): string => {
+    const song = editor.doc.song;
+    const enableIntro = song.loopStart !== 0;
+    const enableOutro = song.loopStart + song.loopLength !== song.barCount;
+    const samples = editor.doc.synth.getTotalSamples(enableIntro, enableOutro, 0);
+    return ExportPrompt.samplesToTime(editor.doc, samples);
+    // The method/patern for knowing duration is in ExportPrompt.ts
+};
+
+function mountSongEditor(container: HTMLElement, onSongChangeCallback?: (songData: Object) => void) {
 const editor: SongEditor = new SongEditor();//same as above
+let onSongChange: ((songData: Object) => void) | null = onSongChangeCallback || null;
+let loadingSong = false;
+const notifySongChange = (): void => {
+    if (!loadingSong && onSongChange) {
+        onSongChange(editor.doc.song.toJsonObject(true, 1, true));
+    }
+};
+editor.doc.notifier.watch(notifySongChange);
 container.appendChild(editor.mainLayer);
 editor.whenUpdated();
 
@@ -159,12 +178,40 @@ return {
             return editor.doc.song.toJsonObject(true, 1, true); 
         },
 
+        getNewSongData: () => {
+            return new Song().toJsonObject(true, 1, true);
+        },
+
+        getSongName: () => {
+            return getSongName(editor);
+        },
+
+        getSongDuration: () => {
+            return getSongDuration(editor);
+        },
+
+        loadSongData: (songData: Object | string) => {
+            const songString = typeof songData === "string" ? songData : JSON.stringify(songData);
+            loadingSong = true;
+            try {
+                new ChangeSong(editor.doc, songString);
+                editor.doc.notifier.notifyWatchers();
+            } finally {
+                loadingSong = false;
+            }
+        },
+
+        setOnSongChange: (callback: ((songData: Object) => void) | null) => {
+            onSongChange = callback;
+        },
+
         getSongString: () => {
             return editor.doc.song.toBase64String();
             // don't know why we would need this but ok
         },
         
         destroy: () => {
+            editor.doc.notifier.unwatch(notifySongChange);
             editor.doc.synth.pause();
             editor.mainLayer.remove();
         }
@@ -174,5 +221,5 @@ return {
 
 
 // When compiling synth.ts as a standalone module named "beepbox", expose these classes as members to JavaScript:
-export { mountSongEditor, Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };
+export { mountSongEditor, getSongName, getSongDuration, Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };
  

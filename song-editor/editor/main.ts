@@ -15,6 +15,17 @@ declare const $: any;
 
 const getSongName = (editor: SongEditor): string => editor.doc.song.title;
 
+const renameSong = (editor: SongEditor, newName: string): void => {
+    /* This will provide the vm/gui with a method to rename the song without trying to force it into the json or whatever other jank would be needed
+    In order to do it without.
+    The editor needs to be the source of truth for the name, not vm/gui. In the case vm/gui needs to rename the song, this should be used (such as in
+    the case of having duplicate names and renaming it to song2)
+    */
+
+    editor.doc.song.title = newName;
+    editor.doc.notifier.notifyWatchers();
+}
+
 const getSongDuration = (editor: SongEditor): string => {
     const song = editor.doc.song;
     const enableIntro = song.loopStart !== 0;
@@ -186,6 +197,10 @@ return {
             return getSongName(editor);
         },
 
+        renameSong: (newName: string) => {
+            return renameSong(editor, newName);
+        },
+
         getSongDuration: () => {
             return getSongDuration(editor);
         },
@@ -195,6 +210,7 @@ return {
             loadingSong = true;
             try {
                 new ChangeSong(editor.doc, songString);
+                editor.doc.resetHistory();
                 editor.doc.notifier.notifyWatchers();
             } finally {
                 loadingSong = false;
@@ -221,5 +237,5 @@ return {
 
 
 // When compiling synth.ts as a standalone module named "beepbox", expose these classes as members to JavaScript:
-export { mountSongEditor, getSongName, getSongDuration, Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };
+export { mountSongEditor, getSongName, renameSong, getSongDuration, Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };
  

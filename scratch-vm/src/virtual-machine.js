@@ -1040,13 +1040,14 @@ class VirtualMachine extends EventEmitter {
         if (!this.editingTarget) {
             return Promise.reject(new Error('No editing target.'));
         }
-        const originalSong = this.editingTarget.getSongs()[songIndex];
+        const target = this.editingTarget;
+        const originalSong = target.getSongs()[songIndex];
         if (!originalSong) {
             return Promise.reject(new Error(`No song at index: ${songIndex}`));
         }
         const clone = Object.assign({}, originalSong);
         return loadSong(clone, this.runtime).then(() => {
-            this.editingTarget.addSong(clone, songIndex + 1);
+            target.addSong(clone, songIndex + 1);
             this.emitTargetsUpdate();
         });
     }

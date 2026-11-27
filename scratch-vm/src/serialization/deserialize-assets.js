@@ -73,7 +73,8 @@ const deserializeSong = function (song, runtime, zip) {
 
     let songFile = zip.file(fileName);
     if (!songFile) {
-        const fileMatch = new RegExp(`^([^/]*/)?${fileName}$`);
+        const escapedFileName = fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const fileMatch = new RegExp(`^([^/]*/)?${escapedFileName}$`);
         songFile = zip.file(fileMatch)[0];
     }
     if (!songFile) {

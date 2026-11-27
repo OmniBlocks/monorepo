@@ -37035,6 +37035,7 @@ li.select2-results__option[role=group] > strong:hover {
             this._lastSequenceNumber = 0;
             this._stateShouldBePushed = false;
             this._recordedNewSong = false;
+            this._historyUpdateFrame = null;
             this._waitingToUpdateState = false;
             this._whenHistoryStateChanged = () => {
                 if (this.synth.recording) {
@@ -37147,6 +37148,7 @@ li.select2-results__option[role=group] > strong:hover {
                 this.channelScrollPos = Math.max(0, Math.min(this.song.getChannelCount() - this.trackVisibleChannels, this.channelScrollPos));
             };
             this._updateHistoryState = () => {
+                this._historyUpdateFrame = null;
                 this._waitingToUpdateState = false;
                 let hash;
                 try {
@@ -37319,10 +37321,38 @@ li.select2-results__option[role=group] > strong:hover {
                 this._stateShouldBePushed = this._stateShouldBePushed || !replace;
                 this._recordedNewSong = this._recordedNewSong || newSong;
                 if (!this._waitingToUpdateState) {
-                    window.requestAnimationFrame(this._updateHistoryState);
+                    this._historyUpdateFrame = window.requestAnimationFrame(this._updateHistoryState);
                     this._waitingToUpdateState = true;
                 }
             }
+        }
+        resetHistory() {
+            if (this._historyUpdateFrame != null) {
+                window.cancelAnimationFrame(this._historyUpdateFrame);
+                this._historyUpdateFrame = null;
+            }
+            this._waitingToUpdateState = false;
+            this._recentChange = null;
+            this._sequenceNumber = 0;
+            this._lastSequenceNumber = 0;
+            this._stateShouldBePushed = false;
+            this._recordedNewSong = false;
+            const currentIndex = window.sessionStorage.getItem("currentUndoIndex") || "0";
+            const state = {
+                canUndo: false,
+                sequenceNumber: 0,
+                bar: this.bar,
+                channel: this.channel,
+                instrument: this.viewedInstrument[this.channel],
+                recoveryUid: this._recoveryUid,
+                prompt: this.prompt,
+                selection: this.selection.toJSON()
+            };
+            if (!this.prefs.displayBrowserUrl) {
+                window.sessionStorage.setItem("oldestUndoIndex", currentIndex);
+                window.sessionStorage.setItem("newestUndoIndex", currentIndex);
+            }
+            this._replaceState(state, this.song.toBase64String());
         }
         _resetSongRecoveryUid() {
             this._recoveryUid = generateUid();
@@ -55790,6 +55820,7 @@ You should be redirected to the song at:<br /><br />
                 loadingSong = true;
                 try {
                     new ChangeSong(editor.doc, songString);
+                    editor.doc.resetHistory();
                     editor.doc.notifier.notifyWatchers();
                 }
                 finally {

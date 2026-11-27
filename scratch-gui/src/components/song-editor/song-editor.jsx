@@ -139,7 +139,7 @@ const SongEditor = ({isVisible, songData, songKey, onSongChange, onSongMetadataC
 SongEditor.propTypes = {
     isVisible: PropTypes.bool,
     songData: PropTypes.string,
-    songKey: PropTypes.string,
+    songKey: PropTypes.object,
     onSongChange: PropTypes.func,
     onSongMetadataChange: PropTypes.func,
     onEditorReady: PropTypes.func,

@@ -20,6 +20,7 @@ const compress = require('./tw-compress-sb3');
 
 const {loadCostume} = require('../import/load-costume.js');
 const {loadSound} = require('../import/load-sound.js');
+const loadSong = require('../import/load-song.js');
 const {deserializeCostume, deserializeSound, deserializeSong} = require('./deserialize-assets.js');
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -1131,7 +1132,17 @@ const parseScratchAssets = function (object, runtime, zip) {
             md5ext: songSource.md5ext || `${songSource.assetId}.${dataFormat}`,
             dataFormat: dataFormat
         };
-        return runtime.wrapAssetRequest(() => deserializeSong(song, runtime, zip).then(() => song));
+        return runtime.wrapAssetRequest(() => deserializeSong(song, runtime, zip)
+            .then(() => {
+                if (!runtime.storage) return null;
+                return loadSong(song, runtime).then(() => song, error => {
+                    if (error instanceof Error && error.message.startsWith('Failed to find song data:')) {
+                        log.warn(`Could not load song asset ${song.md5ext}; skipping ${song.name}.`);
+                        return null;
+                    }
+                    throw error;
+                });
+            }));
     });
 
     return assets;

@@ -7,8 +7,8 @@ import VM from 'scratch-vm';
 import {connect} from 'react-redux';
 
 import AssetPanel from '../components/asset-panel/asset-panel.jsx';
-import songIcon from '../components/gui/icon--songs.svg';
 import addSongFromLibraryIcon from '../components/asset-panel/icon--add-song-lib.svg';
+import songCardIcon from '../components/asset-panel/icon--songs-card.svg';
 import fileUploadIcon from '../components/action-menu/icon--file-upload.svg';
 import {SONGS_TAB_INDEX} from '../reducers/editor-tab';
 import {setRestore} from '../reducers/restore-deletion';
@@ -90,22 +90,31 @@ class SongsTab extends React.Component {
     }
 
     handleExportSong (index) {
-        const song = this.props.vm.editingTarget.sprite.songs[index];
-        if (!song || !song.asset) return;
-        const blob = new Blob([song.asset.data], {type: song.asset.assetType.contentType});
+        const target = this.props.vm.editingTarget;
+        const song = target && target.sprite.songs[index];
+        if (!song || !song.asset || !song.asset.data) {
+            this.handleSongUploadError(new Error('Failed to export because there\'s no song data!'));
+            return;
+        }
+        const blob = new Blob([song.asset.data], {type: 'application/json'});
         downloadBlob(`${song.name}.json`, blob);
     }
 
     handleNewSong () {
+        const target = this.props.vm.editingTarget;
+        if (!target) return;
+        const targetId = target.id;
+
         const addSong = songData => {
             const data = new TextEncoder().encode(JSON.stringify(songData));
             const storage = this.props.vm.runtime.storage;
-            const targetId = this.props.vm.editingTarget.id;
             songUpload(data.buffer, storage, song => {
                 song.name = 'Song';
                 this.props.vm.addSong(song, targetId).then(() => {
-                    const songs = this.props.vm.editingTarget.sprite.songs;
-                    this.setState({selectedSongIndex: songs.length - 1});
+                    const activeTarget = this.props.vm.editingTarget;
+                    if (activeTarget && activeTarget.id === targetId) {
+                        this.setState({selectedSongIndex: activeTarget.sprite.songs.length - 1});
+                    }
                 })
                     .catch(this.handleSongUploadError);
             }, this.handleSongUploadError);
@@ -139,7 +148,7 @@ class SongsTab extends React.Component {
                 song.name = fileName;
                 this.props.vm.addSong(song, targetId).then(() => {
                     const target = this.props.vm.runtime.getTargetById(targetId);
-                    if (target) {
+                    if (target && this.props.vm.editingTarget === target) {
                         this.setState({selectedSongIndex: target.getSongs().length - 1});
                     }
                     if (fileIndex === fileCount - 1) this.props.onCloseImporting();
@@ -241,7 +250,7 @@ class SongsTab extends React.Component {
                     dragType={DragConstants.SONG}
                     isRtl={isRtl}
                     items={songs.map(song => ({
-                        url: songIcon,
+                        url: songCardIcon,
                         name: song.name,
                         details: song === selectedSong ? this.state.selectedSongDuration : null,
                         dragPayload: song
@@ -257,7 +266,7 @@ class SongsTab extends React.Component {
                         <SongEditor
                             isVisible={isVisible}
                             songData={songData}
-                            songKey={selectedSong.md5}
+                            songKey={selectedSong}
                             onEditorReady={this.handleEditorReady}
                             onSongChange={this.handleEditorSongChange}
                             onSongMetadataChange={this.handleEditorSongMetadataChange}

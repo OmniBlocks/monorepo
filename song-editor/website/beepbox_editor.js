@@ -55713,6 +55713,10 @@ You should be redirected to the song at:<br /><br />
     }
 
     const getSongName = (editor) => editor.doc.song.title;
+    const renameSong = (editor, newName) => {
+        editor.doc.song.title = newName;
+        editor.doc.notifier.notifyWatchers();
+    };
     const getSongDuration = (editor) => {
         const song = editor.doc.song;
         const enableIntro = song.loopStart !== 0;
@@ -55812,6 +55816,9 @@ You should be redirected to the song at:<br /><br />
             getSongName: () => {
                 return getSongName(editor);
             },
+            renameSong: (newName) => {
+                return renameSong(editor, newName);
+            },
             getSongDuration: () => {
                 return getSongDuration(editor);
             },
@@ -55857,6 +55864,7 @@ You should be redirected to the song at:<br /><br />
     exports.getSongDuration = getSongDuration;
     exports.getSongName = getSongName;
     exports.mountSongEditor = mountSongEditor;
+    exports.renameSong = renameSong;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

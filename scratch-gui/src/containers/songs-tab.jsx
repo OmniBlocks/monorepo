@@ -267,6 +267,7 @@ class SongsTab extends React.Component {
                             isVisible={isVisible}
                             songData={songData}
                             songKey={selectedSong}
+                            songName={selectedSong.name}
                             onEditorReady={this.handleEditorReady}
                             onSongChange={this.handleEditorSongChange}
                             onSongMetadataChange={this.handleEditorSongMetadataChange}

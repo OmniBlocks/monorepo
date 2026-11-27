@@ -12,11 +12,21 @@ if (typeof window !== 'undefined') {
     window.$ = $;
 }
 
-const SongEditor = ({isVisible, songData, songKey, onSongChange, onSongMetadataChange, onEditorReady, onError}) => {
+const SongEditor = ({
+    isVisible,
+    songData,
+    songKey,
+    songName,
+    onSongChange,
+    onSongMetadataChange,
+    onEditorReady,
+    onError
+}) => {
     const hostRef = useRef(null);
     const editorRef = useRef(null);
     const songDataRef = useRef(songData);
     const songKeyRef = useRef(songKey);
+    const songNameRef = useRef(songName);
     const onSongChangeRef = useRef(onSongChange);
     const onSongMetadataChangeRef = useRef(onSongMetadataChange);
     const onEditorReadyRef = useRef(onEditorReady);
@@ -24,6 +34,7 @@ const SongEditor = ({isVisible, songData, songKey, onSongChange, onSongMetadataC
     const loadedSongKeyRef = useRef(null);
     songDataRef.current = songData;
     songKeyRef.current = songKey;
+    songNameRef.current = songName;
     onSongChangeRef.current = onSongChange;
     onSongMetadataChangeRef.current = onSongMetadataChange;
     onEditorReadyRef.current = onEditorReady;
@@ -53,8 +64,15 @@ const SongEditor = ({isVisible, songData, songKey, onSongChange, onSongMetadataC
                 onSongMetadataChangeRef.current(editor.getSongName(), editor.getSongDuration());
             }
         };
+        const syncSongName = () => {
+            const selectedSongName = songNameRef.current;
+            if (typeof selectedSongName === 'string' && editor.getSongName() !== selectedSongName) {
+                editor.renameSong(selectedSongName);
+            }
+        };
         if (loadedSongKeyRef.current === selectedSongKey) {
             enableSongChangeNotifications();
+            syncSongName();
             notifySongMetadata();
             return;
         }
@@ -64,6 +82,7 @@ const SongEditor = ({isVisible, songData, songKey, onSongChange, onSongMetadataC
             editor.loadSongData(selectedSongData);
             loadedSongKeyRef.current = selectedSongKey;
             enableSongChangeNotifications();
+            syncSongName();
             notifySongMetadata();
         } catch (error) {
             if (onErrorRef.current) onErrorRef.current(error);
@@ -114,6 +133,10 @@ const SongEditor = ({isVisible, songData, songKey, onSongChange, onSongMetadataC
     }, [songData, songKey]);
 
     useEffect(() => {
+        loadSelectedSong();
+    }, [songName]);
+
+    useEffect(() => {
         if (!isVisible) {
             return;
         }
@@ -140,6 +163,7 @@ SongEditor.propTypes = {
     isVisible: PropTypes.bool,
     songData: PropTypes.string,
     songKey: PropTypes.object,
+    songName: PropTypes.string,
     onSongChange: PropTypes.func,
     onSongMetadataChange: PropTypes.func,
     onEditorReady: PropTypes.func,

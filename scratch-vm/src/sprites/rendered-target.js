@@ -572,6 +572,66 @@ class RenderedTarget extends Target {
         this.runtime.requestTargetsUpdate(this);
         return deletedSound;
     }
+    /**
+     * Add a song, taking care to avoid duplicate names.
+     * @param {!object} songObject Object representing the song.
+     * @param {?int} index Index at which to add song
+     */
+    addSong (songObject, index) {
+        const insertIndex = typeof index === 'number' && !isNaN(index) ?
+            index : this.sprite.songs.length;
+        this.sprite.addSongAt(songObject, insertIndex);
+    }
+    /**
+     * Rename a song, taking care to avoid duplicate names.
+     * @param {int} songIndex - the index of the song to be renamed.
+     * @param {string} newName - the desired new name of the song (will be modified if already in use).
+     */
+    renameSong (songIndex, newName) {
+        const song = this.sprite.songs[songIndex];
+        if (!song) return;
+        const usedNames = this.sprite.songs
+            .filter((_song, index) => songIndex !== index)
+            .map(existingSong => existingSong.name);
+        const newUnusedName = StringUtil.unusedName(newName, usedNames);
+        song.name = newUnusedName;
+    }
+    /**
+     * Delete a song by index.
+     * @param {number} index Song index to be deleted
+     * @return {?object} The song that was deleted or null
+     * if the index was out of bounds of the songs list or
+     * this target only has one song.
+     */
+    deleteSong (index) {
+        const originalSongCount = this.sprite.songs.length;
+        if (index < 0 || index >= originalSongCount) {
+            return null;
+        }
+        const deletedSong = this.sprite.deleteSongAt(index);
+        this.runtime.requestTargetsUpdate(this);
+        return deletedSong;
+    }
+    /**
+     * Reorder song list by moving song at songIndex to newIndex.
+     * @param {!number} songIndex Index of the song to move.
+     * @param {!number} newIndex New index for that song.
+     * @returns {boolean} If a change occurred (i.e. if the indices do not match)
+     */
+    reorderSong (songIndex, newIndex) {
+        if (this.sprite.songs.length < 2) return false;
+        newIndex = MathUtil.clamp(newIndex, 0, this.sprite.songs.length - 1);
+        songIndex = MathUtil.clamp(songIndex, 0, this.sprite.songs.length - 1);
+        if (newIndex === songIndex) return false;
+        const song = this.sprite.songs[songIndex];
+        this.sprite.deleteSongAt(songIndex);
+        this.addSong(song, newIndex);
+        return true;
+    }
+
+    getSongs () {
+        return this.sprite.songs;
+    }
 
     /**
      * Update the rotation style.
@@ -1092,6 +1152,7 @@ class RenderedTarget extends Target {
             variables: this.variables,
             costumes: costumes,
             sounds: this.getSounds(),
+            songs: this.getSongs(),
             textToSpeechLanguage: this.textToSpeechLanguage,
             tempo: this.tempo,
             volume: this.volume,

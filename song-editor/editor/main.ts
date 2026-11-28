@@ -8,13 +8,43 @@ import { SongEditor } from "./SongEditor";
 import { NotePin, Note, Pattern, Instrument, Channel, Song, Synth } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
 import { ExportPrompt } from "./ExportPrompt";
-import { ChangePreset } from "./changes";
+import { ChangePreset, ChangeSong } from "./changes";
 declare const $: any;
 
 //namespace beepbox {
 
-function mountSongEditor(container: HTMLElement) {   
+const getSongName = (editor: SongEditor): string => editor.doc.song.title;
+
+const renameSong = (editor: SongEditor, newName: string): void => {
+    /* This will provide the vm/gui with a method to rename the song without trying to force it into the json or whatever other jank would be needed
+    In order to do it without.
+    The editor needs to be the source of truth for the name, not vm/gui. In the case vm/gui needs to rename the song, this should be used (such as in
+    the case of having duplicate names and renaming it to song2)
+    */
+
+    editor.doc.song.title = newName;
+    editor.doc.notifier.notifyWatchers();
+}
+
+const getSongDuration = (editor: SongEditor): string => {
+    const song = editor.doc.song;
+    const enableIntro = song.loopStart !== 0;
+    const enableOutro = song.loopStart + song.loopLength !== song.barCount;
+    const samples = editor.doc.synth.getTotalSamples(enableIntro, enableOutro, 0);
+    return ExportPrompt.samplesToTime(editor.doc, samples);
+    // The method/patern for knowing duration is in ExportPrompt.ts
+};
+
+function mountSongEditor(container: HTMLElement, onSongChangeCallback?: (songData: Object) => void) {
 const editor: SongEditor = new SongEditor();//same as above
+let onSongChange: ((songData: Object) => void) | null = onSongChangeCallback || null;
+let loadingSong = false;
+const notifySongChange = (): void => {
+    if (!loadingSong && onSongChange) {
+        onSongChange(editor.doc.song.toJsonObject(true, 1, true));
+    }
+};
+editor.doc.notifier.watch(notifySongChange);
 container.appendChild(editor.mainLayer);
 editor.whenUpdated();
 
@@ -154,13 +184,58 @@ if ("serviceWorker" in navigator) {
 }
     */
 return {
+        // ob: Functions for scratch-vm/gui to read
+        getSongData: () => {
+            return editor.doc.song.toJsonObject(true, 1, true); 
+        },
+
+        getNewSongData: () => {
+            return new Song().toJsonObject(true, 1, true);
+        },
+
+        getSongName: () => {
+            return getSongName(editor);
+        },
+
+        renameSong: (newName: string) => {
+            return renameSong(editor, newName);
+        },
+
+        getSongDuration: () => {
+            return getSongDuration(editor);
+        },
+
+        loadSongData: (songData: Object | string) => {
+            const songString = typeof songData === "string" ? songData : JSON.stringify(songData);
+            loadingSong = true;
+            try {
+                new ChangeSong(editor.doc, songString);
+                editor.doc.resetHistory();
+                editor.doc.notifier.notifyWatchers();
+            } finally {
+                loadingSong = false;
+            }
+        },
+
+        setOnSongChange: (callback: ((songData: Object) => void) | null) => {
+            onSongChange = callback;
+        },
+
+        getSongString: () => {
+            return editor.doc.song.toBase64String();
+            // don't know why we would need this but ok
+        },
+        
         destroy: () => {
+            editor.doc.notifier.unwatch(notifySongChange);
             editor.doc.synth.pause();
             editor.mainLayer.remove();
         }
     };
 }
 
+
+
 // When compiling synth.ts as a standalone module named "beepbox", expose these classes as members to JavaScript:
-export { mountSongEditor, Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };
+export { mountSongEditor, getSongName, renameSong, getSongDuration, Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset };
  

@@ -24,7 +24,8 @@ const newBlockIds = require('./util/new-block-ids');
 
 const {loadCostume} = require('./import/load-costume.js');
 const {loadSound} = require('./import/load-sound.js');
-const {serializeSounds, serializeCostumes} = require('./serialization/serialize-assets');
+const loadSong = require('./import/load-song.js');
+const {serializeSounds, serializeCostumes, serializeSongs} = require('./serialization/serialize-assets');
 require('canvas-toBlob');
 const {exportCostume} = require('./serialization/tw-costume-import-export');
 const Base64Util = require('./util/base64-util');
@@ -638,6 +639,7 @@ class VirtualMachine extends EventEmitter {
             acc
                 .concat(target.sprite.sounds.map(sound => sound.asset))
                 .concat(target.sprite.costumes.map(costume => costume.asset))
+                .concat(target.sprite.songs.map(song => song.asset))
         ), []);
         const fonts = this.runtime.fontManager.serializeAssets();
         return [
@@ -653,6 +655,7 @@ class VirtualMachine extends EventEmitter {
     serializeAssets (targetId) {
         const costumeDescs = serializeCostumes(this.runtime, targetId);
         const soundDescs = serializeSounds(this.runtime, targetId);
+        const songDescs = serializeSongs(this.runtime, targetId);
         const fontDescs = this.runtime.fontManager.serializeAssets().map(asset => ({
             fileName: `${asset.assetId}.${asset.dataFormat}`,
             fileContent: asset.data
@@ -660,6 +663,7 @@ class VirtualMachine extends EventEmitter {
         return [
             ...costumeDescs,
             ...soundDescs,
+            ...songDescs,
             ...fontDescs
         ];
     }
@@ -967,6 +971,21 @@ class VirtualMachine extends EventEmitter {
     }
 
     /**
+     * Add a song to the current editing target.
+     */
+    addSong (songObject, optTargetId) {
+        const target = optTargetId ? this.runtime.getTargetById(optTargetId) :
+            this.editingTarget;
+        if (target) {
+            return loadSong(songObject, this.runtime).then(() => {
+                target.addSong(songObject);
+                this.emitTargetsUpdate();
+            });
+        }
+        return Promise.reject(new Error(`No target with ID: ${optTargetId}`));
+    }
+
+    /**
      * Add a costume loaded from the library to the current editing target.
      * @param {string} md5ext - the MD5 and extension of the costume to be loaded.
      * @param {!object} costumeObject Object representing the costume.
@@ -1011,6 +1030,63 @@ class VirtualMachine extends EventEmitter {
             this.editingTarget.addSound(clone, soundIndex + 1);
             this.emitTargetsUpdate();
         });
+    }
+    /**
+     * Duplicate the song at the given index. Add it at that index + 1.
+     * @param {!int} songIndex Index of song to duplicate
+     * @returns {?Promise} - a promise that resolves when the song has been decoded and added
+     */
+    duplicateSong (songIndex) {
+        if (!this.editingTarget) {
+            return Promise.reject(new Error('No editing target.'));
+        }
+        const target = this.editingTarget;
+        const originalSong = target.getSongs()[songIndex];
+        if (!originalSong) {
+            return Promise.reject(new Error(`No song at index: ${songIndex}`));
+        }
+        const clone = Object.assign({}, originalSong);
+        return loadSong(clone, this.runtime).then(() => {
+            target.addSong(clone, songIndex + 1);
+            this.emitTargetsUpdate();
+        });
+    }
+
+    /**
+     * Update the JSON data for a song in the current editing target.
+     * @param {int} songIndex Index of the song to update.
+     * @param {object} songData Song editor JSON data.
+     */
+    updateSong (songIndex, songData) {
+        const target = this.editingTarget;
+        const song = target && target.getSongs()[songIndex];
+        if (!song) {
+            return Promise.reject(new Error(`No song at index: ${songIndex}`));
+        }
+        const storage = this.runtime.storage;
+        if (!storage) {
+            return Promise.reject(new Error('No storage module present; cannot save song asset.'));
+        }
+        const data = new _TextEncoder().encode(StringUtil.stringify(songData));
+        const asset = storage.createAsset(
+            storage.AssetType.Song,
+            storage.DataFormat.JSON,
+            data,
+            null,
+            true
+        );
+        song.asset = asset;
+        song.assetId = asset.assetId;
+        song.dataFormat = storage.DataFormat.JSON;
+        song.md5 = `${asset.assetId}.${storage.DataFormat.JSON}`;
+        this.runtime.emitProjectChanged();
+        return Promise.resolve(song);
+    }
+
+    renameSong (songIndex, newName) {
+        if (!this.editingTarget) return;
+        this.editingTarget.renameSong(songIndex, newName);
+        this.emitTargetsUpdate();
     }
 
     /**
@@ -1142,6 +1218,21 @@ class VirtualMachine extends EventEmitter {
                 this.emitTargetsUpdate();
             };
             return restoreFun;
+        }
+        return null;
+    }
+
+    deleteSong (songIndex) {
+        const target = this.editingTarget;
+        if (!target) return null;
+        const deletedSong = target.deleteSong(songIndex);
+        if (deletedSong) {
+            this.runtime.emitProjectChanged();
+            return () => {
+                target.addSong(deletedSong, songIndex);
+                this.runtime.emitProjectChanged();
+                this.emitTargetsUpdate();
+            };
         }
         return null;
     }
@@ -1820,6 +1911,18 @@ class VirtualMachine extends EventEmitter {
             const reorderSuccessful = target.reorderSound(soundIndex, newIndex);
             if (reorderSuccessful) {
                 this.runtime.emitProjectChanged();
+            }
+            return reorderSuccessful;
+        }
+        return false;
+    }
+
+    reorderSong (targetId, songIndex, newIndex) {
+        const target = this.runtime.getTargetById(targetId);
+        if (target) {
+            const reorderSuccessful = target.reorderSong(songIndex, newIndex);
+            if (reorderSuccessful) {
+                this.emitTargetsUpdate();
             }
             return reorderSuccessful;
         }

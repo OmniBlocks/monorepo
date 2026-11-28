@@ -25,8 +25,8 @@ export class Preferences {
 	public enableChannelMuting: boolean = true;
 	public colorTheme: string;
 	public layout: string;
-	public displayBrowserUrl: boolean; //comment for testing
-	//public displayBrowserUrl: boolean = false; //uncomment for testing
+	// public displayBrowserUrl: boolean; //comment for testing
+	public displayBrowserUrl: boolean = false; //uncomment for testing
 	public volume: number = 75;
 	public visibleOctaves: number = Preferences.defaultVisibleOctaves;
 	public pressControlForShortcuts: boolean;
@@ -68,7 +68,7 @@ export class Preferences {
 		this.instrumentImportExport = window.localStorage.getItem("instrumentImportExport") == "true";
 		this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") == "true";
 		this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") != "false";
-		this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false"; //comment for testing
+		this.displayBrowserUrl = false;
 		this.pressControlForShortcuts = window.localStorage.getItem("pressControlForShortcuts") == "true";
 		this.enableMidi = window.localStorage.getItem("enableMidi") != "false";
 		this.showRecordButton = window.localStorage.getItem("showRecordButton") == "true";
@@ -124,7 +124,7 @@ export class Preferences {
 		window.localStorage.setItem("instrumentCopyPaste", this.instrumentCopyPaste ? "true" : "false");
 		window.localStorage.setItem("instrumentImportExport", this.instrumentImportExport ? "true" : "false");
 		window.localStorage.setItem("instrumentButtonsAtTop", this.instrumentButtonsAtTop ? "true" : "false");
-		window.localStorage.setItem("displayBrowserUrl", this.displayBrowserUrl ? "true" : "false");
+		window.localStorage.setItem("displayBrowserUrl", "false");
 		window.localStorage.setItem("pressControlForShortcuts", this.pressControlForShortcuts ? "true" : "false");
 		window.localStorage.setItem("enableMidi", this.enableMidi ? "true" : "false");
 		window.localStorage.setItem("showRecordButton", this.showRecordButton ? "true" : "false");

@@ -20,7 +20,8 @@ const compress = require('./tw-compress-sb3');
 
 const {loadCostume} = require('../import/load-costume.js');
 const {loadSound} = require('../import/load-sound.js');
-const {deserializeCostume, deserializeSound} = require('./deserialize-assets.js');
+const loadSong = require('../import/load-song.js');
+const {deserializeCostume, deserializeSound, deserializeSong} = require('./deserialize-assets.js');
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -481,6 +482,16 @@ const serializeSound = function (sound) {
     return obj;
 };
 
+const serializeSong = function (song) {
+    const obj = Object.create(null);
+    const songToSerialize = song.broken || song;
+    obj.name = song.name;
+    obj.assetId = songToSerialize.assetId;
+    obj.dataFormat = songToSerialize.dataFormat.toLowerCase();
+    obj.md5ext = songToSerialize.md5;
+    return obj;
+};
+
 /**
  * Serialize the given variables object.
  * @param {object} variables The variables to be serialized.
@@ -571,6 +582,7 @@ const serializeTarget = function (target, extensions) {
     obj.currentCostume = target.currentCostume;
     obj.costumes = target.costumes.map(serializeCostume);
     obj.sounds = target.sounds.map(serializeSound);
+    obj.songs = (target.songs || []).map(serializeSong);
     if (Object.prototype.hasOwnProperty.call(target, 'volume')) obj.volume = target.volume;
     if (Object.prototype.hasOwnProperty.call(target, 'layerOrder')) obj.layerOrder = target.layerOrder;
     if (obj.isStage) { // Only the stage should have these properties
@@ -1050,6 +1062,7 @@ const parseScratchAssets = function (object, runtime, zip) {
     const assets = {
         costumePromises: null,
         soundPromises: null,
+        songPromises: null,
         soundBank: runtime.audioEngine && runtime.audioEngine.createBank()
     };
 
@@ -1111,6 +1124,27 @@ const parseScratchAssets = function (object, runtime, zip) {
         // process has been completed.
     });
 
+    assets.songPromises = (object.songs || []).map(songSource => {
+        const dataFormat = songSource.dataFormat || 'json';
+        const song = {
+            assetId: songSource.assetId,
+            name: songSource.name,
+            md5ext: songSource.md5ext || `${songSource.assetId}.${dataFormat}`,
+            dataFormat: dataFormat
+        };
+        return runtime.wrapAssetRequest(() => deserializeSong(song, runtime, zip)
+            .then(() => {
+                if (!runtime.storage) return null;
+                return loadSong(song, runtime).then(() => song, error => {
+                    if (error instanceof Error && error.message.startsWith('Failed to find song data:')) {
+                        log.warn(`Could not load song asset ${song.md5ext}; skipping ${song.name}.`);
+                        return null;
+                    }
+                    throw error;
+                });
+            }));
+    });
+
     return assets;
 };
 
@@ -1156,7 +1190,7 @@ const parseScratchObject = function (object, runtime, extensions, zip, assets) {
         }
     }
     // Costumes from JSON.
-    const {costumePromises} = assets;
+    const {costumePromises, songPromises} = assets;
     // Sounds from JSON
     const {soundBank, soundPromises} = assets;
     // Create the first clone, and load its run-state from JSON.
@@ -1289,7 +1323,10 @@ const parseScratchObject = function (object, runtime, extensions, zip, assets) {
         // Make sure if soundBank is undefined, sprite.soundBank is then null.
         sprite.soundBank = soundBank || null;
     });
-    return Promise.all(costumePromises.concat(soundPromises)).then(() => target);
+    Promise.all(songPromises).then(songs => {
+        sprite.songs = songs.filter(song => song);
+    });
+    return Promise.all(costumePromises.concat(soundPromises, songPromises)).then(() => target);
 };
 
 const deserializeMonitor = function (monitorData, runtime, targets, extensions) {

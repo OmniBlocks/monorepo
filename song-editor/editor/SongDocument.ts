@@ -1,5 +1,5 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
-
+// Copyright (c) 2026 The OmniBlocks Team, distributed under the AGPLv3 license.
 import { Config } from "../synth/SynthConfig";
 import { isMobile } from "./EditorConfig";
 import { Pattern, Channel, Song, Synth } from "../synth/synth";
@@ -60,6 +60,7 @@ export class SongDocument {
     private _lastSequenceNumber: number = 0;
     private _stateShouldBePushed: boolean = false;
     private _recordedNewSong: boolean = false;
+    private _historyUpdateFrame: number | null = null;
     public _waitingToUpdateState: boolean = false;
 
     constructor() {
@@ -128,10 +129,15 @@ export class SongDocument {
     }
 
     public toggleDisplayBrowserUrl() {
+        // ob: Disabled since song data will be stored in project.json and not the URL
+        /*
         const state: HistoryState | null = this._getHistoryState();
         if (state == null) throw new Error("History state is null.");
         this.prefs.displayBrowserUrl = !this.prefs.displayBrowserUrl;
         this._replaceState(state, this.song.toBase64String());
+        */
+       return;
+        
     }
 
     private _getHistoryState(): HistoryState | null {
@@ -343,6 +349,7 @@ export class SongDocument {
     }
 
     private _updateHistoryState = (): void => {
+        this._historyUpdateFrame = null;
         this._waitingToUpdateState = false;
         let hash: string;
         try {
@@ -381,10 +388,42 @@ export class SongDocument {
                 // Defer updating the url/history until all sequenced changes have
                 // committed and the interface has rendered the latest changes to
                 // improve perceived responsiveness.
-                window.requestAnimationFrame(this._updateHistoryState);
+                this._historyUpdateFrame = window.requestAnimationFrame(this._updateHistoryState);
                 this._waitingToUpdateState = true;
             }
         }
+    }
+
+    public resetHistory(): void {
+        // all this crap to reset history
+        // typescript mid
+        if (this._historyUpdateFrame != null) {
+            window.cancelAnimationFrame(this._historyUpdateFrame);
+            this._historyUpdateFrame = null;
+        }
+        this._waitingToUpdateState = false;
+        this._recentChange = null;
+        this._sequenceNumber = 0;
+        this._lastSequenceNumber = 0;
+        this._stateShouldBePushed = false;
+        this._recordedNewSong = false;
+
+        const currentIndex = window.sessionStorage.getItem("currentUndoIndex") || "0";
+        const state: HistoryState = {
+            canUndo: false,
+            sequenceNumber: 0,
+            bar: this.bar,
+            channel: this.channel,
+            instrument: this.viewedInstrument[this.channel],
+            recoveryUid: this._recoveryUid,
+            prompt: this.prompt,
+            selection: this.selection.toJSON()
+        };
+        if (!this.prefs.displayBrowserUrl) {
+            window.sessionStorage.setItem("oldestUndoIndex", currentIndex);
+            window.sessionStorage.setItem("newestUndoIndex", currentIndex);
+        }
+        this._replaceState(state, this.song.toBase64String());
     }
 
     private _resetSongRecoveryUid(): void {

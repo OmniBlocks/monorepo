@@ -2,7 +2,7 @@
 set -e
 
 # Compile editor/EditorConfig.ts into build/editor/EditorConfig.js and dependencies
-pnpm exec tsc -p tsconfig_editor.json
+pnpm exec tsc -p tsconfig_editor.json --diagnostics --listEmittedFiles
 
 # Combine build/editor/EditorConfig.js and dependencies into website/manual/EditorConfig.js
 pnpm exec rollup build/editor/EditorConfig.js \
@@ -19,5 +19,6 @@ pnpm exec terser \
 	--source-map "content='./website/manual/EditorConfig.js.map',url=EditorConfig.min.js.map" \
 	-o ./website/manual/EditorConfig.min.js \
 	--compress \
+	--timings \
 	--mangle \
 	--mangle-props regex="/^_.+/;"

@@ -4,7 +4,7 @@ set -e
 pnpm run deploy-files
 
 # Compile editor/main.ts into build/editor/main.js and dependencies
-pnpm exec tsc
+pnpm exec tsc --diagnostics --listEmittedFiles
 
 # Combine build/editor/main.js and dependencies into to_deploy/beepbox_editor.min.js
 pnpm exec rollup build/editor/main.js \
@@ -20,12 +20,13 @@ pnpm exec terser \
 	to_deploy/beepbox_editor.min.js \
 	-o to_deploy/beepbox_editor.min.js \
 	--compress \
+	--timings \
     --define OFFLINE=true \
 	--mangle \
 	--mangle-props regex="/^_.+/;"
 
 # Compile player/main.ts into build/player/main.js and dependencies
-pnpm exec tsc -p tsconfig_player.json
+pnpm exec tsc -p tsconfig_player.json --diagnostics --listEmittedFiles
 
 # Combine build/player/main.js and dependencies into to_deploy/player/beepbox_player.min..js
 pnpm exec rollup ./build/player/main.js \
@@ -40,6 +41,7 @@ pnpm exec terser \
 	./to_deploy/player/beepbox_player.min.js \
 	-o ./to_deploy/player/beepbox_player.min.js \
 	--compress \
+	--timings \
     --define OFFLINE=true \
 	--mangle \
 	--mangle-props regex="/^_.+/;"

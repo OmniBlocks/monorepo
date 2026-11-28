@@ -1,10 +1,10 @@
 /**
- * Serialize all the assets of the given type ('sounds' or 'costumes')
- * in the provided runtime into an array of file descriptors.
+ * Serialize all assets of the given type ('sounds', 'costumes', or 'songs') in the
+ * provided runtime, or a specific target, into an array of file descriptors.
  * A file descriptor is an object containing the name of the file
  * to be written and the contents of the file, the serialized asset.
  * @param {Runtime} runtime The runtime with the assets to be serialized
- * @param {string} assetType The type of assets to be serialized: 'sounds' | 'costumes'
+ * @param {string} assetType The type of assets to be serialized: 'sounds' | 'costumes' | 'songs'
  * @param {string=} optTargetId Optional target id to serialize assets for
  * @returns {Array<object>} An array of file descriptors for each asset
  */
@@ -54,7 +54,20 @@ const serializeCostumes = function (runtime, optTargetId) {
     return serializeAssets(runtime, 'costumes', optTargetId);
 };
 
+/**
+ * Serialize all the songs in the provided runtime into an array of file
+ * descriptors. A file descriptor is an object containing the name of the file
+ * to be written and the contents of the file, the serialized song.
+ * @param {Runtime} runtime The runtime with the songs to be serialized
+ * @param {string} optTargetId Optional targetid for serializing songs of a single target
+ * @returns {Array<object>} An array of file descriptors for each song
+ */
+const serializeSongs = function (runtime, optTargetId) {
+    return serializeAssets(runtime, 'songs', optTargetId);
+};
+
 module.exports = {
     serializeSounds,
-    serializeCostumes
+    serializeCostumes,
+    serializeSongs
 };

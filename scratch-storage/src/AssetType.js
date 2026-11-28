@@ -46,6 +46,12 @@ const AssetType = {
         name: 'Font',
         runtimeFormat: DataFormat.TTF,
         immutable: true
+    },
+    Song: {
+        contentType: 'application/json',
+        name: 'Song',
+        runtimeFormat: DataFormat.JSON,
+        immutable: true
     }
 };
 

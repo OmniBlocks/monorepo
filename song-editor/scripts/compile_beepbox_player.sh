@@ -2,7 +2,7 @@
 set -e
 
 # Compile player/main.ts into build/player/main.js and dependencies
-pnpm exec tsc -p tsconfig_player.json
+pnpm exec tsc -p tsconfig_player.json --diagnostics --listEmittedFiles
 
 # Combine build/player/main.js and dependencies into website/player/beepbox_player.js
 pnpm exec rollup build/player/main.js \
@@ -19,6 +19,7 @@ pnpm exec terser \
 	--source-map "content='./website/player/beepbox_player.js.map',url=beepbox_player.min.js.map" \
 	-o ./website/player/beepbox_player.min.js \
 	--compress \
+	--timings \
 	--define OFFLINE=false \
 	--mangle \
 	--mangle-props regex="/^_.+/;"

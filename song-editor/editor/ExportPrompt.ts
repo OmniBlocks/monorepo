@@ -1,5 +1,5 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
-
+// Copyright (c) 2026 The OmniBlocks Team, distributed under the AGPLv3 license.
 import { InstrumentType, /*EnvelopeType,*/ Config, getArpeggioPitchIndex } from "../synth/SynthConfig";
 import { Instrument, Pattern, Note, Song, Synth } from "../synth/synth";
 import { ColorConfig } from "./ColorConfig";
@@ -200,7 +200,10 @@ export class ExportPrompt implements Prompt {
         (this._computedSamplesLabel.firstChild as Text).textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1));
     }
 
-    // Could probably be moved to doc or synth. Fine here for now until needed by something else.
+    // "Could probably be moved to doc or synth. Fine here for now until needed by something else."
+    // That something else is now, unfortunately. The OmniBlocks song editor needs to know how long the 
+    // song is in the asset panel. Unfortunately, nobody across a decade and a half of BeepBox modding
+    // ever needed to estimate the length of the song programmatically outside of the export prompt.
     public static samplesToTime(_doc: SongDocument, samples: number): string {
         const rawSeconds: number = Math.round(samples / _doc.synth.samplesPerSecond);
         const seconds: number = rawSeconds % 60;

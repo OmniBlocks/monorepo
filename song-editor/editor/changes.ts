@@ -5296,7 +5296,11 @@ export class ChangeSongTitle extends Change {
         }
 
         doc.song.title = newValue;
+        /*
+        ob: Not needed for OmniBlocks, it will use the main project's title
+        
         document.title = newValue + " - " + EditorConfig.versionDisplayName;
+        */
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }

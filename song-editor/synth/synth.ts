@@ -3572,8 +3572,11 @@ export class Song {
         }
 
         //This is the tab's display name
+        /*
+        ob: Not needed for OmniBlocks, it will use the main project's title, not changed by anything in the song editor.
         this.title = "Untitled";
         document.title = this.title + " - " + EditorConfig.versionDisplayName;
+        */
         if (andResetChannels) {
             this.pitchChannelCount = 5; //Slarmoo's Box: 3
             this.noiseChannelCount = 1;
@@ -4563,7 +4566,10 @@ export class Song {
                 // Length of song name string
                 var songNameLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 this.title = decodeURIComponent(compressed.substring(charIndex, charIndex + songNameLength));
+                /*
+                 ob: Not needed for OmniBlocks, it will use the main project's title
                 document.title = this.title + " - " + EditorConfig.versionDisplayName;
+                */
 
                 charIndex += songNameLength;
             } break;
